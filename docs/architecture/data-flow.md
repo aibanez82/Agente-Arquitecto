@@ -1,63 +1,41 @@
-# Flujo de datos
+# Flujo de Datos — Dashboard de Leads Qualitas
 
-> Última actualización: junio 2026
+## Endpoints y sus fuentes
 
-## Secuencia de carga del dashboard
-
-```mermaid
-sequenceDiagram
-    participant U as Usuario
-    participant D as Dashboard (React)
-    participant L as /api/leads
-    participant A as /api/analytics
-    participant GS as Google Sheet
-    participant GA as GA4
-
-    U->>D: Abre el dashboard / cambia período
-    D->>L: GET /api/leads
-    L->>GS: sheets.values.get (read-only)
-    GS-->>L: filas crudas
-    L-->>D: { resumen, leads[] }
-
-    D->>A: GET /api/analytics?startDate&endDate&channel
-    A->>GA: runReport (Analytics Data API)
-    GA-->>A: usuarios por día y canal
-    A-->>D: { totalChannelUsers, byDay }
-
-    D->>D: Filtra leads por rango de fecha (cliente)
-    D->>U: Renderiza métricas, kanban, funnel, tabla
-```
-
-## Funnel de conversión (lógica de negocio)
-
-Dos flujos posibles según el canal de origen del lead:
-
-```mermaid
-graph LR
-    subgraph "Flujo Landing"
-        L1[COTIZACION_INICIADA] --> L2[WHATSAPP_SALUDO] --> L3[PAGO_APROBADO]
-    end
-
-    subgraph "Flujo WhatsApp"
-        W1[COTIZACION_INICIADA] --> W2[WHATSAPP_SALUDO] --> W3[DATOS_EMISION_INICIADOS] --> W4[CONFIRMACION_DATOS] --> W5[DATOS_EMISION_COMPLETADOS] --> W6[POLIZA_EMITIDA] --> W7[PAGO_APROBADO]
-    end
-```
-
-**Nota clave:** `WHATSAPP_SALUDO` no es un estado "frío" — implica que el lead **ya cotizó** en la landing. El saludo es la primera interacción de la IA de WhatsApp con un lead que ya entregó sus datos iniciales.
-
-## Variables de entorno requeridas
-
-| Variable | Usado por | Descripción |
+| Endpoint | Fuente | Qué devuelve |
 |---|---|---|
-| `GOOGLE_SERVICE_ACCOUNT_EMAIL` | `lib/sheets.js`, `lib/analytics.js` | Email de la cuenta de servicio |
-| `GOOGLE_PRIVATE_KEY` | `lib/sheets.js`, `lib/analytics.js` | Llave privada (rotar periódicamente) |
-| `SHEET_ID` | `lib/sheets.js` | ID del Google Sheet de leads |
-| `SHEET_NAME` | `lib/sheets.js` | Nombre de la pestaña (ej. `Hoja 1`) |
-| `GA4_PROPERTY_ID` | `lib/analytics.js` | Property ID numérico de GA4 |
+| `/api/db-leads` | Heroku Postgres | Leads con estado, cotización, sesión WA, póliza, hitos n8n |
+| `/api/analytics` | GA4 | Usuarios, sesiones, dispositivos, campañas, ciudades, hora |
+| `/api/meta-analytics` | Meta Business API | Enviados, entregados, leídos, respondidos por plantilla |
 
-## Caché
+## JOIN principal entre tablas
 
-- `/api/leads` — `s-maxage=300` (5 min) en el edge de Vercel
-- `/api/analytics` — `s-maxage=120` (2 min)
+```sql
+qualitas_lead l
+LEFT JOIN qualitas_cotizacion c ON l.cotizacion_id = c.id
+LEFT JOIN whatsapp_sessions ws ON ws.quotation_id = c.id
+LEFT JOIN qualitas_polizaemitida p ON p.cotizacion_id = c.id
+LEFT JOIN (
+  SELECT session_id,
+    BOOL_OR(message ILIKE '%confirmó cobertura%') AS confirmo_cobertura,
+    BOOL_OR(message ILIKE '%datos personales%')   AS dio_datos_personales,
+    COUNT(*) FILTER (WHERE role = 'human')        AS human_msg_count
+  FROM n8n_chat_histories
+  GROUP BY session_id
+) nch ON nch.session_id = ws.session_id
+```
 
-El botón "Actualizar" del dashboard fuerza una nueva petición desde el cliente, pero puede seguir sirviendo la respuesta cacheada de Vercel hasta que expire.
+## Reglas críticas de columnas
+
+- Usar `l.canal_atencion` (NO `l.canal`)
+- Usar `c.codigo_postal` (NO `c.cp`)
+- Join cotizacion→lead: `l.cotizacion_id = c.id` (NO `c.lead_id`)
+
+## Timezone
+
+Postgres devuelve `timestamp without time zone`. Al serializar a JSON queda como ISO string con `Z`.
+Todas las conversiones usan `America/Mexico_City` (UTC-6, sin horario de verano desde 2023).
+
+Helpers en `lib/dateRanges.js`:
+- `toMXDateStr(str)` — convierte a YYYY-MM-DD en CDMX
+- `isDateInRange(dateStr, start, end)` — usa toMXDateStr internamente
