@@ -1,7 +1,7 @@
 # Arquitectura de Agentes — Ecosistema IA Quálitas/Insurmind
 
 > Decisión estratégica de arquitectura multi-agente.
-> Definido: 27 junio 2026.
+> Definido: 27 junio 2026. Actualizado: 28 junio 2026.
 
 ---
 
@@ -13,16 +13,26 @@
 
 ## Los 3 niveles
 
-### Nivel 1 — Lectura (read-only)
-Agentes que SOLO leen y entienden. No modifican nada.
+### Nivel 1 — Sistemas de lectura (read-only)
 
-- **Agente de Código** — Django + n8n + BBDD + Dashboard. Los bugs cruzan constantemente entre estos cuatro sistemas, por eso se unifican en un solo agente.
-- **Agente de APIs externas** — GA4 + Meta/WhatsApp. Observa comportamiento de APIs que no se controlan: formatos, límites, latencias, ventanas de datos.
+El Arquitecto lee directamente estos sistemas:
+
+- **Django / HYL-WAI** — Backend en Heroku. Fuente de lógica de negocio.
+- **Postgres** — BD compartida en Heroku entre Django y n8n.
+- **n8n** — Workflows de WhatsApp en Hostinger. Acceso vía API REST (`https://n8n.srv1325340.hstgr.cloud/api/v1/`). API key guardada en Vercel como `N8N_API_KEY`.
+- **Dashboard** — Next.js en Vercel. Repo conectado como GitHub knowledge.
+- **Meta Business API / GA4** — APIs externas de tráfico y WhatsApp.
 
 ### Nivel 2 — Arquitecto (orquestador)
-El cerebro. **NO ejecuta.** Recibe la petición, decide qué fuentes consultar, integra las respuestas y entrega un diagnóstico coherente con el plan de qué tocar y dónde.
+
+El cerebro. **NO ejecuta código.** Recibe la petición, consulta las fuentes del Nivel 1, integra las respuestas y entrega un diagnóstico con el plan de qué tocar y dónde.
+
+**Capacidades directas del Arquitecto (sin pasar por Alberto):**
+- Leer todos los sistemas del Nivel 1
+- Abrir, etiquetar y cerrar GitHub Issues en `aibanez82/Agente-Arquitecto` vía API (token `GITHUB_ISSUES_TOKEN` en Vercel)
 
 ### Nivel 3 — Ejecutores (write)
+
 Agentes que actúan sobre los sistemas. Reciben planes validados del Arquitecto a través de Alberto.
 
 - **Agente QA** — tests automáticos end-to-end (`aibanez82/Agente_QATest_Qualitas`)
@@ -38,43 +48,4 @@ Si una tarea necesita coordinación entre QA y Conversión, sube al Arquitecto �
 
 ---
 
-## Orden de construcción (incremental)
-
-Cada capa valida a la anterior antes de agregar la siguiente.
-
-1. ✅ **Arquitecto + repo Dashboard** — base del diagnóstico cruzado
-2. ✅ **Agente QA** — primer ejecutor activo
-3. ⏳ **Django HYL-WAI conectado al Arquitecto** — cuando PAT esté disponible
-4. ⏳ **Agente de APIs externas** — cuando GA4 y Meta justifiquen un agente dedicado
-5. ⏳ **Agente Conversión** — cuando el flujo esté estable y haya que escalar reintentos
-
----
-
-## Protocolo de comunicación Arquitecto → Ejecutor
-
-El flujo siempre pasa por Alberto:
-
-```
-Ejecutor detecta anomalía
-       ↓
-Alberto la lleva al Arquitecto
-       ↓
-Arquitecto diagnostica causa raíz
-       ↓
-Arquitecto entrega plan concreto a Alberto
-       ↓
-Alberto lo lleva al Ejecutor correspondiente
-       ↓
-Ejecutor actúa y reporta resultado
-```
-
----
-
-## Mapa de repos
-
-| Repo | Agente | Rol |
-|---|---|---|
-| `aibanez82/Agente-Arquitecto` | Arquitecto | Documentación transversal, fuente de verdad del ecosistema |
-| `aibanez82/Dashboard_seguroautoqualitas` | Dashboard Qualitas | Código Next.js del dashboard únicamente |
-| `aguayo-co/HYL-WAI` | (lectura) | Backend Django — fuente de lógica de negocio |
-| `aibanez82/Agente_QATest_Qualitas` | Agente QA | Tests end-to-end |
+## Protocolo de comunicación — flujo completo
