@@ -1,7 +1,7 @@
 # CLAUDE.md — Ecosistema IA Quálitas/Insurmind
 
 > Fuente de verdad del Arquitecto-IA-Qualitas.
-> Actualizado: 29 junio 2026.
+> Actualizado: 29 junio 2026 (sesión tarde).
 
 ---
 
@@ -166,6 +166,43 @@ Ver `BUGS_N8N.md` para detalle completo con evidencia SQL.
 
 ---
 
+## Kommo CRM — integración en curso
+
+Kommo es el CRM de escalada humana del ecosistema. Ya está parcialmente integrado: cuando el bot decide derivar, envía un mensaje WA al lead con un link a Kommo.
+
+**Plan activo:** Base ($15/user/mes). Incluye API v4 completa.
+
+**Feature en diseño — botón "Pasar a Kommo" en el Dashboard:**
+
+Caso de uso: Alberto ve en el dashboard un lead caliente que no está respondiendo al bot y quiere intervenir manualmente como humano.
+
+Flujo propuesto:
+```
+Modal del lead en Dashboard
+    ↓ click "Pasar a Kommo"
+    ↓
+Next.js → Kommo API v4 POST /leads/complex
+    ↓
+Crea contacto + lead en Kommo con:
+  - Nombre (si el bot ya lo capturó)
+  - Teléfono
+  - Vehículo + precio cotizado
+  - Nota con link a conversación WA
+    ↓
+Alberto atiende el lead directamente desde Kommo
+```
+
+**Pendiente para implementar:**
+- Subdominio Kommo de Alberto
+- API token Kommo (Ajustes → Integraciones → API → Token largo)
+- Nombre del pipeline y etapa destino en Kommo
+- Agregar `KOMMO_API_TOKEN` y `KOMMO_SUBDOMAIN` a Vercel
+
+**Repo donde se implementa:** `aibanez82/Dashboard_seguroautoqualitas`
+**Archivo clave:** nuevo endpoint `pages/api/kommo-lead.js` + botón en modal del dashboard
+
+---
+
 ## Pendientes de infraestructura
 
 | Item | Estado |
@@ -175,7 +212,21 @@ Ver `BUGS_N8N.md` para detalle completo con evidencia SQL.
 | Rotar service account key Google Cloud (`ba36b46f377b...`) | ⚠️ Urgente |
 | Regenerar token Meta Business API | ⚠️ Urgente |
 | Reconectar Notion al workspace `aguayo` | ⏳ Pendiente |
-| Subir `BUGS_N8N.md` al repo Dashboard | ⏳ Pendiente (token no disponible en bash) |
+| Subir `BUGS_N8N.md` al repo Dashboard | ⏳ Pendiente (hacer desde Claude Code) |
+| Integración Kommo — botón "Pasar a Kommo" en Dashboard | ⏳ Pendiente (falta subdominio + API token + pipeline de Alberto) |
+
+---
+
+## Flujo de trabajo con Claude Code
+
+A partir del 29 junio 2026, Alberto trabaja desde **Claude Code** sobre repos clonados en `~/claude-projects/`. Esto permite acceso directo a Git sin tokens manuales.
+
+Repos clonados:
+- `~/claude-projects/Agente-Arquitecto` ← este repo, fuente de verdad
+- `~/claude-projects/Dashboard_seguroautoqualitas`
+- `~/claude-projects/HYL-WAI` (requiere PAT — pendiente)
+
+Comando de arranque: `cd ~/claude-projects/<repo> && claude`
 
 ---
 
