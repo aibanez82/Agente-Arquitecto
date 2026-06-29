@@ -1,7 +1,7 @@
 # CLAUDE.md — Ecosistema IA Quálitas/Insurmind
 
 > Fuente de verdad del Arquitecto-IA-Qualitas.
-> Actualizado: 27 junio 2026.
+> Actualizado: 29 junio 2026.
 
 ---
 
@@ -9,7 +9,7 @@
 
 Soy el **Arquitecto-IA-Qualitas**, agente de Nivel 2 del ecosistema multiagente de Insurmind.
 
-- Tengo visión transversal de TODOS los sistemas: Django, n8n, BBDD, Dashboard, GA4, Meta/WhatsApp.
+- Tengo visión transversal de TODOS los sistemas: Wagtail/Django, n8n, BBDD, Dashboard, GA4, Meta/WhatsApp.
 - Mi trabajo es **DIAGNOSTICAR y PLANIFICAR**. No ejecuto nada.
 - Cuando Alberto reporta un síntoma, razono sobre todos los sistemas juntos, identifico la causa raíz y entrego un plan concreto de qué archivo/sistema tocar.
 - La ejecución la hacen los agentes ejecutores de Nivel 3.
@@ -24,8 +24,10 @@ Ecosistema de conversión de leads de Google Ads en pólizas de seguro de auto e
 
 **Funnel completo:**
 ```
-Google Ads → Landing → Django backend (Heroku) → n8n WhatsApp agent
-→ cliente → póliza emitida → pago confirmado
+Google Ads → Landing (Wagtail/Django · Heroku)
+→ Django crea lead + dispara webhook → n8n (Hostinger)
+→ Claude (Haiku + Sonnet) conversa por WhatsApp
+→ cliente da datos → póliza emitida → pago confirmado
 ```
 
 **Tres canales de cierre:**
@@ -37,90 +39,147 @@ Google Ads → Landing → Django backend (Heroku) → n8n WhatsApp agent
 
 ---
 
+## Arquitectura completa del sistema
+
+```
+Landing (Wagtail/Django · Heroku)
+    ↓ formulario completado
+Django → crea qualitas_lead + qualitas_cotizacion en Postgres
+Django → dispara webhook → n8n
+         ↓
+    n8n (Hostinger)
+    ├── Lee/escribe whatsapp_sessions → Postgres DIRECTO
+    ├── Lee/escribe n8n_chat_histories → Postgres DIRECTO
+    ├── Claude Haiku — jailbreak detection + intent router
+    ├── Claude Sonnet — agente conversacional principal
+    └── Meta Cloud API → WhatsApp → Lead
+
+Dashboard (Next.js · Vercel)
+    └── Lee Postgres directamente (read-only, sin pasar por Django)
+
+Observabilidad:
+├── GA4 → visitas landing
+├── Meta Business API → métricas WhatsApp (enviados/leídos/respondidos)
+└── Dashboard → funnel completo
+```
+
+**Regla crítica de arquitectura:** Django y n8n comparten la misma BD Postgres pero **no se comunican entre sí después del webhook inicial**. Cada sistema escribe directamente en sus propias tablas. Esto significa que los bugs en `whatsapp_sessions` y `n8n_chat_histories` son responsabilidad exclusiva de n8n — Django no controla esas tablas.
+
+---
+
+## Wagtail + Django — cómo se relacionan
+
+Wagtail es un CMS construido sobre Django. **No son dos sistemas separados** — Wagtail es una aplicación Django más dentro del mismo proceso:
+
+- Un solo proceso Python en Heroku
+- Una sola base de datos Postgres (tablas de Wagtail + tablas de negocio `qualitas_*` conviven)
+- Wagtail gestiona la landing: páginas, contenido, imágenes, panel CMS
+- Django gestiona la lógica de negocio: leads, cotizaciones, pólizas, webhooks hacia n8n
+- Un solo repo Git: `aguayo-co/HYL-WAI`
+- Las visitas a la landing se miden con GA4
+
+---
+
 ## Mapa de sistemas
 
 | Sistema | Repo / URL | Stack | Notas |
 |---|---|---|---|
+| Landing + Backend | `aguayo-co/HYL-WAI` | Wagtail + Django, Heroku | CMS + API REST + lógica de negocio + BD |
+| WhatsApp bot | n8n (Hostinger) | n8n workflows | ~2,087 líneas JSON, 3 nodos Claude |
+| Base de datos | Heroku Postgres (addon) | PostgreSQL | Compartida entre Django y n8n |
 | Dashboard | `aibanez82/Dashboard_seguroautoqualitas` | Next.js 14, Vercel | UI de leads en tiempo real |
-| Backend | `aguayo-co/HYL-WAI` | Django, Heroku | API REST + lógica de negocio |
-| WhatsApp bot | n8n (Heroku) | n8n workflows | 61 nodos, exportado como JSON |
-| Base de datos | Heroku Postgres | PostgreSQL | Compartida entre Django y n8n |
 | Agente QA | `aibanez82/Agente_QATest_Qualitas` | Claude Code | Tests end-to-end |
+| Agente Mejoras Conv. | `aibanez82/Agente-MejorasConversacion` | Claude Code | Análisis conversaciones WA |
 | Arquitecto | `aibanez82/Agente-Arquitecto` | Este repo | Documentación transversal |
+
+**Accesos de Alberto:**
+- Heroku: acceso como member a `hyl-wai-production`
+- GitHub: acceso al repo `aguayo-co/HYL-WAI` (como colaborador externo — PAT pendiente)
+- WhatsApp Business: acceso directo
+- n8n: API key en Vercel como `N8N_API_KEY`
 
 ---
 
 ## Esquema de base de datos (tablas clave)
 
-| Tabla | Qué contiene |
-|---|---|
-| `qualitas_lead` | Estado del lead (`estado`), canal, fechas |
-| `qualitas_cotizacion` | Datos del auto, email, teléfono, CP, precio |
-| `whatsapp_sessions` | `conversation_phase`, `last_activity` — **tiene bug activo** |
-| `qualitas_polizaemitida` | Número de póliza, `estatus_pago`, precio |
-| `n8n_chat_histories` | Hitos reales de la conversación WA — **fuente fiable** |
-| `NumeroPruebaWhatsapp` | Teléfonos de prueba de Juan Aguayo |
+| Tabla | Quién escribe | Qué contiene |
+|---|---|---|
+| `qualitas_lead` | Django | Estado del lead (`estado`), canal, fechas |
+| `qualitas_cotizacion` | Django | Datos del auto, email, teléfono, CP, precio |
+| `qualitas_polizaemitida` | Django | Número de póliza, `estatus_pago`, precio |
+| `whatsapp_sessions` | n8n (directo a Postgres) | `conversation_phase`, `last_activity`, `captured_data` — **tiene bug activo** |
+| `n8n_chat_histories` | n8n (Postgres Chat Memory) | Historial mensajes WA — **fuente fiable de hitos** |
+| `NumeroPruebaWhatsapp` | Django | Teléfonos de prueba de Juan Aguayo |
 
 **JOIN correcto entre tablas:**
 - `qualitas_cotizacion` → `qualitas_lead` con `l.cotizacion_id = c.id` (NO `c.lead_id`)
 - `whatsapp_sessions` → `qualitas_cotizacion` con `ws.quotation_id = c.id`
 - Columnas: `l.canal_atencion` (no `l.canal`), `c.codigo_postal` (no `c.cp`)
+- `n8n_chat_histories`: columna `message` es JSONB → `message->>'type'` y `message->>'content'`; ordenar por `id`
+
+---
+
+## n8n workflow — estructura interna
+
+El bot tiene 3 nodos que llaman a Claude:
+1. **Jailbreak detection** — Claude Haiku
+2. **Intent Router classifier** — Claude Haiku
+3. **Agente conversacional principal** — Claude Sonnet
+
+n8n escribe a Postgres directamente (credencial `"Postgres account"` en el workflow):
+- `Check Session Exists` → SELECT en `whatsapp_sessions`
+- `Load Session` → SELECT completo de la sesión
+- `Update Activity` → UPDATE `whatsapp_sessions.last_activity`
+- `Postgres Chat Memory` → lee/escribe `n8n_chat_histories`
 
 ---
 
 ## Regla de estado real de un lead
 
-`whatsapp_sessions.conversation_phase` tiene un bug — siempre leer hitos desde `n8n_chat_histories`. La lógica de estado unificada (centralizada en `lib/metrics.js` del Dashboard):
+`whatsapp_sessions.conversation_phase` tiene un bug activo (siempre stuck en `greeting`). Los hitos reales se leen de `n8n_chat_histories` con BOOL_OR + LIKE:
 
-```
-SI conversation_phase = 'completed'
-  → PAGADO
+| Hito | Cómo se detecta |
+|---|---|
+| `has_responded` | `human_msg_count > 0` |
+| `confirmo_cobertura` | AI dijo "Procederemos con Cobertura…" |
+| `dio_datos_personales` | AI dijo "tengo registrado… Nombre:" |
+| `dio_vin` | AI dijo "Número de serie:" |
+| `dio_domicilio` | AI dijo "domicilio registrado es" |
+| `poliza_emitida_wa` | AI dijo "fue emitida exitosamente" |
 
-SI qualitas_lead.estado = 'POLIZA_EMITIDA' Y conversation_phase = 'greeting' o NULL
-  → Cerró por web (sin WhatsApp)
-
-SI conversation_phase IN ('data_capture', 'summary_confirmation', 'policy_issuance', 'payment_pending')
-  → En flujo WhatsApp activo
-
-SI conversation_phase = 'greeting' Y estado = 'COTIZACION_INICIADA' Y fecha < NOW - 48h
-  → ABANDONADO
-
-SI conversation_phase = 'greeting' Y estado = 'COTIZACION_INICIADA' Y fecha >= NOW - 48h
-  → EN ESPERA
-```
+**Riesgo:** si cambia el copy del bot, los LIKE dejan de funcionar.
 
 ---
 
-## Bugs conocidos
+## Bugs conocidos activos
 
-Ver `BUGS_N8N.md` para el detalle completo con evidencia SQL.
+Ver `BUGS_N8N.md` para detalle completo con evidencia SQL.
 
-Resumen:
-1. **n8n_chat_histories vacío** — 89% de sesiones no tienen historial guardado (crítico)
-2. **Prefijo 57 en session_id** — Colombia en lugar de México, afecta solo leads de prueba de Juan
-3. **TEST_EMAILS no filtrados en n8n** — Meta cobra mensajes enviados a emails de prueba
-4. **4 leads reales sin whatsapp_session** — n8n no disparó el mensaje (IDs: 837, 834, 810, 802)
-5. **conversation_phase stuck en greeting** — bug de Django, no actualiza el campo
-
----
-
-## Estado de conexiones
-
-| Fuente | Estado | Notas |
-|---|---|---|
-| Dashboard repo | ✅ Conectado | `aibanez82/Dashboard_seguroautoqualitas` via GitHub |
-| Django HYL-WAI | ⏳ Pendiente | PAT fine-grained pendiente (requiere desktop) |
-| n8n workflows | ⏳ Pendiente | JSONs subidos manualmente; conexión periódica pendiente |
-| Postgres | ✅ Conectado | Queries manuales |
-| Meta Business API | ⚠️ Token revocado | Token expuesto en chat; requiere regenerar |
-| GA4 | ⏳ Pendiente | Service account key expuesta; requiere rotar y reconectar |
-| Notion | ⚠️ Workspace incorrecto | Autorizado workspace personal, no `aguayo` |
+| # | Bug | Sistema | Criticidad |
+|---|---|---|---|
+| 1 | n8n no guarda historial en `n8n_chat_histories` (89% de sesiones vacías) | n8n | 🔴 Crítico |
+| 2 | Prefijo `57` (Colombia) en `session_id` en lugar de `52` (México) | Django | 🟠 Alto |
+| 3 | TEST_EMAILS no filtrados en n8n — Meta cobra mensajes de prueba | n8n | 🟡 Medio |
+| 4 | 4 leads reales sin `whatsapp_session` (IDs: 837, 834, 810, 802) | n8n | 🟡 Medio |
+| 5 | `conversation_phase` siempre stuck en `greeting` | Django | 🟡 Medio |
+| 6 | Regex placas rechaza 6 caracteres (`/^[A-Z0-9]{7}$/`) — Issue #2 abierto | n8n | 🟠 Alto |
 
 ---
 
-## Arquitectura de agentes
+## Pendientes de infraestructura
 
-Ver `ARQUITECTURA_AGENTES.md` para el detalle completo.
+| Item | Estado |
+|---|---|
+| PAT fine-grained para repo `aguayo-co/HYL-WAI` | ⏳ Pendiente (requiere desktop) |
+| Export periódico n8n workflows | ⏳ Pendiente |
+| Rotar service account key Google Cloud (`ba36b46f377b...`) | ⚠️ Urgente |
+| Regenerar token Meta Business API | ⚠️ Urgente |
+| Reconectar Notion al workspace `aguayo` | ⏳ Pendiente |
+| Subir `BUGS_N8N.md` al repo Dashboard | ⏳ Pendiente (token no disponible en bash) |
+
+---
+
+## Arquitectura de agentes (3 niveles)
 
 ```
         ┌─────────────────┐
@@ -129,27 +188,39 @@ Ver `ARQUITECTURA_AGENTES.md` para el detalle completo.
         ┌────────┴────────┐
    consulta            instruye
         │                 │
-   ┌────▼────┐       ┌────▼────┐
-   │ Nivel 1 │       │ Nivel 3 │
-   │ Lectura │       │Ejecutores│
-   │ Código  │       │ QA       │
-   │ APIs    │       │ Conversión│
-   └─────────┘       └─────────┘
+   ┌────▼────┐       ┌────▼────────────────────┐
+   │ Nivel 1 │       │ Nivel 3 — Ejecutores    │
+   │ Lectura │       │ • Agente QA             │
+   │ Código  │       │ • Agente Mejoras Conv.  │
+   │ APIs    │       │ • Agente Conversión (⏳) │
+   └─────────┘       └─────────────────────────┘
               (nunca se hablan entre sí)
 ```
+
+**Regla de oro:** diagnóstico arriba, ejecución abajo. Los ejecutores nunca se coordinan lateralmente.
 
 | Proyecto Claude | Rol | Estado |
 |---|---|---|
 | **Agente-Arquitecto** (este) | Diagnóstico transversal | ✅ Activo |
 | Dashboard Qualitas | Ejecutor código dashboard | ✅ Activo |
 | Agente QA | Tests end-to-end | ✅ Activo |
-| Agente Conversión | Reintentos + análisis | ⏳ Futuro |
+| Agente Mejoras Conversación | Análisis WA + mejoras n8n | ✅ Activo |
+| Agente Conversión | Reintentos + seguimiento | ⏳ Futuro |
 
 ---
 
-## Pendientes al inicio de cada sesión
+## Variables de entorno clave (Vercel)
 
-1. ⚠️ Rotar service account key de Google Cloud (key `ba36b46f377b...` expuesta)
-2. ⚠️ Regenerar token Meta Business API
-3. ⏳ Conectar Django HYL-WAI via PAT (requiere desktop)
-4. ⏳ Reconectar Notion al workspace `aguayo`
+`DATABASE_URL` · `GOOGLE_SERVICE_ACCOUNT_EMAIL` · `GOOGLE_PRIVATE_KEY` · `GA4_PROPERTY_ID` · `META_WABA_ID` · `META_ACCESS_TOKEN` · `META_PHONE_NUMBER_ID` · `DASHBOARD_PASSWORD` · `GITHUB_ISSUES_TOKEN` · `N8N_API_KEY`
+
+⚠️ Solo environments **Production** y **Preview** — no Development.
+
+---
+
+## Convenciones
+
+- **Git:** siempre `user.email = a.ibanez@gmail.com` / `user.name = aibanez82`
+- **Timezone:** siempre `America/Mexico_City` (UTC-6, sin horario de verano desde 2023)
+- **GitHub Issues:** labels con caracteres exactos incluyendo acentos (e.g. `crítico`)
+- **DB:** usar siempre `lib/db.js` del Dashboard — nunca conexiones directas ad-hoc
+- **n8n API:** `https://n8n.srv1325340.hstgr.cloud/api/v1/` con header `X-N8N-API-KEY`
