@@ -189,6 +189,7 @@ Ver `BUGS_N8N.md` para detalle completo con evidencia SQL.
 | 5 | `conversation_phase` siempre stuck en `greeting` | Django | 🟡 Medio |
 | 6 | Regex placas rechaza 6 caracteres (`/^[A-Z0-9]{7}$/`) — Issue #2 abierto | n8n | 🟠 Alto |
 | 7 | Django no escribe `estatus_pago = 'PAGADO'` al confirmar pago — solo dispara webhook a n8n | Django | 🟠 Alto |
+| 8 | `_generar_bloque_492` no incluye teléfono celular en XML SOAP a Quálitas — campo queda vacío en póliza emitida | Django | 🟠 Alto |
 
 **Workaround activo para Bug #7 en Dashboard:**
 ```js
@@ -197,6 +198,13 @@ d.estatus_pago === 'PAGADO' ||
 (d.conversation_phase === 'completed' && d.numero_poliza != null)
 ```
 `conversation_phase = 'completed'` lo setea n8n al recibir confirmación verificada de la pasarela de pago — no es auto-declaración del usuario. El guard `numero_poliza != null` evita falsos positivos.
+
+**Detalle Bug #8:**
+- Trazabilidad confirmada: el dato llega correctamente hasta `_generar_bloque_492` en `qualitas/services.py`
+- El método no llama a `d.get('telefono')` — campo nunca se añade al XML
+- Fix: agregar `<ConsideracionesAdicionalesDA NoConsideracion="40"><TipoRegla>86</TipoRegla><ValorRegla>{telefono}</ValorRegla></ConsideracionesAdicionalesDA>` en `_generar_bloque_492`
+- `TipoRegla 86` confirmado en spec oficial SOAP de Quálitas
+- Issue abierto: `aguayo-co/HYL-WAI` #70
 
 ---
 
