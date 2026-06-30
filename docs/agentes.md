@@ -99,29 +99,38 @@ Alberto abre una sesión de Claude Code en el repo `Agente_QATest_Qualitas` con 
 **Estado:** ✅ Activo
 
 ### Qué hace
-- Analiza el historial de conversaciones de WhatsApp almacenado en `n8n_chat_histories`.
-- Identifica patrones donde los leads se pierden, no responden o abandonan el flujo.
-- Propone mejoras concretas al prompt del agente conversacional de n8n (nodo Claude Sonnet).
-- Puede generar borradores de nuevos flows o modificaciones al JSON del workflow de n8n.
+Sigue un protocolo de 4 pasos automáticos cada vez que Alberto le pide un análisis:
+
+1. **Query Postgres** — extrae leads con abandono (phase en `greeting`/`data_capture`/`summary_confirmation` + `last_activity > 48h`) y leads exitosos (referencia)
+2. **Clasificación por outcome** — categoriza cada lead: nunca respondió, abandonó en data_capture, abandonó en summary, en emisión, pago pendiente, pagó, bot no disparó
+3. **Análisis de copy por fase** — para cada fase con >10% de abandono: extrae el último mensaje del bot antes del silencio, identifica patrones problemáticos (longitud, preguntas múltiples, tono), compara con conversaciones exitosas y propone texto alternativo
+4. **Genera informe Markdown** en `informes/YYYY-MM-DD-analisis.md` con mapa de abandono, análisis de copy y hasta 5 recomendaciones priorizadas con texto concreto
 
 ### Qué NO hace
-- No despliega cambios directamente en n8n — entrega los cambios a Alberto para revisión.
-- No accede a datos personales de clientes más allá de lo necesario para el análisis.
-- No se coordina con el Agente QA ni el Arquitecto directamente.
+- No modifica n8n, templates, ni ningún sistema externo
+- No envía mensajes a leads
+- No escribe en Postgres — acceso estrictamente read-only
+- No se coordina con otros agentes ejecutores
 
 ### Stack técnico
 - Claude Code
-- Acceso directo a Postgres (`DATABASE_URL`) para leer `n8n_chat_histories`
-- n8n API para leer/exportar workflows
+- Heroku Postgres read-only (credencial `readonly_leads` de `hyl-wai-production`)
+- Tablas consultadas: `qualitas_lead`, `qualitas_cotizacion`, `whatsapp_sessions`, `n8n_chat_histories`
 
 ### Cómo se activa
-Alberto abre una sesión en el repo con la instrucción de análisis (p. ej. "analiza las conversaciones de la última semana donde el lead no llegó a dar datos personales").
+Alberto abre el proyecto en Claude Code y dice:
+> "Analiza las conversaciones del [fecha inicio] al [fecha fin]"
+
+### Cómo usa el Arquitecto el output
+Las recomendaciones de copy se traducen en cambios al `systemMessage` del nodo **AI Agent** (Claude Sonnet) en el workflow productivo de n8n. El Arquitecto identifica el nodo exacto; Alberto ejecuta el cambio directamente en n8n.
+
+### Limitación activa
+**Bug #1** — 89% de sesiones no tienen historial en `n8n_chat_histories`. El agente lo detecta y anota en el informe, pero el análisis de copy solo cubre el 11% de conversaciones con datos reales. Resultados válidos pero parciales hasta que se corrija el bug en n8n.
 
 ### Variables de entorno que necesita
 | Variable | Propósito |
 |---|---|
-| `DATABASE_URL` | Leer `n8n_chat_histories` y `whatsapp_sessions` en Postgres |
-| `N8N_API_KEY` | Exportar/leer workflows de n8n |
+| `DATABASE_URL` | Conexión read-only a Postgres (Heroku) |
 
 ---
 

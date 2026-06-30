@@ -94,7 +94,7 @@ Wagtail es un CMS construido sobre Django. **No son dos sistemas separados** —
 | Base de datos | Heroku Postgres (addon) | PostgreSQL | Compartida entre Django y n8n |
 | Dashboard | `aibanez82/Dashboard_seguroautoqualitas` | Next.js 14, Vercel | UI de leads en tiempo real |
 | Agente QA | `aibanez82/Agente_QATest_Qualitas` | Claude Code | Tests end-to-end |
-| Agente Mejoras Conv. | `aibanez82/Agente-MejorasConversacion` | Claude Code | Análisis conversaciones WA |
+| Agente Mejoras Conv. | `aibanez82/Agente-MejorasConversacion` | Claude Code | Lee Postgres → analiza abandono por fase → genera informe Markdown con recomendaciones de copy para n8n |
 | Arquitecto | `aibanez82/Agente-Arquitecto` | Este repo | Documentación transversal |
 
 **Accesos de Alberto:**
@@ -237,6 +237,30 @@ Alberto atiende el lead directamente desde Kommo
 
 ---
 
+## Agente Mejoras Conversación — protocolo de uso
+
+**Repo:** `aibanez82/Agente-MejorasConversacion`
+**Credencial DB:** `readonly_leads` en Heroku `hyl-wai-production` (read-only, no puede modificar nada)
+**Output:** archivos en `informes/YYYY-MM-DD-analisis.md`
+
+**Cómo activarlo:** Alberto abre el proyecto en Claude Code y dice:
+> "Analiza las conversaciones del [fecha inicio] al [fecha fin]"
+
+**Qué produce (4 pasos internos automáticos):**
+1. Query A — leads con abandono (phase en greeting/data_capture/summary_confirmation + last_activity > 48h)
+2. Query B — leads exitosos (referencia de conversaciones que llegaron a póliza)
+3. Clasificación por outcome + análisis del último mensaje del bot antes del silencio
+4. Informe Markdown con mapa de abandono + análisis de copy + hasta 5 recomendaciones concretas de cambio de texto en n8n
+
+**Cómo interpreta el Arquitecto el informe:**
+- Las recomendaciones de copy se traducen en cambios al `systemMessage` del nodo **AI Agent** en el workflow productivo de n8n
+- El Arquitecto identifica el nodo exacto; la ejecución la hace Alberto directamente en n8n
+
+**Limitación activa — Bug #1:**
+El 89% de sesiones no tienen historial en `n8n_chat_histories`. El agente lo detecta y lo anota, pero el análisis de copy solo cubre el 11% de conversaciones con datos. Los resultados son válidos pero parciales hasta que se corrija el bug.
+
+---
+
 ## Pendientes de infraestructura
 
 | Item | Estado |
@@ -290,7 +314,7 @@ Comando de arranque: `cd ~/claude-projects/<repo> && claude`
 | **Agente-Arquitecto** (este) | Diagnóstico transversal | ✅ Activo |
 | Dashboard Qualitas | Ejecutor código dashboard | ✅ Activo |
 | Agente QA | Tests end-to-end | ✅ Activo |
-| Agente Mejoras Conversación | Análisis WA + mejoras n8n | ✅ Activo |
+| Agente Mejoras Conversación | Análisis abandono + recomendaciones copy n8n | ✅ Activo |
 | Agente Conversión | Reintentos + seguimiento | ⏳ Futuro |
 
 ---
