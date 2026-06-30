@@ -64,7 +64,11 @@ Observabilidad:
 └── Dashboard → funnel completo
 ```
 
-**Regla crítica de arquitectura:** Django y n8n comparten la misma BD Postgres pero **no se comunican entre sí después del webhook inicial**. El Dashboard también puede escribir indirectamente a través del webhook n8n (solo para mensajes proactivos). Cada sistema escribe directamente en sus propias tablas. Esto significa que los bugs en `whatsapp_sessions` y `n8n_chat_histories` son responsabilidad exclusiva de n8n — Django no controla esas tablas.
+**Regla crítica de arquitectura:** Django y n8n comparten la misma BD Postgres. Django dispara **dos webhooks** a n8n:
+1. **Al crear el lead** — n8n inicia la conversación WhatsApp
+2. **Al confirmar el pago** — n8n actualiza `conversation_phase = 'completed'` y envía mensaje WA al cliente
+
+El Dashboard también puede escribir indirectamente a través del webhook n8n (solo para mensajes proactivos). Cada sistema escribe directamente en sus propias tablas. Los bugs en `whatsapp_sessions` y `n8n_chat_histories` son responsabilidad exclusiva de n8n — Django no controla esas tablas.
 
 ---
 
@@ -184,6 +188,15 @@ Ver `BUGS_N8N.md` para detalle completo con evidencia SQL.
 | 4 | 4 leads reales sin `whatsapp_session` (IDs: 837, 834, 810, 802) | n8n | 🟡 Medio |
 | 5 | `conversation_phase` siempre stuck en `greeting` | Django | 🟡 Medio |
 | 6 | Regex placas rechaza 6 caracteres (`/^[A-Z0-9]{7}$/`) — Issue #2 abierto | n8n | 🟠 Alto |
+| 7 | Django no escribe `estatus_pago = 'PAGADO'` al confirmar pago — solo dispara webhook a n8n | Django | 🟠 Alto |
+
+**Workaround activo para Bug #7 en Dashboard:**
+```js
+// Condición correcta para detectar póliza pagada
+d.estatus_pago === 'PAGADO' ||
+(d.conversation_phase === 'completed' && d.numero_poliza != null)
+```
+`conversation_phase = 'completed'` lo setea n8n al recibir confirmación verificada de la pasarela de pago — no es auto-declaración del usuario. El guard `numero_poliza != null` evita falsos positivos.
 
 ---
 
