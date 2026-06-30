@@ -95,7 +95,7 @@ Wagtail es un CMS construido sobre Django. **No son dos sistemas separados** —
 | Dashboard | `aibanez82/Dashboard_seguroautoqualitas` | Next.js 14, Vercel | UI de leads en tiempo real |
 | Agente QA | `aibanez82/Agente_QATest_Qualitas` | Claude Code | Tests end-to-end |
 | Agente Mejoras Conv. | `aibanez82/Agente-MejorasConversacion` | Claude Code | Lee Postgres → analiza abandono por fase → genera informe Markdown con recomendaciones de copy para n8n |
-| Arquitecto | `aibanez82/Agente-Arquitecto` | Este repo | Documentación transversal |
+| Arquitecto | `aibanez82/Agente-Arquitecto` | Este repo | Documentación transversal, workflows n8n, spec SOAP Quálitas |
 
 **Accesos de Alberto:**
 - Heroku: acceso como member a `hyl-wai-production`
@@ -125,6 +125,16 @@ Wagtail es un CMS construido sobre Django. **No son dos sistemas separados** —
 ---
 
 ## n8n workflow — estructura interna
+
+**Workflows exportados (fuente de verdad local):**
+
+| Workflow | Archivo en este repo |
+|---|---|
+| Bot principal WhatsApp | `docs/n8n-workflows/WhatsApp Insurance Quotation Bot.json` |
+| Confirmación de pago | `docs/n8n-workflows/WhatsApp Insurance Quotation Bot - Payment Confirmation.json` |
+| Mensajes proactivos (Retomar conversación) | `docs/n8n-workflows/Retomar Conversacion.json` |
+
+> Exportar y hacer commit aquí cada vez que se modifique un workflow en producción.
 
 El bot tiene 3 nodos que llaman a Claude:
 1. **Jailbreak detection** — Claude Haiku
