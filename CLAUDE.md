@@ -1,7 +1,7 @@
 # CLAUDE.md — Ecosistema IA Quálitas/Insurmind
 
 > Fuente de verdad del Arquitecto-IA-Qualitas.
-> Actualizado: 29 junio 2026 (sesión tarde).
+> Actualizado: 29 junio 2026 (v2 — botón "Tomar conversación").
 
 ---
 
@@ -55,7 +55,8 @@ Django → dispara webhook → n8n
     └── Meta Cloud API → WhatsApp → Lead
 
 Dashboard (Next.js · Vercel)
-    └── Lee Postgres directamente (read-only, sin pasar por Django)
+    ├── Lee Postgres directamente (read-only, sin pasar por Django)
+    └── Botón "Tomar conversación" → webhook n8n → INSERT n8n_chat_histories + Send WhatsApp
 
 Observabilidad:
 ├── GA4 → visitas landing
@@ -63,7 +64,7 @@ Observabilidad:
 └── Dashboard → funnel completo
 ```
 
-**Regla crítica de arquitectura:** Django y n8n comparten la misma BD Postgres pero **no se comunican entre sí después del webhook inicial**. Cada sistema escribe directamente en sus propias tablas. Esto significa que los bugs en `whatsapp_sessions` y `n8n_chat_histories` son responsabilidad exclusiva de n8n — Django no controla esas tablas.
+**Regla crítica de arquitectura:** Django y n8n comparten la misma BD Postgres pero **no se comunican entre sí después del webhook inicial**. El Dashboard también puede escribir indirectamente a través del webhook n8n (solo para mensajes proactivos). Cada sistema escribe directamente en sus propias tablas. Esto significa que los bugs en `whatsapp_sessions` y `n8n_chat_histories` son responsabilidad exclusiva de n8n — Django no controla esas tablas.
 
 ---
 
@@ -131,6 +132,26 @@ n8n escribe a Postgres directamente (credencial `"Postgres account"` en el workf
 - `Load Session` → SELECT completo de la sesión
 - `Update Activity` → UPDATE `whatsapp_sessions.last_activity`
 - `Postgres Chat Memory` → lee/escribe `n8n_chat_histories`
+
+**Segundo workflow — mensajes proactivos desde Dashboard:**
+
+```
+Webhook POST /webhook/proactive-wa-message
+  { phone_number, message, session_id }
+    ├── INSERT n8n_chat_histories
+    │     { type: "ai", content: message, tool_calls: [],
+    │       additional_kwargs: {}, response_metadata: {},
+    │       invalid_tool_calls: [] }
+    └── WhatsApp Business Cloud → Send message
+          phoneNumberId: 1028815256982638
+          credential: WhatsApp Send Message Hylant Account
+```
+
+**Reglas del workflow proactivo:**
+- Si el INSERT falla → el WhatsApp NO se envía (stop-on-error)
+- `phone_number` y `session_id` deben empezar con `52` (México)
+- Si `last_activity > 24h` en `whatsapp_sessions` → Meta puede rechazar el mensaje (ventana cerrada)
+- El mensaje se guarda como tipo `ai` para que Claude mantenga contexto en la siguiente respuesta del lead
 
 ---
 
@@ -262,7 +283,7 @@ Comando de arranque: `cd ~/claude-projects/<repo> && claude`
 
 ## Variables de entorno clave (Vercel)
 
-`DATABASE_URL` · `GOOGLE_SERVICE_ACCOUNT_EMAIL` · `GOOGLE_PRIVATE_KEY` · `GA4_PROPERTY_ID` · `META_WABA_ID` · `META_ACCESS_TOKEN` · `META_PHONE_NUMBER_ID` · `DASHBOARD_PASSWORD` · `GITHUB_ISSUES_TOKEN` · `N8N_API_KEY`
+`DATABASE_URL` · `GOOGLE_SERVICE_ACCOUNT_EMAIL` · `GOOGLE_PRIVATE_KEY` · `GA4_PROPERTY_ID` · `META_WABA_ID` · `META_ACCESS_TOKEN` · `META_PHONE_NUMBER_ID` · `DASHBOARD_PASSWORD` · `GITHUB_ISSUES_TOKEN` · `N8N_API_KEY` · `N8N_PROACTIVE_WEBHOOK_URL` · `PROACTIVE_MESSAGE_PASSWORD`
 
 ⚠️ Solo environments **Production** y **Preview** — no Development.
 
