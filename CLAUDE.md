@@ -241,12 +241,13 @@ Alberto atiende el lead directamente desde Kommo
 
 | Item | Estado |
 |---|---|
-| PAT fine-grained para repo `aguayo-co/HYL-WAI` | ⏳ Pendiente (requiere desktop) |
-| Export periódico n8n workflows | ⏳ Pendiente |
 | Rotar service account key Google Cloud (`ba36b46f377b...`) | ⚠️ Urgente |
 | Regenerar token Meta Business API | ⚠️ Urgente |
+| Corrección Bug #7 en Django — Juan Aguayo (Issue #69 `aguayo-co/HYL-WAI`) | ⏳ Pendiente externo |
+| Export periódico n8n workflows | ⏳ Pendiente |
+| PAT fine-grained para repo `aguayo-co/HYL-WAI` | ⏳ Pendiente (`gh` CLI funciona para issues; PAT necesario para acceso a código) |
 | Reconectar Notion al workspace `aguayo` | ⏳ Pendiente |
-| Subir `BUGS_N8N.md` al repo Dashboard | ⏳ Pendiente (hacer desde Claude Code) |
+| Subir `BUGS_N8N.md` al repo Dashboard | ⏳ Pendiente |
 | Integración Kommo — botón "Pasar a Kommo" en Dashboard | ⏳ Pendiente (falta subdominio + API token + pipeline de Alberto) |
 
 ---
