@@ -1,0 +1,107 @@
+{
+  "name": "Retomar Conversacion",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "proactive-wa-message",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "89e98f31-87a2-44f9-aec6-26f27f48b9e6",
+      "name": "Webhook",
+      "webhookId": "afd2b47d-bd99-4525-93a6-42764b8f56df"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO n8n_chat_histories (session_id, message)\nVALUES ($1, $2::jsonb)",
+        "options": {
+          "queryReplacement": "={{ $json.body.session_id }}\n{{ JSON.stringify({type: \"ai\", content: $json.body.message, tool_calls: [], additional_kwargs: {}, response_metadata: {}, invalid_tool_calls: []}) }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        208,
+        0
+      ],
+      "id": "15704489-9b47-42b8-a203-0e669a244b95",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "FbodkhT9DijVcqpB",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "=1028815256982638",
+        "recipientPhoneNumber": "={{ $('Webhook').item.json.body.phone_number }}",
+        "textBody": "=  {{ $('Webhook').item.json.body.message }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "d72eb2f2-071a-4f88-be24-8598de079f34",
+      "name": "Send message",
+      "webhookId": "fd3be604-82e2-4806-89fa-ffc8f7b01969",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "PbzXr53disA74eew",
+          "name": "WhatsApp Send Message Hylant Account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "c9bb3cf0-0029-4a29-9cff-918c59eff04b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "027f10ed20069b1aa23e30e1ddec4d0671ff3ac39d4e9e67a537704d43c045b4"
+  },
+  "id": "96XfJZcwvlHnVJLko3G8-",
+  "tags": []
+}
