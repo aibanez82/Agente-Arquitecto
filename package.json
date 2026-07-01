@@ -1,0 +1,12 @@
+{
+  "name": "agente-arquitecto",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test scripts/",
+    "backup:n8n": "node scripts/n8n-backup/backup.mjs"
+  }
+}
