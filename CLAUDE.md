@@ -194,7 +194,7 @@ Ver `BUGS_N8N.md` para detalle completo con evidencia SQL.
 
 | # | Bug | Sistema | Criticidad |
 |---|---|---|---|
-| 1 | n8n no guarda historial en `n8n_chat_histories` (89% de sesiones vacías) | n8n | 🔴 Crítico |
+| 1 | `n8n_chat_histories` vacío en ~76% de sesiones (medido 1 jul 2026: 154/203). Ojo: el historial existe casi solo cuando el humano responde (48/49) → gran parte del "vacío" es en realidad **leads que nunca respondieron**, no pérdida de datos. Afecta a la analítica, NO al motor de follow-up. | n8n | 🟡 Medio |
 | 2 | Prefijo `57` (Colombia) en `session_id` en lugar de `52` (México) | Django | 🟠 Alto |
 | 3 | TEST_EMAILS no filtrados en n8n — Meta cobra mensajes de prueba | n8n | 🟡 Medio |
 | 4 | 4 leads reales sin `whatsapp_session` (IDs: 837, 834, 810, 802) | n8n | 🟡 Medio |
@@ -202,6 +202,7 @@ Ver `BUGS_N8N.md` para detalle completo con evidencia SQL.
 | 6 | Regex placas rechaza 6 caracteres (`/^[A-Z0-9]{7}$/`) — Issue #2 abierto | n8n | 🟠 Alto |
 | 7 | Django no escribe `estatus_pago = 'PAGADO'` al confirmar pago — solo dispara webhook a n8n | Django | 🟠 Alto |
 | 8 | `_generar_bloque_492` no incluye teléfono celular en XML SOAP a Quálitas — campo queda vacío en póliza emitida | Django | 🟠 Alto |
+| 9 | `POST /api/emitir-externo/` devuelve HTTP 400 recurrente — la emisión de pólizas falla y Django se traga la causa (mensaje genérico, sin logging). Detectado 1 jul 2026. | Django | 🔴 Crítico |
 
 **Workaround activo para Bug #7 en Dashboard:**
 ```js
@@ -217,6 +218,16 @@ d.estatus_pago === 'PAGADO' ||
 - Fix: agregar `<ConsideracionesAdicionalesDA NoConsideracion="40"><TipoRegla>86</TipoRegla><ValorRegla>{telefono}</ValorRegla></ConsideracionesAdicionalesDA>` en `_generar_bloque_492`
 - `TipoRegla 86` confirmado en spec oficial SOAP de Quálitas
 - Issue abierto: `aguayo-co/HYL-WAI` #70
+
+**Detalle Bug #9 (emisión 400):**
+- El nodo `Issue Policy` en n8n hace `POST https://seguroautoqualitas.com/api/emitir-externo/` (endpoint de Django, no Quálitas directo).
+- Django responde `400 {"status":"error","msg":"Experimentamos intermitencias…"}` — mensaje enlatado genérico.
+- Buscando por `request_id` en Papertrail **no hay más líneas**: la vista no loguea el fault real ni el campo que falla. `service=708ms` sugiere rechazo en validación de Django, no caída de Quálitas.
+- El error **no se guarda en BD** (`qualitas_cotizacionrespuestaxml` es de cotización, no de emisión; `qualitas_leadactionevent` no registra fallos de emisión).
+- Probablemente **no** es el Bug #8 (teléfono ausente daría emisión con campo vacío, no 400).
+- Pista para Juan: `QUALITAS_AMBIENTE_FLAG = 0` (verificar si es el valor correcto para emisión en vivo).
+- Petición doble a Juan: (a) causa raíz del campo que falla; (b) **observabilidad** — loguear el fault de Quálitas y devolver la causa en un campo `detail`.
+- Repetido al menos 2 veces el 1 jul 2026 (12:49:32 y 13:05:15 CDMX). request_id ejemplo: `f00e2d0d-927b-33a1-66dc-e6193db0a1f1`.
 
 ---
 
@@ -261,6 +272,13 @@ Alberto atiende el lead directamente desde Kommo
 
 **Repo:** `aibanez82/Agente-MejorasConversacion`
 **Credencial DB:** `readonly_leads` en Heroku `hyl-wai-production` (read-only, no puede modificar nada)
+
+> **Patrón de permisos `readonly_leads`:** cada tabla nueva que crea Django NO tiene permiso para
+> `readonly_leads` hasta que el dueño de la BD ejecute un `GRANT SELECT` específico. Cuando el
+> Dashboard/reporting quiera leer una tabla nueva y dé `permission denied`, la solución es
+> `GRANT SELECT ON <tabla> TO readonly_leads;` — **nunca** el grant masivo `ON ALL TABLES`
+> (expondría `auth_user` con hashes de contraseñas). El rol dueño es el de `DATABASE_URL`
+> (puede granear). Grants aplicados 1 jul 2026: `qualitas_whatsappmessage`, `qualitas_leadactionevent`.
 **Output:** archivos en `informes/YYYY-MM-DD-analisis.md`
 
 **Cómo activarlo:** Alberto abre el proyecto en Claude Code y dice:
@@ -277,7 +295,7 @@ Alberto atiende el lead directamente desde Kommo
 - El Arquitecto identifica el nodo exacto; la ejecución la hace Alberto directamente en n8n
 
 **Limitación activa — Bug #1:**
-El 89% de sesiones no tienen historial en `n8n_chat_histories`. El agente lo detecta y lo anota, pero el análisis de copy solo cubre el 11% de conversaciones con datos. Los resultados son válidos pero parciales hasta que se corrija el bug.
+~76% de sesiones no tienen historial en `n8n_chat_histories` (medido 1 jul 2026: 154/203). El agente lo detecta y lo anota, pero el análisis de copy solo cubre el ~24% de conversaciones con datos. Nota: gran parte de ese "vacío" son leads que nunca respondieron (ver Bug #1 reinterpretado), no pérdida de datos. Los resultados son válidos pero parciales.
 
 ---
 
