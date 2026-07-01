@@ -6,7 +6,7 @@
     "node": ">=18"
   },
   "scripts": {
-    "test": "node --test scripts/",
+    "test": "node --test",
     "backup:n8n": "node scripts/n8n-backup/backup.mjs"
   }
 }
