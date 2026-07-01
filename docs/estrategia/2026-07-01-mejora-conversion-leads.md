@@ -1,131 +1,126 @@
 # Plan de mejora de conversión de leads
 
-> Autor: Arquitecto-IA-Qualitas · Fecha: 1 julio 2026
+> Autor: Arquitecto-IA-Qualitas · Fecha: 1 julio 2026 (v2 — validado con datos de producción)
 > Destinatario: Alberto Ibáñez / Juan Aguayo (aguayo-co)
-> Objetivo: aumentar el % de leads de Google Ads que terminan en póliza pagada,
-> con foco inicial en recuperar leads que reciben mensaje de WhatsApp y no responden.
+> Objetivo: aumentar el % de leads de Google Ads que terminan en póliza pagada.
+
+> **Nota de versión:** la v1 de este documento afirmaba que el Bug #1 "estrangulaba" el motor
+> de follow-up y que había que construir un "Agente Conversión" nuevo en n8n. **Ambas cosas eran
+> falsas.** Al conseguir acceso a Heroku y consultar la BD de producción se comprobó que el motor
+> de follow-up **ya existe, está activo y funciona** (envíos verificados con acuse de Meta). Este
+> documento sustituye a esa versión con la foto real.
 
 ---
 
 ## Resumen ejecutivo
 
-La idea de partida es correcta: **perseguir a los leads que reciben el primer mensaje de
-WhatsApp y no contestan**. Pero "no contesta" no es un solo grupo, y antes de montar un motor
-de reintentos hay que descartar que una parte de esos silencios sean en realidad **mensajes que
-nunca se entregaron** por un bug conocido de formato de teléfono.
+La idea de partida —perseguir a los leads que no responden al primer WhatsApp— **ya está
+implementada y corriendo en producción** del lado de Django. No hay que construirla. Lo que sí
+mueve la aguja de la conversión es otra cosa:
 
-La recomendación es **medir la fuga real por fase antes de construir nada**, y arrancar en
-paralelo el trámite de aprobación de plantillas de WhatsApp con Meta, que es el paso con más
-latencia externa.
-
----
-
-## 1. "No contesta" son tres grupos distintos
-
-No todos los leads silenciosos necesitan lo mismo. Se distinguen leyendo los hitos reales de la
-conversación en `n8n_chat_histories`:
-
-| Grupo | Cómo se detecta | Temperatura | Qué necesita |
-|---|---|---|---|
-| **1. Nunca respondió** | AI envió saludo, `human_msg_count = 0` | Frío | Verificar entrega + revisar copy del primer mensaje |
-| **2. Respondió y se calló a mitad** | `has_responded = true` pero atascado en `confirmo_cobertura` / `dio_datos_personales` / `dio_vin` / `dio_domicilio` | Caliente | Nudge con **el dato exacto que falta** ("solo me falta tu número de serie") |
-| **3. Llegó a póliza, no pagó** | `poliza_emitida_wa = true` sin `estatus_pago = 'PAGADO'` | Muy caliente | Reenviar link de pago |
-
-Los grupos 2 y 3 son leads calientes ya trabajados: recuperarlos es el retorno más alto por
-mensaje enviado. El grupo 1 puede ser el más numeroso, pero es el más frío y el más contaminado
-por el problema de entrega descrito abajo.
+1. **El primer contacto:** el ~76% de los leads no responde *ni una vez* al mensaje inicial.
+   Ahí está la fuga grande, y es un problema de copy/oferta, no de tecnología.
+2. **La cadencia de follow-up:** hoy hay **un solo** recordatorio (a los ~15 min). Hay margen para
+   toques adicionales (24h, 72h) respetando la ventana de Meta.
+3. **La visibilidad:** el Dashboard no muestra los mensajes que Django envía, así que hoy es
+   imposible auditar qué se le mandó a un lead sin entrar a la base de datos.
 
 ---
 
-## 2. Dos bugs conocidos pueden estar frenando la conversión *antes* del follow-up
+## Lo que YA existe y funciona (verificado en producción)
 
-### Bug #2 — prefijo de país incorrecto (responsabilidad Django)
+Django tiene un motor de follow-up de WhatsApp activo, disparado por un **management command vía
+Heroku Scheduler**. Config vars relevantes (`hyl-wai-production`):
 
-Algunos leads se registran con `session_id` / teléfono con prefijo **`57` (Colombia)** en lugar
-de **`52` (México)**. Con el número mal formado, **Meta no entrega el mensaje**. Esos leads no
-son "fríos": son mensajes que nunca llegaron. Perseguirlos con más mensajes al número incorrecto
-no sirve de nada.
+| Config var | Valor | Significado |
+|---|---|---|
+| `WHATSAPP_FOLLOWUPS_ENABLED` | `1` | Follow-up activo |
+| `WHATSAPP_QUOTE_FIRST_FOLLOWUP_DELAY_MINUTES` | `12` | Primer recordatorio ~12-15 min tras el saludo |
+| `WHATSAPP_FOLLOWUP_MAX_CANDIDATE_AGE_MINUTES` | `1440` | Solo persigue leads de ≤24h → **respeta la ventana de Meta** |
 
-> **Acción para Juan:** cuantificar cuántos leads tienen prefijo de país incorrecto y corregir
-> la normalización del teléfono en Django antes del webhook a n8n. Si el porcentaje es alto, este
-> es el arreglo de conversión con mejor retorno de todos — y no requiere ningún motor de
-> reintentos.
+Plantillas HSM aprobadas por Meta en uso: `cotizacion_inicial_con_imagen`, `cotizacion_pdf_inicial`,
+`cotizacion_followup_15m`.
 
-### Bug #1 — 89% de sesiones sin historial (responsabilidad n8n)
-
-n8n no está guardando el historial de conversación en `n8n_chat_histories` en el 89% de los
-casos. Esto nos deja **parcialmente ciegos**: sin historial no se puede saber con fiabilidad en
-qué fase se cayó cada lead. Un perseguidor "inteligente" (que sabe qué dato falta) depende de
-tener este dato; un perseguidor "tonto" (mismo mensaje a todos) funciona sin él, pero convierte
-mucho menos.
-
----
-
-## 3. La restricción que define toda la arquitectura: la ventana de 24 h de Meta
-
-WhatsApp Business no permite enviar texto libre a un usuario fuera de una ventana de 24 h desde su
-última actividad:
-
-- `last_activity < 24 h` → se puede enviar **texto libre** (el bot de Claude improvisa la respuesta).
-- `last_activity > 24 h` → Meta **rechaza** el texto libre. Solo se pueden enviar **plantillas
-  HSM pre-aprobadas** por Meta.
-
-Como perseguir a un lead casi siempre ocurre >24 h después, el motor de reintentos **depende de
-tener plantillas aprobadas**. Sin ellas, el follow-up falla justo cuando más se necesita. El
-trámite de aprobación con Meta tiene latencia (horas o días), por eso conviene arrancarlo cuanto
-antes.
-
-Se necesitan al menos 3 plantillas:
-1. Nudge genérico de reactivación.
-2. "Solo falta un dato" (parametrizable con el dato pendiente).
-3. Reenvío de link de pago.
-
----
-
-## 4. Motor de reintentos propuesto (Agente Conversión)
-
-Cadencia sugerida, con escalada a humano en lugar de spam infinito:
+**Evidencia de que funciona** (lead 952, cotización 2404, 30 jun 2026):
 
 ```
-Mensaje inicial enviado
-   │
-   ├─ +1 h   → si sigue en silencio y DENTRO de ventana 24 h → recordatorio texto libre
-   │
-   ├─ +24 h  → plantilla HSM (según grupo: nudge / falta-dato / pago)
-   │
-   ├─ +72 h  → segunda plantilla HSM
-   │
-   └─ sin respuesta → escalar a humano vía botón "Pasar a Kommo" en el Dashboard
-                       (o marcar el lead como perdido)
+14:53:56  cotizacion_inicial_con_imagen  → sent  (wamid ...52C9)
+15:10:56  cotizacion_followup_15m        → sent  (wamid ...97CA, Meta: "accepted")
 ```
 
-Reutiliza el workflow `Retomar Conversacion.json` ya existente como base (verificar si soporta
-plantillas HSM o solo texto libre) y el botón "Pasar a Kommo" para el traspaso a atención humana.
+Log de eventos (`qualitas_leadactionevent`):
+
+```
+14:53:56  whatsapp_initial_sent         source=django
+15:10:54  whatsapp_followup_15m_queued  source=management_command
+15:10:56  whatsapp_followup_15m_sent    source=management_command
+```
+
+El follow-up se envía correctamente a **no-respondedores**: de 59 follow-ups, **51 fueron a leads
+que nunca respondieron** (comportamiento correcto).
 
 ---
 
-## 5. Plan de acción por orden de prioridad
+## El funnel real (datos de producción, 1 jul 2026)
 
-| # | Acción | Responsable | Bloquea a |
+```
+246 cotizaciones generadas
+ → ~120 recibieron WhatsApp inicial     (whatsapp_initial_sent = 120)
+ → 59 recibieron follow-up a los ~15m   (verificado con acuse de Meta)
+ → ~48 leads respondieron de verdad     (~40% de reply sobre los contactados)
+ → muy pocos llegaron a póliza pagada
+```
+
+Señales de calidad:
+- **Solo 1 mensaje falló** de ~180 (error de parámetros de plantilla de Meta `#132018`). No es sistémico.
+- **93% de las sesiones (`whatsapp_sessions`) están atascadas en `conversation_phase='greeting'`**
+  (189 de 203) → confirma el **Bug #5**: ese campo es inservible como medida de avance.
+
+---
+
+## Reinterpretación del Bug #1 (importante)
+
+El CLAUDE.md describe el Bug #1 como "n8n no guarda historial (89% de sesiones vacías)". Los datos
+matizan esto:
+
+- El número real hoy es **~76%** (154 de 203 sesiones sin historial), no 89%.
+- **El historial existe casi solo cuando el humano responde** (48 de 49 sesiones con historial
+  tienen mensaje humano). El contacto inicial lo manda **Django** (plantillas), no n8n; n8n solo
+  entra cuando el cliente contesta.
+- Por tanto, "76% de sesiones vacías" es en gran parte **"76% de leads que nunca respondieron"**
+  — un problema de **conversión en el primer contacto**, no una pérdida masiva de datos.
+
+**Consecuencia:** el Bug #1 sigue importando para la **analítica** (el Agente Mejoras Conversación
+está ciego sobre esos leads y no puede analizar su copy), pero **NO frena el motor de follow-up**,
+que decide a quién perseguir con su propia lógica del lado Django, no leyendo `n8n_chat_histories`.
+
+---
+
+## Las palancas reales de conversión (por prioridad)
+
+| # | Palanca | Por qué | Dónde |
 |---|---|---|---|
-| 1 | **Medir la fuga por fase** con los hitos de `n8n_chat_histories` (Agente Mejoras Conversación) — cuántos leads en cada grupo | Alberto / Agente Mejoras | Diseño del motor |
-| 2 | **Cuantificar Bug #2** (prefijo de país) — % de leads con teléfono mal formado | Juan (Django) | Nada — arreglo directo |
-| 3 | **Diseñar y enviar a aprobación las 3 plantillas HSM** con Meta | Alberto | Motor de reintentos |
-| 4 | **Corregir Bug #1** (historial vacío) para segmentación fiable | n8n | Perseguidor "inteligente" |
-| 5 | **Construir el Agente Conversión** con la cadencia de arriba | Ejecutor Nivel 3 | — |
+| 1 | **Copy/oferta del primer contacto** | El 76% no responde ni una vez. Es la fuga mayor. | Plantilla `cotizacion_inicial_con_imagen` (Meta) + lógica Django |
+| 2 | **Más toques de follow-up** | Hoy solo hay uno (15 min). Añadir 24h y 72h con plantilla HSM puede recuperar leads que el toque único no alcanza. | Django (nuevas plantillas + scheduler) |
+| 3 | **Visibilidad en el Dashboard** | Hoy no se ve qué se envió a un lead → imposible auditar/optimizar sin tocar la BD. | Repo `Dashboard_seguroautoqualitas` (ver spec aparte) |
+| 4 | **Corregir Bug #1** | Desbloquea el análisis de copy del Agente Mejoras sobre el 76% ciego. Es analítica, no follow-up. | n8n |
+| 5 | **Revisar sobre-envío** | 8 de 59 follow-ups fueron a leads que sí habían respondido. Verificar si se enviaron *después* de su respuesta (mala UX). | Django |
 
 ---
 
-## Recomendación final
+## Recomendación
 
-El instinto de perseguir a los no-respondedores es acertado, pero **el orden importa**:
+El motor de "perseguir no-respondedores" ya existe y está verificado — **no construir nada nuevo
+en n8n**. El foco debe ir al **primer contacto** (palanca 1), que es donde se pierde el 76% de los
+leads, y a la **cadencia de follow-up** (palanca 2). En paralelo, cerrar el **gap de visibilidad
+del Dashboard** (palanca 3) para poder medir y optimizar lo que ya se envía.
 
-1. Medir la fuga real por fase (paso 1) para saber dónde está el agujero grande.
-2. Descartar el Bug #2 (paso 2) — si buena parte de los "no contestan" son mensajes que nunca se
-   entregaron, arreglar la normalización del teléfono convierte más que cualquier campaña de
-   reintentos, y es más barato.
-3. Recién entonces construir el motor de reintentos, con las plantillas de Meta ya aprobadas.
+## Pregunta abierta para Juan
 
-Perseguir leads sobre datos ciegos (Bug #1) y con números mal formados (Bug #2) desperdicia
-presupuesto de mensajes de Meta y da métricas engañosas. Primero visibilidad y entrega, luego
-automatización.
+- ¿Cómo decide exactamente el management command a quién enviar el follow-up (qué define
+  "candidato" y "ya respondió")? Confirmarlo cierra la última incógnita del modelo.
+- ¿Está prevista una cadencia de más de un toque, o el `cotizacion_followup_15m` es el único?
+
+> Nota no relacionada con conversión: existe un incidente activo de **emisión de pólizas** — el
+> endpoint `/api/emitir-externo/` devuelve HTTP 400 de forma recurrente (1 jul 2026) con un
+> mensaje genérico y sin loguear la causa. Se documenta y se traslada a Juan en un Issue aparte.
