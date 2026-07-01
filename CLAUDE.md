@@ -289,8 +289,7 @@ El 89% de sesiones no tienen historial en `n8n_chat_histories`. El agente lo det
 | Regenerar token Meta Business API | ⚠️ Urgente |
 | Corrección Bug #7 en Django — Juan Aguayo (Issue #69 `aguayo-co/HYL-WAI`) | ⏳ Pendiente externo |
 | Corrección Bug #8 en Django — Juan Aguayo (Issue #70 `aguayo-co/HYL-WAI`) | ⏳ Pendiente externo |
-| Re-exportar workflow n8n con cambios caso-001/caso-002 (system prompt AI Agent) y commit | ⏳ Pendiente |
-| Política de backup automático de workflows n8n — diseño en `docs/architecture/backup-policy-n8n.md` | ⏳ Diseñado, falta implementar (requiere secret `N8N_API_KEY` en GitHub Actions) |
+| Política de backup automático de workflows n8n | ✅ Activo (`.github/workflows/backup-n8n.yml`, cron diario 06:00 CDMX + disparo manual). Rotar `N8N_API_KEY` de GitHub Actions — se pegó en texto plano en una sesión de chat el 30 jun 2026, hay que revocarla en n8n y generar una nueva |
 | Tab 2.0 del Dashboard | ⏳ Instrucciones ya dadas al Code Agent |
 | PAT fine-grained para repo `aguayo-co/HYL-WAI` | ⏳ Pendiente (`gh` CLI funciona para issues; PAT necesario para acceso a código) |
 | Reconectar Notion al workspace `aguayo` | ⏳ Pendiente |

@@ -56,19 +56,35 @@ Si un cambio en producción rompe la conversación:
 2. Copiar ese JSON.
 3. En n8n UI: import workflow from JSON (o reemplazar el nodo afectado si el rollback es parcial).
 
-## Qué falta para activarlo
+## Estado: implementado y activo (1 jul 2026)
 
 Plan de implementación detallado (TDD, tarea por tarea): `docs/superpowers/plans/2026-06-30-n8n-workflow-backup.md`.
 
-- [x] Diseño de matching de workflows: en vez de hardcodear IDs, el script busca por nombre
-      exacto contra `GET /api/v1/workflows` — evita depender de IDs que podrían cambiar
-- [ ] Agregar secret `N8N_API_KEY` en GitHub Actions del repo `Agente-Arquitecto` (Alberto, vía `gh secret set`)
-- [ ] Escribir el script de fetch + selección por nombre + escritura de archivo
-- [ ] Escribir `.github/workflows/backup-n8n.yml` (cron + workflow_dispatch, commit solo si `git status` detecta diff)
-- [ ] Probar un ciclo completo: disparo manual → commit generado → diff correcto
-- [ ] Re-exportar y commitear el estado actual (caso-001 y caso-002 ya aplicados en prod,
-      el repo todavía no los refleja) — se resuelve solo en la primera corrida manual del
-      script (ver pendiente #1 del 30 jun 2026)
+- [x] Diseño de matching de workflows por nombre exacto contra `GET /api/v1/workflows` (`scripts/n8n-backup/select-workflows.mjs`)
+- [x] Secret `N8N_API_KEY` en GitHub Actions del repo `Agente-Arquitecto`
+- [x] Script de fetch + selección por nombre + escritura de archivo (`scripts/n8n-backup/backup.mjs`)
+- [x] `.github/workflows/backup-n8n.yml` (cron diario 06:00 CDMX + workflow_dispatch, commit solo si `git status` detecta diff)
+- [x] Ciclo completo probado: disparo manual → commit generado → diff correcto
+- [x] Re-exportado el estado con los cambios caso-001/caso-002 (se resolvió solo, en la primera corrida)
 
-Esto requiere acceso de escritura a GitHub Actions secrets, que Alberto debe hacer manualmente
-(el Arquitecto no tiene acceso a esa UI). El Arquitecto redacta el script y el YAML.
+### Incidente resuelto — PII filtrada por la n8n API (1 jul 2026)
+
+La primera corrida (commit `d3bbae4`) escribió al repo **público** el JSON crudo de
+`GET /workflows/{id}`, que incluye `shared.project.projectRelations[].user` con nombre, email
+y respuestas de encuesta de onboarding del dueño del workflow en n8n — datos que un export
+manual desde la UI nunca trae. Fix en `scripts/n8n-backup/to-export-format.mjs`
+(`toExportFormat()`): whitelist estricta de los campos que sí trae un export manual
+(`name, nodes, pinData, connections, active, settings, versionId, meta, id, tags`) antes de
+escribir cualquier archivo. Verificado en el commit `51b3238`: cero PII, diff de solo 15 líneas
+de contenido real.
+
+**El commit `d3bbae4` con la PII sigue en el historial público de GitHub** — decisión explícita
+de Alberto (1 jul 2026) de no reescribir el historial, solo mitigar hacia adelante.
+
+**Pendiente:** rotar `N8N_API_KEY` — el valor se pegó en texto plano en una sesión de chat el
+30 jun 2026 antes de configurarse como secret. Revocar esa key en n8n UI (Settings → n8n API) y
+generar una nueva, luego `gh secret set N8N_API_KEY --repo aibanez82/Agente-Arquitecto`.
+
+**Regla para cualquier script futuro que lea de la n8n API:** nunca escribir la respuesta cruda
+de `GET /workflows/{id}` a un archivo — siempre pasar por un whitelist de campos como
+`toExportFormat()`.
