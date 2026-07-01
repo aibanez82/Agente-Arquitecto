@@ -273,7 +273,7 @@ jobs:
 
 - [ ] **Step 2: Validate YAML syntax locally**
 
-Run: `python3 -c "import yaml, sys; yaml.safe_load(open('.github/workflows/backup-n8n.yml'))" && echo OK`
+Run: `ruby -ryaml -e "YAML.load_file('.github/workflows/backup-n8n.yml'); puts 'OK'"` (macOS ships Ruby/Psych by default; `python3 -c "import yaml..."` also works if PyYAML is installed)
 Expected: `OK` (this only checks the file parses as valid YAML, not that the job succeeds — actual execution is verified in Task 4)
 
 - [ ] **Step 3: Commit**
