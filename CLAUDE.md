@@ -135,6 +135,8 @@ Wagtail es un CMS construido sobre Django. **No son dos sistemas separados** —
 | Mensajes proactivos (Retomar conversación) | `docs/n8n-workflows/Retomar Conversacion.json` |
 
 > Exportar y hacer commit aquí cada vez que se modifique un workflow en producción.
+> Mientras el backup automático (`docs/architecture/backup-policy-n8n.md`) no esté
+> implementado, este export manual es la única red de seguridad ante cambios rotos.
 
 El bot tiene 3 nodos que llaman a Claude:
 1. **Jailbreak detection** — Claude Haiku
@@ -286,7 +288,10 @@ El 89% de sesiones no tienen historial en `n8n_chat_histories`. El agente lo det
 | Rotar service account key Google Cloud (`ba36b46f377b...`) | ⚠️ Urgente |
 | Regenerar token Meta Business API | ⚠️ Urgente |
 | Corrección Bug #7 en Django — Juan Aguayo (Issue #69 `aguayo-co/HYL-WAI`) | ⏳ Pendiente externo |
-| Export periódico n8n workflows | ⏳ Pendiente |
+| Corrección Bug #8 en Django — Juan Aguayo (Issue #70 `aguayo-co/HYL-WAI`) | ⏳ Pendiente externo |
+| Re-exportar workflow n8n con cambios caso-001/caso-002 (system prompt AI Agent) y commit | ⏳ Pendiente |
+| Política de backup automático de workflows n8n — diseño en `docs/architecture/backup-policy-n8n.md` | ⏳ Diseñado, falta implementar (requiere secret `N8N_API_KEY` en GitHub Actions) |
+| Tab 2.0 del Dashboard | ⏳ Instrucciones ya dadas al Code Agent |
 | PAT fine-grained para repo `aguayo-co/HYL-WAI` | ⏳ Pendiente (`gh` CLI funciona para issues; PAT necesario para acceso a código) |
 | Reconectar Notion al workspace `aguayo` | ⏳ Pendiente |
 | Subir `BUGS_N8N.md` al repo Dashboard | ⏳ Pendiente |
