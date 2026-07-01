@@ -1,6 +1,7 @@
 import { writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { selectWorkflows } from './select-workflows.mjs'
+import { toExportFormat } from './to-export-format.mjs'
 
 const N8N_BASE_URL = process.env.N8N_BASE_URL ?? 'https://n8n.srv1325340.hstgr.cloud/api/v1'
 const OUTPUT_DIR = path.join(import.meta.dirname, '..', '..', 'docs', 'n8n-workflows')
@@ -35,8 +36,9 @@ export async function backupWorkflows() {
   const targets = selectWorkflows(list)
   for (const target of targets) {
     const full = await n8nFetch(`/workflows/${target.id}`)
+    const exportable = toExportFormat(full)
     const outPath = path.join(OUTPUT_DIR, target.file)
-    await writeFile(outPath, JSON.stringify(full, null, 2) + '\n', 'utf8')
+    await writeFile(outPath, JSON.stringify(exportable, null, 2) + '\n', 'utf8')
     console.log(`Wrote ${target.file}`)
   }
 }
