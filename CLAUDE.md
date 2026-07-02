@@ -328,6 +328,7 @@ Alberto atiende el lead directamente desde Kommo
 | `n8n_chat_histories` sin columna de timestamp — pedir a Juan `ALTER TABLE n8n_chat_histories ADD COLUMN created_at timestamptz NOT NULL DEFAULT now();` | ⏳ Pendiente externo — mensaje redactado, ver `docs/estrategia/2026-07-01-conversacion-completa-wa-n8n-django.md` |
 | Issue #74 (`aguayo-co/HYL-WAI`) — follow-up 15 min dejó de enviarse desde 2026-06-30 ~21:11 UTC | ⏳ Causa raíz sin determinar. Requiere acceso Heroku (config vars, releases, scheduler) — Alberto va a dar token OAuth read-only vía Vercel env Plain |
 | Propuesta arquitectura BD — tabla canónica `whatsapp_event` (dual-write desde n8n/Django/Dashboard, reemplaza joins frágiles y LIKE de hitos) | 💡 Documentada como plan de destino, sin decisión de implementar aún |
+| Alerta de emisión fallida (Bug #9) — workflow `Bot Error Handler` en n8n + tarjeta "Emisión falló" en Dashboard | ⏸️ En pausa — implica desarrollo de n8n (Error Workflow + extracción de datos de la ejecución fallida). Spec lista en `docs/estrategia/2026-07-02-alerta-emision-fallida-quálitas.md` |
 
 ---
 
