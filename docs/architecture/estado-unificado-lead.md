@@ -27,6 +27,7 @@ SI conversation_phase = 'greeting' Y estado = 'COTIZACION_INICIADA' Y fecha >= N
 | Hitos conversacionales WA | `n8n_chat_histories` (BOOL_OR + LIKE) | `whatsapp_sessions.conversation_phase` |
 | Póliza emitida | `qualitas_polizaemitida` | — |
 | Pago confirmado | `qualitas_polizaemitida.estatus_pago` | — |
+| Emisión fallida activa (Bug #9, causa externa Quálitas) | `qualitas_leadactionevent.event_type = 'policy_issuance_failed'` sin `qualitas_polizaemitida.numero_poliza` posterior — ver `docs/estrategia/2026-07-02-alerta-emision-fallida-quálitas.md` | — |
 
 ## Regla crítica
 
