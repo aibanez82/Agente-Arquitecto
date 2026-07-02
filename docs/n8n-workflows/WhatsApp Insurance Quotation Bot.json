@@ -279,6 +279,14 @@
               "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters12_Value', `Phone number (10 digits)`, 'string') }}"
             },
             {
+              "name": "serie",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters18_Value', `From **user input** (captured in Group 2), NOT from quotation API`, 'string') }}"
+            },
+            {
+              "name": "placas",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters19_Value', `License plates (7 alphanumeric)`, 'string') }}"
+            },
+            {
               "name": "calle",
               "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters13_Value', `Street name`, 'string') }}"
             },
@@ -297,14 +305,6 @@
             {
               "name": "colonia",
               "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters17_Value', `Neighborhood/Colony`, 'string') }}"
-            },
-            {
-              "name": "serie",
-              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters18_Value', `From **user input** (captured in Group 2), NOT from quotation API`, 'string') }}"
-            },
-            {
-              "name": "placas",
-              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters19_Value', `License plates (7 alphanumeric)`, 'string') }}"
             },
             {
               "name": "paquete",

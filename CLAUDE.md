@@ -238,6 +238,7 @@ d.estatus_pago === 'PAGADO' ||
 - `qualitas_cotizacion.serie_vehiculo` y `whatsapp_sessions.captured_data` NO son fuente del VIN — ambos quedan `NULL`/`{}` en los casos revisados; el dato viaja directo de la conversación al tool call, sin pasar por columna dedicada en Postgres.
 - Póliza `7620096850` ya está `PAGADO` con VIN incorrecto — requiere corrección/reemisión directa con Quálitas, gestión separada del fix de n8n.
 - Issue abierto: `aguayo-co/HYL-WAI` #83.
+- **Fix validado end-to-end en staging (2 jul 2026):** entorno de pruebas montado en Heroku `hyl-wai-stg` + copia STAGING del workflow en n8n (folder separado, credenciales propias de Postgres/WhatsApp). Se sembró una conversación de prueba en `n8n_chat_histories` con VIN reconocible (`TESTVIN1234567890`) y se corrió manualmente vía "Execute workflow" con datos fijados ("pin") en el trigger, evitando depender del webhook real de Meta (bloqueado por la restricción de "un solo trigger de WhatsApp por Facebook App"). Resultado: `parameters18_Value` (serie) llegó correcto a `Issue_Policy`, Django/Quálitas sandbox respondió `"serie":"TESTVIN1234567890"`. Fix aplicado y confirmado en producción (`docs/n8n-workflows/WhatsApp Insurance Quotation Bot.json`) el mismo día — pendiente que Alberto lo replique en el nodo `Issue Policy` del workflow real en n8n producción.
 
 ---
 
