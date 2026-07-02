@@ -313,6 +313,9 @@ Alberto atiende el lead directamente desde Kommo
 | Reconectar Notion al workspace `aguayo` | ⏳ Pendiente |
 | Subir `BUGS_N8N.md` al repo Dashboard | ⏳ Pendiente |
 | Integración Kommo — botón "Pasar a Kommo" en Dashboard | ⏳ Pendiente (falta subdominio + API token + pipeline de Alberto) |
+| `n8n_chat_histories` sin columna de timestamp — pedir a Juan `ALTER TABLE n8n_chat_histories ADD COLUMN created_at timestamptz NOT NULL DEFAULT now();` | ⏳ Pendiente externo — mensaje redactado, ver `docs/estrategia/2026-07-01-conversacion-completa-wa-n8n-django.md` |
+| Issue #74 (`aguayo-co/HYL-WAI`) — follow-up 15 min dejó de enviarse desde 2026-06-30 ~21:11 UTC | ⏳ Causa raíz sin determinar. Requiere acceso Heroku (config vars, releases, scheduler) — Alberto va a dar token OAuth read-only vía Vercel env Plain |
+| Propuesta arquitectura BD — tabla canónica `whatsapp_event` (dual-write desde n8n/Django/Dashboard, reemplaza joins frágiles y LIKE de hitos) | 💡 Documentada como plan de destino, sin decisión de implementar aún |
 
 ---
 
