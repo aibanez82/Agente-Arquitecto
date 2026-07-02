@@ -203,6 +203,7 @@ Ver `BUGS_N8N.md` para detalle completo con evidencia SQL.
 | 7 | Django no escribe `estatus_pago = 'PAGADO'` al confirmar pago — solo dispara webhook a n8n | Django | 🟠 Alto |
 | 8 | `_generar_bloque_492` no incluye teléfono celular en XML SOAP a Quálitas — campo queda vacío en póliza emitida | Django | 🟠 Alto |
 | 9 | `POST /api/emitir-externo/` devuelve HTTP 400 recurrente — la emisión de pólizas falla y Django se traga la causa (mensaje genérico, sin logging). Detectado 1 jul 2026. | Django | 🔴 Crítico |
+| 10 | AI Agent envía ciudad/estado en vez de VIN al llamar `Issue_Policy` — 3 de 5 pólizas emitidas hasta ahora tienen VIN incorrecto en Quálitas, una ya `PAGADO` (`7620096850`). Detectado 2 jul 2026. Issue `aguayo-co/HYL-WAI` #83. | n8n | 🔴 Crítico |
 
 **Workaround activo para Bug #7 en Dashboard:**
 ```js
@@ -228,6 +229,15 @@ d.estatus_pago === 'PAGADO' ||
 - Pista para Juan: `QUALITAS_AMBIENTE_FLAG = 0` (verificar si es el valor correcto para emisión en vivo).
 - Petición doble a Juan: (a) causa raíz del campo que falla; (b) **observabilidad** — loguear el fault de Quálitas y devolver la causa en un campo `detail`.
 - Repetido al menos 2 veces el 1 jul 2026 (12:49:32 y 13:05:15 CDMX). request_id ejemplo: `f00e2d0d-927b-33a1-66dc-e6193db0a1f1`.
+
+**Detalle Bug #10 (VIN↔ciudad/estado en Issue_Policy):**
+- Auditoría completa de las 5 emisiones históricas vía `n8n_chat_histories` (`Calling Issue_Policy` + regex sobre `parameters18_Value`): 3 de 5 con valor incorrecto (`Hidalgo`, `Ciudad de México`, `Ciudad General Escobedo` en vez del VIN).
+- En los 2 casos auditados a fondo, el VIN se capturó y validó correctamente en la conversación (`Validate_Personal_Data` sin error) — el error ocurre solo al construir la llamada `Issue_Policy`.
+- Causa: el parámetro `serie` (`parameters18_Value`) está intercalado en medio de 5 campos de domicilio consecutivos (`...colonia → serie → placas...`); el AI Agent "sigue el patrón" de domicilio y mete ciudad/estado ahí en vez del VIN.
+- Fix propuesto: reordenar `bodyParameters` del nodo `Issue Policy` en n8n para agrupar `serie` + `placas` justo después de los datos personales, separados del bloque de domicilio. No requiere cambios en Django.
+- `qualitas_cotizacion.serie_vehiculo` y `whatsapp_sessions.captured_data` NO son fuente del VIN — ambos quedan `NULL`/`{}` en los casos revisados; el dato viaja directo de la conversación al tool call, sin pasar por columna dedicada en Postgres.
+- Póliza `7620096850` ya está `PAGADO` con VIN incorrecto — requiere corrección/reemisión directa con Quálitas, gestión separada del fix de n8n.
+- Issue abierto: `aguayo-co/HYL-WAI` #83.
 
 ---
 
