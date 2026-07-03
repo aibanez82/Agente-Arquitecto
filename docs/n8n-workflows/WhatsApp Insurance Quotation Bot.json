@@ -12,10 +12,10 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        -976,
-        -48
+        -4256,
+        1648
       ],
-      "id": "177c85a5-b656-4305-a9a9-f407fbb1aea7",
+      "id": "22114334-d384-4316-8b95-4828a26b1f20",
       "name": "Check Session Exists",
       "credentials": {
         "postgres": {
@@ -52,10 +52,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        -752,
-        -48
+        -4032,
+        1648
       ],
-      "id": "0a11feef-0aea-46cc-9fc3-2729bff3e190",
+      "id": "36ba4991-9a4a-4b24-9af8-a0cd9e7f3a41",
       "name": "Session Router"
     },
     {
@@ -69,10 +69,10 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        -448,
-        -224
+        -3728,
+        1472
       ],
-      "id": "0977707e-2b0d-4755-8f8e-ca0846e838b6",
+      "id": "4c4bd484-b650-4488-90e9-1853b6d9d4c1",
       "name": "Load Session",
       "credentials": {
         "postgres": {
@@ -92,10 +92,10 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        -256,
-        -224
+        -3536,
+        1472
       ],
-      "id": "2de79411-154c-4c90-8928-cca22073a290",
+      "id": "197289c8-1efb-4b30-a42f-b23dd673bb0a",
       "name": "Update Activity",
       "credentials": {
         "postgres": {
@@ -111,10 +111,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -448,
-        -48
+        -3728,
+        1648
       ],
-      "id": "e165ddb1-ae55-410f-b83a-5e8469c1eeef",
+      "id": "e1261f61-f206-4229-b47d-59e24e27cb62",
       "name": "Fallback Flag"
     },
     {
@@ -140,10 +140,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -816,
-        -1088
+        -4096,
+        608
       ],
-      "id": "1f7e027f-a78b-4df3-a655-4fa36531f32f",
+      "id": "3ebc6f87-8acd-4f6e-aeef-53c3d9d98fb8",
       "name": "Dev Data Injector"
     },
     {
@@ -153,10 +153,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        240,
-        -48
+        -3040,
+        1648
       ],
-      "id": "f26a6d40-2fa3-4cec-9f4e-7b0b92a6eb21",
+      "id": "568ea55e-8644-46e5-a29a-be9bd984d327",
       "name": "Merge Session Data"
     },
     {
@@ -166,10 +166,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1200,
-        -48
+        -4480,
+        1648
       ],
-      "id": "27ea9440-0fc5-4d92-a5af-f2102dbcb994",
+      "id": "89c982d0-f751-4d09-b9b7-fe2ff2d200e1",
       "name": "Session Context Builder"
     },
     {
@@ -183,10 +183,10 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        4208,
-        -16
+        928,
+        1680
       ],
-      "id": "9eb19263-c0aa-472d-a842-1dc3a757ef30",
+      "id": "07e13567-ab82-4f17-a727-0d828edc005f",
       "name": "AI Agent",
       "onError": "continueErrorOutput"
     },
@@ -206,10 +206,10 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
       "typeVersion": 1.3,
       "position": [
-        3888,
-        208
+        608,
+        1904
       ],
-      "id": "46486471-3d90-49db-8287-399af07b79a9",
+      "id": "a3b35fdb-fcc0-4613-921d-3ea778cd1c44",
       "name": "Anthropic Chat Model",
       "credentials": {
         "anthropicApi": {
@@ -321,10 +321,10 @@
       "type": "n8n-nodes-base.httpRequestTool",
       "typeVersion": 4.3,
       "position": [
-        4160,
-        208
+        880,
+        1904
       ],
-      "id": "55493e51-03ec-4cac-98c6-0fbe24022946",
+      "id": "51eea54d-65be-470b-af39-81ac51d6dcf1",
       "name": "Issue Policy"
     },
     {
@@ -359,10 +359,10 @@
       "type": "n8n-nodes-base.httpRequestTool",
       "typeVersion": 4.3,
       "position": [
-        4320,
-        208
+        1040,
+        1904
       ],
-      "id": "9f08b1bd-e2f2-48a6-922b-02e20fa038c9",
+      "id": "9772718e-cb17-4e34-9a0d-3e1cfb5d28ff",
       "name": "Get Quotation Data"
     },
     {
@@ -376,10 +376,10 @@
       "type": "@n8n/n8n-nodes-langchain.toolCode",
       "typeVersion": 1.3,
       "position": [
-        4464,
-        208
+        1184,
+        1904
       ],
-      "id": "43f58fd5-f83f-4a8d-b620-f5d51898fd80",
+      "id": "b1c529b2-5c92-4243-b92b-b23c1c42ce2a",
       "name": "Validate Personal Data"
     },
     {
@@ -396,10 +396,10 @@
       "type": "@n8n/n8n-nodes-langchain.chatTrigger",
       "typeVersion": 1.4,
       "position": [
-        -1040,
-        -1088
+        -4320,
+        608
       ],
-      "id": "b4fac20c-5a2d-47b9-9481-2f5a2056fc33",
+      "id": "2c0ad8c6-8338-4e7f-a852-0b96f78b9903",
       "name": "Chat Message Trigger",
       "webhookId": "52d0be99-7fa5-429c-bc69-d0cb4636089b"
     },
@@ -410,10 +410,10 @@
       "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
       "typeVersion": 1.3,
       "position": [
-        4016,
-        208
+        736,
+        1904
       ],
-      "id": "3a157a1b-88d1-45e3-b702-debfa33e6c75",
+      "id": "3769734b-e74c-4b57-909a-bd7492e2ad7d",
       "name": "Postgres Chat Memory",
       "credentials": {
         "postgres": {
@@ -434,10 +434,10 @@
       "type": "n8n-nodes-base.whatsAppTrigger",
       "typeVersion": 1,
       "position": [
-        -1424,
-        -48
+        -4704,
+        1648
       ],
-      "id": "5fe9bff5-8152-4af7-905d-a9e114ea4999",
+      "id": "80dccf45-763c-48d4-92fa-4fdf1925bfd4",
       "name": "WhatsApp Message Trigger",
       "webhookId": "18c1b498-024e-4803-8088-56ccf9812f33",
       "credentials": {
@@ -460,10 +460,10 @@
       "type": "n8n-nodes-base.postgresTool",
       "typeVersion": 2.6,
       "position": [
-        4624,
-        192
+        1344,
+        1888
       ],
-      "id": "4c74ffdd-5d54-4860-b911-a45abc2c1074",
+      "id": "92d56186-5e1a-4206-9333-83b22997c3f7",
       "name": "Search Colony by Postal Code",
       "credentials": {
         "postgres": {
@@ -479,10 +479,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2064,
-        32
+        -1216,
+        1728
       ],
-      "id": "d1cc652c-c74d-4733-a3ab-3fbe44ea779a",
+      "id": "5a5b2a32-4a6d-4669-b3d8-1f9f11720e77",
       "name": "Basic Input Sanitization"
     },
     {
@@ -503,10 +503,10 @@
       "type": "@n8n/n8n-nodes-langchain.guardrails",
       "typeVersion": 2,
       "position": [
-        2320,
-        32
+        -960,
+        1728
       ],
-      "id": "80af02a8-9902-48b8-aa81-62abae5c5cab",
+      "id": "d514c722-f0a0-4e01-9fca-ba17e807c4f1",
       "name": "PII Sanitization"
     },
     {
@@ -523,10 +523,10 @@
       "type": "@n8n/n8n-nodes-langchain.guardrails",
       "typeVersion": 2,
       "position": [
-        2576,
-        32
+        -704,
+        1728
       ],
-      "id": "e803f63a-b120-41af-a86c-6f8a9f3915b7",
+      "id": "1e98a8fa-3092-4fbf-8c1e-8973d201204f",
       "name": "Detect Jailbreak"
     },
     {
@@ -542,10 +542,10 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
       "typeVersion": 1.3,
       "position": [
-        2576,
-        208
+        -704,
+        1904
       ],
-      "id": "0eb698a4-1b39-40bf-bde8-02003f95453b",
+      "id": "9eda29cd-b481-44f9-8fcb-b19165614c84",
       "name": "Haiku",
       "credentials": {
         "anthropicApi": {
@@ -561,10 +561,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3280,
-        -1280
+        0,
+        416
       ],
-      "id": "358434ac-ad46-4637-800a-8af7e1f42c78",
+      "id": "4af29b28-651e-4b3e-9704-6e7c809e58f9",
       "name": "Jailbreak Warning Message"
     },
     {
@@ -574,10 +574,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2992,
-        0
+        -288,
+        1696
       ],
-      "id": "297353af-802d-45d3-8626-38f09c6c320d",
+      "id": "63980450-1159-4898-8dec-41eaebc68108",
       "name": "Restore Context After Guardrail"
     },
     {
@@ -594,10 +594,10 @@
       "type": "@n8n/n8n-nodes-langchain.guardrails",
       "typeVersion": 2,
       "position": [
-        5504,
-        -160
+        2224,
+        1536
       ],
-      "id": "d835b15e-f737-4bdb-ad2f-25dd02e14662",
+      "id": "ca46d922-dc68-46da-8869-24e76e2c02ca",
       "name": "Sanitize Output PII"
     },
     {
@@ -607,10 +607,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        5920,
-        -160
+        2640,
+        1536
       ],
-      "id": "17d3d9a8-c9c7-4788-9085-a8f45228ef91",
+      "id": "f859ee36-3b5c-4354-9478-9616f9ef2d60",
       "name": "Filter System Leaks"
     },
     {
@@ -620,10 +620,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        5728,
-        -160
+        2448,
+        1536
       ],
-      "id": "f7c57f70-be10-405b-8111-c3f7a34ee8ce",
+      "id": "9bccd879-1bd5-40ae-a44f-6e1cd445120b",
       "name": "Restore Output Context"
     },
     {
@@ -654,10 +654,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        432,
-        -48
+        -2848,
+        1648
       ],
-      "id": "0136a563-69c6-4b99-b76e-a68f6a15e7d1",
+      "id": "27a470e5-3b19-4d70-a1ef-282325e96d46",
       "name": "Phase Guard"
     },
     {
@@ -667,10 +667,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3280,
-        -1696
+        0,
+        0
       ],
-      "id": "829c29e6-1420-4d5d-9d44-0a080f6e8dbb",
+      "id": "3025137c-dc02-4509-b930-f107cca48f79",
       "name": "Completed Session Response"
     },
     {
@@ -684,10 +684,10 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        5152,
-        -160
+        1872,
+        1536
       ],
-      "id": "1f55f701-d3b5-48d9-bf81-e64bc4044c45",
+      "id": "8fe13467-44a6-4645-bef7-3d4f040d6a0a",
       "name": "Update Phase in DB",
       "credentials": {
         "postgres": {
@@ -703,10 +703,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        5328,
-        -160
+        2048,
+        1536
       ],
-      "id": "457512ed-25ed-47b6-83de-c806122ed4cb",
+      "id": "a60b4f20-4cb9-4838-9bb8-c57b39d241ce",
       "name": "Restore Context After Phase Update"
     },
     {
@@ -716,10 +716,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4544,
-        -16
+        1264,
+        1680
       ],
-      "id": "e689e88c-44cd-4e0b-9de7-318dd07f203b",
+      "id": "def542a6-4280-4ec2-8d66-162320b4532f",
       "name": "Phase Extractor"
     },
     {
@@ -750,10 +750,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        736,
-        48
+        -2544,
+        1744
       ],
-      "id": "74473b04-e917-4caa-ab1c-203ff991132c",
+      "id": "7a26886c-0a01-4756-90f7-f24165df245d",
       "name": "Ban Guard"
     },
     {
@@ -763,10 +763,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3280,
-        -1488
+        0,
+        208
       ],
-      "id": "8089c035-279c-4c4b-ac80-53ea728b01d7",
+      "id": "48759367-427f-40f6-a419-d04539dea6df",
       "name": "Ban Message"
     },
     {
@@ -780,10 +780,10 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        3184,
-        0
+        -96,
+        1696
       ],
-      "id": "13f0d5a6-6b52-4383-8f3a-eb4acf792307",
+      "id": "8d0c76fa-f10e-4a99-91ec-522ebb8f3962",
       "name": "Intent Router"
     },
     {
@@ -799,10 +799,10 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
       "typeVersion": 1.3,
       "position": [
-        3184,
-        192
+        -96,
+        1888
       ],
-      "id": "8eeaeac5-27a9-49bb-afe1-cd141307806f",
+      "id": "e3bef73f-38a3-49b0-95bd-a213d427e0c0",
       "name": "Anthropic Chat Model1",
       "credentials": {
         "anthropicApi": {
@@ -818,10 +818,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3488,
-        0
+        208,
+        1696
       ],
-      "id": "410f1ad0-8309-4f37-9271-3ff113947227",
+      "id": "628f4e8a-effd-4bf5-8ccf-af36276c718f",
       "name": "Parse Router Output"
     },
     {
@@ -851,10 +851,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        3680,
-        0
+        400,
+        1696
       ],
-      "id": "0e0e9ddb-7317-4992-bcc4-53d038575a50",
+      "id": "731680b9-77c9-4a5a-a529-09f90ffcb8a8",
       "name": "Route by Intent"
     },
     {
@@ -884,10 +884,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        3872,
-        448
+        592,
+        2144
       ],
-      "id": "f9b94ff6-5daa-478e-aee4-7aed9a423cce",
+      "id": "005631fb-7dd0-44b5-ad43-2e7e58b12d51",
       "name": "Check Out of Scope"
     },
     {
@@ -897,10 +897,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4208,
-        416
+        928,
+        2112
       ],
-      "id": "bc1902a3-e536-415a-8ff7-3f7bdd38b15f",
+      "id": "2cf7a717-4fbf-4639-8fb0-ea69fbae0e80",
       "name": "Increment Out of Scope"
     },
     {
@@ -914,10 +914,10 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        4416,
-        416
+        1136,
+        2112
       ],
-      "id": "dad7fd21-42a4-4fdf-8e7d-1e8db4a353f6",
+      "id": "573e0e93-21ee-4fa5-baf4-e6688d3310f5",
       "name": "Update Out of Scope in DB",
       "credentials": {
         "postgres": {
@@ -933,10 +933,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4624,
-        416
+        1344,
+        2112
       ],
-      "id": "89bb8462-80b5-4f8b-b96a-73360ba3a1d5",
+      "id": "bef05fb0-8431-4614-8c8a-9d1f9e7946d4",
       "name": "Restore After Out of Scope Update"
     },
     {
@@ -946,10 +946,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        6112,
-        224
+        2832,
+        1920
       ],
-      "id": "875f8852-2b40-441b-bab1-4dda9d257b1d",
+      "id": "ae886a0c-56ec-47af-a5d7-d8a72949062e",
       "name": "Permanent Ban Response"
     },
     {
@@ -980,10 +980,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        4832,
-        416
+        1552,
+        2112
       ],
-      "id": "04b704d7-52e9-444c-8d59-505680e9bdc5",
+      "id": "2d4f4238-762d-41e0-b6ed-1f67b16bb690",
       "name": "Out of Scope Guard"
     },
     {
@@ -993,10 +993,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        6112,
-        432
+        2832,
+        2128
       ],
-      "id": "22a21aa8-b820-4fcd-81a8-2611648cc68f",
+      "id": "4c883c0e-186a-4a83-a3f9-95e667523cc7",
       "name": "Out of Scope Warning"
     },
     {
@@ -1012,10 +1012,10 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
       "typeVersion": 1.3,
       "position": [
-        5488,
-        832
+        2208,
+        2528
       ],
-      "id": "e7f7827c-2b06-4456-992b-20a8ec95dd25",
+      "id": "2290782c-dfeb-4eb5-9572-7da06d8c6eed",
       "name": "Anthropic Chat Model2",
       "credentials": {
         "anthropicApi": {
@@ -1031,10 +1031,10 @@
       "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
       "typeVersion": 1.3,
       "position": [
-        5632,
-        832
+        2352,
+        2528
       ],
-      "id": "ebd0bc9e-545c-415f-afc0-2de28afe7d24",
+      "id": "8fd23ae6-e30d-4860-bd7d-281b11be2707",
       "name": "Postgres Chat Memory1",
       "credentials": {
         "postgres": {
@@ -1052,10 +1052,10 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        5536,
-        624
+        2256,
+        2320
       ],
-      "id": "2c7ef771-43e0-4316-9217-cbadfff2343b",
+      "id": "fa321a62-6a81-4420-8db3-6bf369a65bce",
       "name": "RAG IA Agent"
     },
     {
@@ -1069,10 +1069,10 @@
       "type": "@n8n/n8n-nodes-langchain.toolCode",
       "typeVersion": 1.3,
       "position": [
-        5776,
-        832
+        2496,
+        2528
       ],
-      "id": "df5967e1-f476-42ca-9357-3567e1102cb2",
+      "id": "f5ee73f7-a99c-4132-9302-2db756bfbac3",
       "name": "search_knowledge_base1"
     },
     {
@@ -1082,10 +1082,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        6512,
-        624
+        3232,
+        2320
       ],
-      "id": "07a400c8-c1e4-485e-8aef-8dd227c94e52",
+      "id": "24d8342a-2138-4456-84bd-5e75e817b4d1",
       "name": "Format KB Response"
     },
     {
@@ -1095,10 +1095,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        6688,
-        624
+        3408,
+        2320
       ],
-      "id": "7706d35a-b651-4d1c-9d40-49bf78a3fc92",
+      "id": "8517d680-1c53-498f-b779-4f2ff4b5d061",
       "name": "Phase Extractor1"
     },
     {
@@ -1108,10 +1108,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4736,
-        -16
+        1456,
+        1680
       ],
-      "id": "4b2f1d9c-dc11-4b8f-bb0d-c63606c6a491",
+      "id": "fc771003-17ef-47b1-9bd2-0e96b6b7cb59",
       "name": "Detect API Failure"
     },
     {
@@ -1142,10 +1142,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        4944,
-        -16
+        1664,
+        1680
       ],
-      "id": "f1594ca8-4043-49e8-a52b-70d7f3a5d469",
+      "id": "42e3ae60-c0d4-40e6-8910-784283b26d7b",
       "name": "Is API Error?"
     },
     {
@@ -1159,10 +1159,10 @@
       "type": "n8n-nodes-base.whatsApp",
       "typeVersion": 1.1,
       "position": [
-        7024,
-        -240
+        3744,
+        1456
       ],
-      "id": "9b78df2a-93b9-46c4-83c1-f881c02bd605",
+      "id": "d52f39ba-ec10-46f5-92a1-10e001add37e",
       "name": "Send message",
       "webhookId": "9b728eb6-dfed-4d81-a84a-b583374f6df4",
       "credentials": {
@@ -1179,10 +1179,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1520,
-        48
+        -1760,
+        1744
       ],
-      "id": "d6d7ca4a-9c20-4437-8857-177edae513d4",
+      "id": "c0597c7e-7153-4690-b657-690c2a1365cb",
       "name": "Message Budget Guard"
     },
     {
@@ -1213,10 +1213,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        1824,
-        -288
+        -1456,
+        1408
       ],
-      "id": "2cfb23f4-c384-40c1-ba79-5a0422c980ac",
+      "id": "0b242b6b-b3bf-4fa8-b2a7-561d0da3bfdd",
       "name": "Is Budget Exceeded?"
     },
     {
@@ -1226,10 +1226,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4208,
-        608
+        928,
+        2304
       ],
-      "id": "0d00df50-567d-4e1f-9bea-19ee5476e4be",
+      "id": "4be37c89-319d-4c96-905a-6af58f4b5607",
       "name": "KB Budget Guard"
     },
     {
@@ -1260,10 +1260,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        4832,
-        608
+        1552,
+        2304
       ],
-      "id": "cb90fde7-2b52-44fd-8950-6c0f9fb2d39d",
+      "id": "11d6f69c-ea77-4a6f-8700-a29ff9316040",
       "name": "If"
     },
     {
@@ -1277,10 +1277,10 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        5888,
-        624
+        2608,
+        2320
       ],
-      "id": "48704b9f-36ca-4609-9b9f-730fcee787f5",
+      "id": "31ccd32a-86bd-448e-a631-ff2a67794302",
       "name": "Increment KB Counter",
       "credentials": {
         "postgres": {
@@ -1296,10 +1296,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        6112,
-        624
+        2832,
+        2320
       ],
-      "id": "98b13871-df4d-47ef-9cd5-c8a36a95dbf2",
+      "id": "49af38a0-9a31-45e4-89a0-782d08341a0d",
       "name": "Restore After KB Counter"
     },
     {
@@ -1309,10 +1309,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        6096,
-        -160
+        2816,
+        1536
       ],
-      "id": "f22069d6-7e73-4195-8b16-535bd092b80d",
+      "id": "6ad8a4f0-ff95-45c5-aa30-2e168f9c115d",
       "name": "Append Soft Warning"
     },
     {
@@ -1322,10 +1322,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        6320,
-        624
+        3040,
+        2320
       ],
-      "id": "31bec45c-593e-4c76-837e-fbf535a3e110",
+      "id": "b442eede-3ed2-453c-afcf-d311e07bc4f0",
       "name": "Append KB Soft Warning"
     }
   ],
@@ -1417,11 +1417,6 @@
             "index": 0
           }
         ]
-      ]
-    },
-    "Dev Data Injector": {
-      "main": [
-        []
       ]
     },
     "Update Activity": {
@@ -2104,20 +2099,10 @@
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false,
-    "timeSavedMode": "fixed",
-    "timezone": "America/Mexico_City",
-    "saveDataErrorExecution": "all",
-    "saveDataSuccessExecution": "all",
-    "saveExecutionProgress": true,
-    "saveManualExecutions": false,
-    "callerPolicy": "workflowsFromSameOwner",
-    "executionTimeout": 60
+    "availableInMCP": false
   },
-  "versionId": "ee0c077c-8bf3-48c6-bca4-5ded02dae1bc",
-  "meta": {
-    "templateCredsSetupCompleted": true
-  },
-  "id": "CPcP1m8sURQIOAGgCN8s0",
+  "versionId": "c96e6f87-9a36-4554-bed5-8690677e3722",
+  "meta": null,
+  "id": "BtOaZm7WlZT-24V7hqCnF",
   "tags": []
 }
