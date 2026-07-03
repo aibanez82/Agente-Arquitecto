@@ -95,6 +95,7 @@ Wagtail es un CMS construido sobre Django. **No son dos sistemas separados** —
 | Dashboard | `aibanez82/Dashboard_seguroautoqualitas` | Next.js 14, Vercel | UI de leads en tiempo real |
 | Agente QA | `aibanez82/Agente_QATest_Qualitas` | Claude Code | Tests end-to-end |
 | Agente Mejoras Conv. | `aibanez82/Agente-MejorasConversacion` | Claude Code | Lee Postgres → analiza abandono por fase → genera informe Markdown con recomendaciones de copy para n8n |
+| Agente n8n | `aibanez82/Agente_n8n` (nombre a confirmar) | Claude Code | Entiende workflows n8n, propone mejoras, modifica los JSON y sube a git — Alberto importa manualmente en n8n |
 | Arquitecto | `aibanez82/Agente-Arquitecto` | Este repo | Documentación transversal, workflows n8n, spec SOAP Quálitas |
 
 **Accesos de Alberto:**
@@ -311,6 +312,36 @@ Alberto atiende el lead directamente desde Kommo
 
 ---
 
+## Agente n8n — protocolo de uso
+
+**Repo:** `aibanez82/Agente_n8n` (nombre a confirmar cuando se cree)
+**Rol:** Ejecutor Nivel 3, especializado en workflows n8n. Yo (Arquitecto) diagnostico y le paso el bug/nodo a tocar; Agente n8n ejecuta el cambio en el JSON. Nunca decide qué tocar de forma autónoma.
+
+**Flujo v1 (handoff manual, sin clonar repos entre sí):**
+```
+Arquitecto diagnostica → identifica workflow + nodo exacto a modificar
+    ↓
+Alberto baja la última versión del JSON
+  (docs/n8n-workflows/ en este repo, o export fresco de n8n)
+    ↓
+Alberto se lo pasa a Agente n8n desde una carpeta local
+    ↓
+Agente n8n analiza, propone mejora, modifica el JSON
+    ↓
+Agente n8n hace commit/push a su propio repo
+    ↓
+Alberto importa el JSON manualmente en n8n (producción)
+    ↓
+Alberto actualiza docs/n8n-workflows/ en Agente-Arquitecto
+  con la versión final importada (mantener fuente de verdad sincronizada)
+```
+
+**Punto de atención:** como Agente n8n no tiene clonado este repo, el JSON que modifica vive solo en su propio repo hasta que Alberto lo reimporta a producción y lo vuelve a traer aquí. Si se salta el último paso, `docs/n8n-workflows/` en este repo queda desactualizado respecto a lo que corre en producción — mismo riesgo que ya existía con el backup manual (ver `docs/architecture/backup-policy-n8n.md`).
+
+**Pendiente:** confirmar nombre final del repo en GitHub una vez creado, para actualizar la tabla de "Mapa de sistemas".
+
+---
+
 ## Pendientes de infraestructura
 
 | Item | Estado |
@@ -329,6 +360,7 @@ Alberto atiende el lead directamente desde Kommo
 | Issue #74 (`aguayo-co/HYL-WAI`) — follow-up 15 min dejó de enviarse desde 2026-06-30 ~21:11 UTC | ⏳ Causa raíz sin determinar. Requiere acceso Heroku (config vars, releases, scheduler) — Alberto va a dar token OAuth read-only vía Vercel env Plain |
 | Propuesta arquitectura BD — tabla canónica `whatsapp_event` (dual-write desde n8n/Django/Dashboard, reemplaza joins frágiles y LIKE de hitos) | 💡 Documentada como plan de destino, sin decisión de implementar aún |
 | Alerta de emisión fallida (Bug #9) — workflow `Bot Error Handler` en n8n + tarjeta "Emisión falló" en Dashboard | ⏸️ En pausa — implica desarrollo de n8n (Error Workflow + extracción de datos de la ejecución fallida). Spec lista en `docs/estrategia/2026-07-02-alerta-emision-fallida-quálitas.md` |
+| Crear repo `Agente_n8n` en GitHub + confirmar nombre final | 🆕 En construcción — ver protocolo en sección "Agente n8n" |
 
 ---
 
@@ -358,7 +390,8 @@ Comando de arranque: `cd ~/claude-projects/<repo> && claude`
    │ Nivel 1 │       │ Nivel 3 — Ejecutores    │
    │ Lectura │       │ • Agente QA             │
    │ Código  │       │ • Agente Mejoras Conv.  │
-   │ APIs    │       │ • Agente Conversión (⏳) │
+   │ APIs    │       │ • Agente n8n            │
+   │         │       │ • Agente Conversión (⏳) │
    └─────────┘       └─────────────────────────┘
               (nunca se hablan entre sí)
 ```
@@ -371,6 +404,7 @@ Comando de arranque: `cd ~/claude-projects/<repo> && claude`
 | Dashboard Qualitas | Ejecutor código dashboard | ✅ Activo |
 | Agente QA | Tests end-to-end | ✅ Activo |
 | Agente Mejoras Conversación | Análisis abandono + recomendaciones copy n8n | ✅ Activo |
+| Agente n8n | Entiende workflows n8n, propone mejoras, modifica JSON | 🆕 En construcción |
 | Agente Conversión | Reintentos + seguimiento | ⏳ Futuro |
 
 ---
