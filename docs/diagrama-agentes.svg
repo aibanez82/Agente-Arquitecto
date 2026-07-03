@@ -1,6 +1,6 @@
 <svg width="680" height="720" viewBox="0 0 680 720" xmlns="http://www.w3.org/2000/svg" role="img">
 <title>Arquitectura de agentes — Ecosistema Quálitas/Insurmind</title>
-<desc>Diagrama de los tres niveles de agentes IA y los sistemas de infraestructura. Actualizado 28 junio 2026.</desc>
+<desc>Diagrama de los tres niveles de agentes IA y los sistemas de infraestructura. Actualizado 2 julio 2026.</desc>
 <style>
   text { font-family: system-ui, sans-serif; }
   .th { font-size: 14px; font-weight: 500; fill: #26215C; }
@@ -9,7 +9,7 @@
 </style>
 <rect width="680" height="720" fill="#ffffff"/>
 <text class="th" x="340" y="30" text-anchor="middle" font-size="15" fill="#2C2C2A">Ecosistema IA Quálitas / Insurmind</text>
-<text class="ts" x="340" y="50" text-anchor="middle" fill="#888780">28 junio 2026 · API n8n Hostinger + GitHub Issues</text>
+<text class="ts" x="340" y="50" text-anchor="middle" fill="#888780">2 julio 2026 · API n8n Hostinger + GitHub Issues</text>
 <rect x="220" y="80" width="240" height="56" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
 <text class="th" x="340" y="103" text-anchor="middle" dominant-baseline="central" fill="#26215C">Arquitecto-IA-Qualitas</text>
 <text class="ts" x="340" y="123" text-anchor="middle" dominant-baseline="central" fill="#3C3489">diagnostica · planifica · no ejecuta</text>
@@ -21,9 +21,12 @@
 <rect x="80" y="360" width="160" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
 <text x="160" y="383" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#04342C">Agente QA</text>
 <text x="160" y="401" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#085041">tests end-to-end</text>
-<rect x="440" y="360" width="160" height="56" rx="8" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="0.5"/>
-<text x="520" y="383" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#2C2C2A">Agente Conversión</text>
-<text x="520" y="401" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#5F5E5A">futuro · reintentos</text>
+<rect x="260" y="360" width="190" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<text x="355" y="383" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#04342C">Mejoras Conversación</text>
+<text x="355" y="401" text-anchor="middle" dominant-baseline="central" font-size="11" fill="#085041">abandono → copy n8n</text>
+<rect x="490" y="360" width="150" height="56" rx="8" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="0.5"/>
+<text x="565" y="383" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#2C2C2A">Agente Conversión</text>
+<text x="565" y="401" text-anchor="middle" dominant-baseline="central" font-size="11" fill="#5F5E5A">futuro · reintentos</text>
 <text class="label" x="38" y="392" text-anchor="start">Nivel 3</text>
 <line x1="36" y1="360" x2="36" y2="416" stroke="#D3D1C7" stroke-width="0.5"/>
 <rect x="60" y="520" width="130" height="44" rx="8" fill="#EAF3DE" stroke="#3B6D11" stroke-width="0.5"/>
@@ -52,16 +55,17 @@
 <line x1="340" y1="136" x2="340" y2="228" stroke="#888780" stroke-width="1" marker-end="url(#arr)" marker-start="url(#arr)"/>
 <text x="352" y="188" font-size="11" fill="#888780">diagnóstico</text>
 <line x1="295" y1="272" x2="200" y2="360" stroke="#888780" stroke-width="1" marker-end="url(#arr)"/>
-<line x1="385" y1="272" x2="480" y2="360" stroke="#888780" stroke-width="1" marker-end="url(#arr)"/>
-<text x="340" y="330" text-anchor="middle" font-size="11" fill="#888780">todo pasa por Alberto</text>
+<line x1="340" y1="272" x2="355" y2="360" stroke="#888780" stroke-width="1" marker-end="url(#arr)"/>
+<line x1="385" y1="272" x2="560" y2="360" stroke="#888780" stroke-width="1" marker-end="url(#arr)"/>
+<text x="340" y="322" text-anchor="middle" font-size="11" fill="#888780">todo pasa por Alberto</text>
 <path d="M460 108 Q580 120 575 520" fill="none" stroke="#888780" stroke-width="1" stroke-dasharray="5 3" marker-end="url(#arr)"/>
 <text x="568" y="320" font-size="11" fill="#888780" text-anchor="middle">abre Issues</text>
 <text x="568" y="334" font-size="11" fill="#888780" text-anchor="middle">vía API</text>
 <path d="M445 136 Q470 330 425 520" fill="none" stroke="#888780" stroke-width="1" stroke-dasharray="5 3" marker-end="url(#arr)"/>
 <path d="M310 136 Q285 330 275 520" fill="none" stroke="#888780" stroke-width="1" stroke-dasharray="5 3" marker-end="url(#arr)"/>
 <path d="M255 130 Q160 330 125 520" fill="none" stroke="#888780" stroke-width="1" stroke-dasharray="5 3" marker-end="url(#arr)"/>
-<line x1="240" y1="388" x2="440" y2="388" stroke="#A32D2D" stroke-width="1" stroke-dasharray="4 4"/>
-<text x="340" y="382" text-anchor="middle" font-size="11" fill="#A32D2D">nunca se hablan</text>
+<line x1="90" y1="430" x2="630" y2="430" stroke="#A32D2D" stroke-width="1" stroke-dasharray="4 4"/>
+<text x="360" y="444" text-anchor="middle" font-size="11" fill="#A32D2D">los ejecutores nunca se hablan entre sí</text>
 <line x1="60" y1="678" x2="90" y2="678" stroke="#888780" stroke-width="1" stroke-dasharray="5 3"/>
 <text x="96" y="682" font-size="11" fill="#888780">lectura / API</text>
 <line x1="200" y1="678" x2="230" y2="678" stroke="#888780" stroke-width="1" marker-end="url(#arr)"/>

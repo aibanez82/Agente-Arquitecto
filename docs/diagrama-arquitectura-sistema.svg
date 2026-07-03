@@ -1,0 +1,148 @@
+<svg width="1780" height="900" viewBox="0 0 1780 900" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Arquitectura del sistema — Ecosistema Quálitas/Insurmind</title>
+<desc>Diagrama del funnel completo: Google Ads, Landing/Django, n8n/WhatsApp, Postgres compartida, Dashboard y Kommo. Actualizado 2 julio 2026.</desc>
+<style>
+  text { font-family: system-ui, sans-serif; }
+  .th { font-size: 14px; font-weight: 500; }
+  .ts { font-size: 11px; font-weight: 400; }
+  .li { font-size: 10.5px; }
+  .label { font-size: 11px; fill: #888780; }
+</style>
+<rect width="1780" height="900" fill="#ffffff"/>
+<text x="890" y="30" text-anchor="middle" font-size="15" font-weight="500" fill="#2C2C2A">Arquitectura del sistema — Quálitas / Insurmind</text>
+<text x="890" y="50" text-anchor="middle" font-size="12" fill="#888780">2 julio 2026 · Google Ads → Landing → WhatsApp → póliza emitida → pago confirmado</text>
+
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="#888780" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+</defs>
+
+<!-- ===== Connectors (drawn first, boxes painted on top) ===== -->
+<line x1="135" y1="140" x2="250" y2="170" stroke="#888780" stroke-width="1" marker-end="url(#arr)"/>
+
+<line x1="460" y1="210" x2="1140" y2="210" stroke="#888780" stroke-width="1" stroke-dasharray="5 3" marker-end="url(#arr)"/>
+<text class="li" x="800" y="200" text-anchor="middle" fill="#5F5E5A">Webhook 1: lead creado</text>
+<text class="li" x="800" y="188" text-anchor="middle" fill="#5F5E5A">Webhook 2: pago confirmado</text>
+
+<line x1="1140" y1="320" x2="460" y2="320" stroke="#888780" stroke-width="1" marker-end="url(#arr)"/>
+<text class="li" x="800" y="336" text-anchor="middle" fill="#5F5E5A">Issue_Policy → POST /api/emitir-externo/</text>
+
+<line x1="160" y1="360" x2="160" y2="400" stroke="#888780" stroke-width="1" marker-end="url(#arr)"/>
+<text class="li" x="172" y="384" fill="#5F5E5A">XML SOAP</text>
+
+<path d="M380 360 Q550 385 700 400" fill="none" stroke="#888780" stroke-width="1" marker-end="url(#arr)"/>
+<text class="li" x="520" y="394" text-anchor="middle" fill="#5F5E5A">INSERT / UPDATE</text>
+
+<path d="M1220 360 Q1080 388 960 400" fill="none" stroke="#888780" stroke-width="1" marker-end="url(#arr)"/>
+<text class="li" x="1080" y="430" text-anchor="middle" fill="#5F5E5A">lee/escribe directo</text>
+<text class="li" x="1080" y="443" text-anchor="middle" fill="#5F5E5A">"Postgres account"</text>
+
+<path d="M1330 360 Q1290 380 1235 400" fill="none" stroke="#888780" stroke-width="1" marker-end="url(#arr)"/>
+<line x1="1330" y1="430" x2="1370" y2="430" stroke="#888780" stroke-width="1" marker-end="url(#arr)"/>
+
+<path d="M1460 400 Q1440 380 1420 360" fill="none" stroke="#888780" stroke-width="1" stroke-dasharray="5 3" marker-end="url(#arr)"/>
+<text class="li" x="1466" y="390" fill="#5F5E5A">respuestas</text>
+
+<path d="M900 590 Q1150 605 1300 640" fill="none" stroke="#888780" stroke-width="1" marker-end="url(#arr)"/>
+<text class="li" x="1150" y="618" text-anchor="middle" fill="#5F5E5A">SELECT read-only</text>
+<text class="li" x="1150" y="630" text-anchor="middle" fill="#5F5E5A">"readonly_leads"</text>
+
+<path d="M1560 680 C1740 680 1740 340 1560 340" fill="none" stroke="#888780" stroke-width="1" stroke-dasharray="5 3" marker-end="url(#arr)"/>
+<text class="li" x="1600" y="506" fill="#5F5E5A">webhook /proactive-wa-message</text>
+<text class="li" x="1600" y="520" fill="#5F5E5A">botón «Tomar conversación»</text>
+
+<line x1="1140" y1="710" x2="300" y2="710" stroke="#B4B2A9" stroke-width="1" stroke-dasharray="2 3" marker-end="url(#arr)"/>
+<text class="li" x="720" y="700" text-anchor="middle" fill="#8A8878">planeado: Kommo API v4 · botón «Pasar a Kommo»</text>
+
+<path d="M620 700 Q880 730 1140 760" fill="none" stroke="#888780" stroke-width="1" marker-end="url(#arr)"/>
+<text class="li" x="880" y="750" text-anchor="middle" fill="#5F5E5A">tráfico landing + métricas WA</text>
+
+<!-- ===== Nodes ===== -->
+
+<!-- Google Ads -->
+<rect x="40" y="90" width="190" height="50" rx="8" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="0.5"/>
+<text x="135" y="109" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="500" fill="#2C2C2A">Google Ads</text>
+<text x="135" y="126" text-anchor="middle" dominant-baseline="central" font-size="10.5" fill="#5F5E5A">tráfico de entrada</text>
+
+<!-- Landing / Django -->
+<rect x="40" y="170" width="420" height="190" rx="10" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.7"/>
+<text x="62" y="192" font-size="10.5" fill="#0C447C">Heroku · Wagtail + Django</text>
+<text x="62" y="214" font-size="15" font-weight="600" fill="#042C53">Landing + Backend</text>
+<text class="li" x="62" y="242" fill="#0C447C">• crea qualitas_lead + qualitas_cotizacion</text>
+<text class="li" x="62" y="262" fill="#0C447C">• dispara Webhook 1 (lead) y Webhook 2 (pago)</text>
+<text class="li" x="62" y="282" fill="#0C447C">• POST /api/emitir-externo/ → XML SOAP</text>
+<text class="li" x="62" y="302" fill="#0C447C">• un solo repo: aguayo-co/HYL-WAI</text>
+
+<!-- Quálitas SOAP externo -->
+<rect x="40" y="400" width="260" height="70" rx="8" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="0.5" stroke-dasharray="2 3"/>
+<text x="62" y="422" font-size="10.5" fill="#5F5E5A">Externo</text>
+<text x="62" y="440" font-size="13" font-weight="500" fill="#2C2C2A">Quálitas — API SOAP</text>
+<text class="li" x="62" y="458" fill="#5F5E5A">emisión de pólizas · TipoRegla 86/492</text>
+
+<!-- Postgres hub -->
+<rect x="640" y="400" width="380" height="190" rx="10" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.9"/>
+<text x="662" y="422" font-size="10.5" fill="#3C3489">Heroku · compartida Django + n8n</text>
+<text x="662" y="444" font-size="15" font-weight="600" fill="#26215C">Postgres</text>
+<text class="li" x="662" y="470" fill="#26215C">qualitas_lead — Django · estado, canal</text>
+<text class="li" x="662" y="488" fill="#26215C">qualitas_cotizacion — Django · auto, CP</text>
+<text class="li" x="662" y="506" fill="#26215C">qualitas_polizaemitida — Django · pago</text>
+<text class="li" x="662" y="524" fill="#A32D2D">whatsapp_sessions — n8n · phase bug activo</text>
+<text class="li" x="662" y="542" fill="#0F6E56">n8n_chat_histories — n8n · fuente fiable de hitos</text>
+
+<!-- n8n -->
+<rect x="1140" y="170" width="420" height="190" rx="10" fill="#FAECE7" stroke="#993C1D" stroke-width="0.7"/>
+<text x="1162" y="192" font-size="10.5" fill="#712B13">Hostinger · n8n</text>
+<text x="1162" y="214" font-size="15" font-weight="600" fill="#4A1B0C">Bot WhatsApp</text>
+<text class="li" x="1162" y="240" fill="#712B13">~2,087 líneas · 3 nodos Claude por mensaje</text>
+<rect x="1162" y="252" width="376" height="24" rx="5" fill="#ffffff" stroke="#E7D4C9" stroke-width="0.5"/>
+<text class="li" x="1174" y="267" fill="#4A1B0C">Haiku — jailbreak detection</text>
+<rect x="1162" y="280" width="376" height="24" rx="5" fill="#ffffff" stroke="#E7D4C9" stroke-width="0.5"/>
+<text class="li" x="1174" y="295" fill="#4A1B0C">Haiku — intent router classifier</text>
+<rect x="1162" y="308" width="376" height="24" rx="5" fill="#ffffff" stroke="#E7D4C9" stroke-width="0.5"/>
+<text class="li" x="1174" y="323" fill="#4A1B0C">Sonnet — agente conversacional principal</text>
+
+<!-- Meta Cloud API -->
+<rect x="1140" y="400" width="190" height="60" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+<text x="1235" y="424" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="500" fill="#4A1B0C">Meta Cloud API</text>
+<text x="1235" y="442" text-anchor="middle" dominant-baseline="central" font-size="10.5" fill="#712B13">envío WhatsApp</text>
+
+<!-- Lead WhatsApp -->
+<rect x="1370" y="400" width="190" height="60" rx="8" fill="#FAEEDA" stroke="#BA7517" stroke-width="0.5"/>
+<text x="1465" y="424" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="500" fill="#633806">Lead</text>
+<text x="1465" y="442" text-anchor="middle" dominant-baseline="central" font-size="10.5" fill="#854F0B">cliente en WhatsApp</text>
+
+<!-- Dashboard -->
+<rect x="1140" y="640" width="420" height="190" rx="10" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.7"/>
+<text x="1162" y="662" font-size="10.5" fill="#085041">Vercel · Next.js 14</text>
+<text x="1162" y="684" font-size="15" font-weight="600" fill="#04342C">Dashboard</text>
+<text class="li" x="1162" y="710" fill="#085041">• lee Postgres read-only ("readonly_leads")</text>
+<text class="li" x="1162" y="730" fill="#085041">• botón «Tomar conversación» → webhook n8n</text>
+<text class="li" x="1162" y="750" fill="#085041">• botón «Pasar a Kommo» — en diseño</text>
+<text class="li" x="1162" y="770" fill="#085041">• GitHub Issues vía API (Agente-Arquitecto)</text>
+
+<!-- Kommo -->
+<rect x="40" y="640" width="260" height="140" rx="10" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="0.7" stroke-dasharray="4 4"/>
+<text x="62" y="662" font-size="10.5" fill="#5F5E5A">En diseño</text>
+<text x="62" y="684" font-size="14" font-weight="600" fill="#2C2C2A">Kommo CRM</text>
+<text class="li" x="62" y="708" fill="#5F5E5A">escalada humana · Plan Base, API v4</text>
+<text class="li" x="62" y="726" fill="#5F5E5A">falta: subdominio + token +</text>
+<text class="li" x="62" y="744" fill="#5F5E5A">pipeline de Alberto</text>
+
+<!-- Observabilidad -->
+<rect x="360" y="640" width="260" height="140" rx="10" fill="#FAEEDA" stroke="#BA7517" stroke-width="0.7"/>
+<text x="382" y="662" font-size="10.5" fill="#854F0B">Observabilidad</text>
+<text x="382" y="684" font-size="14" font-weight="600" fill="#633806">GA4 + Meta Business</text>
+<text class="li" x="382" y="708" fill="#854F0B">GA4 — tráfico de landing por canal</text>
+<text class="li" x="382" y="726" fill="#854F0B">Meta Business API — enviados/leídos/</text>
+<text class="li" x="382" y="744" fill="#854F0B">respondidos por plantilla</text>
+
+<!-- ===== Legend ===== -->
+<line x1="40" y1="856" x2="80" y2="856" stroke="#888780" stroke-width="1"/>
+<text x="88" y="860" font-size="11" fill="#888780">flujo directo</text>
+<line x1="200" y1="856" x2="240" y2="856" stroke="#888780" stroke-width="1" stroke-dasharray="5 3"/>
+<text x="248" y="860" font-size="11" fill="#888780">webhook / evento async</text>
+<line x1="440" y1="856" x2="480" y2="856" stroke="#B4B2A9" stroke-width="1" stroke-dasharray="2 3"/>
+<text x="488" y="860" font-size="11" fill="#8A8878">planeado / en diseño</text>
+<text x="700" y="860" font-size="11" fill="#A32D2D">whatsapp_sessions.conversation_phase: bug activo, stuck en "greeting" (Bug #5)</text>
+</svg>
