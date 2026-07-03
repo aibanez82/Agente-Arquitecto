@@ -114,7 +114,7 @@ Wagtail es un CMS construido sobre Django. **No son dos sistemas separados** —
 | `qualitas_polizaemitida` | Django | Número de póliza, `estatus_pago`, precio |
 | `whatsapp_sessions` | n8n (directo a Postgres) | `conversation_phase`, `last_activity`, `captured_data` — **tiene bug activo** |
 | `n8n_chat_histories` | n8n (Postgres Chat Memory) | Historial mensajes WA — **fuente fiable de hitos** |
-| `NumeroPruebaWhatsapp` | Django | Teléfonos de prueba de Juan Aguayo |
+| ~~`NumeroPruebaWhatsapp`~~ | — | **Corregido 2 jul 2026: esta tabla NO existe en producción** (verificado contra `information_schema.tables`). No hay un mecanismo de números de prueba de Juan documentado que sea real — confirmar con él directamente si tiene un número dedicado para pruebas en producción. |
 
 **JOIN correcto entre tablas:**
 - `qualitas_cotizacion` → `qualitas_lead` con `l.cotizacion_id = c.id` (NO `c.lead_id`)
