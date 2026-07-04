@@ -151,3 +151,33 @@ n8n_chat_histories` — esto resuelve una duda abierta de arquitectura (si n8n r
 timestamp, vale la pena evaluar a futuro pedirle a Juan/n8n que agregue una columna
 `created_at DEFAULT now()` en esa tabla, para eliminar el problema de raíz en vez de mitigarlo en
 el Dashboard).
+
+---
+
+## Resolución (4 jul 2026) — confirmado y DDL corregida
+
+El Dashboard agent corrió el Paso 0 y **confirmó empíricamente**: `n8n_chat_histories` solo tiene
+`id, session_id, message`; `additional_kwargs` y `response_metadata` vacíos (`{}`) en las **855
+filas**, cero excepciones; `n8n_chat_histories_archive` mismo esquema. **No existe hora real por
+mensaje en ningún lado.** El Dashboard ya aplicó el parche interino: mensajes de n8n sin reloj bajo
+"hora aproximada"; solo Django pinta hora exacta (`sent_at`).
+
+**Fix de fondo — es una migración de BD (DDL), la ejecuta Juan / el dueño del rol `DATABASE_URL`,
+NO el agente de n8n** (y `DEFAULT now()` no requiere tocar el workflow). **DDL correcta en DOS
+pasos** — deja el histórico en `NULL` honesto en vez de horas falsas:
+
+```sql
+ALTER TABLE n8n_chat_histories ADD COLUMN created_at timestamptz;            -- existentes = NULL
+ALTER TABLE n8n_chat_histories ALTER COLUMN created_at SET DEFAULT now();    -- nuevos = hora real
+```
+
+⚠️ **NO usar `ADD COLUMN created_at timestamptz NOT NULL DEFAULT now()` en un solo paso:** rellenaría
+las 855 filas viejas con la hora del ALTER (idénticas y falsas), reintroduciendo el bug de "todo
+colapsado a una hora". La columna queda **nullable** — no hay nada verdadero con que rellenar el
+histórico.
+
+Verificaciones adicionales: aplicar lo mismo a `_archive` y que el archivado **preserve** `created_at`
+(no regenerarlo con `now()` al archivar); confirmar que el nodo Postgres Chat Memory tolera la columna
+extra (usa `CREATE TABLE IF NOT EXISTS` + INSERT de `session_id`/`message`, no debería romperse). Sin
+nuevo GRANT: la columna hereda el SELECT de la tabla para `readonly_leads`. Hora en UTC (el Dashboard
+convierte a México). Trackeado como issue en `aguayo-co/HYL-WAI` para Juan.
