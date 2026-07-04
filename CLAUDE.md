@@ -204,7 +204,7 @@ Ver `BUGS_N8N.md` para detalle completo con evidencia SQL.
 | 7 | Django no escribe `estatus_pago = 'PAGADO'` al confirmar pago — solo dispara webhook a n8n | Django | 🟠 Alto |
 | 8 | `_generar_bloque_492` no incluye teléfono celular en XML SOAP a Quálitas — campo queda vacío en póliza emitida | Django | 🟠 Alto |
 | 9 | `POST /api/emitir-externo/` devuelve HTTP 400 recurrente — la emisión de pólizas falla y Django se traga la causa (mensaje genérico, sin logging). Detectado 1 jul 2026. | Django | 🔴 Crítico |
-| 10 | AI Agent envía ciudad/estado en vez de VIN al llamar `Issue_Policy` — 3 de 5 pólizas emitidas hasta ahora tienen VIN incorrecto en Quálitas, una ya `PAGADO` (`7620096850`). Detectado 2 jul 2026. Issue `aguayo-co/HYL-WAI` #83. | n8n | ✅ Resuelto — fix desplegado en producción el 2 jul 2026, validado antes en staging |
+| 10 | AI Agent envía ciudad/estado en vez de VIN al llamar `Issue_Policy`. Detectado 2 jul 2026. Issue `aguayo-co/HYL-WAI` #83. | n8n | 🔴 **REABIERTO 3 jul 2026** — el fix del 2 jul (reorden de campos) era cosmético y NO resolvió. Nueva recurrencia en prod: póliza con `serie/VIN = "Gómez Palacio"`. Causa raíz real identificada: la descripción del campo `serie` no define el contenido. Fix pendiente de aplicar. |
 
 **Workaround activo para Bug #7 en Dashboard:**
 ```js
@@ -234,13 +234,69 @@ d.estatus_pago === 'PAGADO' ||
 **Detalle Bug #10 (VIN↔ciudad/estado en Issue_Policy):**
 - Auditoría completa de las 5 emisiones históricas vía `n8n_chat_histories` (`Calling Issue_Policy` + regex sobre `parameters18_Value`): 3 de 5 con valor incorrecto (`Hidalgo`, `Ciudad de México`, `Ciudad General Escobedo` en vez del VIN).
 - En los 2 casos auditados a fondo, el VIN se capturó y validó correctamente en la conversación (`Validate_Personal_Data` sin error) — el error ocurre solo al construir la llamada `Issue_Policy`.
-- Causa: el parámetro `serie` (`parameters18_Value`) está intercalado en medio de 5 campos de domicilio consecutivos (`...colonia → serie → placas...`); el AI Agent "sigue el patrón" de domicilio y mete ciudad/estado ahí en vez del VIN.
-- Fix propuesto: reordenar `bodyParameters` del nodo `Issue Policy` en n8n para agrupar `serie` + `placas` justo después de los datos personales, separados del bloque de domicilio. No requiere cambios en Django.
 - `qualitas_cotizacion.serie_vehiculo` y `whatsapp_sessions.captured_data` NO son fuente del VIN — ambos quedan `NULL`/`{}` en los casos revisados; el dato viaja directo de la conversación al tool call, sin pasar por columna dedicada en Postgres.
-- Póliza `7620096850` ya está `PAGADO` con VIN incorrecto — requiere corrección/reemisión directa con Quálitas, gestión separada del fix de n8n.
 - Issue abierto: `aguayo-co/HYL-WAI` #83.
-- **Fix validado end-to-end en staging (2 jul 2026):** entorno de pruebas montado en Heroku `hyl-wai-stg` + copia STAGING del workflow en n8n (folder separado, credenciales propias de Postgres/WhatsApp). Se sembró una conversación de prueba en `n8n_chat_histories` con VIN reconocible (`TESTVIN1234567890`) y se corrió manualmente vía "Execute workflow" con datos fijados ("pin") en el trigger, evitando depender del webhook real de Meta (bloqueado por la restricción de "un solo trigger de WhatsApp por Facebook App"). Resultado: `parameters18_Value` (serie) llegó correcto a `Issue_Policy`, Django/Quálitas sandbox respondió `"serie":"TESTVIN1234567890"`.
-- **✅ Desplegado en producción (2 jul 2026):** backup manual disparado antes del cambio (política de `docs/architecture/backup-policy-n8n.md`), workflow completo reimportado en n8n con el fix aplicado (mismos IDs de credenciales, sin necesidad de reasignar nada), verificado visualmente que `serie`/`placas` quedaron después de `telefono` y que el workflow sigue Active/Published. Bug cerrado del lado de n8n — pendiente solo la corrección manual de la póliza `7620096850` con Quálitas.
+
+**Historia del fix fallido (2 jul 2026) — hipótesis original DESCARTADA:**
+- Hipótesis original: el AI "seguía el patrón" del domicilio porque `serie` estaba intercalado entre campos de domicilio (`...colonia → serie → placas...`). Fix aplicado: reordenar `bodyParameters` para agrupar `serie`+`placas` tras `telefono`, separados del domicilio.
+- El fix se validó en staging con VIN reconocible `TESTVIN1234567890` y se desplegó a producción. **Pero la validación era engañosa:** un token obviamente-VIN es inconfundible; el modelo lo colocaba bien por falta de ambigüedad, no porque el reorden funcionara.
+
+**Recurrencia 3 jul 2026 y CAUSA RAÍZ REAL (confirmada por comparación controlada):**
+- Nueva póliza en prod con `serie/VIN = "Gómez Palacio"` (ciudad de Durango). El fix del reorden NO resolvió.
+- **El reorden era cosmético:** cambió la posición en el array `bodyParameters`, pero los identificadores `$fromAI` siguen siendo `parameters18_Value` (serie) y `parameters19_Value` (placas) — numéricamente *después* del bloque domicilio (13–17). El esquema que ve el modelo no cambió.
+- **Causa real: la descripción del campo `serie` en `$fromAI` no define QUÉ es el campo.** Dice `` `From **user input** (captured in Group 2), NOT from quotation API` `` — una nota de *procedencia*, no de *contenido*. Todos los demás campos SÍ definen contenido (`teléfono 10 dígitos`, `placas 7 alfanuméricos`, `CP 5 dígitos`). Sin saber que debe ser un VIN, el modelo agarra otro string del usuario del Grupo 2 → la ciudad del domicilio.
+- **Comparación controlada que lo confirma:** `serie` (param 18) y `placas` (param 19) son adyacentes, con el mismo reorden y la misma vecindad. La única diferencia es la descripción. `placas` (con descripción de contenido) sale bien (`GAL126D`); `serie` (sin ella) sale mal. → la posición/reorden NO es la causa; la descripción SÍ.
+
+**Fix correcto (pendiente de aplicar — handoff a Agente n8n):**
+- Nodo `Issue Policy`, campo `serie` (`parameters18_Value`). Cambiar la descripción `$fromAI` de la nota de procedencia a una definición de contenido, p. ej.: `Número de serie / VIN del vehículo capturado del usuario en Grupo 2: 5-20 caracteres alfanuméricos, SIN espacios, NUNCA un nombre de ciudad/estado/colonia (NO es un dato de domicilio).`
+- Ojo: el bot acepta **5-20 caracteres alfanuméricos** para serie (así lo define el system prompt), NO estrictamente un VIN de 17. Una validación defense-in-depth debe ser `^[A-Za-z0-9]{5,20}$` (sin espacios) — rechaza "Gómez Palacio" (tiene espacio, y suele exceder/variar) pero acepta series cortas legítimas. No usar regex de VIN-17.
+- **IMPORTANTE — el layout `$fromAI` real:** los campos del tool son claves opacas (`parameters1_Value`…`parameters21_Value`) ordenadas por número; `serie`(18) queda justo tras `colonia`(17). El "reorden" del 2 jul cambió el array pero NO los números `$fromAI`, así que el layout que ve el modelo no cambió → confirma que el reorden fue inútil y que la descripción es la única palanca.
+
+**⚠️ Estado de validación (3 jul 2026) — causa raíz REFINADA y por qué un fix de solo-descripción NO es certificable:**
+
+Se montó un harness de reproducción (system prompt real + schema real con claves opacas `parametersN_Value` en orden numérico real) y se corrió Claude Sonnet con descripción VIEJA vs NUEVA:
+- **Ronda 1-2 (escenarios sintéticos, 48 muestras):** 48/48 VIN correcto, VIEJA y NUEVA por igual. No reprodujo.
+- **Ronda 3 (transcript REAL de la sesión fallida `528717955153`, 12 muestras):** 12/12 VIN correcto. **NO reprodujo el fallo ni con la conversación exacta que produjo `serie="Gómez Palacio"` en producción.**
+- **Total: 60 muestras, 0 fallos.**
+
+**Por qué el harness no reproduce (comprobado contra el workflow real):** el nodo `Anthropic Chat Model` (AI Agent) corre `claude-sonnet-4-5-20250929` a **`temperature: 0.7`**, maxTokens 2000. El harness usa Sonnet 4.6 a temperatura efectiva baja. Dos diferencias decisivas:
+1. **Temperature 0.7 sobre una tarea de tool-call/extracción estructurada** — el fallo es un evento de cola de muestreo (raro, estocástico). No se puede fijar 0.7 en los subagentes → no se reproduce la tirada mala.
+2. **Modelo 4.5 vs 4.6** — 4.6 sigue instrucciones mejor y evita la confusión; 4.5 a temp alta a veces mete el token de ubicación sobrante.
+
+**Anatomía del fallo real (sesión `528717955153`, póliza `7620098065` — otra afectada, PAGADA):** VIN `3N1CN8AE40531V` capturado, validado y mostrado en el resumen correctamente. En `Issue_Policy`: `parameters17`(colonia)=`"Gómez Palacio Centro"`, `parameters18`(serie)=`"Gómez Palacio"` (la ciudad). Disparador: el CP 35000 devolvió colonia≈ciudad casi idénticas ("Gómez Palacio Centro" / "Gómez Palacio"); el modelo llenó colonia y metió el token de ciudad sobrante en `serie`(18), que va justo después con clave opaca y descripción que no dice "VIN".
+
+**Causa raíz multi-factor (la descripción era solo 1 de 3-4 factores):**
+- (a) **Temperature 0.7** en una extracción de tool-call — el factor dominante y el más barato de arreglar. Debería ser **0** (o ~0.1). Este solo cambio elimina casi toda la aleatoriedad que causa la substitución.
+- (b) Descripción de `serie` pobre (solo procedencia) — reduce probabilidad pero no la elimina.
+- (c) Clave opaca `parameters18_Value` pegada al bloque domicilio (17=colonia) — estructural; el reorden del 2 jul no lo tocó.
+- (d) Modelo 4.5 (opcional: 4.6 acertó 100% en pruebas).
+
+**Conclusión clave — un fix de prompt/descripción NUNCA es "certificable a 100%":** sobre un modelo estocástico a temp 0.7, cualquier fix de texto solo *baja la probabilidad*, no la garantiza; y no se puede medir la mejora por replay porque el entorno de test no reproduce la tirada mala. Lo único que **garantiza** que una ciudad no llegue a Quálitas es un **guard determinista** antes de emitir:
+- Rechazar `serie` si contiene espacios o no cumple `^[A-Za-z0-9]{5,20}$`, o si `serie == colonia`/`ciudad`. "Gómez Palacio" tiene espacio → bloqueado deterministamente. Esto SÍ es testeable/certificable con casos unitarios.
+
+**Plan recomendado (orden de prioridad):**
+1. **`temperature: 0`** en el nodo AI Agent (cambio de un campo; el mayor y más fiable lever para un tool-call). Probablemente EL fix.
+2. **Descripción de `serie`** → definición de contenido (defense-in-depth, baja más la probabilidad).
+3. **Guard determinista** (Code node en n8n antes de `Issue_Policy`, e idealmente validación en Django `/api/emitir-externo/`) — lo único que da certeza real.
+4. (Opcional) subir el modelo del AI Agent a Sonnet 4.6.
+
+- El reorden del 2 jul fue inútil (no cambió las claves `$fromAI`). Póliza `7620098065` (Sandra Luz Hernández, PAGADA) se suma a `7620096850` en la lista de reemisión manual con Quálitas.
+
+**✅ RESOLUCIÓN (4 jul 2026) — plan definitivo de defensa en capas + decisión de formato:**
+- **Decisión de negocio (Alberto):** `serie` debe ser **exactamente 17 caracteres (VIN completo)**; el bot rechaza todo lo que no cumpla. Quálitas requiere el VIN completo → la regex estricta es correcta.
+- **Regex canónica (Django y n8n deben coincidir):** `^[A-HJ-NPR-Z0-9]{8}[0-9X][A-HJ-NPR-Z0-9]{8}$` (17 chars, sin espacios/guiones/acentos, sin I/O/Q, 9º carácter dígito o X). Normalizar antes: `String(serie).trim().toUpperCase()`.
+- **Capa 1 — Django (Juan, ✅ hecho, rama `stg`):** autoridad final. Valida serie + `matches_geographic_field` (rechaza colonia/ciudad/municipio/estado) + contrato de error `400 {code:"invalid_vehicle_serie", reason: empty|matches_geographic_field|invalid_vin_format}`. Guía: `aguayo-co/HYL-WAI:docs/guia-n8n-validacion-serie-vin.md`.
+- **Capa 2 — n8n mapeo rígido (Agente n8n, ⏳):** `Issue_Policy.serie`/`placas` leen el valor ya validado (reutilizar el de `Validate Personal Data`), NO un `$fromAI` nuevo. El valor emitido = el validado por construcción.
+- **Capa 3 — n8n consistencia + validación cliente (Agente n8n, ⏳):** (a) actualizar el systemMessage del AI Agent: serie = exactamente 17 chars VIN (no "5-20"), coach al usuario; (b) Code node determinista antes de `Issue_Policy` que normaliza + valida con la regex; si falla, re-preguntar, NO llamar a Django; (c) manejar `400 invalid_vehicle_serie` → parar, re-preguntar, re-validar, sin auto-reintento.
+- **Temperatura:** se queda en 0.7. Con el mapeo rígido + validación determinista, la correctitud no depende del muestreo — no hace falta tocarla.
+- **INCONSISTENCIA a corregir en lockstep:** el prompt del bot decía "5-20 caracteres"; DEBE pasar a "exactamente 17" o el bot aceptará series que Django rechaza (loop muerto). Parte de Capa 3(a).
+- **Pólizas con serie inválida a reemitir con Quálitas:** `7620096850` (VIN=ciudad) y `7620098065` (Sandra Luz, serie `3N1CN8AE40531V` = 14 chars, VIN incompleto). Auditar el resto con la regex.
+
+**Pólizas afectadas — pendiente re-auditar:**
+- Confirmadas históricas (2 jul): 3 de 5 con valor incorrecto (`Hidalgo`, `Ciudad de México`, `Ciudad General Escobedo`).
+- Póliza `7620096850` ya `PAGADO` con VIN incorrecto — reemisión manual directa con Quálitas.
+- Nueva del 3 jul (`serie = "Gómez Palacio"`) — identificar número de póliza y añadir a la lista de reemisión manual.
+- Correr la auditoría SQL sobre `n8n_chat_histories` (ver más abajo) para el conteo total actualizado tras esta recurrencia.
 
 ---
 
