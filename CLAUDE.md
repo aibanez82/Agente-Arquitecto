@@ -282,6 +282,16 @@ Se montó un harness de reproducción (system prompt real + schema real con clav
 
 - El reorden del 2 jul fue inútil (no cambió las claves `$fromAI`). Póliza `7620098065` (Sandra Luz Hernández, PAGADA) se suma a `7620096850` en la lista de reemisión manual con Quálitas.
 
+**Corrección de arquitectura (4 jul, hallada por el Agente n8n):** `Issue Policy`, `Validate Personal Data`, `Get Quotation Data`, `Search Colony` NO son nodos en serie — son **tools colgadas del AI Agent** (`ai_tool`), invocadas por el modelo cuando decide. Implicaciones:
+- No hay un "antes de Issue Policy" lineal donde meter un Code node. La validación determinista de la serie en la ruta de emisión vive en **Django** (que ya está desplegado y ES el único gate de emisión).
+- `Validate Personal Data` e `Issue Policy` son tool calls **independientes**, cada una con su propia extracción `$fromAI`. Endurecer `Validate` NO caza la divergencia observada (Validate recibió el VIN, Issue Policy re-extrajo la ciudad) — solo rechaza en captura. El gate de emisión es Django.
+- No existe hoy ningún store determinista y referenciable del VIN: `whatsapp_sessions.captured_data` está `{}` (Bug #5). El VIN solo vive en la conversación y llega a las tools vía IA.
+
+**Decisión (4 jul): Opción A (cierre seguro ya) + Opción B diferida.**
+- **Opción A (en ejecución, Agente n8n, rama `stg`):** (1) prompt del bot → VIN-17 (todas las menciones); (2) manejo del `400 invalid_vehicle_serie` a nivel prompt + verificar ruteo `Detect API Failure`/`Is API Error?` para que ese código específico rute a re-pregunta y no a error genérico; (3) endurecer la regex de serie dentro de `Validate Personal Data` a la canónica (defensa temprana). Django es el backstop que garantiza que ninguna ciudad se emita.
+- **Opción B (diferida — tarea de arquitectura aparte):** persistir el VIN validado en `whatsapp_sessions.captured_data` y que `Issue Policy` lo lea deterministamente vía `={{ $('Load Session').first().json.captured_data.serie }}` (patrón precedente — `Issue Policy` ya referencia `Load Session` con éxito). Saca a la IA del mapeo final (satisface el principio de Alberto "mapeo sin interpretación de IA") y de paso arregla el Bug #5. Es un mini-proyecto, no un cambio mínimo.
+- **Rollout:** Django `stg`→prod y los cambios de n8n suben JUNTOS (o Django después de que n8n maneje el 400), o habrá emisiones atascadas.
+
 **✅ RESOLUCIÓN (4 jul 2026) — plan definitivo de defensa en capas + decisión de formato:**
 - **Decisión de negocio (Alberto):** `serie` debe ser **exactamente 17 caracteres (VIN completo)**; el bot rechaza todo lo que no cumpla. Quálitas requiere el VIN completo → la regex estricta es correcta.
 - **Regex canónica (Django y n8n deben coincidir):** `^[A-HJ-NPR-Z0-9]{8}[0-9X][A-HJ-NPR-Z0-9]{8}$` (17 chars, sin espacios/guiones/acentos, sin I/O/Q, 9º carácter dígito o X). Normalizar antes: `String(serie).trim().toUpperCase()`.
