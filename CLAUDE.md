@@ -485,6 +485,7 @@ Comando de arranque: `cd ~/claude-projects/<repo> && claude`
 
 ## Convenciones
 
+- **Persistencia entre máquinas — NUNCA usar memoria local:** Alberto trabaja desde al menos 3 laptops. La carpeta de memoria del agente (`.claude/…/memory/`) es **local a cada máquina y no se sincroniza** → se pierde al cambiar de equipo. Por tanto, TODA iniciativa, plan, backlog o cualquier cosa que deba conservarse se guarda **en git** (en `docs/iniciativas/` para iniciativas/backlog, o el `docs/` que corresponda) y se hace commit+push. Nunca en memoria.
 - **Git:** siempre `user.email = a.ibanez@gmail.com` / `user.name = aibanez82`
 - **Timezone:** siempre `America/Mexico_City` (UTC-6, sin horario de verano desde 2023)
 - **GitHub Issues:** labels con caracteres exactos incluyendo acentos (e.g. `crítico`)
