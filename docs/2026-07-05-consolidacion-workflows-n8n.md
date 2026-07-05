@@ -7,6 +7,13 @@
 > creados ad-hoc, y **varios comparten `webhookId` con producción** — la causa raíz del Bug #12.
 > Ejecutor de los borrados: Agente n8n (o Alberto en la UI). Este doc es el diagnóstico + plan.
 
+> **✅ EJECUTADO (5 jul 2026, ~20:11 UTC) por el Arquitecto vía API** (autorizado por Alberto: "por
+> mí borramos todo stg"). Los 12 duplicados borrados (DELETE `/workflows/{id}`, todos HTTP 200).
+> Instancia verificada: quedan **exactamente 3 workflows, los de producción, todos activos**. Peligro
+> de colisión de webhookId eliminado. **NO se tocó la rama `stg` de git** (conserva el fix del Bug
+> #10 pendiente de merge). Falta: re-exportar los 3 de prod a `docs/n8n-workflows/` (export actual es
+> del 3 jul).
+
 ---
 
 ## Inventario completo (API en vivo, 5 jul)
