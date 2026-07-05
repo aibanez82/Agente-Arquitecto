@@ -205,6 +205,7 @@ Ver `BUGS_N8N.md` para detalle completo con evidencia SQL.
 | 8 | `_generar_bloque_492` no incluye teléfono celular en XML SOAP a Quálitas — campo queda vacío en póliza emitida | Django | 🟠 Alto |
 | 9 | `POST /api/emitir-externo/` devuelve HTTP 400 recurrente — la emisión de pólizas falla y Django se traga la causa (mensaje genérico, sin logging). Detectado 1 jul 2026. | Django | 🔴 Crítico |
 | 10 | AI Agent envía ciudad/estado en vez de VIN al llamar `Issue_Policy`. Detectado 2 jul 2026. Issue `aguayo-co/HYL-WAI` #83. | n8n | 🔴 **REABIERTO 3 jul 2026** — el fix del 2 jul (reorden de campos) era cosmético y NO resolvió. Nueva recurrencia en prod: póliza con `serie/VIN = "Gómez Palacio"`. Causa raíz real identificada: la descripción del campo `serie` no define el contenido. Fix pendiente de aplicar. |
+| 11 | Sesiones pegadas a la 1ª cotización al recotizar — leads reales caen fuera del funnel WhatsApp. Detectado 4 jul 2026 por el Dashboard agent (9/9 verificado: 46 enviados, solo 37 en funnel). | n8n | 🟠 Alto — **registrado, en pausa (Alberto lo piensa).** Ver detalle abajo. |
 
 **Workaround activo para Bug #7 en Dashboard:**
 ```js
@@ -312,6 +313,16 @@ Se montó un harness de reproducción (system prompt real + schema real con clav
 - Correr la auditoría SQL sobre `n8n_chat_histories` (ver más abajo) para el conteo total actualizado tras esta recurrencia.
 
 ---
+
+**Detalle Bug #11 (sesión pegada a la 1ª cotización al recotizar) — REGISTRADO, EN PAUSA (Alberto lo piensa):**
+- **Síntoma (Dashboard agent, 4 jul):** el funnel "VÍA WHATSAPP" pierde leads — 46 enviados hoy, solo 37 en el funnel; los 9 faltantes recibieron el mensaje y varios conversan activamente, pero el dashboard no los ve. 9/9 verificado.
+- **Causa raíz:** `whatsapp_sessions` es **única por teléfono** (`session_id='52'+telefono`). Al recotizar (común: 2-4 cotizaciones por número), se crea cotización nueva pero la fila de sesión ya existe y **su `quotation_id` NO se actualiza** → queda pegado a la 1ª cotización. El join del dashboard (`whatsapp_sessions.quotation_id = qualitas_cotizacion.id`) no encuentra la cotización nueva → lead fuera del funnel.
+- **Dónde vive el fix (evidencia):** el bot de conversación NUNCA escribe `quotation_id` (solo lo lee de la BD; comentario en el código: "quotation_id is NOT extracted from message — it comes from DB"). El `quotation_id` se asigna **solo al crear la sesión**, en **el workflow del webhook de "lead creado" de Django** (envía 1er mensaje + crea sesión). **Ese workflow NO está exportado** en `docs/n8n-workflows/` (gap de fuente de verdad — hay ≥1 workflow más). El fix va ahí: **UPSERT del `quotation_id`** (si la sesión existe, actualizarla a la cotización nueva), no insert-si-no-existe.
+- **Arquitectura — NO "sesión por cotización":** WhatsApp = un hilo por número, y `n8n_chat_histories` (memoria) se llavea por `session_id=teléfono`. Lo correcto: una sesión por teléfono apuntando a la cotización **más reciente** → UPSERT de `quotation_id`.
+- **DECISIÓN PENDIENTE de Alberto:** al actualizar `quotation_id`, ¿(a) resetear a `greeting` + limpiar `captured_data` (recotización = conversación fresca; recomendado, porque el historial y `captured_data` arrastran contexto/serie del auto anterior y si recotiza otro auto quedan mal), o (b) mantener fase/captured_data y solo cambiar `quotation_id`? Depende de por qué recotiza la gente (mismo auto más barato vs otro auto).
+- **Prerrequisitos para el handoff al Agente n8n:** (1) exportar el workflow de creación de sesión; (2) decisión (a)/(b).
+- **Mitigación dashboard (aprobada como interina):** asociar la sesión por teléfono al lead más reciente + reetiquetar "Recotizaciones" en UI. El arreglo limpio es upstream (n8n).
+- **Relación:** encaja con el proyecto CSF (el `captured_data` debe resetear en recotización) y con Bug #4 (leads sin whatsapp_session).
 
 ## Kommo CRM — integración en curso
 
