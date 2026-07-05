@@ -372,9 +372,25 @@ Alberto atiende el lead directamente desde Kommo
 3. Clasificación por outcome + análisis del último mensaje del bot antes del silencio
 4. Informe Markdown con mapa de abandono + análisis de copy + hasta 5 recomendaciones concretas de cambio de texto en n8n
 
-**Cómo interpreta el Arquitecto el informe:**
-- Las recomendaciones de copy se traducen en cambios al `systemMessage` del nodo **AI Agent** en el workflow productivo de n8n
-- El Arquitecto identifica el nodo exacto; la ejecución la hace Alberto directamente en n8n
+**Cómo se ejecutan las recomendaciones — tubería Mejoras → Arquitecto → Agente n8n (NO lateral):**
+
+Las recomendaciones de copy se traducen en cambios al `systemMessage` del nodo **AI Agent** en n8n. El **Agente n8n es el ejecutor** de ese cambio (no Mejoras, no Alberto a mano). Pero **Mejoras y n8n NO se comunican directamente** (regla de oro: los ejecutores no se hablan). La tubería es:
+
+```
+Agente Mejoras Conversación  → analiza abandono, propone cambios de copy (informe)
+        ↓
+Arquitecto (yo)              → valida, traduce a cambio EXACTO (qué frase, qué nodo)
+                               y CHEQUEA IMPACTO TRANSVERSAL antes de aprobar
+        ↓
+Agente n8n                   → aplica el cambio en el JSON, commit/push
+        ↓
+Alberto                      → importa en n8n
+```
+
+**Por qué el Arquitecto en medio no es burocracia — el systemMessage tiene dependencias cruzadas que Mejoras no ve:**
+- **Hitos por LIKE:** los hitos (`confirmo_cobertura`, `poliza_emitida_wa`, etc.) se detectan con `BOOL_OR + LIKE` sobre frases EXACTAS del bot. Si Mejoras propone cambiar justo esas frases, arregla el abandono pero **rompe la analítica de hitos** (de la que él mismo depende). El Arquitecto lo detecta y pide al Agente n8n actualizar TAMBIÉN el patrón LIKE.
+- **Bug #10 / manejo de errores:** el systemMessage (~24K chars) contiene las instrucciones de serie VIN-17, el manejo del `400 invalid_vehicle_serie`, la línea load-bearing de detección desde body. Un cambio de copy puede chocar con ellas.
+- Es el mismo patrón usado para el Bug #10 (diagnóstico → prompt para el Agente n8n → ejecución). El punto de encuentro de los dos ejecutores es el Arquitecto, nunca el otro agente.
 
 **Limitación activa — Bug #1:**
 ~76% de sesiones no tienen historial en `n8n_chat_histories` (medido 1 jul 2026: 154/203). El agente lo detecta y lo anota, pero el análisis de copy solo cubre el ~24% de conversaciones con datos. Nota: gran parte de ese "vacío" son leads que nunca respondieron (ver Bug #1 reinterpretado), no pérdida de datos. Los resultados son válidos pero parciales.
