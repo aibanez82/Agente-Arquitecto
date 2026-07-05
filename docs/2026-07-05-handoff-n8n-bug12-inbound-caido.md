@@ -37,51 +37,80 @@ Hechos confirmados — NO son suposiciones sobre el export local:
 
 ## Causas probables (borde Meta → webhook), en orden de sospecha
 
-1. **La suscripción del webhook en Meta se invalidó / el registro del webhook de n8n se perdió.** El
-   `whatsAppTrigger` de n8n registra su callback URL con Meta al activar el nodo. Si la instancia de
-   Hostinger **se reinició** ~22:38 UTC del 03-jul y no re-registró el webhook, o si Meta revocó la
-   suscripción, los POST dejan de llegar aunque el workflow figure activo. **Sospecha principal.**
-2. **Un workflow duplicado/staging robó y luego liberó el webhook.** Hay MUCHAS copias en la
-   instancia (`..._STG`, `..._stg`, `..._BCK_2jul`, `... copy`). Si alguna comparte el mismo
-   `path`/`webhookId` y se activó→desactivó, pudo des-registrar el webhook de producción. (Las copias
-   `_STG` se tocaron el 04-jul, *después* del corte — menos probable como disparador, pero hay que
-   descartarlo.)
-3. **Token/credencial de Meta caducado** (`WhatsApp Hylant Account`, id `bUWR11VM0seHo63P`). Nota: en
-   Pendientes de infra ya figura "Regenerar token Meta Business API" como urgente. Un token vencido
-   suele romper el *envío*, pero según cómo esté montada la suscripción también puede tumbar la
-   entrega entrante.
+### 🥇 Sospecha PRINCIPAL — colisión de webhookId con workflows duplicados (CONFIRMADA por API, 5 jul)
+
+**Escaneé los 15 workflows de la instancia. CUATRO comparten el mismo `webhookId`
+`18c1b498-024e-4803-8088-56ccf9812f33` (la misma ruta de webhook):**
+
+| active | Workflow | id |
+|---|---|---|
+| ✅ **true** | `WhatsApp Insurance Quotation Bot` (producción) | `BtOaZm7WlZT-24V7hqCnF` |
+| ❌ false | `WhatsApp Insurance Quotation Bot_stg` | `0KX6Tg0ljmpIVtFslubUA` |
+| ❌ false | `WhatsApp Insurance Quotation Bot` (copia) | `CPcP1m8sURQIOAGgCN8s0` |
+| ❌ false | `WhatsApp Insurance Quotation Bot_STG` | `DFg__oxPp2x2uaXkhvj44` |
+
+Los 3 duplicados nacieron de copiar el workflow de producción — n8n **no regenera el `webhookId` al
+duplicar**, así que heredan la misma ruta.
+
+**Mecánica del fallo:** la ruta del webhook se deriva del `webhookId`. Si se **activa y luego
+desactiva** cualquiera de esas copias que comparte `18c1b498`, al desactivarla n8n **borra el
+registro de esa ruta** del webhook. Producción queda **huérfana**: `active:true` pero sin webhook
+registrado. Meta hace POST a una ruta que ya no existe → **cero ejecuciones, en silencio, sin
+errores**. Encaja al 100% con lo observado (corte seco 22:38:53 UTC, sin ejecución fallida). Y
+explica por qué es el **2º apagón silencioso en una semana**: cada toque a un `_STG` que colisiona
+tumba producción. (El `updatedAt` 04-jul de las copias no lo descarta: activar/desactivar NO
+actualiza `updatedAt`.)
+
+**Corroboración por API:** el duplicado `CPcP1m8sURQIOAGgCN8s0` **recibió ejecuciones `mode:webhook`
+reales de Meta el 01–02 jul** (ids 1953–1961) — prueba de que la ruta compartida `18c1b498`
+efectivamente se turnó entre workflows (Meta POSTeaba a la copia cuando estaba activa). Los otros dos
+duplicados (`0KX6...`, `DFg__...`) no tienen ejecuciones: consistente con activarse→desactivarse sin
+llegar a recibir un mensaje, des-registrando la ruta sin dejar rastro. La colisión no es teórica: ya
+ocurrió.
+
+### Sospechas secundarias (descartar si la #1 no cuadra)
+
+2. **Reinicio de Hostinger ~22:38 UTC del 03-jul sin re-registrar el webhook.** Verificar logs de la
+   instancia / panel Hostinger.
+3. **Token/credencial de Meta caducado** (`WhatsApp Hylant Account`, id `bUWR11VM0seHo63P`). En
+   Pendientes de infra ya figura "Regenerar token Meta Business API" como urgente.
 
 ---
 
 ## Tareas (en orden)
 
-### 1. Confirmar la causa exacta del borde Meta→webhook
+### 1. Confirmar la causa (la #1 ya está medio confirmada; cerrarla)
 
-- **Instancia:** ¿hubo un **reinicio / redeploy de Hostinger** alrededor de las 22:38 UTC del
-  03-jul? (logs del contenedor n8n / panel Hostinger). Es la hipótesis #1.
-- **Meta App:** en **Meta → WhatsApp → Configuration → Webhooks**, verificar que la **Callback URL**
-  apunta al webhook de n8n (`.../webhook/18c1b498-024e-4803-8088-56ccf9812f33` o la ruta del
-  `whatsAppTrigger`), que está **verificada** y que el campo **`messages`** sigue suscrito. Usar
-  "Test"/reenviar un evento de prueba desde Meta y ver si n8n lo recibe.
-- **Duplicados:** listar workflows que contengan un `whatsAppTrigger` con el **mismo webhookId
-  `18c1b498...`** y confirmar que solo el de producción lo usa (que ningún staging lo pisó).
-  `GET /workflows` ya está disponible vía API para auditarlo.
+- **Colisión de webhookId (sospecha #1, ya evidenciada):** el hecho está confirmado (4 workflows con
+  `18c1b498`). Lo que falta es correlacionar con el toggle: revisar el **historial de ejecuciones de
+  los 3 duplicados** (`0KX6...`, `CPcP1...`, `DFg__...`) — si alguno tiene una ejecución o cambio de
+  estado cerca del 03-jul 22:38 UTC, es la pistola humeante. `GET /executions?workflowId=<id>`.
+- **Secundaria — instancia:** ¿reinicio / redeploy de Hostinger ~22:38 UTC del 03-jul? (logs n8n /
+  panel Hostinger).
+- **Secundaria — Meta App:** en **Meta → WhatsApp → Configuration → Webhooks**, verificar que la
+  **Callback URL** apunta a la ruta del `whatsAppTrigger` (`.../webhook/18c1b498-...`), que está
+  **verificada** y que **`messages`** sigue suscrito.
 
-**Entrega:** una línea de causa raíz + evidencia (reinicio a tal hora / captura de la config de
-webhook en Meta / duplicado que compartía el path).
+**Entrega:** una línea de causa raíz + evidencia.
 
-### 2. Reactivar la ruta de ingesta
+### 2. Reactivar la ruta de ingesta + eliminar la colisión (fix durable)
 
-Según la causa:
+**(a) Reactivar producción:** **desactivar y volver a activar** el workflow `BtOaZm7WlZT-24V7hqCnF`
+(o re-guardar el nodo `WhatsApp Message Trigger`) → fuerza a n8n a re-registrar la ruta del webhook.
+Si no basta, re-configurar la suscripción en la Meta App.
 
-- **Re-registrar el webhook con Meta** — la vía estándar en n8n: **desactivar y volver a activar** el
-  workflow `BtOaZm7WlZT-24V7hqCnF` (o re-guardar el nodo `WhatsApp Message Trigger`), lo que fuerza a
-  n8n a re-suscribir la callback URL en Meta. Si eso no basta, re-configurar la suscripción
-  directamente en la Meta App.
-- Si fue **token caducado** → renovar la credencial `WhatsApp Hylant Account` (lo ejecuta Alberto;
-  tú diagnosticas y avisas).
-- Si fue un **duplicado** pisando el path → corregir el path/quitar el trigger duplicado del
-  workflow que no debe tenerlo.
+**(b) ⚠️ Eliminar la colisión — SIN esto, se vuelve a caer:** los 3 duplicados que comparten
+`18c1b498` (`0KX6...`, `CPcP1...`, `DFg__...`) son una bomba de relojería: el próximo toque a
+cualquiera vuelve a des-registrar producción. Para cada uno, elegir UNA:
+   - **Borrarlo** si ya no sirve (hay `_BCK_2jul`, `copy`, y varios `_STG` — consolidar).
+   - Si debe conservarse (staging real), **regenerar su `webhookId`** para que NO colisione con
+     producción — en la UI: abrir el nodo `WhatsApp Message Trigger` del duplicado y regenerar el
+     webhook (o borrar y recrear el nodo trigger), de modo que reciba una ruta propia distinta de
+     `18c1b498`.
+   - **Ningún workflow de staging debe compartir el `webhookId` de producción.** Es la causa
+     estructural de los apagones repetidos.
+
+**(c) Si fue token caducado** → renovar la credencial `WhatsApp Hylant Account` (lo ejecuta Alberto).
 
 **Verificación OBLIGATORIA antes de cerrar (medible por API):**
 - Enviar un WhatsApp entrante de prueba y confirmar:
