@@ -1,9 +1,19 @@
 # Iniciativa — Extracción de datos de Constancia de Situación Fiscal (CSF)
 
-> Estado: **DISEÑO APROBADO (4 jul 2026)** → ver spec completa en
-> [`2026-07-04-constancia-fiscal-integracion-n8n-design.md`](2026-07-04-constancia-fiscal-integracion-n8n-design.md).
-> Este archivo es el placeholder original; la fuente de verdad ahora es el spec.
-> Guardado en git (no en memoria local) para que persista entre sus 3 laptops.
+> **TRIGGER DE RETOMADA:** cuando Alberto diga *"retomemos el proyecto de extractor de PDF"* →
+> leer la **spec** y el **plan** de abajo y continuar por el siguiente paso pendiente.
+
+## Cómo retomar (estado al 4 jul 2026)
+
+- **Diseño:** ✅ aprobado → [`2026-07-04-constancia-fiscal-integracion-n8n-design.md`](2026-07-04-constancia-fiscal-integracion-n8n-design.md)
+- **Plan de implementación:** ✅ escrito → [`2026-07-04-constancia-fiscal-plan-implementacion.md`](2026-07-04-constancia-fiscal-plan-implementacion.md)
+- **Nada ejecutado aún.** Siguiente paso = elegir por dónde arrancar:
+  - **A — Desplegar el extractor** (Docker en VPS Hostinger) → Alberto + Arquitecto; runbook en Fase 1 del plan. NO bloqueado por staging.
+  - **B — Handoff al Agente n8n** (Fases 2-3: workflow CSF Ingestion + cambio bot) → construir se puede ya; **probar requiere staging**.
+  - **C — Montar Staging Fase 1** (`entorno-pruebas-staging.md`) → desbloqueador para probar A+B y llevar a prod.
+- **Recomendación:** el camino crítico pasa por **staging (C)**; **A** es victoria limpia autocontenida cuando haya 20 min en el VPS.
+
+> Este archivo es el índice; la fuente de verdad es la spec + el plan. Guardado en git (no memoria local).
 
 ## Qué es
 
