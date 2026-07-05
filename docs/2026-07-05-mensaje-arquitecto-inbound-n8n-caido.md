@@ -38,8 +38,21 @@ falla de forma ruidosa, simplemente dejan de entrar datos.
   enviando y registrando en `qualitas_whatsappmessage`. Leads nuevos siguen entrando y recibiendo
   su primer mensaje.
 - Por tanto **el fallo NO está en Django ni en el envío saliente** — está acotado a la **ruta de
-  ingesta**: Meta Cloud API → webhook de n8n → INSERT en `n8n_chat_histories`. Es un problema del
-  lado de n8n (webhook desactivado / workflow inactivo / suscripción del webhook de Meta caída).
+  ingesta**: Meta Cloud API → webhook de n8n → INSERT en `n8n_chat_histories`.
+
+## Confirmado en vivo contra la API de n8n (5 jul)
+
+Verificado directamente contra `https://n8n.srv1325340.hstgr.cloud/api/v1/` (no sobre la copia local):
+
+- El bot de producción (`WhatsApp Insurance Quotation Bot`, id `BtOaZm7WlZT-24V7hqCnF`) **está
+  `active: true`** y su `WhatsApp Message Trigger` está bien configurado (`updates: ["messages"]`).
+- **La última ejecución webhook fue la id `2059` @ `2026-07-03T22:38:53 UTC`; CERO ejecuciones desde
+  entonces** (~2 días). El último `status: error` (id 1996) fue a las 17:26 UTC del 03-jul, *antes*
+  del corte → no relacionado.
+- **Conclusión:** no fue una desactivación ni un error interno de n8n. **Meta dejó de entregar al
+  webhook** aunque n8n está activo y escuchando → el fallo vive en el **borde Meta → registro del
+  webhook** (probable reinicio de Hostinger sin re-registro, suscripción de Meta invalidada, o token
+  caducado). Detalle y plan de reactivación en `docs/2026-07-05-handoff-n8n-bug12-inbound-caido.md`.
 
 ---
 

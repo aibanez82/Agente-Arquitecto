@@ -9,103 +9,131 @@
 
 ---
 
-## Contexto en una frase
+## ⚠️ Diagnóstico hecho EN VIVO contra la API de n8n (no sobre copia local)
 
-Desde el **2026-07-03 ~22:30 UTC** los mensajes **entrantes** de WhatsApp dejaron de guardarse en
-`n8n_chat_histories`. Django y el envío saliente funcionan bien → el fallo está **acotado a la ruta
-de ingesta de n8n** (Meta Cloud API → trigger de n8n → memoria Postgres). Último mensaje capturado:
-`n8n_chat_histories.id = 4693` (lead 1045).
+Consultado el **estado vivo** en `https://n8n.srv1325340.hstgr.cloud/api/v1/` (con `X-N8N-API-KEY`).
+Hechos confirmados — NO son suposiciones sobre el export local:
+
+| Hecho | Evidencia (API en vivo, 5 jul) |
+|---|---|
+| El workflow de producción **está ACTIVO** | `GET /workflows` → `WhatsApp Insurance Quotation Bot` id **`BtOaZm7WlZT-24V7hqCnF`** → `active: true`, `updatedAt: 2026-07-02T23:27:11Z` |
+| El nodo trigger está **bien configurado** | `WhatsApp Message Trigger` (`n8n-nodes-base.whatsAppTrigger`, webhookId `18c1b498-024e-4803-8088-56ccf9812f33`), `updates: ["messages"]`, credencial `whatsAppTriggerApi` = `WhatsApp Hylant Account` (id `bUWR11VM0seHo63P`) |
+| **La ingesta se cortó en seco el 2026-07-03 22:38:53 UTC** | `GET /executions?workflowId=BtOaZm7WlZT-24V7hqCnF` → última ejecución `mode: webhook, status: success` es la **id 2059 @ 2026-07-03T22:38:53Z**. **CERO ejecuciones desde entonces (~2 días).** |
+| El corte **no fue un error interno** | El último `status: error` (id 1996) fue a las **17:26 UTC del 03-jul, ANTES** del corte → no relacionado. No hay ejecuciones fallidas en el momento del corte: simplemente dejaron de llegar. |
+
+### Lectura del Arquitecto (qué descarta esta evidencia)
+
+- ❌ **NO** es "workflow desactivado" → está `active: true`.
+- ❌ **NO** es un error de nodo / credencial de Postgres / bug de código → la última ejecución fue
+  `success`; el corte es la **ausencia total de ejecuciones**, no ejecuciones que fallan.
+- ✅ **SÍ** es que **Meta dejó de entregar al webhook** de n8n. El bot está activo y escuchando, pero
+  Meta no le está haciendo POST. El fallo vive en el **borde Meta → registro del webhook de n8n**,
+  no dentro del workflow.
+
+> Esto casa con el reporte del Dashboard (último capturado `n8n_chat_histories.id 4693`, lead 1045,
+> ~22:30 UTC): el último POST entrante que n8n procesó fue 22:38:53 UTC del 03-jul.
 
 ---
 
-## Workflow y nodos implicados
+## Causas probables (borde Meta → webhook), en orden de sospecha
 
-**Workflow:** `WhatsApp Insurance Quotation Bot`
-(export local: `docs/n8n-workflows/WhatsApp Insurance Quotation Bot.json` — ⚠️ export del 3 jul,
-puede NO reflejar el estado vivo en producción; verifica contra n8n en vivo).
-
-| Nodo | Tipo | id | Rol en la ingesta |
-|---|---|---|---|
-| `WhatsApp Message Trigger` | `n8n-nodes-base.whatsAppTrigger` | `80dccf45-763c-48d4-92fa-4fdf1925bfd4` | **Punto de entrada** de los mensajes entrantes de Meta. webhookId `18c1b498-024e-4803-8088-56ccf9812f33`. **Principal sospechoso.** |
-| `Postgres Chat Memory` | `@n8n/n8n-nodes-langchain.memoryPostgresChat` | `3769734b-...` | Escribe el historial en `n8n_chat_histories` (memoria del AI Agent). |
-| `Postgres Chat Memory1` | `@n8n/n8n-nodes-langchain.memoryPostgresChat` | `8fd23ae6-...` | Segundo punto de escritura de memoria. |
-
-> Nota: en el export local el workflow figura `active: true`, pero eso es del 3 jul (antes/durante el
-> corte). El estado que importa es el **vivo en n8n**. No asumas que está activo.
+1. **La suscripción del webhook en Meta se invalidó / el registro del webhook de n8n se perdió.** El
+   `whatsAppTrigger` de n8n registra su callback URL con Meta al activar el nodo. Si la instancia de
+   Hostinger **se reinició** ~22:38 UTC del 03-jul y no re-registró el webhook, o si Meta revocó la
+   suscripción, los POST dejan de llegar aunque el workflow figure activo. **Sospecha principal.**
+2. **Un workflow duplicado/staging robó y luego liberó el webhook.** Hay MUCHAS copias en la
+   instancia (`..._STG`, `..._stg`, `..._BCK_2jul`, `... copy`). Si alguna comparte el mismo
+   `path`/`webhookId` y se activó→desactivó, pudo des-registrar el webhook de producción. (Las copias
+   `_STG` se tocaron el 04-jul, *después* del corte — menos probable como disparador, pero hay que
+   descartarlo.)
+3. **Token/credencial de Meta caducado** (`WhatsApp Hylant Account`, id `bUWR11VM0seHo63P`). Nota: en
+   Pendientes de infra ya figura "Regenerar token Meta Business API" como urgente. Un token vencido
+   suele romper el *envío*, pero según cómo esté montada la suscripción también puede tumbar la
+   entrega entrante.
 
 ---
 
 ## Tareas (en orden)
 
-### 1. Diagnóstico — ¿qué pasó a las ~22:30 UTC del 2026-07-03?
+### 1. Confirmar la causa exacta del borde Meta→webhook
 
-Revisa el **log de ejecuciones** del workflow `WhatsApp Insurance Quotation Bot` alrededor de esa
-hora (Executions en la UI, o `GET /api/v1/executions?workflowId=...&includeData=true`). Busca:
+- **Instancia:** ¿hubo un **reinicio / redeploy de Hostinger** alrededor de las 22:38 UTC del
+  03-jul? (logs del contenedor n8n / panel Hostinger). Es la hipótesis #1.
+- **Meta App:** en **Meta → WhatsApp → Configuration → Webhooks**, verificar que la **Callback URL**
+  apunta al webhook de n8n (`.../webhook/18c1b498-024e-4803-8088-56ccf9812f33` o la ruta del
+  `whatsAppTrigger`), que está **verificada** y que el campo **`messages`** sigue suscrito. Usar
+  "Test"/reenviar un evento de prueba desde Meta y ver si n8n lo recibe.
+- **Duplicados:** listar workflows que contengan un `whatsAppTrigger` con el **mismo webhookId
+  `18c1b498...`** y confirmar que solo el de producción lo usa (que ningún staging lo pisó).
+  `GET /workflows` ya está disponible vía API para auditarlo.
 
-- ¿El workflow se **desactivó** (active=false) en ese instante? ¿Hay un release / import / edición
-  que coincida con la hora?
-- ¿Hay ejecuciones **fallando** en el `WhatsApp Message Trigger` o justo después (error de webhook,
-  de credencial de Meta, de conexión Postgres)?
-- ¿Dejaron de **entrar ejecuciones** por completo desde las ~22:30 UTC? (Si no hay ninguna ejecución
-  entrante desde esa hora → el webhook de Meta ya no está llegando: apunta a suscripción de Meta
-  caída o webhook de n8n despublicado, no a un error interno.)
-- Revisa también reinicios/caídas de la instancia Hostinger a esa hora.
-
-**Entrega:** una línea de causa raíz (qué se rompió y por qué) + evidencia (id de ejecución, captura
-del error, o "sin ejecuciones desde HH:MM").
+**Entrega:** una línea de causa raíz + evidencia (reinicio a tal hora / captura de la config de
+webhook en Meta / duplicado que compartía el path).
 
 ### 2. Reactivar la ruta de ingesta
 
-Según lo que encuentres en (1):
+Según la causa:
 
-- Si el workflow quedó **inactivo** → reactivarlo.
-- Si el **webhook de Meta** dejó de apuntar a n8n / se despublicó → re-registrar la suscripción del
-  `WhatsApp Message Trigger` (re-guardar/re-activar el nodo republica el webhook) y verificar en
-  **Meta → WhatsApp → Configuration → Webhooks** que la Callback URL y los campos suscritos
-  (`messages`) siguen correctos y verificados.
-- Si fue un **error de credencial** (token de Meta expirado) → renovar. Ojo: en Pendientes de infra
-  ya figura "Regenerar token Meta Business API" como urgente — puede ser la causa.
+- **Re-registrar el webhook con Meta** — la vía estándar en n8n: **desactivar y volver a activar** el
+  workflow `BtOaZm7WlZT-24V7hqCnF` (o re-guardar el nodo `WhatsApp Message Trigger`), lo que fuerza a
+  n8n a re-suscribir la callback URL en Meta. Si eso no basta, re-configurar la suscripción
+  directamente en la Meta App.
+- Si fue **token caducado** → renovar la credencial `WhatsApp Hylant Account` (lo ejecuta Alberto;
+  tú diagnosticas y avisas).
+- Si fue un **duplicado** pisando el path → corregir el path/quitar el trigger duplicado del
+  workflow que no debe tenerlo.
 
-**Verificación de que quedó arreglado (obligatoria antes de cerrar):**
-- Enviar un mensaje de prueba entrante y confirmar que aparece una **fila nueva** en
-  `n8n_chat_histories` con `id > 4693`.
-- Confirmar que el AI Agent **responde** al mensaje entrante (no solo que se guarda).
+**Verificación OBLIGATORIA antes de cerrar (medible por API):**
+- Enviar un WhatsApp entrante de prueba y confirmar:
+  - Aparece una **ejecución nueva** con `startedAt > 2026-07-03T22:38:53Z` en
+    `GET /executions?workflowId=BtOaZm7WlZT-24V7hqCnF`.
+  - Aparece una **fila nueva** en `n8n_chat_histories` con `id > 4693`.
+  - El AI Agent **responde** al mensaje (no solo que se guarda).
 
 ### 3. Alerta de "inbound caído" (2º apagón silencioso en una semana)
 
-Este es el **segundo apagón silencioso en 7 días** (el 1º: follow-up de 15 min, Issue #74). No
-queremos volver a enterarnos por casualidad. Añadir monitoreo:
+Segundo apagón silencioso en 7 días (el 1º: follow-up de 15 min, Issue #74). Añadir monitoreo para
+no volver a descubrirlo por casualidad:
 
-- **Mínimo viable:** un workflow de n8n programado (cron, p. ej. cada 30–60 min) que consulte
-  "¿cuántas filas nuevas entraron en `n8n_chat_histories` en la última hora?" y, si es **0** durante
-  la franja de actividad (horario diurno CDMX), dispare una **notificación a Alberto**
+- **Mínimo viable:** workflow de n8n programado (cron cada 30–60 min) que consulte "¿cuántas
+  ejecuciones webhook / filas nuevas en `n8n_chat_histories` en la última hora?" y, si es **0**
+  durante la franja diurna CDMX con envíos salientes activos, notifique a Alberto
   (WhatsApp / email / Slack).
-- **Recomendado además:** apuntar el campo **"Error Workflow"** del `WhatsApp Insurance Quotation
-  Bot` a un handler de errores (reutiliza el patrón ya especificado en
-  `docs/estrategia/2026-07-02-alerta-emision-fallida-quálitas.md`, sección "n8n — workflow de error
-  dedicado"). Hoy está en "- No Workflow -", por eso los fallos son mudos.
-
-**Umbral de la alerta:** ojo con el baseline — la captura NO es 100%: ~30% de sesiones tienen
-historial (muchos leads nunca responden, Bug #1). Por eso la señal fiable NO es "tasa baja" sino
-**"0 filas nuevas durante una franja con envíos salientes activos"**. Usa "cero entrante mientras hay
-outbound" como condición, no un porcentaje.
+- **Recomendado además:** apuntar el campo **"Error Workflow"** del bot (hoy en "- No Workflow -") a
+  un handler de errores — reutiliza el patrón de
+  `docs/estrategia/2026-07-02-alerta-emision-fallida-quálitas.md`.
+- **Umbral correcto:** la captura NO es 100% (~30% de sesiones tienen historial; muchos leads nunca
+  responden — Bug #1). La señal fiable NO es "tasa baja" sino **"0 ejecuciones webhook entrantes
+  mientras hay outbound activo"**. Este apagón concreto se habría cazado en <1h con esa regla.
 
 ---
 
 ## Al terminar (cierre del ciclo)
 
-1. Exporta el workflow modificado y actualiza `docs/n8n-workflows/` en este repo (mantener la fuente
-   de verdad sincronizada — hoy el export es del 3 jul).
-2. Reporta al Arquitecto: causa raíz (tarea 1), qué reactivaste (tarea 2, con la evidencia de
-   `id > 4693`), y qué alerta quedó montada (tarea 3).
-3. El Arquitecto avisa al Agente Dashboard para el **rescate de los leads ~1046–1103** (revisar en
-   WhatsApp Business quiénes respondieron durante el apagón y retomarlos).
+1. Exporta el workflow (si lo modificaste) y actualiza `docs/n8n-workflows/` en Agente-Arquitecto —
+   el export actual es del 3 jul y ya se demostró que puede divergir del vivo.
+2. Reporta al Arquitecto: causa raíz (tarea 1), qué reactivaste con la evidencia de la ejecución
+   `startedAt > 22:38:53Z` e `id > 4693` (tarea 2), y qué alerta quedó montada (tarea 3).
+3. El Arquitecto avisa al Agente Dashboard para el **rescate de los leads ~1046–1103**.
 
 ---
 
 ## Fuera de alcance de este handoff
 
-- El **rescate** de los leads afectados (lo coordina el Arquitecto con el Dashboard, no es cambio de
-  workflow).
-- La renovación del **token de Meta** si resulta ser la causa (la ejecuta Alberto; tú diagnosticas y
-  avisas).
+- El **rescate** de los leads afectados (lo coordina el Arquitecto con el Dashboard).
+- La renovación del **token de Meta** si resulta ser la causa (la ejecuta Alberto).
+
+---
+
+## Apéndice — comandos API usados para el diagnóstico (reproducibles)
+
+```bash
+BASE="https://n8n.srv1325340.hstgr.cloud/api/v1"
+# Estado del workflow (active) + updatedAt
+curl -s -H "X-N8N-API-KEY: $N8N_API_KEY" "$BASE/workflows?limit=50"
+# Última ejecución (corte): id 2059 @ 2026-07-03T22:38:53Z, cero después
+curl -s -H "X-N8N-API-KEY: $N8N_API_KEY" \
+  "$BASE/executions?workflowId=BtOaZm7WlZT-24V7hqCnF&limit=20"
+# Config viva del trigger
+curl -s -H "X-N8N-API-KEY: $N8N_API_KEY" "$BASE/workflows/BtOaZm7WlZT-24V7hqCnF"
+```
