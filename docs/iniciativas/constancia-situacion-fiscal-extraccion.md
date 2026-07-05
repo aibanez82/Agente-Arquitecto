@@ -1,6 +1,8 @@
 # Iniciativa — Extracción de datos de Constancia de Situación Fiscal (CSF)
 
-> Estado: **guardado para retomar** (4 jul 2026). Alberto ya tiene el código hecho.
+> Estado: **DISEÑO APROBADO (4 jul 2026)** → ver spec completa en
+> [`2026-07-04-constancia-fiscal-integracion-n8n-design.md`](2026-07-04-constancia-fiscal-integracion-n8n-design.md).
+> Este archivo es el placeholder original; la fuente de verdad ahora es el spec.
 > Guardado en git (no en memoria local) para que persista entre sus 3 laptops.
 
 ## Qué es
