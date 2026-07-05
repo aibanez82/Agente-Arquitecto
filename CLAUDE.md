@@ -206,6 +206,7 @@ Ver `BUGS_N8N.md` para detalle completo con evidencia SQL.
 | 9 | `POST /api/emitir-externo/` devuelve HTTP 400 recurrente — la emisión de pólizas falla y Django se traga la causa (mensaje genérico, sin logging). Detectado 1 jul 2026. | Django | 🔴 Crítico |
 | 10 | AI Agent envía ciudad/estado en vez de VIN al llamar `Issue_Policy`. Detectado 2 jul 2026. Issue `aguayo-co/HYL-WAI` #83. | n8n | 🔴 **REABIERTO 3 jul 2026** — el fix del 2 jul (reorden de campos) era cosmético y NO resolvió. Nueva recurrencia en prod: póliza con `serie/VIN = "Gómez Palacio"`. Causa raíz real identificada: la descripción del campo `serie` no define el contenido. Fix pendiente de aplicar. |
 | 11 | Sesiones pegadas a la 1ª cotización al recotizar — leads reales caen fuera del funnel WhatsApp. Detectado 4 jul 2026 por el Dashboard agent (9/9 verificado: 46 enviados, solo 37 en funnel). | n8n | 🟠 Alto — **registrado, en pausa (Alberto lo piensa).** Ver detalle abajo. |
+| 12 | Inbound Meta→n8n caído: los mensajes ENTRANTES de WhatsApp no se guardan en `n8n_chat_histories` desde 2026-07-03 ~22:30 UTC. Apagón silencioso detectado por el Dashboard agent (5 jul): tasa de captura 0/48 vs ~30% baseline; último capturado `id 4693` (lead 1045). Django/outbound OK → fallo acotado a la ruta de ingesta n8n. Leads afectados ~1046–1103 (rescate manual). **2º apagón silencioso en una semana** (cf. Issue #74). | n8n | 🔴 Crítico — **abierto.** Ver `docs/2026-07-05-mensaje-arquitecto-inbound-n8n-caido.md`. |
 
 **Workaround activo para Bug #7 en Dashboard:**
 ```js
