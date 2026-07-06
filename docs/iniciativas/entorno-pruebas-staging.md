@@ -40,10 +40,38 @@ Stack paralelo completo; cada componente de staging apunta SOLO a gemelos de sta
 - **WhatsApp:** staging usa una **Meta App distinta** → webhook distinto → no choca con el trigger de prod. (Con instancia separada esto es aún más limpio.)
 - **Quálitas:** existe la variable `QUALITAS_AMBIENTE_FLAG`, pero el flag ≠ las credenciales sandbox.
 
+## Hallazgos del código `stg` (6 jul — leídos vía `gh` / GitHub API)
+
+> El Arquitecto tiene acceso de **lectura al repo** `aguayo-co/HYL-WAI` vía `gh` (permiso `pull`). La nota del CLAUDE.md "PAT pendiente para código" está desactualizada. **NO** hay acceso a la Heroku Platform API (sin token) → los *valores reales* de config vars de `hyl-wai-stg` no son visibles; el código solo revela **qué vars lee y sus defaults**.
+
+**Inventario de config vars que lee la app (rama `stg`):**
+
+| Var | Fuente | Default en código | Qué hacer en staging |
+|---|---|---|---|
+| `WEBHOOK_URL` | `qualitas/views.py:904` | **PROD n8n** (`n8n.srv1325340.hstgr.cloud/.../payment-confirmation`) | 🔴 **DEBE** apuntar a la instancia n8n de staging. Si no, Django stg dispara al n8n de PROD → WhatsApps a leads reales |
+| `N8N_TOKEN` | `qualitas/views.py:905` | ⚠️ token real hardcodeado en el código | usar el de la instancia stg; ver nota de seguridad |
+| `QUALITAS_URL` (emisión) | `services.py:275/692/733` | `https://qa.qualitas.com.mx:8443/WsEmision/...` (**ya es QA**) | dejar default o apuntar a QA |
+| `QUALITAS_WSDL_TARIFAS` (cotización) | `services.py:125/190` | `qbcenter.qualitas.com.mx/wsTarifa/...` (QA) | dejar default o QA |
+| `QUALITAS_URL_OPL`, `QUALITAS_URL_PAGO` | `services.py:810/893` | — | endpoints de pago QA |
+| `QUALITAS_USER_TARIFA`, `QUALITAS_PASSWORD_TARIFA` | `services.py:126/191` | — | credenciales QA (confirmar con Juan) |
+| `QUALITAS_WPUID`, `QUALITAS_WPTOKEN` | `services.py:811/812/894` | — | credenciales pago QA |
+| `QUALITAS_AGENTE`, `QUALITAS_NO_NEGOCIO`, `QUALITAS_DERECHO` | `services.py:476-478` | — | parámetros de negocio QA |
+| `QUALITAS_AMBIENTE_FLAG` | `services.py:479` | `"1"` | **NO es el selector de ambiente** — es un valor SOAP (`NoConsideracion="4"/TipoRegla 1`). Confirmar con Juan qué valor = prueba |
+| `QUALITAS_BDEO_URL/USER/PASS` | `services.py:1022-1024` | — | inspección BDEO (si aplica) |
+| `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_ACCESS_TOKEN` | `services.py:1094/1095` | — | Django también tiene creds Meta; en stg → número/app de test |
+| `DATABASE_URL` | `settings/base.py:170` | — | Postgres addon PROPIO de stg |
+| `AMBIENTE_PRUEBAS` | `settings/base.py:29` | `"0"` | **poner `"1"`** → muestra banner de entorno no-productivo |
+
+**Corrección clave sobre Quálitas (invalida supuesto previo):** el selector sandbox↔prod es **`QUALITAS_URL`/`QUALITAS_WSDL_TARIFAS`**, NO `QUALITAS_AMBIENTE_FLAG`. El default del código ya es el entorno **QA** de Quálitas. Staging solo necesita endpoints QA + credenciales QA; el flag es una bandera *dentro* de Quálitas cuyo valor de "prueba" hay que confirmar con Juan.
+
+**🔒 Nota de seguridad (para Juan):** `N8N_TOKEN` tiene un token real como default hardcodeado en `qualitas/views.py:905`. Mover a solo-env y **rotar** el token. (Añadir a Pendientes de infraestructura del CLAUDE.md.)
+
+**Andamiaje de pruebas ya existente en el repo (reusar, no reinventar):** `docker/pruebas.env.example`, comandos `bootstrap_pruebas_local.py` y `poblar_pruebas_dummy.py` (datos dummy), `feature/test-environment-banner`, `feature/local-docker-pruebas-env`. El gate VIN del Bug #10 vive en `qualitas/vehicle_series.py` (rama `stg`); el follow-up del Issue #74 en `qualitas/whatsapp_followups.py` + comando `enviar_seguimientos_whatsapp.py`.
+
 ## Hueco pendiente (dependencia externa)
 
-**Quálitas sandbox — confirmar con Juan** (Alberto envía el mensaje; el Arquitecto lo redacta cuando lo pida):
-(a) qué valor de `QUALITAS_AMBIENTE_FLAG` = sandbox; (b) si `hyl-wai-stg` ya tiene cargadas las credenciales sandbox (no solo el flag); (c) si el sandbox cubre cotización (tarifas) Y emisión. **Es la dependencia con más plazo externo** → bloquea solo el paso de emisión del runbook, no el resto.
+**Quálitas sandbox — confirmar con Juan** (Alberto envía el mensaje; el Arquitecto lo redacta cuando lo pida). Reformulado tras leer el código (ver Hallazgos):
+(a) confirmar que los endpoints QA del código (`qa.qualitas.com.mx:8443/WsEmision`, `qbcenter.qualitas.com.mx/wsTarifa`) son el sandbox correcto y que hay **credenciales QA** (`QUALITAS_USER_TARIFA`/`QUALITAS_PASSWORD_TARIFA`/`QUALITAS_WPUID`/`QUALITAS_WPTOKEN`); (b) **qué valor de `QUALITAS_AMBIENTE_FLAG`** marca "prueba" en el lado de Quálitas (código default `"1"`); (c) si el QA cubre cotización (tarifas) Y emisión. **Es la dependencia con más plazo externo** → bloquea solo el paso de emisión del runbook, no el resto.
 
 ---
 
@@ -56,7 +84,7 @@ Stack paralelo completo; cada componente de staging apunta SOLO a gemelos de sta
 
 1. **Postgres staging.** Provisionar addon Postgres PROPIO en `hyl-wai-stg` (nunca la BD prod). Correr migraciones Django. Verificar: `hyl-wai-stg` levanta y `DATABASE_URL` de stg ≠ la de prod.
 
-2. **Backend `hyl-wai-stg`.** Confirmar deploy desde rama `stg`. Verificar landing accesible y que el webhook de "lead creado" apunta a la **instancia n8n de staging** (no a la de prod). ⚠️ Config var del webhook n8n en `hyl-wai-stg` debe ser la URL de la instancia separada.
+2. **Backend `hyl-wai-stg`.** Confirmar deploy desde rama `stg`. Verificar landing accesible. ⚠️ **Config var `WEBHOOK_URL`** (y `N8N_TOKEN`) en `hyl-wai-stg` DEBE apuntar a la **instancia n8n de staging** — su default en código es el n8n de PROD (`views.py:904`). Poner `AMBIENTE_PRUEBAS=1` (banner de entorno de prueba). Verificar con `heroku config -a hyl-wai-stg` (requiere que Alberto lo corra o dé token).
 
 3. **Instancia n8n separada.** Levantar según sub-decisión (a/b/c). Importar los **3 workflows de prod** (`WhatsApp Insurance Quotation Bot`, `Payment Confirmation`, `Retomar Conversacion`) desde `docs/n8n-workflows/`.
 
@@ -77,7 +105,8 @@ Con instancia separada el riesgo de `webhookId` compartido desaparece, pero SIGU
 - [ ] **WhatsApp Trigger** → webhook de la Meta App de test.
 - [ ] **`Issue Policy` (httpRequest)** → URL de `hyl-wai-stg`, NUNCA `seguroautoqualitas.com`.
 - [ ] **Claude (Anthropic)** — puede reusar la key de prod (solo hace llamadas LLM, sin efectos secundarios) o una key separada para trackear coste. Decisión menor.
-- [ ] Config var del webhook n8n en `hyl-wai-stg` → instancia n8n de staging.
+- [ ] **`WEBHOOK_URL` + `N8N_TOKEN`** en `hyl-wai-stg` → instancia n8n de staging (default en código = n8n PROD → riesgo real de WhatsApp a leads reales).
+- [ ] `QUALITAS_URL`/`QUALITAS_WSDL_TARIFAS` → endpoints QA; credenciales QA cargadas; `AMBIENTE_PRUEBAS=1`.
 - [ ] Ningún workflow de staging activo comparte `webhookId` con la instancia de prod (con instancia separada es imposible por construcción; verificar igual).
 
 ---
