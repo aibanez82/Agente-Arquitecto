@@ -96,6 +96,27 @@ Stack paralelo completo; cada componente de staging apunta SOLO a gemelos de sta
 
 7. **Prueba E2E:** enviar "hola" desde un número verificado → conversación real → captura de datos → serie/VIN → emisión sandbox → simular webhook de pago (curl). Verificar en BD stg que se escribieron `qualitas_lead`/`qualitas_cotizacion`/`whatsapp_sessions`/`n8n_chat_histories`.
 
+### Manifiesto de credenciales de los workflows (leído de los JSON, 6 jul)
+
+Acceso API a la instancia stg **verificado** (`.env.local` → `N8N_STG_API_KEY`, gitignored). Instancia vacía (0 workflows). Credenciales a crear en stg y repuntar:
+
+| Credencial (type · nombre · id prod) | Nodos | Repuntar a |
+|---|---|---|
+| `postgres` · "Postgres account" · `FbodkhT9DijVcqpB` | 11 (Check/Load/Update Session, Chat Memory, Search Colony, Update Phase/Scope, KB Counter) | BD Postgres STG |
+| `anthropicApi` · "Anthropic Hylant Account" · `aWrCOYz0wHIk5GSd` | 4 (Anthropic Chat Model ×3, Haiku) | key prod o nueva |
+| `whatsAppTriggerApi` · "WhatsApp Hylant Account" · `bUWR11VM0seHo63P` | WhatsApp Message Trigger (inbound) | 2ª Meta App (test) |
+| `whatsAppApi` · "WhatsApp Send Message Hylant Account" · `PbzXr53disA74eew` | Send message (outbound) | 2ª Meta App (test) |
+| `httpHeaderAuth` · "Header Auth account" · `VNlbUSCkIzgHFhLc` | Payment Webhook Trigger | token = `N8N_TOKEN` de `hyl-wai-stg` |
+
+Valores hardcodeados en parámetros a reescribir (no son credenciales): `1028815256982638` (phoneNumberId → número test, en los 3 workflows) y `seguroautoqualitas.com` (→ URL `hyl-wai-stg`, en el bot principal incl. `Issue Policy`).
+
+**⚠️ Versión de los JSON:** los de `docs/n8n-workflows/` son del **3 jul** — anteriores al fix del Bug #10 (vive en rama `stg` del repo **Agente-n8n**). F1 debe importar la **versión con el fix** (objetivo = validar Bug #10 E2E). Reconciliar la fuente de verdad antes de importar.
+
+**Bloqueadores upstream para que las credenciales tengan valores reales:**
+1. BD Postgres STG (runbook paso 1) — ❌ sin provisionar (Heroku).
+2. 2ª Meta App + número test (paso 5) — ❌ sin crear (Meta Business).
+3. URL pública de `hyl-wai-stg` — ❓ desconocida (`hyl-wai-stg.herokuapp.com` → 404).
+
 ### Checklist de auditoría de credenciales (nodo por nodo)
 
 Con instancia separada el riesgo de `webhookId` compartido desaparece, pero SIGUE siendo obligatorio verificar que ningún nodo apunte a un recurso de prod:
