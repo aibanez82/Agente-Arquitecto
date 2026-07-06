@@ -3,7 +3,28 @@
 > Respuesta al handoff `docs/2026-07-05-handoff-despliegue-bug10-vin.md`.
 > Autor: Agente n8n (Nivel 3) · Fecha: 5 julio 2026
 > Destinatario: **Arquitecto-IA-Qualitas** (vía Alberto) — **pendiente de validación antes de ejecutar**.
-> Estado: 🟡 propuesta, nada ejecutado.
+> Estado: 🟢 **APROBADA por el Arquitecto (5 jul). Ejecutado lo mecánico + deploy preparado. Falta: ping a Juan + Alberto dispara.**
+
+---
+
+## ✅ EJECUCIÓN PREPARADA — resultados de los 3 encargos del Arquitecto
+
+Rama `Agente-n8n:stg` — commits `d370365` (4 ediciones) + `5eaf351` (script de deploy). Nada tocado en prod.
+
+**1. Verificación A — 5ª edición: NO hace falta.** El `$fromAI` de serie en `Issue Policy` (`parameters18_Value`, L288) **ya define contenido VIN-17**: *"Número de serie / VIN del vehículo: 17 caracteres alfanuméricos, sin espacios ni guiones, sin las letras I, O ni Q"* (freebie del commit `a5da2e2`). Es la única línea `$fromAI`+serie. Las 4 ediciones de la tabla (A) aplicadas `tal cual`; JSON validado; tras ellas **no queda ningún "5-20" real** — solo los 8 falsos positivos de IDs de modelo `claude-*-4-5-2025…`.
+
+**2. Diff anti-divergencia: PASA — sin divergencia.** GET a prod-en-vivo (`BtOaZm7WlZT-24V7hqCnF`, `updatedAt 2026-07-02T23:27Z`) vs baseline `829f469`: **61 nodos, 0 diferencias de parámetros, connections idénticas**. Prod no cambió desde que se ramificó `stg` → el PUT no pisa nada ajeno.
+   - Diff `stg`-editado vs prod-en-vivo: el PUT modifica **exactamente 3 nodos** (`AI Agent`, `Issue Policy`, `Validate Personal Data`, solo `parameters`), 58 idénticos, sin altas/bajas, connections idénticas, webhookId `18c1b498` intacto. Es el changeset del Bug#10 y nada más.
+
+**3. Body + comandos listos.** Script versionado `Agente-n8n:scripts/deploy-bug10-prod.sh`:
+   - **Dry-run por defecto** (regenera el body derivado desde el JSON de `stg` — `name`/`nodes`/`connections`/`settings` de prod, sin `_stg`/`active`/`id` — y valida `neverError`). Probado ✅.
+   - **`--go`** ejecuta la secuencia validada por el Arquitecto: `PUT /workflows/{id}` → `POST /workflows/{id}/activate` → verificación (`active:true` + webhookId `18c1b498` + nombre limpio). El PUT body **stg se queda pristine** (decisión C2): el body es derivado, no se muta la rama.
+
+### Qué falta para el lunes
+1. ✅ Hecho: verificación A, diff anti-divergencia, body+script.
+2. ⏳ **Ping a Juan** para desplegar el gate Django (`stg`→prod).
+3. ⏳ **Alberto dispara** `./scripts/deploy-bug10-prod.sh --go` en **lockstep con Juan**, luego valida en prod (conversación de PRUEBA: "hola" inbound + serie mala → re-pregunta; correr 2-3× por temp 0.7).
+4. Tras validar: merge `stg`→`main` en `Agente-n8n` + re-export a `docs/n8n-workflows/`.
 
 ---
 
