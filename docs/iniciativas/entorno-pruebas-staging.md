@@ -119,6 +119,6 @@ Con instancia separada el riesgo de `webhookId` compartido desaparece, pero SIGU
 
 ## Próximos pasos al retomar
 
-1. ✅ Instancia n8n = otra instancia en Hostinger (fijado 6 jul). Al provisionarla, verificar BD n8n propia + `N8N_ENCRYPTION_KEY` propia → arranca el paso 3.
+1. ✅ Instancia n8n de staging PROVISIONADA y viva (6 jul): **`https://n8n-xlqk.srv1810257.hstgr.cloud/`** (Hostinger, servidor `srv1810257` ≠ prod `srv1325340` → aislada; BD n8n y encryption key propias por ser deploy fresco). Verificado: `/healthz` 200, API pública habilitada (`/api/v1/workflows` → 401 pide `X-N8N-API-KEY`). **Falta: API key de ESTA instancia** para que el Arquitecto opere por API (crear credenciales stg → reescribir refs de credencial en los 3 workflows → importar → dejar inactivos hasta validar).
 2. Alberto pide al Arquitecto redactar el mensaje a Juan (Quálitas sandbox) → desbloquea el paso 6.
 3. Con eso, F1 es ejecutable de principio a fin. Relacionado: Bug #10 y su plan (en `CLAUDE.md`), Bug #12 (`docs/2026-07-05-consolidacion-workflows-n8n.md`).
