@@ -30,10 +30,8 @@ Stack paralelo completo; cada componente de staging apunta SOLO a gemelos de sta
 1. **n8n = instancia SEPARADA (no misma instancia con `_STG`).**
    **Por qué cambió:** la decisión previa (4 jul) era "workflow `_STG` en la misma instancia". El **Bug #12** demostró que ese patrón es peligroso: los duplicados `_STG` compartían el `webhookId 18c1b498` con prod; al activar/desactivar un `_STG`, n8n des-registraba la ruta compartida y dejaba prod **huérfano** (`active:true` sin webhook). Fue el 2º apagón silencioso de inbound en una semana. El 5 jul se borraron los 12 duplicados y la instancia quedó solo con los 3 workflows de prod. Reintroducir `_STG` ahí repetiría el fallo recién erradicado.
    **Beneficio de instancia separada:** aislamiento total — sin `webhookId` compartido, sin credenciales globales compartidas (en n8n las credenciales son globales a la instancia). Elimina de raíz la clase de fallo del Bug #12.
-   **Sub-decisión pendiente (implementación, la elige Alberto para arrancar):** dónde vive la instancia separada. Opciones, de más barato/rápido a más aislado:
-     - (a) **n8n Cloud** (trial/tier bajo) — cero mantenimiento de infra, aislado por diseño. Recomendado para arrancar F1.
-     - (b) Segundo contenedor n8n en el mismo VPS Hostinger, puerto/subdominio distinto — más barato pero comparte host.
-     - (c) Otro VPS — máximo aislamiento, más setup.
+   **Sub-decisión (fijada 6 jul):** la instancia de staging vivirá en **otra instancia de n8n en Hostinger** (separada de `n8n.srv1325340.hstgr.cloud`).
+   ⚠️ **Requisito de aislamiento para que cuente como instancia separada:** debe ser un proceso n8n independiente con **su propia base de datos n8n** y **su propia `N8N_ENCRYPTION_KEY`** — no basta con reusar la misma BD/instancia n8n. Solo así el espacio de `webhookId` y las credenciales quedan aislados del prod y no puede recaer el Bug #12. Subdominio/puerto propio para el webhook base. Si es en el mismo VPS, ojo con la contención de recursos (no comparte estado, solo hardware).
 
 2. **Dashboard test = Vercel Preview → BD stg.** Un Deploy Preview del dashboard con `DATABASE_URL` apuntando a la Postgres de staging. Es la única forma de que vea las conversaciones de staging y no las de prod. (Se mantiene en **F2** según el fasing.)
 
@@ -92,6 +90,6 @@ Con instancia separada el riesgo de `webhookId` compartido desaparece, pero SIGU
 
 ## Próximos pasos al retomar
 
-1. Alberto elige dónde vive la instancia n8n separada (sub-decisión a/b/c) → arranca el paso 3.
+1. ✅ Instancia n8n = otra instancia en Hostinger (fijado 6 jul). Al provisionarla, verificar BD n8n propia + `N8N_ENCRYPTION_KEY` propia → arranca el paso 3.
 2. Alberto pide al Arquitecto redactar el mensaje a Juan (Quálitas sandbox) → desbloquea el paso 6.
 3. Con eso, F1 es ejecutable de principio a fin. Relacionado: Bug #10 y su plan (en `CLAUDE.md`), Bug #12 (`docs/2026-07-05-consolidacion-workflows-n8n.md`).
