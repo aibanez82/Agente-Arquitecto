@@ -110,7 +110,7 @@ Acceso API a la instancia stg **verificado** (`.env.local` → `N8N_STG_API_KEY`
 
 Valores hardcodeados en parámetros a reescribir (no son credenciales): `1028815256982638` (phoneNumberId → número test, en los 3 workflows) y `seguroautoqualitas.com` (→ URL `hyl-wai-stg`, en el bot principal incl. `Issue Policy`).
 
-**⚠️ Versión de los JSON:** los de `docs/n8n-workflows/` son del **3 jul** — anteriores al fix del Bug #10 (vive en rama `stg` del repo **Agente-n8n**). F1 debe importar la **versión con el fix** (objetivo = validar Bug #10 E2E). Reconciliar la fuente de verdad antes de importar.
+**✅ Versión de los JSON RESUELTA (6 jul):** F1 importa el JSON con el fix desde `aibanez82/Agente-n8n` rama `stg` (`workflows/WhatsApp Insurance Quotation Bot.json`, HEAD `405cec3`). Diagnóstico del Arquitecto: (a) el fix Bug #10 está correcto en los nodos vivos (regex VIN-17 canónica en `Validate Personal Data`, `{5,20}`=0 en `.nodes`; los "5-20" del grep eran fechas de model-ID — falsos positivos); (b) el JSON es un export estilo-BD con 19 claves top-level → **NO importable tal cual**, hay que reducir a `{name,nodes,connections,settings}` (eso elimina de paso el `activeVersion` con el único `{5,20}` stale y el `pinData` con PII). **Ejecución: Agente n8n end-to-end vía API.** Spec completo: `docs/2026-07-06-handoff-agente-n8n-import-staging-bug10.md`.
 
 **Bloqueadores upstream para que las credenciales tengan valores reales:**
 1. BD Postgres STG (runbook paso 1) — ✅ addon propio existe; `STG_DATABASE_URL` en `.env.local`; credencial n8n creada.
