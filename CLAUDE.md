@@ -492,6 +492,8 @@ Staging end-to-end para replicar bug fixes antes de prod (gitflow `stg`→`main`
 | Propuesta arquitectura BD — tabla canónica `whatsapp_event` (dual-write desde n8n/Django/Dashboard, reemplaza joins frágiles y LIKE de hitos) | 💡 Documentada como plan de destino, sin decisión de implementar aún |
 | Alerta de emisión fallida (Bug #9) — workflow `Bot Error Handler` en n8n + tarjeta "Emisión falló" en Dashboard | ⏸️ En pausa — implica desarrollo de n8n (Error Workflow + extracción de datos de la ejecución fallida). Spec lista en `docs/estrategia/2026-07-02-alerta-emision-fallida-quálitas.md` |
 | Crear repo `Agente_n8n` en GitHub + confirmar nombre final | 🆕 En construcción — ver protocolo en sección "Agente n8n" |
+| `N8N_TOKEN` con valor real hardcodeado como default en `qualitas/views.py:905` (rama `stg`) | ⚠️ Seguridad — hallazgo del 6 jul al auditar config vars de `hyl-wai-stg`. Mover a solo-env y rotar el token — pedir a Juan. Ver `docs/iniciativas/entorno-pruebas-staging.md` |
+| Revisar cumplimiento de la política de IA de WhatsApp de Meta (enero 2026, interacciones deben ser "task-specific") | ⏳ Pendiente — priorizar sobre el escalado de volumen. Ver `docs/estrategia/2026-07-06-evaluacion-plataformas-conversacion-whatsapp.md` |
 
 ---
 
