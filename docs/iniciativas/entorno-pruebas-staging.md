@@ -150,7 +150,8 @@ Con instancia separada el riesgo de `webhookId` compartido desaparece, pero SIGU
 4. **✅ Aislamiento re-confirmado en vivo (7 jul), por vía distinta a la planeada.** El handoff formal `docs/2026-07-07-handoff-agente-n8n-verificacion-aislamiento-staging.md` nunca llegó al Agente n8n (no se copió a `Agente-n8n/handoffs/`, quedó solo en este repo — gap de proceso registrado). Las verificaciones se cubrieron igual porque se re-pidieron directo en un mensaje de seguimiento: 0 refs a `seguroautoqualitas.com`, `Issue Policy` → `hyl-wai-stg`, 9 nodos Postgres → `Postgres STG`. **No confirmado todavía:** si se regeneró el `webhookId` heredado de prod (tarea 1 del handoff perdido) — revisar en el próximo reporte.
 5. **✅ Drift de schema (`rate_limit_data` en `whatsapp_sessions`) resuelto (7 jul).** No era migración Django — tabla operativa de n8n. Fix aplicado por el Agente n8n en staging. Ver `docs/2026-07-07-respuesta-agente-n8n-rate-limit-data-no-es-migracion.md`.
 6. **Script de reset de datos de prueba:** `scripts/reset-test-phone-stg.sql` — borra un número de `qualitas_cotizacion` (con CASCADE a Lead/Asegurado/PolizaEmitida/CotizacionRespuestaXml) + `qualitas_leadactionevent`/`qualitas_whatsappmessage` (SET_NULL, no cascadean, hay que borrarlos aparte) + `whatsapp_sessions`/`n8n_chat_histories`. Solo contra STG, correr en TablePlus. Reusable para cada ronda de pruebas E2E.
-7. **✅ "hola" enviado y confirmado (7 jul) — ejecución `success`.** Validación E2E del Bug #10 en curso. Siguientes pruebas pendientes (ver `docs/2026-07-06-handoff-agente-n8n-fase-e2e-staging-bug10.md`, sección "Validación E2E"):
-   - Serie inválida (p. ej. con espacio o 14 caracteres) → el bot debe **re-preguntar**, nunca emitir. Repetir 2-3 veces.
-   - Serie válida de 17 caracteres → debe proceder y llegar a Quálitas sandbox como VIN, no como ciudad/estado.
-   - Éxito = 0 emisiones con ciudad en el campo `serie`.
+7. **Validación E2E del Bug #10 en curso (7 jul):**
+   - ✅ "hola" enviado y confirmado — ejecución `success`.
+   - ✅ **Serie inválida — PASA.** Probado 2 veces con el mismo VIN base: con espacio (`1HGCM82633 004352`) y truncado a 13 caracteres (`1HGCM82633A00`). El bot detectó ambos casos correctamente y re-preguntó sin intentar avanzar — nunca llegó a `Issue_Policy`.
+   - ⏳ **Serie válida — en curso.** Alberto está enviando `1HGCM82633A004352` (17 caracteres válidos) para confirmar que el flujo completa hasta emisión en sandbox con el VIN correcto (no ciudad/estado) en el tool call.
+   - Éxito final = 0 emisiones con ciudad en el campo `serie`.
