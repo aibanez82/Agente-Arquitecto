@@ -307,6 +307,8 @@ Se montó un harness de reproducción (system prompt real + schema real con clav
 - **INCONSISTENCIA a corregir en lockstep:** el prompt del bot decía "5-20 caracteres"; DEBE pasar a "exactamente 17" o el bot aceptará series que Django rechaza (loop muerto). Parte de Capa 3(a).
 - **Pólizas con serie inválida a reemitir con Quálitas:** `7620096850` (VIN=ciudad) y `7620098065` (Sandra Luz, serie `3N1CN8AE40531V` = 14 chars, VIN incompleto). Auditar el resto con la regex.
 
+**✅ ENTORNO DE STAGING E2E LISTO (6 jul 2026) — vía para validar el fix antes de prod:** el workflow con el fix (rama `stg` de `aibanez82/Agente-n8n`) fue **importado a una instancia n8n de staging separada** (`n8n-xlqk.srv1810257.hstgr.cloud`, aislada de prod → cierra también el Bug #12) por el Agente n8n y **verificado por el Arquitecto contra la API viva**: workflow `WhatsApp Insurance Quotation Bot_stg` id `dNqtM20ij6ecZYAX`, inactivo, VIN-17 presente, `{5,20}`=0, 0 refs a prod, Django→`hyl-wai-stg`, creds Postgres/Anthropic de staging. **Único bloqueador para el E2E: 2ª Meta App + número de test** (tarea de Alberto) → crea las 2 credenciales WhatsApp + phoneNumberId real + activación. Detalle e historia: `docs/iniciativas/entorno-pruebas-staging.md`, handoff `docs/2026-07-06-handoff-agente-n8n-import-staging-bug10.md`, reporte del ejecutor `Agente-n8n:docs/2026-07-06-resultado-import-staging.md`.
+
 **Pólizas afectadas — pendiente re-auditar:**
 - Confirmadas históricas (2 jul): 3 de 5 con valor incorrecto (`Hidalgo`, `Ciudad de México`, `Ciudad General Escobedo`).
 - Póliza `7620096850` ya `PAGADO` con VIN incorrecto — reemisión manual directa con Quálitas.

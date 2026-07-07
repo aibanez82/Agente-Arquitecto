@@ -103,21 +103,24 @@ Acceso API a la instancia stg **verificado** (`.env.local` → `N8N_STG_API_KEY`
 | Credencial (type · nombre · id prod) | Nodos | Repuntar a |
 |---|---|---|
 | `postgres` · "Postgres account" · `FbodkhT9DijVcqpB` | 11 (Check/Load/Update Session, Chat Memory, Search Colony, Update Phase/Scope, KB Counter) | ✅ **creada en stg → "Postgres STG" id `5wlLe3gD07CLIM7U`** (ssl require + allowUnauthorizedCerts) |
-| `anthropicApi` · "Anthropic Hylant Account" · `aWrCOYz0wHIk5GSd` | 4 (Anthropic Chat Model ×3, Haiku) | ⏳ key prod o nueva (falta valor en `.env.local`) |
+| `anthropicApi` · "Anthropic Hylant Account" · `aWrCOYz0wHIk5GSd` | 4 (Anthropic Chat Model ×3, Haiku) | ✅ **creada en stg → "Anthropic STG" id `aHI51VvnRnPixCx5`** (Agente n8n, 6 jul) |
 | `whatsAppTriggerApi` · "WhatsApp Hylant Account" · `bUWR11VM0seHo63P` | WhatsApp Message Trigger (inbound) | ⏳ 2ª Meta App (test) |
 | `whatsAppApi` · "WhatsApp Send Message Hylant Account" · `PbzXr53disA74eew` | Send message (outbound) | ⏳ 2ª Meta App (test) |
 | `httpHeaderAuth` · "Header Auth account" · `VNlbUSCkIzgHFhLc` | Payment Webhook Trigger | ⏳ token = `N8N_TOKEN` de `hyl-wai-stg` |
 
 Valores hardcodeados en parámetros a reescribir (no son credenciales): `1028815256982638` (phoneNumberId → número test, en los 3 workflows) y `seguroautoqualitas.com` (→ URL `hyl-wai-stg`, en el bot principal incl. `Issue Policy`).
 
+**✅ WORKFLOW PRINCIPAL IMPORTADO A STAGING (6 jul, Agente n8n, verificado por el Arquitecto contra la API viva):** `WhatsApp Insurance Quotation Bot_stg` · id **`dNqtM20ij6ecZYAX`** · **inactivo** · 61 nodos. Creds repuntadas: Postgres `5wlLe3gD07CLIM7U` (9 nodos) + Anthropic `aHI51VvnRnPixCx5` (4 nodos). Django→`hyl-wai-stg`. phoneNumberId→placeholder. Las 2 credenciales WhatsApp de prod se **quitaron** en el import → esos 2 nodos (WhatsApp Message Trigger, Send message) quedan sin credencial a propósito hasta tener la Meta App. Verificación del Arquitecto: 0 refs a los 6 ids/hosts de prod, `{5,20}`=0, VIN-17 presente. Reporte del ejecutor: `Agente-n8n:docs/2026-07-06-resultado-import-staging.md`; script idempotente `Agente-n8n:scripts/import-stg-workflow.py` (commits `1ad877b`→`63692e1`).
+> **⚠️ Gotcha de import por API (reutilizable para los otros 2 workflows):** el export trae en `settings` claves que el `POST /api/v1/workflows` **rechaza con 400** (`binaryMode`, `availableInMCP`). Filtrar `settings` a las válidas (conservar `executionOrder`). Idem: reducir el JSON a `{name,nodes,connections,settings}` (sin `active`/`id`/`tags`/`shared`/`activeVersion`/`pinData`).
+
 **✅ Versión de los JSON RESUELTA (6 jul):** F1 importa el JSON con el fix desde `aibanez82/Agente-n8n` rama `stg` (`workflows/WhatsApp Insurance Quotation Bot.json`, HEAD `405cec3`). Diagnóstico del Arquitecto: (a) el fix Bug #10 está correcto en los nodos vivos (regex VIN-17 canónica en `Validate Personal Data`, `{5,20}`=0 en `.nodes`; los "5-20" del grep eran fechas de model-ID — falsos positivos); (b) el JSON es un export estilo-BD con 19 claves top-level → **NO importable tal cual**, hay que reducir a `{name,nodes,connections,settings}` (eso elimina de paso el `activeVersion` con el único `{5,20}` stale y el `pinData` con PII). **Ejecución: Agente n8n end-to-end vía API.** Spec completo: `docs/2026-07-06-handoff-agente-n8n-import-staging-bug10.md`.
 
 **Bloqueadores upstream para que las credenciales tengan valores reales:**
 1. BD Postgres STG (runbook paso 1) — ✅ addon propio existe; `STG_DATABASE_URL` en `.env.local`; credencial n8n creada.
-2. 2ª Meta App + número test (paso 5) — ❌ sin crear (Meta Business). Bloquea las 2 credenciales WhatsApp.
-3. URL pública de `hyl-wai-stg` — ✅ **`https://hyl-wai-stg-d1085ad74dbf.herokuapp.com/`** (para reescribir `seguroautoqualitas.com` → stg en los JSON).
-4. Valor de `N8N_TOKEN` de `hyl-wai-stg` — ⏳ para la credencial `httpHeaderAuth` del webhook de pago.
-5. Key Anthropic — ⏳ reusar la de prod (meter en `.env.local` como `STG_ANTHROPIC_KEY`).
+2. 2ª Meta App + número test (paso 5) — ❌ sin crear (Meta Business). **ÚNICO bloqueador del E2E del bot principal:** de ahí salen las 2 credenciales WhatsApp + el phoneNumberId real + la activación.
+3. URL pública de `hyl-wai-stg` — ✅ **`https://hyl-wai-stg-d1085ad74dbf.herokuapp.com/`** (ya reescrito en el workflow importado).
+4. Valor de `N8N_TOKEN` de `hyl-wai-stg` — ⏳ para la credencial `httpHeaderAuth` del workflow de **pago** (no del bot principal).
+5. Key Anthropic — ✅ credencial "Anthropic STG" creada (`aHI51VvnRnPixCx5`).
 
 ### Checklist de auditoría de credenciales (nodo por nodo)
 
