@@ -83,7 +83,7 @@ Stack paralelo completo; cada componente de staging apunta SOLO a gemelos de sta
 
 1. **Postgres staging.** Provisionar addon Postgres PROPIO en `hyl-wai-stg` (nunca la BD prod). Correr migraciones Django. Verificar: `hyl-wai-stg` levanta y `DATABASE_URL` de stg ≠ la de prod.
 
-2. **Backend `hyl-wai-stg`.** Confirmar deploy desde rama `stg`. Verificar landing accesible. ⚠️ **Config var `WEBHOOK_URL`** (y `N8N_TOKEN`) en `hyl-wai-stg` DEBE apuntar a la **instancia n8n de staging** — su default en código es el n8n de PROD (`views.py:904`). Poner `AMBIENTE_PRUEBAS=1` (banner de entorno de prueba). Verificar con `heroku config -a hyl-wai-stg` (requiere que Alberto lo corra o dé token).
+2. **Backend `hyl-wai-stg`.** Confirmar deploy desde rama `stg`. Verificar landing accesible. ✅ **`WEBHOOK_URL`/`N8N_TOKEN` corregidos (7 jul, Bug #16)** — ahora apuntan a la instancia n8n de staging con token propio (`STG_N8N_TOKEN` en `.env.local`). `AMBIENTE_PRUEBAS=1` ya estaba correcto.
 
 3. **Instancia n8n separada.** Levantar según sub-decisión (a/b/c). Importar los **3 workflows de prod** (`WhatsApp Insurance Quotation Bot`, `Payment Confirmation`, `Retomar Conversacion`) desde `docs/n8n-workflows/`.
 
@@ -130,7 +130,7 @@ Con instancia separada el riesgo de `webhookId` compartido desaparece, pero SIGU
 - [ ] **WhatsApp Trigger** → webhook de la Meta App de test.
 - [ ] **`Issue Policy` (httpRequest)** → URL de `hyl-wai-stg`, NUNCA `seguroautoqualitas.com`.
 - [ ] **Claude (Anthropic)** — puede reusar la key de prod (solo hace llamadas LLM, sin efectos secundarios) o una key separada para trackear coste. Decisión menor.
-- [ ] **`WEBHOOK_URL` + `N8N_TOKEN`** en `hyl-wai-stg` → instancia n8n de staging (default en código = n8n PROD → riesgo real de WhatsApp a leads reales).
+- [x] **`WEBHOOK_URL` + `N8N_TOKEN`** en `hyl-wai-stg` → instancia n8n de staging (corregido 7 jul, Bug #16).
 - [x] `QUALITAS_URL`/`QUALITAS_WSDL_TARIFAS` → endpoints QA; credenciales QA cargadas (confirmado 7 jul); `QUALITAS_AMBIENTE_FLAG=0`; `AMBIENTE_PRUEBAS=1`.
 - [ ] Ningún workflow de staging activo comparte `webhookId` con la instancia de prod (con instancia separada es imposible por construcción; verificar igual).
 
