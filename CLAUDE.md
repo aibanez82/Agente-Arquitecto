@@ -37,6 +37,8 @@ Google Ads → Landing (Wagtail/Django · Heroku)
 
 **Colaborador clave:** Juan Aguayo (`juan.aguayo@aguayo.co`), co-fundador de aguayo-co, propietario del repo Django `aguayo-co/HYL-WAI`.
 
+**Colaboradora clave:** Laura, de Hylant. Reporta manualmente (hoja Excel, día siguiente) las ventas/pagos confirmados — es la fuente para saber qué pólizas se pagaron de verdad, no un sistema. No depende de Juan.
+
 ---
 
 ## Arquitectura completa del sistema
@@ -494,7 +496,7 @@ Staging end-to-end para replicar bug fixes antes de prod (gitflow `stg`→`main`
 | Crear repo `Agente_n8n` en GitHub + confirmar nombre final | 🆕 En construcción — ver protocolo en sección "Agente n8n" |
 | `N8N_TOKEN` con valor real hardcodeado como default en `qualitas/views.py:905` (rama `stg`) | ⚠️ Seguridad — hallazgo del 6 jul al auditar config vars de `hyl-wai-stg`. Mover a solo-env y rotar el token — pedir a Juan. Ver `docs/iniciativas/entorno-pruebas-staging.md` |
 | Revisar cumplimiento de la política de IA de WhatsApp de Meta (enero 2026, interacciones deben ser "task-specific") | ⏳ Pendiente — priorizar sobre el escalado de volumen. Ver `docs/estrategia/2026-07-06-evaluacion-plataformas-conversacion-whatsapp.md` |
-| Cómo saber con certeza si un cliente pagó la póliza — la doc oficial SOAP de Quálitas (`docs/qualitas-api/`: WsEmision, WsTarifas, WsImpresion, Matriz de Captura) **no documenta ningún endpoint ni campo de consulta de estatus de pago** (verificado 7 jul). Solo cubre `FormaPago` (método/frecuencia) y los recibos generados al emitir — nada sobre si un recibo/link de pago fue efectivamente pagado. Hoy la única señal es `qualitas_polizaemitida.estatus_pago`, que depende de un webhook externo de Quálitas hacia Django no documentado en su spec (ver Bug #7 y su workaround). Detectado por Alberto al revisar una conversación con póliza emitida y link de pago enviado, sin forma de confirmar el pago desde ahí. | 💡 Sin investigar — revisar con Juan si existe un mecanismo real de confirmación (webhook, endpoint de consulta) más allá de lo documentado |
+| Cómo saber con certeza si un cliente pagó la póliza — la doc oficial SOAP de Quálitas (`docs/qualitas-api/`: WsEmision, WsTarifas, WsImpresion, Matriz de Captura) **no documenta ningún endpoint ni campo de consulta de estatus de pago** (verificado 7 jul). Solo cubre `FormaPago` (método/frecuencia) y los recibos generados al emitir — nada sobre si un recibo/link de pago fue efectivamente pagado. Hoy la única señal automatizada es `qualitas_polizaemitida.estatus_pago`, que depende de un webhook externo de Quálitas hacia Django no documentado en su spec (ver Bug #7 y su workaround). Detectado por Alberto al revisar una conversación con póliza emitida y link de pago enviado, sin forma de confirmar el pago desde ahí. **No es dependencia de Juan** — la resolución probable es manual: Laura (Hylant) reporta ventas/pagos confirmados en una hoja Excel al día siguiente. | 💡 Sin investigar — definir si conviene formalizar el reporte de Laura como fuente de verdad (p. ej. cargarlo al Dashboard) en vez de perseguir un mecanismo automático de Quálitas |
 
 ---
 
