@@ -457,7 +457,7 @@ Staging end-to-end para replicar bug fixes antes de prod (gitflow `stg`→`main`
 | Backend/landing | `hyl-wai-stg` (`https://hyl-wai-stg-d1085ad74dbf.herokuapp.com`, deploy desde rama `stg`) | ✅ existe |
 | Base de datos | Addon Postgres propio de `hyl-wai-stg` | ✅ (`STG_DATABASE_URL`) |
 | n8n (bot WA) | **Instancia SEPARADA** en Hostinger `https://n8n-xlqk.srv1810257.hstgr.cloud` (servidor `srv1810257` ≠ prod `srv1325340`; BD/encryption key propias) | ✅ viva, API habilitada. Decisión clave: instancia separada para NO recaer en el Bug #12 (webhookId compartido) |
-| Número WhatsApp | 2ª Meta App + número de test (Cloud API) | ❌ **bloqueador — Juan** |
+| Número WhatsApp | 2ª Meta App + número de test (Cloud API) | ✅ creada (7 jul) — E2E en pruebas con Agente n8n |
 | Quálitas | Sandbox QA (`QUALITAS_URL`→`qa.qualitas.com.mx`; el switch es la URL, NO `QUALITAS_AMBIENTE_FLAG`) | ✅ credenciales QA + `QUALITAS_AMBIENTE_FLAG=0` (valor de prueba) ya en Heroku `hyl-wai-stg` — confirmado por Alberto 7 jul |
 | Dashboard | Vercel Preview → BD stg | ⏳ Fase 2 |
 
@@ -466,7 +466,7 @@ Staging end-to-end para replicar bug fixes antes de prod (gitflow `stg`→`main`
 - Credencial **Postgres STG** `5wlLe3gD07CLIM7U` + **Anthropic STG** `aHI51VvnRnPixCx5`.
 - Workflow del bot **con el fix Bug #10 importado** (desde `aibanez82/Agente-n8n` rama `stg`): `WhatsApp Insurance Quotation Bot_stg` id **`dNqtM20ij6ecZYAX`**, **inactivo**, 61 nodos, 0 refs a prod, VIN-17 presente, Django→`hyl-wai-stg`. Ejecutado por el Agente n8n vía API, verificado contra la instancia viva.
 
-**Bloqueador único del E2E: 2ª Meta App de test (Juan).** De ella salen las 2 credenciales WhatsApp + phoneNumberId + la autorización OAuth2 + la activación. Mensaje listo: `docs/2026-07-06-mensaje-juan-meta-app-staging.md`.
+**✅ 2ª Meta App de test creada (7 jul) — bloqueador del E2E resuelto.** Alberto está corriendo pruebas E2E con el Agente n8n (handoff v2). Pendiente reporte de resultado.
 
 **Fase E2E ya especificada (handoff v2, modelo OAuth2 nativo):** el trigger `whatsAppTrigger` de n8n es **OAuth2** (`clientId`=App ID / `clientSecret`=App Secret); `whatsAppApi` (Send) pide `accessToken`+`businessAccountId` (WABA). Modelo A (nativo) elegido porque prod usa ese trigger → staging debe ser gemelo fiel. Requiere: 6 secretos de Juan (`STG_WA_ACCESS_TOKEN`, `STG_WA_BUSINESS_ACCOUNT_ID`, `STG_WA_APP_ID`, `STG_WA_APP_SECRET`, `STG_WA_PHONE_NUMBER_ID`), whitelist de la redirect URL OAuth de n8n en la App, y un **"Connect" OAuth2 manual de Alberto** en la UI (la API no lo hace). Handoff: `Agente-n8n:handoffs/2026-07-06-fase-e2e-staging-bug10.md` (canónico en `docs/2026-07-06-handoff-agente-n8n-fase-e2e-staging-bug10.md`).
 
