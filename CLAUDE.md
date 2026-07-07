@@ -197,7 +197,7 @@ Ver `BUGS_N8N.md` para detalle completo con evidencia SQL.
 
 | # | Bug | Sistema | Criticidad |
 |---|---|---|---|
-| 1 | `n8n_chat_histories` vacío en ~76% de sesiones (medido 1 jul 2026: 154/203). Ojo: el historial existe casi solo cuando el humano responde (48/49) → gran parte del "vacío" es en realidad **leads que nunca respondieron**, no pérdida de datos. Afecta a la analítica, NO al motor de follow-up. | n8n | 🟡 Medio |
+| 1 | `n8n_chat_histories` vacío en ~76% de sesiones (medido 1 jul 2026: 154/203). Ojo: el historial existe casi solo cuando el humano responde (48/49) → gran parte del "vacío" es en realidad **leads que nunca respondieron**, no pérdida de datos. Afecta a la analítica, NO al motor de follow-up. **Precisión 7 jul:** `canal_atencion` distingue esto limpiamente — leads `LANDING` (399 de ~434) cierran 100% por la web sin tocar WhatsApp (`conversation_phase` siempre `greeting`, 0 mensajes n8n, datos en `qualitas_asegurado` vía formulario web); leads `WHATSAPP` (35) sí tienen conversación real de 29-48 mensajes. Detalle: `docs/2026-07-07-hallazgo-agente-dashboard-canal-landing-vs-whatsapp.md`. | n8n | 🟡 Medio |
 | 2 | Prefijo `57` (Colombia) en `session_id` en lugar de `52` (México) | Django | 🟠 Alto |
 | 3 | TEST_EMAILS no filtrados en n8n — Meta cobra mensajes de prueba | n8n | 🟡 Medio |
 | 4 | 4 leads reales sin `whatsapp_session` (IDs: 837, 834, 810, 802) | n8n | 🟡 Medio |
