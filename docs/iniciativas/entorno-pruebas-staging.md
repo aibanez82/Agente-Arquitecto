@@ -1,6 +1,6 @@
 # Iniciativa — Entorno de pruebas / staging end-to-end
 
-> Estado: **RETOMADA 6 jul 2026 — Fase 1 con runbook listo.** Topología reabierta y decidida tras el Bug #12.
+> Estado: **⛔ PAUSADA 7 jul 2026 — Bug #15: el número de WhatsApp de test comparte `phone_number_id` con producción.** Toda ejecución de prueba en staging se está duplicando en producción (escritura real en `n8n_chat_histories`/`whatsapp_sessions` de prod, aunque sin llegar a emisión). NO correr más pruebas hasta que Juan aísle de verdad el número de test en su propia WABA. Detalle: fila Bug #15 en `CLAUDE.md`.
 > Guardado en git (no en memoria local) para persistir entre las 3 laptops de Alberto.
 
 ## Objetivo
