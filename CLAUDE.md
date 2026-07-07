@@ -455,7 +455,7 @@ Staging end-to-end para replicar bug fixes antes de prod (gitflow `stg`→`main`
 | Base de datos | Addon Postgres propio de `hyl-wai-stg` | ✅ (`STG_DATABASE_URL`) |
 | n8n (bot WA) | **Instancia SEPARADA** en Hostinger `https://n8n-xlqk.srv1810257.hstgr.cloud` (servidor `srv1810257` ≠ prod `srv1325340`; BD/encryption key propias) | ✅ viva, API habilitada. Decisión clave: instancia separada para NO recaer en el Bug #12 (webhookId compartido) |
 | Número WhatsApp | 2ª Meta App + número de test (Cloud API) | ❌ **bloqueador — Juan** |
-| Quálitas | Sandbox QA (`QUALITAS_URL`→`qa.qualitas.com.mx`; el switch es la URL, NO `QUALITAS_AMBIENTE_FLAG`) | ⏳ confirmar credenciales QA con Juan |
+| Quálitas | Sandbox QA (`QUALITAS_URL`→`qa.qualitas.com.mx`; el switch es la URL, NO `QUALITAS_AMBIENTE_FLAG`) | ✅ credenciales QA + `QUALITAS_AMBIENTE_FLAG=0` (valor de prueba) ya en Heroku `hyl-wai-stg` — confirmado por Alberto 7 jul |
 | Dashboard | Vercel Preview → BD stg | ⏳ Fase 2 |
 
 **Hecho y verificado por el Arquitecto (6 jul):**

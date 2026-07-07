@@ -56,7 +56,7 @@ Stack paralelo completo; cada componente de staging apunta SOLO a gemelos de sta
 | `QUALITAS_USER_TARIFA`, `QUALITAS_PASSWORD_TARIFA` | `services.py:126/191` | — | credenciales QA (confirmar con Juan) |
 | `QUALITAS_WPUID`, `QUALITAS_WPTOKEN` | `services.py:811/812/894` | — | credenciales pago QA |
 | `QUALITAS_AGENTE`, `QUALITAS_NO_NEGOCIO`, `QUALITAS_DERECHO` | `services.py:476-478` | — | parámetros de negocio QA |
-| `QUALITAS_AMBIENTE_FLAG` | `services.py:479` | `"1"` | **NO es el selector de ambiente** — es un valor SOAP (`NoConsideracion="4"/TipoRegla 1`). Confirmar con Juan qué valor = prueba |
+| `QUALITAS_AMBIENTE_FLAG` | `services.py:479` | `"1"` | **NO es el selector de ambiente** — es un valor SOAP (`NoConsideracion="4"/TipoRegla 1`). ✅ Confirmado 7 jul: `0` = prueba, ya seteado en Heroku `hyl-wai-stg` |
 | `QUALITAS_BDEO_URL/USER/PASS` | `services.py:1022-1024` | — | inspección BDEO (si aplica) |
 | `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_ACCESS_TOKEN` | `services.py:1094/1095` | — | Django también tiene creds Meta; en stg → número/app de test |
 | `DATABASE_URL` | `settings/base.py:170` | — | Postgres addon PROPIO de stg |
@@ -70,8 +70,7 @@ Stack paralelo completo; cada componente de staging apunta SOLO a gemelos de sta
 
 ## Hueco pendiente (dependencia externa)
 
-**Quálitas sandbox — confirmar con Juan** (Alberto envía el mensaje; el Arquitecto lo redacta cuando lo pida). Reformulado tras leer el código (ver Hallazgos):
-(a) confirmar que los endpoints QA del código (`qa.qualitas.com.mx:8443/WsEmision`, `qbcenter.qualitas.com.mx/wsTarifa`) son el sandbox correcto y que hay **credenciales QA** (`QUALITAS_USER_TARIFA`/`QUALITAS_PASSWORD_TARIFA`/`QUALITAS_WPUID`/`QUALITAS_WPTOKEN`); (b) **qué valor de `QUALITAS_AMBIENTE_FLAG`** marca "prueba" en el lado de Quálitas (código default `"1"`); (c) si el QA cubre cotización (tarifas) Y emisión. **Es la dependencia con más plazo externo** → bloquea solo el paso de emisión del runbook, no el resto.
+**✅ RESUELTO (7 jul, confirmado por Alberto):** (a) las credenciales QA (`QUALITAS_USER_TARIFA`/`QUALITAS_PASSWORD_TARIFA`/`QUALITAS_WPUID`/`QUALITAS_WPTOKEN`) ya están puestas en Heroku `hyl-wai-stg` y son válidas contra el sandbox QA de Quálitas; (b) `QUALITAS_AMBIENTE_FLAG = 0` es el valor de prueba (**corrige el supuesto previo** de que el default `"1"` del código era el de prueba — `0` ya está seteado en Heroku `hyl-wai-stg`); (c) el QA de Quálitas cubre cotización Y emisión completas. Ya no bloquea el paso 6 del runbook — solo falta repuntar el nodo `Issue Policy` de n8n a `hyl-wai-stg` (eso depende de la Meta App, no de Quálitas).
 
 ---
 
@@ -92,7 +91,7 @@ Stack paralelo completo; cada componente de staging apunta SOLO a gemelos de sta
 
 5. **Número WhatsApp test.** Crear 2ª Meta App + número de test de Cloud API. Registrar el `phoneNumberId` de test en la cred `WhatsApp Test`. Configurar el WhatsApp Trigger de staging con su **webhook propio** (de la Meta App de test). Verificar los hasta 5 destinatarios verificados.
 
-6. **Quálitas sandbox.** *(BLOQUEADO hasta respuesta de Juan.)* Setear `QUALITAS_AMBIENTE_FLAG` = valor sandbox en `hyl-wai-stg`; cargar credenciales sandbox; repuntar el nodo `Issue Policy` para que llame al `/api/emitir-externo/` de **`hyl-wai-stg`** (no a `seguroautoqualitas.com` de prod).
+6. **Quálitas sandbox.** ✅ Credenciales QA + `QUALITAS_AMBIENTE_FLAG=0` ya en Heroku `hyl-wai-stg` (confirmado por Alberto 7 jul). Solo falta repuntar el nodo `Issue Policy` para que llame al `/api/emitir-externo/` de **`hyl-wai-stg`** (no a `seguroautoqualitas.com` de prod) — mismo paso 4/5 del runbook, sigue atado a tener la Meta App para poder activar el workflow.
 
 7. **Prueba E2E:** enviar "hola" desde un número verificado → conversación real → captura de datos → serie/VIN → emisión sandbox → simular webhook de pago (curl). Verificar en BD stg que se escribieron `qualitas_lead`/`qualitas_cotizacion`/`whatsapp_sessions`/`n8n_chat_histories`.
 
@@ -132,7 +131,7 @@ Con instancia separada el riesgo de `webhookId` compartido desaparece, pero SIGU
 - [ ] **`Issue Policy` (httpRequest)** → URL de `hyl-wai-stg`, NUNCA `seguroautoqualitas.com`.
 - [ ] **Claude (Anthropic)** — puede reusar la key de prod (solo hace llamadas LLM, sin efectos secundarios) o una key separada para trackear coste. Decisión menor.
 - [ ] **`WEBHOOK_URL` + `N8N_TOKEN`** en `hyl-wai-stg` → instancia n8n de staging (default en código = n8n PROD → riesgo real de WhatsApp a leads reales).
-- [ ] `QUALITAS_URL`/`QUALITAS_WSDL_TARIFAS` → endpoints QA; credenciales QA cargadas; `AMBIENTE_PRUEBAS=1`.
+- [x] `QUALITAS_URL`/`QUALITAS_WSDL_TARIFAS` → endpoints QA; credenciales QA cargadas (confirmado 7 jul); `QUALITAS_AMBIENTE_FLAG=0`; `AMBIENTE_PRUEBAS=1`.
 - [ ] Ningún workflow de staging activo comparte `webhookId` con la instancia de prod (con instancia separada es imposible por construcción; verificar igual).
 
 ---
@@ -146,5 +145,5 @@ Con instancia separada el riesgo de `webhookId` compartido desaparece, pero SIGU
 ## Próximos pasos al retomar
 
 1. ✅ Instancia n8n de staging PROVISIONADA y viva (6 jul): **`https://n8n-xlqk.srv1810257.hstgr.cloud/`** (Hostinger, servidor `srv1810257` ≠ prod `srv1325340` → aislada; BD n8n y encryption key propias por ser deploy fresco). Verificado: `/healthz` 200, API pública habilitada (`/api/v1/workflows` → 401 pide `X-N8N-API-KEY`). **Falta: API key de ESTA instancia** para que el Arquitecto opere por API (crear credenciales stg → reescribir refs de credencial en los 3 workflows → importar → dejar inactivos hasta validar).
-2. Alberto pide al Arquitecto redactar el mensaje a Juan (Quálitas sandbox) → desbloquea el paso 6.
-3. Con eso, F1 es ejecutable de principio a fin. Relacionado: Bug #10 y su plan (en `CLAUDE.md`), Bug #12 (`docs/2026-07-05-consolidacion-workflows-n8n.md`).
+2. ✅ Quálitas sandbox confirmado (7 jul) — ver "Hueco pendiente" arriba. Ya no bloquea.
+3. **Único bloqueador restante de F1: la 2ª Meta App de test (Juan).** Mensaje ya enviado (`docs/2026-07-06-mensaje-juan-meta-app-staging.md`), aún sin respuesta al 7 jul. En cuanto llegue: Agente n8n ejecuta el handoff v2 (`docs/2026-07-06-handoff-agente-n8n-fase-e2e-staging-bug10.md`) y F1 es ejecutable de principio a fin. Relacionado: Bug #10 y su plan (en `CLAUDE.md`), Bug #12 (`docs/2026-07-05-consolidacion-workflows-n8n.md`).
