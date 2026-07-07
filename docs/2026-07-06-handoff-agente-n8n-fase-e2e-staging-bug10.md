@@ -1,79 +1,76 @@
-# Handoff Arquitecto → Agente n8n — Fase E2E de staging (activar bot + validar Bug #10)
+# Handoff Arquitecto → Agente n8n — Fase E2E de staging (activar bot + validar Bug #10) — v2
 
-> Autor: Arquitecto-IA-Qualitas · 6 jul 2026
-> Ejecutor: **Agente n8n** (end-to-end vía API).
-> Gobernanza: reportas resultados al Arquitecto **a través de Alberto**. No hablas con otros agentes.
-> Depende de: fase de import ya completada (`handoffs/` / `Agente-n8n:docs/2026-07-06-resultado-import-staging.md`).
-> Copia canónica del Arquitecto: `Agente-Arquitecto:docs/2026-07-06-handoff-agente-n8n-fase-e2e-staging-bug10.md`.
+> Autor: Arquitecto-IA-Qualitas · 6 jul 2026 · **v2: corregido a OAuth2 nativo** tras el hallazgo de esquemas del Agente n8n (`Agente-n8n:docs/2026-07-06-fase-e2e-hallazgos-esquema-wa.md`, verificado por el Arquitecto contra la instancia viva).
+> Ejecutor: **Agente n8n** (end-to-end vía API, con un paso manual de Alberto en la UI).
+> Gobernanza: reportas al Arquitecto **a través de Alberto**. No hablas con otros agentes.
+> Copia canónica: `Agente-Arquitecto:docs/2026-07-06-handoff-agente-n8n-fase-e2e-staging-bug10.md`.
 
-## Objetivo
+## Decisión de diseño (Arquitecto): Modelo A — OAuth2 nativo
 
-Dejar el workflow de staging **activo y funcional** para validar el fix del Bug #10 (VIN/serie) end-to-end con un número de WhatsApp de prueba, sin tocar producción.
+El trigger `whatsAppTrigger` de n8n es **OAuth2** (`clientId`/`clientSecret`), no webhook manual. Usamos el modelo **A (nativo)**, NO el B (webhook genérico). **Razón decisiva:** prod usa el `whatsAppTrigger` nativo; staging debe ser gemelo fiel o el E2E no valida lo que corre en prod. n8n auto-gestiona el webhook con Meta → sin verify token manual ni callback URL que pegar en el panel de Meta.
+
+## Esquemas reales (verificados en la instancia viva)
+
+| Credencial | Nodo | Campos requeridos |
+|---|---|---|
+| `whatsAppApi` | `Send message` | `accessToken`, `businessAccountId` (WABA ID) |
+| `whatsAppTriggerApi` | `WhatsApp Message Trigger` | `clientId` (= App ID), `clientSecret` (= App Secret) — OAuth2 |
 
 ## Estado de partida (verificado por el Arquitecto)
 
-- Instancia staging: `https://n8n-xlqk.srv1810257.hstgr.cloud` (aislada de prod).
+- Instancia: `https://n8n-xlqk.srv1810257.hstgr.cloud` (aislada de prod).
 - Workflow: `WhatsApp Insurance Quotation Bot_stg` · id **`dNqtM20ij6ecZYAX`** · **inactivo** · 61 nodos.
-- Creds ya listas: Postgres STG `5wlLe3gD07CLIM7U` (9 nodos) + Anthropic STG `aHI51VvnRnPixCx5` (4 nodos).
-- Los 2 nodos WhatsApp (`WhatsApp Message Trigger`, `Send message`) están **sin credencial** a propósito.
-- `Send message` tiene el placeholder `STG_PHONE_NUMBER_ID_PENDING` en el phoneNumberId.
-- Django ya reescrito a `hyl-wai-stg-d1085ad74dbf.herokuapp.com`.
+- Creds listas: Postgres STG `5wlLe3gD07CLIM7U` + Anthropic STG `aHI51VvnRnPixCx5`.
+- 2 nodos WhatsApp sin credencial (a propósito). `Send message` con placeholder `STG_PHONE_NUMBER_ID_PENDING`.
 
-## Precondición (te la da Alberto cuando Juan entregue la App de Meta de staging)
+## Precondición — secretos (Juan entrega → Alberto pone en `Agente-n8n/.env.local`)
 
-Alberto pondrá en el `.env.local` de ESTE proyecto (Agente-n8n) los secretos de la App de test:
-- `STG_WA_ACCESS_TOKEN` — access token para enviar.
-- `STG_WA_PHONE_NUMBER_ID` — phoneNumberId del número de prueba.
-- `STG_WA_APP_SECRET` — App Secret (para el trigger).
-- `STG_WA_VERIFY_TOKEN` — verify token (Alberto lo define; debe coincidir con lo que ponga Juan en Meta).
-- (ya tienes) `N8N_STG_API_KEY`.
+| Env var | Va a | Origen (Meta) |
+|---|---|---|
+| `STG_WA_ACCESS_TOKEN` | `whatsAppApi.accessToken` | access token (System User ideal) |
+| `STG_WA_BUSINESS_ACCOUNT_ID` | `whatsAppApi.businessAccountId` | **WhatsApp Business Account ID (WABA)** |
+| `STG_WA_APP_ID` | `whatsAppTriggerApi.clientId` | **App ID** de la Meta App de test |
+| `STG_WA_APP_SECRET` | `whatsAppTriggerApi.clientSecret` | App Secret |
+| `STG_WA_PHONE_NUMBER_ID` | param `phoneNumberId` del nodo `Send message` | phoneNumberId del número de test |
 
-No arranques hasta tener estos valores.
+(Ya tienes `N8N_STG_API_KEY`. **No** hace falta verify token en modelo A.) No arranques sin estos valores.
 
-## Tareas (orden estricto)
+## Tareas
 
-**1. Regenerar el `webhookId` del `WhatsApp Message Trigger`.**
-El importado conserva `18c1b498-024e-4803-8088-56ccf9812f33` — **es el webhookId de PROD (Bug #12)**. Aunque en instancia separada no colisiona, hay que regenerarlo por higiene y para que el callback URL de staging sea propio. Genera un UUID v4 nuevo, ponlo en `nodes[].webhookId` de ese nodo, y actualiza el workflow por API. El **callback URL resultante** será:
-`https://n8n-xlqk.srv1810257.hstgr.cloud/webhook/<NUEVO_WEBHOOK_ID>`
-→ **Reporta este URL a Alberto** (se lo pasa a Juan para el webhook de Meta).
+**Por API (Agente n8n):**
+1. **Regenerar el `webhookId`** del `WhatsApp Message Trigger` (conserva `18c1b498…`, el de prod/Bug #12) → UUID v4 nuevo, antes del Connect. Higiene.
+2. **Crear `whatsAppApi` "WhatsApp Send STG"**: `accessToken`=`STG_WA_ACCESS_TOKEN`, `businessAccountId`=`STG_WA_BUSINESS_ACCOUNT_ID`.
+3. **Crear el cascarón `whatsAppTriggerApi` "WhatsApp Trigger STG"**: `clientId`=`STG_WA_APP_ID`, `clientSecret`=`STG_WA_APP_SECRET`. (Queda creada pero **sin autorizar** — el OAuth2 lo completa Alberto en la UI.)
+4. **Cablear** credenciales a nodos: `WhatsApp Message Trigger`→Trigger STG; `Send message`→Send STG.
+5. **Reemplazar** `STG_PHONE_NUMBER_ID_PENDING` → `STG_WA_PHONE_NUMBER_ID` en `Send message`.
 
-**2. Crear las 2 credenciales WhatsApp** (consulta primero el esquema: `GET /api/v1/credentials/schema/whatsAppApi` y `.../whatsAppTriggerApi`, como se hizo con postgres):
-- `whatsAppApi` → nombre "WhatsApp Send STG" · usa `STG_WA_ACCESS_TOKEN` (+ businessAccountId si el esquema lo pide).
-- `whatsAppTriggerApi` → nombre "WhatsApp Trigger STG" · usa `STG_WA_ACCESS_TOKEN` + `STG_WA_APP_SECRET` según el esquema.
+**Manual en la UI de staging (Alberto), tras tarea 3 y tras el whitelist de Juan:**
+6. **Completar el "Connect" OAuth2** de la credencial "WhatsApp Trigger STG" (login Facebook + autorizar). La API pública no puede hacerlo.
 
-**3. Cablear las credenciales a sus nodos** en el workflow `dNqtM20ij6ecZYAX`:
-- `WhatsApp Message Trigger` → `whatsAppTriggerApi` "WhatsApp Trigger STG".
-- `Send message` → `whatsAppApi` "WhatsApp Send STG".
+**Por API (Agente n8n), tras el Connect:**
+7. **Activar el workflow** (`active:true`). La activación deja el trigger en escucha y n8n gestiona la suscripción del webhook con Meta.
 
-**4. Reemplazar el placeholder del phoneNumberId:** `STG_PHONE_NUMBER_ID_PENDING` → `STG_WA_PHONE_NUMBER_ID` en el nodo `Send message` (y en cualquier otro sitio donde aparezca).
+## Qué necesita Juan en Meta (para el modelo A)
+- Whitelistear la **redirect URL de OAuth de n8n** en la App (Valid OAuth Redirect URIs):
+  `https://n8n-xlqk.srv1810257.hstgr.cloud/rest/oauth2-credential/callback`
+- Suscribir el campo **`messages`** del objeto `whatsapp_business_account`.
+- Añadir el **número de Alberto** como destinatario verificado del número de test.
+- (NO hay que pegar callback URL ni verify token manual — lo gestiona n8n.)
 
-**5. Verify token del trigger:** confirma qué verify token usa/espera el `WhatsApp Message Trigger` de n8n y alinéalo con `STG_WA_VERIFY_TOKEN`. Reporta el valor exacto a Alberto (Juan debe poner el mismo en Meta).
+## Secuencia de coordinación
+1. Agente n8n: tareas 1–5 (crea el cascarón del trigger). Reporta a Alberto: ids de creds, listo para Connect.
+2. Juan: whitelistea la redirect URL + suscribe `messages` + añade el número de Alberto.
+3. Alberto: "Connect" OAuth2 en la UI de staging.
+4. Agente n8n: tarea 7 (activar). Confirma `active=true`.
 
-**6. Activar el workflow** (`active: true` vía API). ⚠️ **La activación registra el webhook y es lo que permite que n8n responda el handshake de verificación de Meta** — por eso debe estar activo ANTES de que Juan verifique el webhook en la App. Confirma `active=true` por API.
-
-## Coordinación con Meta (secuencia, para que Alberto sepa el orden)
-
-1. Agente n8n hace tareas 1–6 → reporta a Alberto: **callback URL final + verify token + ids de creds**.
-2. Alberto pasa a Juan: callback URL + verify token → Juan los pone en la App, suscribe el campo `messages`, y añade el número de Alberto como destinatario verificado.
-3. Meta verifica el webhook contra el endpoint **activo** de n8n staging.
-
-## Validación E2E del Bug #10 (tú verificas ejecuciones por API; Alberto manda los mensajes)
-
-Tras configurar Meta, Alberto envía desde su número verificado:
-1. **"hola"** → debe dispararse una ejecución. Verifica con `GET /api/v1/executions?workflowId=dNqtM20ij6ecZYAX` que corrió `success`.
-2. **Serie inválida** (p. ej. `"Gómez Palacio"` con espacio, o una de 14 chars) → el bot debe **re-preguntar**, NUNCA emitir. El gate de Django (`hyl-wai-stg`) devuelve `400 invalid_vehicle_serie`. **Repetir 2–3 veces** (el manejo del 400 es prompt-level a temperature 0.7 → probabilístico).
-3. **Serie válida de 17 (VIN completo)** → debe proceder. Confirmar que a Quálitas sandbox llega el VIN, no una ciudad.
-
-Criterio de éxito: 0 emisiones con ciudad en `serie`; toda serie no-17 se re-pregunta o la rechaza Django.
+## Validación E2E del Bug #10 (Agente n8n verifica ejecuciones por API; Alberto manda mensajes)
+1. **"hola"** → ejecución `success` (`GET /api/v1/executions?workflowId=dNqtM20ij6ecZYAX`).
+2. **Serie inválida** (`"Gómez Palacio"` con espacio, o 14 chars) → el bot **re-pregunta**, NUNCA emite; Django (`hyl-wai-stg`) devuelve `400 invalid_vehicle_serie`. **Repetir 2–3×** (prompt-level, temp 0.7).
+3. **Serie válida de 17** → procede; a Quálitas sandbox llega el VIN, no una ciudad.
+Éxito = 0 emisiones con ciudad en `serie`.
 
 ## Reporte final (al Arquitecto vía Alberto)
-- Nuevo webhookId + callback URL.
-- ids de las 2 credenciales WhatsApp.
-- Confirmación `active=true`.
-- Resultado de las 3 pruebas E2E (con ids de ejecución).
-- Cualquier gotcha (como el de `settings` en el import).
+Nuevo webhookId; ids de las 2 creds WhatsApp; confirmación de Connect + `active=true`; resultado de las 3 pruebas (ids de ejecución); gotchas.
 
-## Fuera de alcance de este handoff
-- Los otros 2 workflows (Payment Confirmation, Retomar Conversacion) — fase aparte; el de pago necesita la cred `httpHeaderAuth` (token `N8N_TOKEN` de `hyl-wai-stg`).
-- Sandbox Quálitas (endpoints/credenciales QA) — depende de Juan (mensaje aparte).
-- Merge `stg`→`main` + re-export a `docs/n8n-workflows/` — cuando el E2E pase.
+## Fuera de alcance
+Otros 2 workflows (pago necesita `httpHeaderAuth`); sandbox Quálitas (Juan); merge `stg`→`main` + re-export a `docs/n8n-workflows/` cuando pase el E2E.
