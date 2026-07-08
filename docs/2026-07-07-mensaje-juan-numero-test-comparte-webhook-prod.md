@@ -1,13 +1,11 @@
 # Mensaje para Juan — el número de WhatsApp de test comparte webhook con producción
 
 > Contexto (para el Arquitecto/Alberto, NO enviar): el App de Meta que Juan creó para staging
-> (`docs/2026-07-06-mensaje-juan-meta-app-staging.md`) no logró el aislamiento esperado. Confirmado
-> hoy (7 jul) con datos de ejecución de ambas instancias de n8n: el mismo evento de webhook llega
-> a producción Y a staging al mismo tiempo. Bug #15 en `CLAUDE.md`. Profundizado el mismo día vía
-> Graph API directa (con `STG_META_ACCESS_TOKEN` y `STG_META_APP_SECRET`, guardados en
-> `Agente-Arquitecto/.env.local`, gitignored): prod tiene override de webhook a nivel de número,
-> test no; `/subscriptions` de la App de test está vacío. No se pudo confirmar la WABA del número
-> de test sin su ID — hipótesis de trabajo: comparte WABA con producción.
+> (`docs/2026-07-06-mensaje-juan-meta-app-staging.md`) no logró el aislamiento esperado. **Confirmado
+> con certeza (7 jul) por el Agente n8n vía payload crudo:** el `wamid` (id único de Meta) es idéntico
+> entre ejecuciones de staging y de producción — es el mismo mensaje entregado dos veces, no
+> coincidencia. Se descartó la hipótesis de WABA compartida (son WABAs distintas, `subscribed_apps`
+> limpio en ambas). Bug #15 en `CLAUDE.md`. Listo para enviar.
 
 ---
 
@@ -23,12 +21,12 @@ Consecuencia real: el número de prueba escribió datos en la base de datos de *
 
 **Lo que necesito:** que el número de prueba (`17377323515`) tenga su **propio `phone_number_id`, completamente aislado**, sin que producción reciba ninguno de sus webhooks.
 
-Ya adelanté parte del diagnóstico consultando directo la Graph API (con el access token y el App Secret que me diste):
-- El número de **producción** (`1028815256982638`) SÍ tiene un override de webhook explícito a nivel de número, apuntando correctamente solo a nuestro n8n de producción.
-- El número de **test** (`1154577517746231`, App `hyl-wai-stg`, id `4539428293006817`) **NO tiene ningún override de webhook a nivel de número**.
-- La lista de suscripciones a nivel de App (`GET /4539428293006817/subscriptions`) está **vacía**.
+Ya investigamos bastante de nuestro lado antes de pasártelo, para que no tengas que empezar desde cero:
 
-Esto descarta que la App de test tenga una suscripción de Webhooks producto mal apuntada a prod (se vería ahí). Mi sospecha es que el número de test quedó registrado bajo la **misma WABA** que producción, y por eso hereda su configuración de webhook a nivel de cuenta — pero necesito el ID de esa WABA para confirmarlo (`GET /{waba-id}/subscribed_apps`) y no lo tengo. ¿Puedes revisar en Meta Business Manager bajo qué WABA quedó el número de test, y si comparte cuenta con el de producción?
+- Confirmamos con el `wamid` (el ID único que Meta asigna a cada mensaje) que es **el mismo mensaje entregado dos veces** — no es una coincidencia ni un reintento nuestro. El payload trae el `phone_number_id` del número de **test** (`1154577517746231`), pero llegó también al webhook de **producción**.
+- Descartamos que compartan WABA: la de staging (`27763806206640265`) y la de producción (`2418053602347168`) son distintas, y en `subscribed_apps` cada una muestra un solo App — `hyl-wai-stg` en la de staging, `Aguayo IA` en la de producción. Nada cruzado visible ahí.
+
+Así que el cruce es real, pero **no se ve en el nivel que normalmente revisaríamos** (App Webhooks / WABA subscribed_apps). Sospechamos que puede ser algo como: un System User con permisos sobre las dos WABAs, una suscripción vieja que no aparece en ese endpoint, o algo a nivel de Business Manager que agrupa las dos cuentas. **Lo que necesito de ti:** que revises directo en el dashboard de la App de producción el **log de entregas de webhook** (Meta Business Manager → tu App de producción → WhatsApp → Configuration → Webhooks → ver el historial/log de eventos entregados) para ese `phone_number_id` de test y veas qué suscripción o permiso está causando que también le llegue a producción.
 
 Mientras tanto, vamos a pausar todas las pruebas en staging para no seguir generando ruido en la base de producción.
 
