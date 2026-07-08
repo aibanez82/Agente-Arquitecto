@@ -468,6 +468,8 @@ Alberto actualiza docs/n8n-workflows/ en Agente-Arquitecto
 
 Staging end-to-end para replicar bug fixes antes de prod (gitflow `stg`→`main`). Objetivo inmediato: validar el fix del **Bug #10** (VIN/serie) E2E antes de mergear. Detalle vivo: `docs/iniciativas/entorno-pruebas-staging.md`.
 
+**Nuevo participante (8 jul): Agente QA & Testing** (`aibanez82/Agente_QATest_Qualitas`) se incorpora para **liderar las pruebas E2E en STG** — poder correr un flujo completo sin llenar la landing a mano, y validar cambios de `systemMessage` (¿el bot ahora se comporta como queremos?). Contexto del ecosistema y del entorno STG ya cargado en su `context/ARQUITECTO.md`. **Pendiente de diseño (Arquitecto):** el método para generar el lead+cotización inicial sin pasar por la landing — hoy ese flujo lo dispara el webhook "lead creado" de Django hacia n8n, y el payload/contrato exacto para simularlo sintéticamente en STG todavía no está documentado. **Aviso importante para cualquier prueba WhatsApp real en STG:** el Bug #15 sigue activo — cada mensaje a STG también se procesa en PROD hasta que se despliegue la mitigación retenida (`docs/2026-07-08-handoff-agente-n8n-bug15-filtro-phone-number-id-prod.md`).
+
 **Principio rector:** stack paralelo completo; cada componente de staging apunta SOLO a gemelos de staging, nunca a prod (riesgo #1 = staging escribiendo/disparando contra prod).
 
 **Mapa prod → staging:**
@@ -530,6 +532,7 @@ Repos clonados:
 - `~/claude-projects/Dashboard_seguroautoqualitas`
 - `~/claude-projects/Agente-MejorasConversacion`
 - `~/claude-projects/Agente-n8n` (push directo habilitado desde el Arquitecto, 8 jul)
+- `~/claude-projects/Agente_QATest_Qualitas` (push directo habilitado desde el Arquitecto, 8 jul)
 - `~/claude-projects/HYL-WAI` (requiere PAT — pendiente)
 
 Comando de arranque: `cd ~/claude-projects/<repo> && claude`
@@ -561,7 +564,7 @@ Comando de arranque: `cd ~/claude-projects/<repo> && claude`
 |---|---|---|
 | **Agente-Arquitecto** (este) | Diagnóstico transversal | ✅ Activo |
 | Dashboard Qualitas | Ejecutor código dashboard | ✅ Activo |
-| Agente QA | Tests end-to-end | ✅ Activo |
+| Agente QA | Tests end-to-end · nuevo objetivo (8 jul): liderar pruebas E2E en STG sin pasar por la landing, y validar cambios de `systemMessage` | ✅ Activo |
 | Agente Mejoras Conversación | Análisis abandono (Postgres) + análisis de tono/trato (capturas WA) → recomendaciones de copy/tono para n8n | ✅ Activo |
 | Agente n8n | Entiende workflows n8n, propone mejoras, modifica JSON | 🆕 En construcción |
 | Agente Conversión | Reintentos + seguimiento | ⏳ Futuro |
