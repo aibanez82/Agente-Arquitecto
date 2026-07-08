@@ -97,7 +97,7 @@ Wagtail es un CMS construido sobre Django. **No son dos sistemas separados** —
 | Dashboard | `aibanez82/Dashboard_seguroautoqualitas` | Next.js 14, Vercel | UI de leads en tiempo real |
 | Agente QA | `aibanez82/Agente_QATest_Qualitas` | Claude Code | Tests end-to-end |
 | Agente Mejoras Conv. | `aibanez82/Agente-MejorasConversacion` | Claude Code | Dos modos: (1) lee Postgres → analiza abandono por fase; (2) analiza capturas de pantalla de conversaciones WhatsApp → detecta problemas de tono/trato. Ambos generan informe Markdown con recomendaciones de copy/tono para el systemMessage de n8n — nunca modifica nada él mismo |
-| Agente n8n | `aibanez82/Agente_n8n` (nombre a confirmar) | Claude Code | Entiende workflows n8n, propone mejoras, modifica los JSON y sube a git — Alberto importa manualmente en n8n |
+| Agente n8n | `aibanez82/Agente-n8n` | Claude Code | Entiende workflows n8n, propone mejoras, modifica los JSON y sube a git — Alberto importa manualmente en n8n |
 | Arquitecto | `aibanez82/Agente-Arquitecto` | Este repo | Documentación transversal, workflows n8n, spec SOAP Quálitas |
 
 **Accesos de Alberto:**
@@ -460,7 +460,7 @@ Alberto actualiza docs/n8n-workflows/ en Agente-Arquitecto
 
 **Punto de atención:** como Agente n8n no tiene clonado este repo, el JSON que modifica vive solo en su propio repo hasta que Alberto lo reimporta a producción y lo vuelve a traer aquí. Si se salta el último paso, `docs/n8n-workflows/` en este repo queda desactualizado respecto a lo que corre en producción — mismo riesgo que ya existía con el backup manual (ver `docs/architecture/backup-policy-n8n.md`).
 
-**Pendiente:** confirmar nombre final del repo en GitHub una vez creado, para actualizar la tabla de "Mapa de sistemas".
+**✅ Nombre de repo confirmado:** `aibanez82/Agente-n8n` (con guion). Clonado en local en `~/claude-projects/Agente-n8n` (8 jul) y con push directo habilitado — mismo `gh auth` (scope `repo`) que el resto de los repos de esta cuenta, sin setup adicional. Esto cierra el gap de "no tengo escritura en ese repo": ahora puedo dejar handoffs directamente en `Agente-n8n/handoffs/` en vez de depender de que Alberto los copie.
 
 ---
 
@@ -514,7 +514,7 @@ Staging end-to-end para replicar bug fixes antes de prod (gitflow `stg`→`main`
 | Issue #74 (`aguayo-co/HYL-WAI`) — follow-up 15 min dejó de enviarse desde 2026-06-30 ~21:11 UTC | ⏳ Causa raíz sin determinar. Requiere acceso Heroku (config vars, releases, scheduler) — Alberto va a dar token OAuth read-only vía Vercel env Plain |
 | Propuesta arquitectura BD — tabla canónica `whatsapp_event` (dual-write desde n8n/Django/Dashboard, reemplaza joins frágiles y LIKE de hitos) | 💡 Documentada como plan de destino, sin decisión de implementar aún |
 | Alerta de emisión fallida (Bug #9) — workflow `Bot Error Handler` en n8n + tarjeta "Emisión falló" en Dashboard | ⏸️ En pausa — implica desarrollo de n8n (Error Workflow + extracción de datos de la ejecución fallida). Spec lista en `docs/estrategia/2026-07-02-alerta-emision-fallida-quálitas.md` |
-| Crear repo `Agente_n8n` en GitHub + confirmar nombre final | 🆕 En construcción — ver protocolo en sección "Agente n8n" |
+| ~~Crear repo `Agente_n8n` en GitHub + confirmar nombre final~~ | ✅ Resuelto (8 jul) — repo es `aibanez82/Agente-n8n`, clonado local, push directo habilitado |
 | `N8N_TOKEN` con valor real hardcodeado como default en `qualitas/views.py:905` (rama `stg`) | ⚠️ Seguridad — hallazgo del 6 jul al auditar config vars de `hyl-wai-stg`. Mover a solo-env y rotar el token — pedir a Juan. Ver `docs/iniciativas/entorno-pruebas-staging.md` |
 | Revisar cumplimiento de la política de IA de WhatsApp de Meta (enero 2026, interacciones deben ser "task-specific") | ⏳ Pendiente — priorizar sobre el escalado de volumen. Ver `docs/estrategia/2026-07-06-evaluacion-plataformas-conversacion-whatsapp.md` |
 | Cómo saber con certeza si un cliente pagó la póliza — la doc oficial SOAP de Quálitas (`docs/qualitas-api/`: WsEmision, WsTarifas, WsImpresion, Matriz de Captura) **no documenta ningún endpoint ni campo de consulta de estatus de pago** (verificado 7 jul). Solo cubre `FormaPago` (método/frecuencia) y los recibos generados al emitir — nada sobre si un recibo/link de pago fue efectivamente pagado. Hoy la única señal automatizada es `qualitas_polizaemitida.estatus_pago`, que depende de un webhook externo de Quálitas hacia Django no documentado en su spec (ver Bug #7 y su workaround). Detectado por Alberto al revisar una conversación con póliza emitida y link de pago enviado, sin forma de confirmar el pago desde ahí. **No es dependencia de Juan** — la resolución probable es manual: Laura (Hylant) reporta ventas/pagos confirmados en una hoja Excel al día siguiente. | 💡 Sin investigar — definir si conviene formalizar el reporte de Laura como fuente de verdad (p. ej. cargarlo al Dashboard) en vez de perseguir un mecanismo automático de Quálitas |
@@ -528,6 +528,8 @@ A partir del 29 junio 2026, Alberto trabaja desde **Claude Code** sobre repos cl
 Repos clonados:
 - `~/claude-projects/Agente-Arquitecto` ← este repo, fuente de verdad
 - `~/claude-projects/Dashboard_seguroautoqualitas`
+- `~/claude-projects/Agente-MejorasConversacion`
+- `~/claude-projects/Agente-n8n` (push directo habilitado desde el Arquitecto, 8 jul)
 - `~/claude-projects/HYL-WAI` (requiere PAT — pendiente)
 
 Comando de arranque: `cd ~/claude-projects/<repo> && claude`
