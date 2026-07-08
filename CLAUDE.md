@@ -96,7 +96,7 @@ Wagtail es un CMS construido sobre Django. **No son dos sistemas separados** —
 | Base de datos | Heroku Postgres (addon) | PostgreSQL | Compartida entre Django y n8n |
 | Dashboard | `aibanez82/Dashboard_seguroautoqualitas` | Next.js 14, Vercel | UI de leads en tiempo real |
 | Agente QA | `aibanez82/Agente_QATest_Qualitas` | Claude Code | Tests end-to-end |
-| Agente Mejoras Conv. | `aibanez82/Agente-MejorasConversacion` | Claude Code | Lee Postgres → analiza abandono por fase → genera informe Markdown con recomendaciones de copy para n8n |
+| Agente Mejoras Conv. | `aibanez82/Agente-MejorasConversacion` | Claude Code | Dos modos: (1) lee Postgres → analiza abandono por fase; (2) analiza capturas de pantalla de conversaciones WhatsApp → detecta problemas de tono/trato. Ambos generan informe Markdown con recomendaciones de copy/tono para el systemMessage de n8n — nunca modifica nada él mismo |
 | Agente n8n | `aibanez82/Agente_n8n` (nombre a confirmar) | Claude Code | Entiende workflows n8n, propone mejoras, modifica los JSON y sube a git — Alberto importa manualmente en n8n |
 | Arquitecto | `aibanez82/Agente-Arquitecto` | Este repo | Documentación transversal, workflows n8n, spec SOAP Quálitas |
 
@@ -379,6 +379,10 @@ Alberto atiende el lead directamente desde Kommo
 ## Agente Mejoras Conversación — protocolo de uso
 
 **Repo:** `aibanez82/Agente-MejorasConversacion`
+**Rol:** especializado en CÓMO conversa el bot (abandono y tono/trato). Nunca modifica nada — solo analiza y propone. Dos modos de entrada, misma tubería de salida.
+
+### Modo 1 — Análisis de abandono (Postgres)
+
 **Credencial DB:** `readonly_leads` en Heroku `hyl-wai-production` (read-only, no puede modificar nada)
 
 > **Patrón de permisos `readonly_leads`:** cada tabla nueva que crea Django NO tiene permiso para
@@ -398,12 +402,25 @@ Alberto atiende el lead directamente desde Kommo
 3. Clasificación por outcome + análisis del último mensaje del bot antes del silencio
 4. Informe Markdown con mapa de abandono + análisis de copy + hasta 5 recomendaciones concretas de cambio de texto en n8n
 
-**Cómo se ejecutan las recomendaciones — tubería Mejoras → Arquitecto → Agente n8n (NO lateral):**
+**Limitación activa — Bug #1:**
+~76% de sesiones no tienen historial en `n8n_chat_histories` (medido 1 jul 2026: 154/203). El agente lo detecta y lo anota, pero el análisis de copy solo cubre el ~24% de conversaciones con datos. Nota: gran parte de ese "vacío" son leads que nunca respondieron (ver Bug #1 reinterpretado), no pérdida de datos. Los resultados son válidos pero parciales.
 
-Las recomendaciones de copy se traducen en cambios al `systemMessage` del nodo **AI Agent** en n8n. El **Agente n8n es el ejecutor** de ese cambio (no Mejoras, no Alberto a mano). Pero **Mejoras y n8n NO se comunican directamente** (regla de oro: los ejecutores no se hablan). La tubería es:
+### Modo 2 — Análisis de tono/trato (capturas de pantalla)
+
+Alberto le pasa capturas de pantalla de conversaciones WhatsApp reales cuando detecta un problema de tono (ej.: el bot trata de "usted" y el caso pide un trato más cercano). El agente identifica QUÉ parte del `systemMessage` del nodo **AI Agent** (n8n) está generando ese tono y propone la modificación EXACTA (frase, ubicación, redacción nueva) — igual que en Modo 1, solo propone, nunca escribe.
+
+**Regla de acceso al `systemMessage`:** el Agente Mejoras Conversación NO tiene acceso directo a n8n. El `systemMessage` completo vive exportado en `docs/n8n-workflows/WhatsApp Insurance Quotation Bot.json` (fuente de verdad en este repo). Cuando este análisis lo requiera, **el Arquitecto extrae y entrega el fragmento relevante como contexto de solo lectura** para ese análisis puntual — consistente con "los ejecutores nunca se hablan entre sí, todo pasa por mí".
+
+**Riesgo transversal que el Arquitecto valida antes de aprobar un cambio de tono (Mejoras no lo ve):**
+- **Hitos por LIKE:** un cambio de tono puede tocar sin querer alguna de las frases exactas de las que dependen los hitos (`confirmo_cobertura`, `poliza_emitida_wa`, etc. — ver "Regla de estado real de un lead").
+- **Bug #10/#14:** el `systemMessage` (~24K chars) también contiene las instrucciones de serie VIN-17, el manejo del `400 invalid_vehicle_serie` y las SECURITY RULES del deflect fuera de alcance — un cambio de tono cerca de esas secciones puede chocar con ellas.
+
+### Tubería común — Mejoras → Arquitecto → Agente n8n (NO lateral)
+
+Tanto las recomendaciones de copy (Modo 1) como las de tono (Modo 2) se traducen en cambios al `systemMessage` del nodo **AI Agent** en n8n. El **Agente n8n es el ejecutor** de ese cambio (no Mejoras, no Alberto a mano). Pero **Mejoras y n8n NO se comunican directamente** (regla de oro: los ejecutores no se hablan). La tubería es:
 
 ```
-Agente Mejoras Conversación  → analiza abandono, propone cambios de copy (informe)
+Agente Mejoras Conversación  → analiza abandono o tono, propone cambios de copy (informe)
         ↓
 Arquitecto (yo)              → valida, traduce a cambio EXACTO (qué frase, qué nodo)
                                y CHEQUEA IMPACTO TRANSVERSAL antes de aprobar
@@ -413,13 +430,7 @@ Agente n8n                   → aplica el cambio en el JSON, commit/push
 Alberto                      → importa en n8n
 ```
 
-**Por qué el Arquitecto en medio no es burocracia — el systemMessage tiene dependencias cruzadas que Mejoras no ve:**
-- **Hitos por LIKE:** los hitos (`confirmo_cobertura`, `poliza_emitida_wa`, etc.) se detectan con `BOOL_OR + LIKE` sobre frases EXACTAS del bot. Si Mejoras propone cambiar justo esas frases, arregla el abandono pero **rompe la analítica de hitos** (de la que él mismo depende). El Arquitecto lo detecta y pide al Agente n8n actualizar TAMBIÉN el patrón LIKE.
-- **Bug #10 / manejo de errores:** el systemMessage (~24K chars) contiene las instrucciones de serie VIN-17, el manejo del `400 invalid_vehicle_serie`, la línea load-bearing de detección desde body. Un cambio de copy puede chocar con ellas.
-- Es el mismo patrón usado para el Bug #10 (diagnóstico → prompt para el Agente n8n → ejecución). El punto de encuentro de los dos ejecutores es el Arquitecto, nunca el otro agente.
-
-**Limitación activa — Bug #1:**
-~76% de sesiones no tienen historial en `n8n_chat_histories` (medido 1 jul 2026: 154/203). El agente lo detecta y lo anota, pero el análisis de copy solo cubre el ~24% de conversaciones con datos. Nota: gran parte de ese "vacío" son leads que nunca respondieron (ver Bug #1 reinterpretado), no pérdida de datos. Los resultados son válidos pero parciales.
+Es el mismo patrón usado para el Bug #10 (diagnóstico → prompt para el Agente n8n → ejecución). El punto de encuentro de los dos ejecutores es el Arquitecto, nunca el otro agente.
 
 ---
 
@@ -549,7 +560,7 @@ Comando de arranque: `cd ~/claude-projects/<repo> && claude`
 | **Agente-Arquitecto** (este) | Diagnóstico transversal | ✅ Activo |
 | Dashboard Qualitas | Ejecutor código dashboard | ✅ Activo |
 | Agente QA | Tests end-to-end | ✅ Activo |
-| Agente Mejoras Conversación | Análisis abandono + recomendaciones copy n8n | ✅ Activo |
+| Agente Mejoras Conversación | Análisis abandono (Postgres) + análisis de tono/trato (capturas WA) → recomendaciones de copy/tono para n8n | ✅ Activo |
 | Agente n8n | Entiende workflows n8n, propone mejoras, modifica JSON | 🆕 En construcción |
 | Agente Conversión | Reintentos + seguimiento | ⏳ Futuro |
 
