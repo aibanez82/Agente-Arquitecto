@@ -66,11 +66,48 @@ Observabilidad:
 └── Dashboard → funnel completo
 ```
 
-**Regla crítica de arquitectura:** Django y n8n comparten la misma BD Postgres. Django dispara **dos webhooks** a n8n:
-1. **Al crear el lead** — n8n inicia la conversación WhatsApp
-2. **Al confirmar el pago** — n8n actualiza `conversation_phase = 'completed'` y envía mensaje WA al cliente
+**Regla crítica de arquitectura:** Django y n8n comparten la misma BD Postgres.
 
-El Dashboard también puede escribir indirectamente a través del webhook n8n (solo para mensajes proactivos). Cada sistema escribe directamente en sus propias tablas. Los bugs en `whatsapp_sessions` y `n8n_chat_histories` son responsabilidad exclusiva de n8n — Django no controla esas tablas.
+> **✅ CORRECCIÓN (9 jul 2026, leído directo del código de `aguayo-co/HYL-WAI` rama `main`,
+> commit `586b318` — reemplaza el punto 1 de abajo, que era incorrecto):** Django **NO** dispara
+> ningún webhook a n8n al crear el lead. Confirmado con la lista de workflows de PROD vía API
+> (solo 3 existen: bot principal, Payment Confirmation, Retomar Conversación — ninguno recibe un
+> "lead creado"). Lo que realmente pasa (`qualitas/models.py`, dentro del `serve()` de la landing
+> page, tras crear `Cotizacion`+`Lead`): (a) Django genera el PDF de cotización, lo sube a S3; (b)
+> Django manda el **primer mensaje de WhatsApp DIRECTO vía Meta Graph API** (plantilla con imagen +
+> link al PDF + botón quick-reply), usando sus propias credenciales `WHATSAPP_ACCESS_TOKEN`/
+> `WHATSAPP_PHONE_NUMBER_ID` — sin pasar por n8n; (c) si el envío fue exitoso, Django hace un
+> **`INSERT INTO whatsapp_sessions` directo por SQL crudo** (`phone_number`, `quotation_id`,
+> `conversation_phase='greeting'`, `session_id`) — **este es el punto exacto donde nace el prefijo
+> 57 vs 52 del Bug #2** (`NumeroPruebaWhatsapp.objects.filter(...).exists() → 57 si True, 52 si
+> False`, justo antes del INSERT). Cuando el cliente responde más tarde, `Check Session Exists` de
+> n8n ya encuentra la fila (creada por Django) y carga el `quotation_id` correcto — n8n nunca
+> extrae el `quotation_id` del texto del mensaje. **Implicación para el Bug #11** (sesión pegada a
+> la 1ª cotización al recotizar): el fix del UPSERT de `quotation_id` va en **Django**
+> (`qualitas/models.py`, este mismo `INSERT`, cambiarlo a `INSERT ... ON CONFLICT (session_id) DO
+> UPDATE ...`), **no en un workflow de n8n** — el "workflow del webhook de lead creado" que se
+> mencionaba en el Bug #11 no existe; era una inferencia nunca verificada. Esto es tarea de Juan,
+> no del Agente n8n.
+>
+> **⚠️ Hallazgo sin confirmar, pendiente de Juan:** la tabla `qualitas_numeropruebawhatsapp`
+> (modelo `NumeroPruebaWhatsapp`, migración `0024`, ya presente en el commit desplegado en PROD
+> desde el 5 jun según Heroku) **no existe** en la BD accesible vía `DATABASE_URL` del Dashboard
+> (`information_schema.tables` sin resultados, confirmado 9 jul). Pero las `whatsapp_sessions` más
+> recientes (creadas hace minutos al momento de revisar) sí tienen `quotation_id` correcto — el
+> código que depende de esa tabla parece estar funcionando de todas formas, lo cual no cuadra si
+> la tabla de verdad no existe. Dos hipótesis sin descartar: (a) la migración 0024 nunca corrió en
+> PROD y este bloque de código lleva tiempo fallando silenciosamente sin afectar el envío del
+> mensaje inicial (el INSERT a `whatsapp_sessions` sí ocurre según los datos — inconsistente con
+> (a) salvo que haya otro camino de creación que no hemos encontrado); (b) el `DATABASE_URL` que
+> usa el Dashboard (y por tanto el Arquitecto) no apunta exactamente a la misma base que usa
+> `hyl-wai-production` hoy. **Pedir a Juan que confirme directo en Heroku
+> (`heroku run python manage.py showmigrations qualitas --app hyl-wai-production`) si la 0024 está
+> aplicada.**
+
+Aparte de esto, Django SÍ dispara **un webhook real** a n8n:
+1. **Al confirmar el pago** — n8n actualiza `conversation_phase = 'completed'` y envía mensaje WA al cliente (`enviar_webhook_whatsapp` en `qualitas/views.py`, hacia el workflow "Payment Confirmation")
+
+El Dashboard también puede escribir indirectamente a través del webhook n8n (solo para mensajes proactivos). Cada sistema escribe directamente en sus propias tablas. Los bugs en `whatsapp_sessions` y `n8n_chat_histories` son responsabilidad exclusiva de n8n — Django no controla esas tablas (salvo la creación inicial de `whatsapp_sessions`, ver corrección arriba).
 
 ---
 
@@ -332,11 +369,11 @@ Se montó un harness de reproducción (system prompt real + schema real con clav
 **Detalle Bug #11 (sesión pegada a la 1ª cotización al recotizar) — REGISTRADO, EN PAUSA (Alberto lo piensa):**
 - **Síntoma (Dashboard agent, 4 jul):** el funnel "VÍA WHATSAPP" pierde leads — 46 enviados hoy, solo 37 en el funnel; los 9 faltantes recibieron el mensaje y varios conversan activamente, pero el dashboard no los ve. 9/9 verificado.
 - **Causa raíz:** `whatsapp_sessions` es **única por teléfono** (`session_id='52'+telefono`). Al recotizar (común: 2-4 cotizaciones por número), se crea cotización nueva pero la fila de sesión ya existe y **su `quotation_id` NO se actualiza** → queda pegado a la 1ª cotización. El join del dashboard (`whatsapp_sessions.quotation_id = qualitas_cotizacion.id`) no encuentra la cotización nueva → lead fuera del funnel.
-- **Dónde vive el fix (evidencia):** el bot de conversación NUNCA escribe `quotation_id` (solo lo lee de la BD; comentario en el código: "quotation_id is NOT extracted from message — it comes from DB"). El `quotation_id` se asigna **solo al crear la sesión**, en **el workflow del webhook de "lead creado" de Django** (envía 1er mensaje + crea sesión). **Ese workflow NO está exportado** en `docs/n8n-workflows/` (gap de fuente de verdad — hay ≥1 workflow más). El fix va ahí: **UPSERT del `quotation_id`** (si la sesión existe, actualizarla a la cotización nueva), no insert-si-no-existe.
+- **✅ Dónde vive el fix — CORREGIDO 9 jul, leído directo del código:** el bot de conversación NUNCA escribe `quotation_id` (solo lo lee de la BD). Pero **NO hay ningún "workflow del webhook de lead creado" en n8n** — eso era una inferencia nunca verificada (confirmado por API: PROD solo tiene 3 workflows, ninguno de "lead creado"). El `quotation_id` se asigna con un **`INSERT INTO whatsapp_sessions` de SQL crudo dentro de Django** (`qualitas/models.py`, en el `serve()` de la landing page, justo después de enviar el WhatsApp inicial vía Meta Graph API directo). **El fix es un cambio de Django, no de n8n:** cambiar ese `INSERT` a `INSERT ... ON CONFLICT (session_id) DO UPDATE SET quotation_id = EXCLUDED.quotation_id, ...`. Ver la corrección completa de arquitectura más arriba (sección "Regla crítica de arquitectura").
 - **Arquitectura — NO "sesión por cotización":** WhatsApp = un hilo por número, y `n8n_chat_histories` (memoria) se llavea por `session_id=teléfono`. Lo correcto: una sesión por teléfono apuntando a la cotización **más reciente** → UPSERT de `quotation_id`.
 - **DECISIÓN PENDIENTE de Alberto:** al actualizar `quotation_id`, ¿(a) resetear a `greeting` + limpiar `captured_data` (recotización = conversación fresca; recomendado, porque el historial y `captured_data` arrastran contexto/serie del auto anterior y si recotiza otro auto quedan mal), o (b) mantener fase/captured_data y solo cambiar `quotation_id`? Depende de por qué recotiza la gente (mismo auto más barato vs otro auto).
-- **Prerrequisitos para el handoff al Agente n8n:** (1) exportar el workflow de creación de sesión; (2) decisión (a)/(b).
-- **Mitigación dashboard (aprobada como interina):** asociar la sesión por teléfono al lead más reciente + reetiquetar "Recotizaciones" en UI. El arreglo limpio es upstream (n8n).
+- **Prerrequisito para el fix:** solo la decisión (a)/(b) — ya NO hace falta exportar ningún workflow (no existe). El cambio es en `qualitas/models.py` de `aguayo-co/HYL-WAI`, tarea de **Juan**, no del Agente n8n.
+- **Mitigación dashboard (aprobada como interina):** asociar la sesión por teléfono al lead más reciente + reetiquetar "Recotizaciones" en UI. El arreglo limpio es upstream (Django).
 - **Relación:** encaja con el proyecto CSF (el `captured_data` debe resetear en recotización) y con Bug #4 (leads sin whatsapp_session).
 
 ## Kommo CRM — integración en curso
@@ -508,7 +545,7 @@ Staging end-to-end para replicar bug fixes antes de prod (gitflow `stg`→`main`
 | Corrección Bug #8 en Django — Juan Aguayo (Issue #70 `aguayo-co/HYL-WAI`) | ⏳ Pendiente externo |
 | Política de backup automático de workflows n8n | ✅ Activo (`.github/workflows/backup-n8n.yml`, cron diario 06:00 CDMX + disparo manual). Rotar `N8N_API_KEY` de GitHub Actions — se pegó en texto plano en una sesión de chat el 30 jun 2026, hay que revocarla en n8n y generar una nueva |
 | Tab 2.0 del Dashboard | ⏳ Instrucciones ya dadas al Code Agent |
-| PAT fine-grained para repo `aguayo-co/HYL-WAI` | ⏳ Pendiente (`gh` CLI funciona para issues; PAT necesario para acceso a código) |
+| ~~PAT fine-grained para repo `aguayo-co/HYL-WAI`~~ | ✅ Resuelto (9 jul) — `gh auth` (scope `repo`) ya permitía clonar directo, sin PAT nuevo |
 | Reconectar Notion al workspace `aguayo` | ⏳ Pendiente |
 | Subir `BUGS_N8N.md` al repo Dashboard | ⏳ Pendiente |
 | Integración Kommo — botón "Pasar a Kommo" en Dashboard | ⏳ Pendiente (falta subdominio + API token + pipeline de Alberto) |
@@ -533,7 +570,7 @@ Repos clonados:
 - `~/claude-projects/Agente-MejorasConversacion`
 - `~/claude-projects/Agente-n8n` (push directo habilitado desde el Arquitecto, 8 jul)
 - `~/claude-projects/Agente_QATest_Qualitas` (push directo habilitado desde el Arquitecto, 8 jul)
-- `~/claude-projects/HYL-WAI` (requiere PAT — pendiente)
+- `~/claude-projects/HYL-WAI` (✅ clonado 9 jul — `gh auth` con scope `repo` ya alcanzaba, no hizo falta PAT nuevo)
 
 Comando de arranque: `cd ~/claude-projects/<repo> && claude`
 
