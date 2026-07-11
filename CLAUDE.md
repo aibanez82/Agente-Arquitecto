@@ -192,7 +192,7 @@ Detalle completo, evidencia y cronología: `docs/bugs/` (un archivo por bug, má
 | 8 | `_generar_bloque_492` no incluía teléfono celular en XML SOAP | Django | ✅ Resuelto (verificado 10 jul) | `docs/bugs/bug-08-telefono-soap.md` |
 | 9 | `POST /api/emitir-externo/` devuelve HTTP 400 recurrente sin causa logueada | Django | 🔴 Crítico | `docs/bugs/bug-09-emision-400.md` |
 | 10 | AI Agent enviaba ciudad/estado en vez de VIN en `Issue_Policy` | n8n | ✅ Resuelto en prod (10 jul, confirmado con tráfico real) | `docs/bugs/bug-10-vin-issue-policy.md` |
-| 11 | Sesión pegada a la 1ª cotización al recotizar — lead cae del funnel WhatsApp | n8n | 🟠 Alto — registrado, en pausa (Alberto lo piensa) | `docs/bugs/bug-11-recotizar-session.md` |
+| 11 | Sesión pegada a la 1ª cotización al recotizar — lead cae del funnel WhatsApp | Django | ✅ Resuelto — desplegado y verificado en PROD (11 jul) | `docs/bugs/bug-11-recotizar-session.md` |
 | 12 | Inbound Meta→n8n caído por `webhookId` compartido entre workflows | n8n | ✅ Resuelto — cerrado por decisión de Alberto (10 jul) | `docs/bugs/bug-12-inbound-caido.md` |
 | 13 | Follow-up de cotización puede enviar el precio de otra forma de pago | Django + n8n | 🟠 Alto | `docs/bugs/bug-13-forma-pago-followup.md` |
 | 14 | Deflect "fuera de alcance" mata conversaciones reales con `qid` válido | n8n | 🔴 Crítico | `docs/bugs/bug-14-deflect-fuera-de-alcance.md` |
