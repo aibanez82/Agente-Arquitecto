@@ -1,6 +1,8 @@
 # Bug #1 — Historiales vacíos en ~76% de sesiones
 
-**Sistema:** n8n · **Estado:** 🟡 Activo (mayoría = leads que nunca respondieron, no pérdida de datos)
+**Sistema:** n8n · **Estado:** ✅ Resuelto (11 jul) — no era un bug, decisión de Alberto
+
+**Cierre (11 jul):** confirmado que no hay problema de arquitectura ni de desarrollo, ni leads sin respuesta perdidos. Es un malentendido de métrica: 399 de ~434 leads son canal `LANDING` y cierran 100% por la web sin tocar WhatsApp nunca (por eso 0 mensajes en n8n y `conversation_phase` en `greeting` — no porque algo falle, sino porque el cliente nunca escribió). Los 35 leads de canal `WHATSAPP` sí tienen conversación real (29-48 mensajes), y cuando el humano responde el historial se guarda en 48/49 casos. Solo afecta a cómo se interpreta la métrica "% de sesiones con historial" sin filtrar por canal — no afecta al motor de follow-up ni pierde datos. Alberto decidió marcarlo resuelto tras esta aclaración.
 
 ## Fila de la tabla original
 
