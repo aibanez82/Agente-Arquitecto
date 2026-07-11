@@ -176,31 +176,17 @@ n8n escribe a Postgres directamente (credencial `"Postgres account"` en el workf
 
 ---
 
-## Bugs — índice
+## Bugs — fuente única
 
-Detalle completo, evidencia y cronología: `docs/bugs/` (un archivo por bug, más `docs/bugs/INDEX.md` con el registro histórico completo).
+**A partir del 11 jul 2026, el estado vigente de todos los bugs vive en `github.com/aibanez82/qualitas-issues` (privado) — NO en este archivo.** Cualquier agente del ecosistema (y Juan) puede abrir/comentar issues ahí directamente; solo el Arquitecto cierra/certifica. Convenciones completas en el `README.md` de ese repo.
 
-| # | Bug | Sistema | Estado | Detalle |
-|---|---|---|---|---|
-| 1 | Historiales vacíos ~76% de sesiones (mayoría = leads que nunca respondieron) | n8n | ✅ Resuelto — no era bug, malentendido de métrica (11 jul) | `docs/bugs/bug-01-historiales-vacios.md` |
-| 2 | Prefijo `57` (Colombia) en `session_id` en vez de `52` (México) — nace en Django, `qualitas/models.py` | Django | 🟡 Medio — única evidencia confirmada es tráfico de prueba de Juan, no clientes reales (11 jul) | `docs/bugs/bug-02-prefijo-57.md` |
-| 3 | TEST_EMAILS no filtrados en n8n — Meta cobra mensajes de prueba | n8n | 🟡 Medio | `docs/bugs/bug-03-test-emails.md` |
-| 4 | 4 leads reales sin `whatsapp_session` (IDs: 837, 834, 810, 802) | n8n | 🟡 Medio | `docs/bugs/bug-04-leads-sin-session.md` |
-| 5 | `conversation_phase` siempre stuck en `greeting` | Django | 🟡 Medio | `docs/bugs/bug-05-conversation-phase-stuck.md` |
-| 6 | Regex placas rechazaba 6 caracteres | n8n | ✅ Resuelto (9 jul, verificado en prod 10 jul) | `docs/bugs/bug-06-regex-placas.md` |
-| 7 | Django no escribe `estatus_pago='PAGADO'` al confirmar pago | Django | 🟠 Alto — workaround activo en Dashboard (ver abajo) | `docs/bugs/bug-07-estatus-pago.md` |
-| 8 | `_generar_bloque_492` no incluía teléfono celular en XML SOAP | Django | ✅ Resuelto (verificado 10 jul) | `docs/bugs/bug-08-telefono-soap.md` |
-| 9 | `POST /api/emitir-externo/` devuelve HTTP 400 recurrente sin causa logueada | Django | 🔴 Crítico | `docs/bugs/bug-09-emision-400.md` |
-| 10 | AI Agent enviaba ciudad/estado en vez de VIN en `Issue_Policy` | n8n | ✅ Resuelto en prod (10 jul, confirmado con tráfico real) | `docs/bugs/bug-10-vin-issue-policy.md` |
-| 11 | Sesión pegada a la 1ª cotización al recotizar — lead cae del funnel WhatsApp | Django | ✅ Resuelto — desplegado y verificado en PROD (11 jul) | `docs/bugs/bug-11-recotizar-session.md` |
-| 12 | Inbound Meta→n8n caído por `webhookId` compartido entre workflows | n8n | ✅ Resuelto — cerrado por decisión de Alberto (10 jul) | `docs/bugs/bug-12-inbound-caido.md` |
-| 13 | Follow-up de cotización puede enviar el precio de otra forma de pago | Django + n8n | 🟠 Alto | `docs/bugs/bug-13-forma-pago-followup.md` |
-| 14 | Deflect "fuera de alcance" mata conversaciones reales con `qid` válido | n8n | 🔴 Crítico | `docs/bugs/bug-14-deflect-fuera-de-alcance.md` |
-| 15 | Meta entregaba mensajes del número de test también al webhook de PROD | Meta Business Manager | ✅ Resuelto (10 jul) | `docs/bugs/bug-15-meta-cruce-stg-prod.md` |
-| 16 | `WEBHOOK_URL`/`N8N_TOKEN` de staging eran idénticos a los de producción | Django (Heroku) | ✅ Resuelto (7 jul) | `docs/bugs/bug-16-webhook-credenciales-compartidas.md` |
-| 17 | Botón "Tomar conversación" del Dashboard en STG disparaba WhatsApp real por PROD | Dashboard (Vercel) | ✅ Resuelto (10 jul) | `docs/bugs/bug-17-webhook-proactivo-stg.md` |
+**Por qué se movió:** mantener una tabla de bugs aquí Y en otros 4 repos generaba desincronización real — el 11 jul detectamos que este mismo archivo llevaba 9 días reportando el Issue #74 como pendiente cuando ya estaba resuelto. Un solo tracker con estado (abierto/cerrado) evita que vuelva a pasar.
 
-**Workaround activo para Bug #7 en Dashboard:**
+**Qué SÍ va en `qualitas-issues`:** defectos técnicos (código, esquema, queries, regex, integraciones). **Qué NO va ahí:** recomendaciones de copy/tono — esas siguen la tubería normal (ver "Agente Mejoras Conversación" abajo).
+
+Los `docs/bugs/bug-NN-*.md` de este repo (y equivalentes en los otros repos de agentes) siguen existiendo como el cuaderno de investigación largo — cronología, SQL, decisiones — cada issue del tracker enlaza al suyo. No se borró nada.
+
+**Workaround activo para Bug #7 en Dashboard** (documentado en detalle en `docs/bugs/bug-07-estatus-pago.md` y en el issue correspondiente):
 ```js
 // Condición correcta para detectar póliza pagada
 d.estatus_pago === 'PAGADO' ||
@@ -321,5 +307,6 @@ Comando de arranque: `cd ~/claude-projects/<repo> && claude`
 - **DB:** usar siempre `lib/db.js` del Dashboard — nunca conexiones directas ad-hoc
 - **n8n API:** `https://n8n.srv1325340.hstgr.cloud/api/v1/` con header `X-N8N-API-KEY`
 - **Convención de handoffs (aprendida 6 jul):** todo handoff a un ejecutor se deja en el repo de ESE ejecutor (`<repo>/handoffs/`) y se comunica con la **ruta absoluta completa** + ubicación git. Nunca solo en el repo del Arquitecto.
+- **Revisión periódica del tracker (desde 11 jul):** el Arquitecto revisa `github.com/aibanez82/qualitas-issues` periódicamente para (a) detectar issues duplicados entre agentes, (b) verificar en vivo contra el sistema real cualquier issue que alguien marque como resuelto antes de cerrarlo, y (c) reabrir si un cierre resulta ser falso. No es solo del Arquitecto detectar bugs — es mantener el tracker mismo honesto.
 
-> **Disciplina de CLAUDE.md:** este archivo se carga completo en cada turno — tamaño máximo **15 KB**. Aquí solo viven hechos estables y reglas operativas. Cronologías, evidencia, hallazgos e investigaciones de bugs van SIEMPRE a `docs/bugs/bug-NN-*.md` (crear el archivo si no existe); en la tabla de bugs solo se actualiza la línea de estado. Al cerrar un bug: estado → ✅ con fecha, y todo lo demás al archivo de detalle. Verificar `wc -c CLAUDE.md` tras cada edición.
+> **Disciplina de CLAUDE.md:** este archivo se carga completo en cada turno — tamaño máximo **15 KB**. Aquí solo viven hechos estables y reglas operativas. El estado de bugs vive en `qualitas-issues` (ver arriba), no aquí. Cronologías, evidencia e investigaciones de cualquier tema van a `docs/` (crear el archivo que corresponda si no existe). Verificar `wc -c CLAUDE.md` tras cada edición.
