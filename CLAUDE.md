@@ -183,7 +183,7 @@ Detalle completo, evidencia y cronología: `docs/bugs/` (un archivo por bug, má
 | # | Bug | Sistema | Estado | Detalle |
 |---|---|---|---|---|
 | 1 | Historiales vacíos ~76% de sesiones (mayoría = leads que nunca respondieron) | n8n | ✅ Resuelto — no era bug, malentendido de métrica (11 jul) | `docs/bugs/bug-01-historiales-vacios.md` |
-| 2 | Prefijo `57` (Colombia) en `session_id` en vez de `52` (México) — nace en Django, `qualitas/models.py` | Django | 🟠 Alto — activo | `docs/bugs/bug-02-prefijo-57.md` |
+| 2 | Prefijo `57` (Colombia) en `session_id` en vez de `52` (México) — nace en Django, `qualitas/models.py` | Django | 🟡 Medio — única evidencia confirmada es tráfico de prueba de Juan, no clientes reales (11 jul) | `docs/bugs/bug-02-prefijo-57.md` |
 | 3 | TEST_EMAILS no filtrados en n8n — Meta cobra mensajes de prueba | n8n | 🟡 Medio | `docs/bugs/bug-03-test-emails.md` |
 | 4 | 4 leads reales sin `whatsapp_session` (IDs: 837, 834, 810, 802) | n8n | 🟡 Medio | `docs/bugs/bug-04-leads-sin-session.md` |
 | 5 | `conversation_phase` siempre stuck en `greeting` | Django | 🟡 Medio | `docs/bugs/bug-05-conversation-phase-stuck.md` |

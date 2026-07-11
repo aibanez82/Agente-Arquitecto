@@ -1,6 +1,16 @@
 # Bug #2 — Prefijo 57 (Colombia) en session_id en lugar de 52 (México)
 
-**Sistema:** Django · **Estado:** 🟠 Alto — confirmado activo
+**Sistema:** Django · **Estado:** 🟡 Medio (bajado de 🟠 Alto el 11 jul — ver reevaluación abajo)
+
+## Reevaluación (11 jul) — bajado a Medio
+
+La única evidencia "confirmada en vivo" del bug es la sesión `573107696237` — que **es el segundo número de prueba de Juan** (así lo identifica la nota del Bug #15: "Afecta también a un segundo número de prueba (Juan, `573107696237`, prefijo `57` = coincide con Bug #2)"). Es un teléfono colombiano real (+57), no un número mexicano al que Django le puso el prefijo equivocado por accidente. La lógica (`NumeroPruebaWhatsapp.objects.filter(...).exists() → 57 si True, 52 si False`) probablemente funciona como bandera interna de "esto es tráfico de prueba", no como un error de detección de país.
+
+**Lo que sigue sin confirmarse (por eso no se cierra del todo):**
+1. Nunca se verificó si un número mexicano real (no de Juan, no de QA) cayó alguna vez en `57` por un falso positivo del `.filter(...).exists()`. La hipótesis de que esto explica el patrón general `qid=null/phase=fallback` sigue sin confirmar.
+2. Sigue sin resolverse si la tabla `qualitas_numeropruebawhatsapp` existe de verdad en producción (ver hallazgo pendiente más abajo). Si no existe, el `.filter(...).exists()` siempre daría `False` → siempre asignaría `52` → el bug no podría estar afectando a clientes reales aunque quisiera.
+
+**Pendiente para cerrarlo con certeza:** pedir a Juan que confirme en Heroku si la migración 0024 corrió (`heroku run python manage.py showmigrations qualitas --app hyl-wai-production`).
 
 ## Fila de la tabla original
 
