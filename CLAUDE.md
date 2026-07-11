@@ -68,41 +68,7 @@ Observabilidad:
 
 **Regla crítica de arquitectura:** Django y n8n comparten la misma BD Postgres.
 
-> **✅ CORRECCIÓN (9 jul 2026, leído directo del código de `aguayo-co/HYL-WAI` rama `main`,
-> commit `586b318` — reemplaza el punto 1 de abajo, que era incorrecto):** Django **NO** dispara
-> ningún webhook a n8n al crear el lead. Confirmado con la lista de workflows de PROD vía API
-> (solo 3 existen: bot principal, Payment Confirmation, Retomar Conversación — ninguno recibe un
-> "lead creado"). Lo que realmente pasa (`qualitas/models.py`, dentro del `serve()` de la landing
-> page, tras crear `Cotizacion`+`Lead`): (a) Django genera el PDF de cotización, lo sube a S3; (b)
-> Django manda el **primer mensaje de WhatsApp DIRECTO vía Meta Graph API** (plantilla con imagen +
-> link al PDF + botón quick-reply), usando sus propias credenciales `WHATSAPP_ACCESS_TOKEN`/
-> `WHATSAPP_PHONE_NUMBER_ID` — sin pasar por n8n; (c) si el envío fue exitoso, Django hace un
-> **`INSERT INTO whatsapp_sessions` directo por SQL crudo** (`phone_number`, `quotation_id`,
-> `conversation_phase='greeting'`, `session_id`) — **este es el punto exacto donde nace el prefijo
-> 57 vs 52 del Bug #2** (`NumeroPruebaWhatsapp.objects.filter(...).exists() → 57 si True, 52 si
-> False`, justo antes del INSERT). Cuando el cliente responde más tarde, `Check Session Exists` de
-> n8n ya encuentra la fila (creada por Django) y carga el `quotation_id` correcto — n8n nunca
-> extrae el `quotation_id` del texto del mensaje. **Implicación para el Bug #11** (sesión pegada a
-> la 1ª cotización al recotizar): el fix del UPSERT de `quotation_id` va en **Django**
-> (`qualitas/models.py`, este mismo `INSERT`, cambiarlo a `INSERT ... ON CONFLICT (session_id) DO
-> UPDATE ...`), **no en un workflow de n8n** — el "workflow del webhook de lead creado" que se
-> mencionaba en el Bug #11 no existe; era una inferencia nunca verificada. Esto es tarea de Juan,
-> no del Agente n8n.
->
-> **⚠️ Hallazgo sin confirmar, pendiente de Juan:** la tabla `qualitas_numeropruebawhatsapp`
-> (modelo `NumeroPruebaWhatsapp`, migración `0024`, ya presente en el commit desplegado en PROD
-> desde el 5 jun según Heroku) **no existe** en la BD accesible vía `DATABASE_URL` del Dashboard
-> (`information_schema.tables` sin resultados, confirmado 9 jul). Pero las `whatsapp_sessions` más
-> recientes (creadas hace minutos al momento de revisar) sí tienen `quotation_id` correcto — el
-> código que depende de esa tabla parece estar funcionando de todas formas, lo cual no cuadra si
-> la tabla de verdad no existe. Dos hipótesis sin descartar: (a) la migración 0024 nunca corrió en
-> PROD y este bloque de código lleva tiempo fallando silenciosamente sin afectar el envío del
-> mensaje inicial (el INSERT a `whatsapp_sessions` sí ocurre según los datos — inconsistente con
-> (a) salvo que haya otro camino de creación que no hemos encontrado); (b) el `DATABASE_URL` que
-> usa el Dashboard (y por tanto el Arquitecto) no apunta exactamente a la misma base que usa
-> `hyl-wai-production` hoy. **Pedir a Juan que confirme directo en Heroku
-> (`heroku run python manage.py showmigrations qualitas --app hyl-wai-production`) si la 0024 está
-> aplicada.**
+**✅ CORRECCIÓN (9 jul 2026):** Django **NO** dispara ningún webhook a n8n al crear el lead. Lo que realmente pasa: (a) Django genera el PDF de cotización; (b) manda el primer WhatsApp **directo vía Meta Graph API**, sin pasar por n8n; (c) hace un `INSERT INTO whatsapp_sessions` por SQL crudo — **ahí nace el prefijo 57 vs 52 del Bug #2**. Cronología completa, el hallazgo pendiente sobre la tabla `NumeroPruebaWhatsapp`, y la implicación para el Bug #11: `docs/bugs/bug-02-prefijo-57.md`.
 
 Aparte de esto, Django SÍ dispara **un webhook real** a n8n:
 1. **Al confirmar el pago** — n8n actualiza `conversation_phase = 'completed'` y envía mensaje WA al cliente (`enviar_webhook_whatsapp` en `qualitas/views.py`, hacia el workflow "Payment Confirmation")
@@ -133,7 +99,7 @@ Wagtail es un CMS construido sobre Django. **No son dos sistemas separados** —
 | Base de datos | Heroku Postgres (addon) | PostgreSQL | Compartida entre Django y n8n |
 | Dashboard | `aibanez82/Dashboard_seguroautoqualitas` | Next.js 14, Vercel | UI de leads en tiempo real |
 | Agente QA | `aibanez82/Agente_QATest_Qualitas` | Claude Code | Tests end-to-end |
-| Agente Mejoras Conv. | `aibanez82/Agente-MejorasConversacion` | Claude Code | Dos modos: (1) lee Postgres → analiza abandono por fase; (2) analiza capturas de pantalla de conversaciones WhatsApp → detecta problemas de tono/trato. Ambos generan informe Markdown con recomendaciones de copy/tono para el systemMessage de n8n — nunca modifica nada él mismo |
+| Agente Mejoras Conv. | `aibanez82/Agente-MejorasConversacion` | Claude Code | Analiza abandono y tono/trato, propone copy — nunca modifica nada él mismo. Protocolo: `docs/protocolos/agente-mejoras-conversacion.md` |
 | Agente n8n | `aibanez82/Agente-n8n` | Claude Code | Entiende workflows n8n, propone mejoras, modifica los JSON y sube a git — Alberto importa manualmente en n8n |
 | Arquitecto | `aibanez82/Agente-Arquitecto` | Este repo | Documentación transversal, workflows n8n, spec SOAP Quálitas |
 
@@ -189,25 +155,7 @@ n8n escribe a Postgres directamente (credencial `"Postgres account"` en el workf
 - `Update Activity` → UPDATE `whatsapp_sessions.last_activity`
 - `Postgres Chat Memory` → lee/escribe `n8n_chat_histories`
 
-**Segundo workflow — mensajes proactivos desde Dashboard:**
-
-```
-Webhook POST /webhook/proactive-wa-message
-  { phone_number, message, session_id }
-    ├── INSERT n8n_chat_histories
-    │     { type: "ai", content: message, tool_calls: [],
-    │       additional_kwargs: {}, response_metadata: {},
-    │       invalid_tool_calls: [] }
-    └── WhatsApp Business Cloud → Send message
-          phoneNumberId: 1028815256982638
-          credential: WhatsApp Send Message Hylant Account
-```
-
-**Reglas del workflow proactivo:**
-- Si el INSERT falla → el WhatsApp NO se envía (stop-on-error)
-- `phone_number` y `session_id` deben empezar con `52` (México)
-- Si `last_activity > 24h` en `whatsapp_sessions` → Meta puede rechazar el mensaje (ventana cerrada)
-- El mensaje se guarda como tipo `ai` para que Claude mantenga contexto en la siguiente respuesta del lead
+**Workflow proactivo (Dashboard → WhatsApp):** segundo workflow que recibe `POST /webhook/proactive-wa-message` del Dashboard, hace INSERT en `n8n_chat_histories` y envía el WhatsApp. Detalle completo (payload, reglas): `docs/protocolos/workflow-proactivo-dashboard.md`.
 
 ---
 
@@ -228,39 +176,29 @@ Webhook POST /webhook/proactive-wa-message
 
 ---
 
-## Bugs conocidos activos
+## Bugs — índice
 
-Ver `BUGS_N8N.md` para detalle completo con evidencia SQL.
+Detalle completo, evidencia y cronología: `docs/bugs/` (un archivo por bug, más `docs/bugs/INDEX.md` con el registro histórico completo).
 
-| # | Bug | Sistema | Criticidad |
-|---|---|---|---|
-| 1 | `n8n_chat_histories` vacío en ~76% de sesiones (medido 1 jul 2026: 154/203). Ojo: el historial existe casi solo cuando el humano responde (48/49) → gran parte del "vacío" es en realidad **leads que nunca respondieron**, no pérdida de datos. Afecta a la analítica, NO al motor de follow-up. **Precisión 7 jul:** `canal_atencion` distingue esto limpiamente — leads `LANDING` (399 de ~434) cierran 100% por la web sin tocar WhatsApp (`conversation_phase` siempre `greeting`, 0 mensajes n8n, datos en `qualitas_asegurado` vía formulario web); leads `WHATSAPP` (35) sí tienen conversación real de 29-48 mensajes. Detalle: `docs/2026-07-07-hallazgo-agente-dashboard-canal-landing-vs-whatsapp.md`. | n8n | 🟡 Medio |
-| 2 | Prefijo `57` (Colombia) en `session_id` en lugar de `52` (México) | Django | 🟠 Alto — **confirmado ACTIVO en vivo 7 jul:** sesión real `573107696237` cayendo en `qid=null / phase=fallback` en `n8n_chat_histories` (mensajes más recientes de toda la tabla al momento de revisar). **Hipótesis nueva:** esto probablemente explica el patrón `qid=null/phase=fallback` en general — si Django crea el `session_id` con el prefijo equivocado, el inbound real de Meta (con el prefijo correcto del cliente) nunca hace match contra la sesión/cotización guardada. Pendiente confirmar revisando `qualitas_cotizacion.telefono` de esa cotización vs. el prefijo real usado. Código fuente del bug: `qualitas/models.py`, lógica `NumeroPruebaWhatsapp.objects.filter(...).exists() → 57 si True, 52 si False` (ver también la nota sin resolver sobre si esa tabla existe en prod, `docs/2026-07-07-respuesta-agente-n8n-rate-limit-data-no-es-migracion.md`). |
-| 3 | TEST_EMAILS no filtrados en n8n — Meta cobra mensajes de prueba | n8n | 🟡 Medio |
-| 4 | 4 leads reales sin `whatsapp_session` (IDs: 837, 834, 810, 802) | n8n | 🟡 Medio |
-| 5 | `conversation_phase` siempre stuck en `greeting` | Django | 🟡 Medio |
-| 6 | ~~Regex placas rechaza 6 caracteres (`/^[A-Z0-9]{7}$/`) — Issue #2~~ | n8n | ✅ Resuelto — ver detalle abajo |
-| 7 | Django no escribe `estatus_pago = 'PAGADO'` al confirmar pago — solo dispara webhook a n8n | Django | 🟠 Alto |
-| 8 | ~~`_generar_bloque_492` no incluye teléfono celular en XML SOAP a Quálitas~~ | Django | ✅ Resuelto — ver detalle abajo |
-| 9 | `POST /api/emitir-externo/` devuelve HTTP 400 recurrente — la emisión de pólizas falla y Django se traga la causa (mensaje genérico, sin logging). Detectado 1 jul 2026. | Django | 🔴 Crítico |
-| 10 | AI Agent envía ciudad/estado en vez de VIN al llamar `Issue_Policy`. Detectado 2 jul 2026. Issue `aguayo-co/HYL-WAI` #83. | n8n | 🔴 **SIGUE ACTIVO EN PROD (evidencia 5 jul: 4 de las últimas 7 emisiones con ciudad en vez de VIN — `Gómez Palacio`/`Ciudad General Escobedo`/`Ciudad de México`/`Hidalgo`).** Fix construido pero SIN desplegar (vive en `stg`). **Hallazgo 5 jul: la rama `stg` NO está lista tal cual — conserva ~4 menciones "5-20 caracteres" junto a las VIN-17 → inconsistente con el gate Django (loop muerto). Falta reconciliar a "exactamente 17" (Capa 3a) antes de desplegar.** Handoff de despliegue en lockstep (n8n + Django juntos): `docs/2026-07-05-handoff-despliegue-bug10-vin.md`. **ES EL bloqueo #1 para escalar ventas el lunes.** **✅ LADO n8n LISTO (5 jul, verificado por Arquitecto contra git): rama `stg` reconciliada (commit `d370365` — 0 "5-20" reales, 8 "exactamente 17"); diff anti-divergencia PASA (prod no divergió del baseline, el PUT toca solo los 3 nodos del Bug#10: AI Agent, Issue Policy, Validate); script `Agente-n8n:scripts/deploy-bug10-prod.sh` (`5eaf351`, dry-run OK) que hace PUT→activate→verifica webhookId+name. Decisión Arquitecto: `docs/2026-07-05-decision-arquitecto-deploy-bug10.md`.** Pendiente para desbloquear: (1) Juan despliega gate Django `stg`→prod (mensaje: `docs/2026-07-05-mensaje-juan-deploy-validacion-vin.md`); (2) Alberto dispara `deploy-bug10-prod.sh --go` en lockstep + valida en prod (hola inbound + serie mala→re-pregunta 2-3×); (3) merge `stg`→`main` + re-export a `docs/n8n-workflows/`. **✅ RESUELTO EN PROD (confirmado 10 jul con tráfico real, no solo código) — desplegado 8 jul.** Checklist post-deploy cerrado por Agente n8n revisando las 64 ejecuciones reales desde el baseline (`docs/2026-07-10-reporte-cierre-bug10-vin-bug6-placas-prod.md` en `Agente-n8n`): (1) 2 "hola" inbound reales sin duplicar workflow (`2243`, `2267`); (2) serie inválida/ciudad → sin ocurrencia natural en 2 días de tráfico, ya validado en STG antes del deploy (colonia "Gómez Palacio" rechazada a nivel de prompt, 7 jul); (3) **VIN-17 válido → cliente real** (sesión `525541421628`, quotationId `2572`, Samuel Pesado, Mercedes-Benz A-200) — **verificado por el Arquitecto de forma independiente leyendo el `n8n_chat_histories` real de PROD, no solo confiando en el reporte**: el cliente escribió `Numero de serie WDDBF4DB7HJ553346` (17 caracteres), `Validate_Personal_Data` lo validó correctamente como `serie`, y `Issue_Policy` lo recibió bien formado — Quálitas lo rechazó con `"El número de serie ya está registrado con una póliza."`, un **rechazo de negocio (VIN duplicado)**, no de formato. Es la prueba más directa posible de que el fix funciona: antes del fix, el bug mandaba la ciudad/estado del domicilio en ese campo en vez del VIN. (4) Backstop Django `400 invalid_vehicle_serie`: sin ocurrencia natural, ya validado en STG, no bloqueante. **2 de 4 ítems con evidencia de cliente real, los otros 2 sin ocurrencia natural pero pre-validados en STG — no bloqueantes.** Deja de ser el bloqueo #1 para escalar ventas. |
-| 11 | Sesiones pegadas a la 1ª cotización al recotizar — leads reales caen fuera del funnel WhatsApp. Detectado 4 jul 2026 por el Dashboard agent (9/9 verificado: 46 enviados, solo 37 en funnel). | n8n | 🟠 Alto — **registrado, en pausa (Alberto lo piensa).** Ver detalle abajo. |
-| 12 | Inbound Meta→n8n caído: los mensajes ENTRANTES de WhatsApp no se guardan en `n8n_chat_histories`. **Confirmado en vivo por API n8n (5 jul):** bot `BtOaZm7WlZT-24V7hqCnF` está `active:true` con trigger OK, pero la última ejecución webhook fue id `2059 @ 2026-07-03T22:38:53 UTC` — cero desde entonces. NO es desactivación ni error interno → **Meta dejó de entregar al webhook**. **Causa raíz identificada (escaneo API 5 jul): 4 workflows comparten el mismo `webhookId 18c1b498`** (producción `BtOaZm7...` activo + 3 duplicados `_STG`/copy inactivos). Al activar→desactivar un duplicado, n8n des-registra la ruta compartida y deja producción huérfana (`active:true` sin webhook). Corroborado: la copia `CPcP1...` recibió webhooks reales de Meta el 01–02 jul. **Fix durable = borrar/regenerar el webhookId de los 3 duplicados**, ningún staging debe compartir el de prod. Dashboard lo detectó: 0/48 captura vs ~30% baseline, último `n8n_chat_histories.id 4693` (lead 1045). Leads afectados ~1046–1103 (rescate). **2º apagón silencioso en una semana** (cf. Issue #74). **✅ INGESTA REACTIVADA (5 jul 20:09 UTC) por el Arquitecto vía API: desactivar→activar `BtOaZm7...` re-registró la ruta; confirmado E2E con "hola" → ejecución nueva id `2060` success (tras la 2059 del corte). Token Meta OK.** **✅ CONSOLIDACIÓN EJECUTADA (5 jul ~20:11 UTC): 12 duplicados borrados vía API; instancia = solo los 3 workflows de prod, todos activos → colisión de webhookId eliminada, no puede recaer por esta vía.** Pendiente: (1) alerta de inbound caído; (2) **rescate leads 1046–1103 — PLAN LISTO** (58 leads/49 tel únicos, 15 dentro de ventana 24h Meta + 34 fuera→requieren plantilla, solo 1 ya re-enganchó; `docs/2026-07-05-rescate-leads-1046-1103.md`); (3) re-exportar los 3 de prod a `docs/n8n-workflows/`; (4) NO borrar rama `stg` de git hasta mergear Bug #10. Ver `docs/2026-07-05-consolidacion-workflows-n8n.md`. | n8n | ✅ **Resuelto — cerrado por decisión de Alberto (10 jul), sin retomar alerta ni rescate de leads.** Servicio restaurado y fix estructural (webhookId consolidado) ya hechos; los pendientes de alerta y rescate de leads 1046-1103 se descartan deliberadamente, no son un olvido. Ver `docs/2026-07-05-handoff-n8n-bug12-inbound-caido.md`. |
-| 13 | Follow-up de cotización (Django, 15 min) puede enviar al cliente el precio de una **forma de pago distinta** a la que eligió en la conversación. Detectado por el Agente Conversaciones (caso `2026-07-07-caso-001`): Tsuru 2012, Cobertura Amplia, **Pago Mensual** cotizado en conversación a $8,666.78 MXN (10:45); seguimiento ~24h después ofrece "$8,050.33 MXN" — diferencia ~$616 (~7%), coincide casi exacto con el "Recargo por forma de pago fraccionada" que documenta Quálitas (`docs/qualitas-api/AnalisisDeEsquemaDeSistemasUsuarios.md`) → **no es una tarifa que varió, son dos productos de pago distintos** (mensual-con-recargo vs. anual-contado-sin-recargo). **Causa raíz:** la forma de pago que el cliente elige en la conversación de WhatsApp vive solo en el contexto del AI Agent (n8n) — no hay evidencia de que se escriba a `qualitas_cotizacion.forma_pago` en Postgres antes de `issue_policy`. El follow-up de 15 min (`qualitas/whatsapp_followups.py` → `resolver_opcion_cotizacion_whatsapp` en `qualitas/quote_helpers.py`, repo `aguayo-co/HYL-WAI`) lee `forma_pago` de la BD; si está vacío (cliente no llegó a confirmar/emitir), cae a un default conservador "C" (anual contado) y renderiza el monto real de ESA opción — correcto en sí mismo, pero no corresponde al plan que el bot ya le había cotizado verbalmente al cliente. **Hallazgo secundario:** el timing observado (~24h, no los 15 min default) coincide con `WHATSAPP_FOLLOWUP_MAX_CANDIDATE_AGE_MINUTES` (default 1440 min) — el candidato pudo haber quedado en cola casi hasta expirar, posible relación con la fiabilidad del scheduler de follow-up (Issue #74). **Para confirmar con certeza:** consultar `qualitas_cotizacion.forma_pago` de esa cotización al momento del follow-up, y `metadata.rule_key`/`template_name` del `WhatsappMessage` de seguimiento. **Candidatos de fix:** (a) persistir `forma_pago` en cuanto el cliente la elige en conversación, no solo al emitir; (b) que el follow-up se omita si `forma_pago` no está confirmada en BD, en vez de asumir un default; (c) que el mensaje de seguimiento aclare explícitamente a qué plan de pago corresponde el monto mostrado. Investigado por fork del Arquitecto 7 jul (no se leyó BD en vivo, solo código). | Django + n8n | 🟠 Alto — mensaje real pero de otro plan puede erosionar la confianza del cliente en la cotización |
-| 14 | El AI Agent a veces responde con el mensaje de "fuera de alcance" (`"Solo puedo ayudarte con la contratación de tu póliza de auto. ¿Seguimos con la contratación?"`, de la SECURITY RULE #4 del systemMessage) ante mensajes que SÍ están en alcance, con `qid` **válido** — matando conversaciones reales. **4 casos confirmados en producción (7 jul), todos con cotización real vinculada:** (a) lead 753/cotización 2205 (BK Encore 2019): *"Solo quería cotizar porque el seguro que tengo se vence en un mes"* → deflect → cliente *"Por ahora no gracias"* → perdido; (b) cotización 2258 (BYD Song Pro 2026): *"...si me pueden ayudar con un descuento adicional"* → deflect, pero el cliente insistió con "Si" y el bot se recuperó y sí mostró la cotización — no siempre se pierde el lead; (c) **cotización 2492 (Renault Duster 2020) — el caso más contundente:** cliente pregunta *"Si te mando los datos por aquí me podrías dar una cotización?"*, el bot llama `Get_Quotation_Data`, **la tool call devuelve los datos reales del vehículo exitosamente**, y AÚN ASÍ el turno siguiente responde con el deflect en vez de usar esos datos — cliente *"No, gracias"* → `[phase:completed]`, lead cerrado y perdido. Esto descarta que sea solo un problema de clasificación de intención previa a la tool call: **el modelo a veces ignora un resultado de tool call válido y cae al fallback de seguridad de todas formas** — apunta a inconsistencia del modelo en la síntesis post-tool-call, no (solo) al Intent Router. (d) Reproducido también en vivo por Alberto durante la validación E2E del Bug #10 en staging: tras el resumen de póliza (Honda Accord 2026), un simple "sí" disparó el mismo mensaje en loop, bloqueando la Prueba B de esa validación. **Hipótesis sin confirmar:** las SECURITY RULES (máxima prioridad, con esa frase textual) compiten con las instrucciones de fase/post-tool-call más abajo en el prompt; podría ser inconsistencia de temperatura del modelo más que un patrón de input determinista. **Pendiente:** pedir al Agente n8n el contenido exacto (CTX + fase autoreportada) de los turnos alrededor del loop en staging; medir frecuencia real en prod (cuántas cotizaciones con `qid` válido terminan con este mensaje) para dimensionar el impacto total, no solo los 4 casos encontrados al azar. **Distinto del Bug #2:** todos estos casos tienen `qid` válido (no es el patrón `qid=null/fallback` de sesiones sin match). Handoff al Agente n8n (medir alcance + proponer fix de prompt + probar en staging antes de prod): `docs/2026-07-07-handoff-agente-n8n-bug14-deflect-fuera-de-alcance.md`. | n8n | 🔴 Crítico — bloquea conversiones reales confirmadas y bloquea la validación E2E del Bug #10 |
-| 15 | **✅ CONFIRMADO (7 jul), y RECONFIRMADO SISTEMÁTICO (8 jul) — Meta entrega el mismo mensaje del número de WhatsApp de test dos veces: al webhook de staging Y al de producción.** Prueba definitiva del Agente n8n (7 jul): para 3 pares de ejecuciones (prod ids 2171/2172/2177 ↔ staging ids 27/28/33, ambas `mode=webhook`), el **`wamid`** (id único que Meta asigna por mensaje — no algo que n8n calcule) es **idéntico** en ambas ejecuciones, y el `phone_number_id` del payload es el de **staging** (`1154577517746231`) aunque llegó al webhook de producción. **8 jul, el Arquitecto lo reconfirma en vivo y descarta las 4 capas de configuración que podían explicarlo:** (1) `subscribed_apps` de la WABA de staging → solo `hyl-wai-stg`, limpio; (2) acceso de activos de Business Manager, probado con un System User token generado por Juan y scopeado **solo** a la WABA de PROD (`Quálitas by Aguayo`, permiso "Números de teléfono - solo ver") → **no puede leer** el número de staging (`GET /1154577517746231` → 400 missing permissions), incluso con el control positivo confirmando que el token sí lee la propia WABA de PROD sin problema; (3) webhook a nivel App de `Aguayo IA` (PROD) → apunta correctamente a su propio n8n (`n8n.srv1325340.../webhook/18c1b498...`); (4) webhook a nivel App de `hyl-wai-stg` → apunta correctamente al suyo (`n8n-xlqk.srv1810257.../webhook/19640449...`). **Las 4 capas están limpias y aun así el cruce sigue ocurriendo** — confirmado de nuevo con wamid idéntico entre `STG exec 40` y `PROD exec 2210` (mismo `from`, mismo `phone_number_id` de staging, mismo `body:"Si"`), y el patrón es **sistemático**: comparando timestamps de inicio de ejecución en ambas instancias, cada mensaje a staging dispara una ejecución en PROD dentro de ~60-90ms, para múltiples mensajes, no solo el de la prueba de hoy. **Un hallazgo intermedio que en principio apuntaba a la causa (`+1 737-732-3515` seguía apareciendo en el "Configuración de la API" quickstart del App Dashboard de `Aguayo IA`) resultó ser un artefacto de la UI de Meta** — el "Activos conectados" real de esa App está vacío, y el propio `subscribed_apps`/acceso de Business Manager, ya probados, dicen que no debería tener visibilidad. **Mecanismo real aún sin determinar** — probablemente algo a nivel Meta que ninguna de estas 4 APIs/pantallas expone (posible comportamiento de plataforma/bug, no una config nuestra mal puesta). **Mitigación preparada, retenida por Alberto — NO entregada aún al Agente n8n:** guard `IF` en el workflow de PROD justo después de `WhatsApp Message Trigger` que ignora cualquier mensaje cuyo `phone_number_id` no sea el real de PROD (`1028815256982638`), antes de tocar `Session Context Builder`/Postgres/AI Agent. Handoff completo (retenido, copia canónica aquí): `docs/2026-07-08-handoff-agente-n8n-bug15-filtro-phone-number-id-prod.md`. **Impacto confirmado, contenido:** escribió ruido de conversación en `n8n_chat_histories`/`whatsapp_sessions` de PROD real; `Issue_Policy` nunca se ejecutó en prod (quotation_id de prueba no existe ahí) → **0 pólizas ni llamadas a Quálitas de producción disparadas**. Afecta también a un segundo número de prueba (Juan, `573107696237`, prefijo `57` = coincide con Bug #2). **No se tocó ni borró nada de prod** — sesión `525551074144` queda como evidencia. **Bloquea toda prueba nueva de staging hasta que Juan lo corrija o se active la mitigación.** Mensaje enviado a Juan con la evidencia original: `docs/2026-07-07-mensaje-juan-numero-test-comparte-webhook-prod.md`. Pendiente: escalar a soporte de Meta Business con la evidencia del 8 jul. **ACTUALIZACIÓN 9 jul — Juan dio de alta un número de staging nuevo** (en vez de escalar a soporte Meta, o mientras eso avanza): `+52 1 56 4040 5919` / `phoneNumberId 1295913556933337`, dentro del **mismo WABA** (`27763806206640265`) y la **misma Meta App** (`hyl-wai-stg`, `app_id 4539428293006817`) — confirmado por Alberto con 3 checks directos contra la Graph API (número aparece en `GET /{WABA}/phone_numbers`; `debug_token` del `STG_WA_ACCESS_TOKEN` resuelve al mismo `app_id`; `GET /{WABA}/subscribed_apps` solo lista `hyl-wai-stg`, ninguna App nueva). Al ser el mismo WABA/App/token, las credenciales n8n (`WhatsApp Trigger STG` OAuth2, `WhatsApp Send STG`) **no cambiaron** — solo hacía falta actualizar el `phoneNumberId` hardcodeado. Ejecutado y verificado en vivo por el Arquitecto (9 jul): (1) Heroku `hyl-wai-stg` → `WHATSAPP_PHONE_NUMBER_ID=1295913556933337` y `WHATSAPP_AGENTE=5215640405919` ya aplicados; (2) los 3 nodos `Send message` de los workflows de staging (`WhatsApp Insurance Quotation Bot_stg`, `Payment Confirmation_stg`, `Retomar Conversacion_stg`) ya apuntan a `1295913556933337` — el bot principal traía pegado el placeholder de PROD (`1028815256982638`) desde el import del 6 jul, nunca corregido; los otros dos traían el número viejo de staging (`1154577517746231`). **Esto NO es un fix confirmado del mecanismo del Bug #15** (la causa raíz en la plataforma de Meta sigue sin determinarse) — es un cambio de número dentro de la misma infraestructura, que puede o no romper el cruce. **Pendiente: validar con un envío E2E real que el cruce hacia el webhook de PROD ya no ocurre con el número nuevo** antes de dar el bug por cerrado; si el cruce persiste con este número también, refuerza que es un comportamiento de plataforma de Meta (no algo ligado al número específico) y habría que activar la mitigación retenida (`docs/2026-07-08-handoff-agente-n8n-bug15-filtro-phone-number-id-prod.md`). **ACTUALIZACIÓN 10 jul — el número del 9 jul tampoco bastó; Juan dio de alta un WABA genuinamente nuevo (tercer cambio de `phone_number_id` de STG):** `1295913556933337` → `1259868760534397` (`+52 1 56 3030 5518`). A diferencia del cambio anterior, esta vez el WABA viejo (`27763806206640265`) dejó de ser visible con `STG_WA_ACCESS_TOKEN` — señal de que el número nuevo vive en un **WABA distinto de verdad**. Confirmado por Alberto y verificado en vivo por API (trabajo hecho en el repo `Agente-n8n`, commit `89812a6`): WABA nuevo = **`1545609890436326`** (`name: "STG Hylant Qualitas Tel Mexico"` — ya no comparte naming con prod), `GET /phone_numbers` de ese WABA solo lista el número nuevo, `subscribed_apps` solo tiene `hyl-wai-stg`. `AppID`/`App Secret` sin cambios. Los 3 nodos `Send message` de STG se refactorizaron para leer el `phoneNumberId` desde un nodo `WA Config STG` centralizado (`waPhoneNumberId = "1259868760534397"`, confirmado en vivo por el Arquitecto) en vez de tenerlo hardcodeado 3 veces — evita que se repita el error del 9 jul (nodo que quedó desactualizado).
-
-**✅ BUG #15 RESUELTO (10 jul) — confirmado con prueba E2E real, no solo config limpia por API.** Alberto mandó mensajes reales al número nuevo de STG; el Arquitecto verificó de forma independiente contra ambas instancias de n8n: STG registró 5 ejecuciones reales entre 16:40:53 y 16:41:55 UTC (`mode=webhook`, `success`); PROD no registró NINGUNA ejecución en ni después de esa ventana — su última ejecución fue a las 16:25:37 UTC, **15+ minutos antes** de la prueba, sin relación. Primera vez que un cambio de infraestructura de Meta rompe el cruce de verdad (los 2 intentos anteriores — nuevo número en el mismo WABA, y las 4 capas de config revisadas el 8 jul — no lo lograron). La causa raíz exacta del lado de Meta sigue sin determinarse con certeza (WABA compartido parece ser el factor, aunque no se confirmó el mecanismo interno), pero el síntoma está resuelto de forma verificable. La mitigación retenida (guard `IF` de `phone_number_id` en PROD) queda disponible como respaldo si reaparece, pero no fue necesario activarla. **Falso positivo a descartar (10 jul, hallazgo de Agente n8n):** la ejecución `2278` de PROD (`2026-07-10T02:12:35Z`) tiene `phone_number_id` correcto de PROD (`1028815256982638`) pero remitente `5215551074144` — el teléfono personal de Alberto, que también usa como identidad de prueba en STG. **No es un cruce de Meta** — es tráfico legítimo directo al número real de PROD desde ese mismo teléfono. Anotado para no confundirlo con el patrón del Bug #15 en una futura auditoría (la señal real del bug era `phone_number_id` de STG llegando a PROD, no un remitente de STG usando su teléfono para escribirle directo a PROD). | Meta Business Manager | ✅ Resuelto (10 jul) — confirmado con prueba E2E real + verificación independiente del Arquitecto contra ejecuciones de ambas instancias |
-| 16 | **`WEBHOOK_URL` y `N8N_TOKEN` de `hyl-wai-stg` son IDÉNTICOS a los de `hyl-wai-production`** (verificado 7 jul vía Heroku Platform API, ambas apps): `WEBHOOK_URL=https://n8n.srv1325340.hstgr.cloud/webhook/payment-confirmation` (n8n de PROD) en las dos apps; `N8N_TOKEN` con el mismo valor (64 chars) en las dos. Es el riesgo que ya se había marcado el 6 jul ("🔴 DEBE apuntar a la instancia n8n de staging") y nunca se corrigió. **Consecuencia:** si algo dispara el webhook de confirmación de pago desde `hyl-wai-stg` (p. ej. la prueba con `curl` planeada para la Fase 3 del runbook de staging), pega contra el workflow de Payment Confirmation de **producción**, con token válido. **Mitigante actual:** ese workflow todavía NO está importado a la instancia de staging (solo se importó el bot principal) — nadie puede disparar esto sin querer simular un pago a propósito, hoy. **Contraste positivo:** `WHATSAPP_ACCESS_TOKEN`/`WHATSAPP_PHONE_NUMBER_ID` (el envío directo de Django vía Meta Graph API para la cotización inicial) SÍ están correctamente aislados — son distintos en cada app. Solo el webhook Django→n8n de pago comparte credenciales. **✅ CORREGIDO (7 jul, con aprobación de Alberto):** `hyl-wai-stg` actualizado vía Heroku API — `WEBHOOK_URL` → `https://n8n-xlqk.srv1810257.hstgr.cloud/webhook/payment-confirmation` (host de staging); `N8N_TOKEN` → token nuevo de 64 chars, aleatorio, distinto al de prod (guardado en `Agente-Arquitecto/.env.local` como `STG_N8N_TOKEN`, gitignored). Confirmado con una consulta `GET` posterior — persistido correctamente. **Pendiente:** cuando se importe el workflow de Payment Confirmation a staging, crear ahí la credencial `httpHeaderAuth` ("Header Auth STG") usando el mismo valor de `STG_N8N_TOKEN` para que el webhook de Django haga match. | Django (Heroku) | ✅ Resuelto — mismo patrón que el Bug #15 pero en la dirección Django→n8n |
-| 17 | **El botón "Tomar conversación" del Dashboard en STG dispara un WhatsApp real por el número de negocio de PROD.** Detectado y confirmado por el agente del Dashboard (10 jul): al escopear `DATABASE_URL` a la rama `stg` en Vercel (`--git-branch`) para que el Preview de STG lea/escriba contra `hyl-wai-stg`, quedó sin escopear la otra vía de efecto secundario real del dashboard — el endpoint `pages/api/n8n-proactive-message.js`, que llama a `N8N_PROACTIVE_WEBHOOK_URL` (n8n) para que el bot mande un WhatsApp real al lead. Esa variable (y `PROACTIVE_MESSAGE_PASSWORD`) **nunca tuvo override por rama** — `vercel env ls` solo muestra un valor "Preview" genérico de hace 11 días, de antes de que existiera STG, que casi seguro apunta al mismo webhook de n8n que usa PROD. **Confirmado con tráfico real:** Alberto probó el botón en el Preview de STG contra el teléfono de prueba `5551074144`; los 3 mensajes enviados aparecieron acto seguido en `n8n_chat_histories` de la base de **PROD** (`session_id 525551074144`), procesados como entrantes reales por el bot de producción — no fue una simulación aislada de STG. Por suerte el teléfono usado es de prueba del equipo; de haber sido un lead real habría recibido un WhatsApp genuino sin que nada en el dashboard lo distinguiera de un envío legítimo. **Mismo patrón exacto que el Bug #16** (Django→n8n Payment Confirmation compartiendo credenciales STG/PROD), ahora en la dirección Dashboard→n8n. Reporte original: `Dashboard_SeguroAuto/docs/2026-07-10-mensaje-arquitecto-webhook-proactivo-stg-envia-prod.md`. **Plan (Arquitecto, 10 jul):** (1) mitigación inmediata — Dashboard bloquea el endpoint cuando `process.env.VERCEL_ENV !== 'production'` (ya ofrecida por el propio agente del Dashboard, aprobada; **✅ desplegado, commit `b08bc4d` en rama `stg`, 20:55 — corrección: el commit `7725850` citado antes era solo la respuesta en docs, no el fix de código; verificado directo en `pages/api/n8n-proactive-message.js`**); (2) fix durable — handoff enviado a Agente n8n (`Agente-n8n/handoffs/2026-07-10-handoff-agente-n8n-bug17-workflow-proactivo-stg.md`) pidiendo el workflow gemelo aislado en STG. **✅ Resulta que ya existía — el workflow `Retomar Conversacion_stg` (id `nYRaRzU83qDLuEWI`, activo, construido el 8 jul por el Agente n8n, antes de este handoff) ES el proactivo y ya cumple el checklist completo:** credencial `Postgres STG`, `WA Config STG` con `waPhoneNumberId="1259868760534397"` (el vigente tras el 3er cambio de número del Bug #15), `webhookId` propio `9d95ce27-...` (no compartido con prod), INSERT a `n8n_chat_histories` con la forma de JSON esperada. URL: `https://n8n-xlqk.srv1810257.hstgr.cloud/webhook/proactive-wa-message`. **Reportado por Alberto/Agente n8n, pendiente de que el Arquitecto lo re-verifique de forma independiente contra la API de STG** (sin `N8N_STG_API_KEY` disponible en esta laptop en este momento — ver `project_arquitecto_access_setup`, credenciales no persisten entre máquinas todavía). (3) Único paso que falta — asignado al **Agente Dashboard** (es quien tiene el proyecto Vercel enlazado, `.vercel/project.json` en su repo, no el Arquitecto): escopear `N8N_PROACTIVE_WEBHOOK_URL` a esa URL y `PROACTIVE_MESSAGE_PASSWORD` (cualquier valor, es un secreto interno del Dashboard, no lo valida n8n) a la rama `stg` en Vercel vía `vercel env add ... preview --git-branch=stg` (mismo patrón usado para `DATABASE_URL`). Handoff actualizado: `Dashboard_seguroautoqualitas/docs/2026-07-10-respuesta-arquitecto-bug17-webhook-proactivo-stg.md` (commit `796d0d0`, rama `stg`). **✅ Paso 3 completado** (`N8N_PROACTIVE_WEBHOOK_URL`/`PROACTIVE_MESSAGE_PASSWORD` escopeadas a `stg`, confirmado por `vercel env ls`). **✅ BUG #17 CERRADO (10 jul).** Cierre final tras un hallazgo adicional: al probar el botón en STG con las 3 defensas ya activas, Alberto y el Agente Dashboard descubrieron que convivían **dos identidades "STG" en Vercel** — rama `stg` y rama vieja `feat/n8n-real-timestamps-stg` (usada para validar el issue #87 el 9 jul), cada una con su propio override de `DATABASE_URL`, y la URL de deploy que Alberto tenía guardada de `feat/n8n-real-timestamps-stg` estaba además **congelada** (snapshot de env vars de antes del escopeo). El Agente Dashboard propuso consolidar a una sola identidad (`docs/2026-07-10-propuesta-agente-dashboard-consolidar-stg.md`); el Arquitecto revisó la propuesta, verificó en vivo (`git merge-base`, `vercel env ls`) que dos de sus tres afirmaciones eran imprecisas, y pidió invertir el orden — confirmar primero si ambas ramas apuntaban a la misma base física antes de borrar nada (`docs/2026-07-10-respuesta-arquitecto-propuesta-consolidar-stg.md`). **Confirmado por comparación de host/puerto/nombre de base (Heroku dashboard vs. endpoint temporal en Vercel): mismo cluster Aurora, mismo nombre de base `dei0jssp8kr5kv` — sin riesgo de pérdida de datos.** El lead 299 que parecía "faltar" en `stg` en realidad sí estaba, solo caía en la pestaña "Test" del dashboard. Ejecutado por el Agente Dashboard: rama `feat/n8n-real-timestamps-stg` y su `DATABASE_URL` override borrados (confirmado por el Arquitecto vía `git fetch --prune` + `vercel env ls`); su único commit propio era byte-idéntico a uno ya presente en `stg`, sin pérdida de código. **Estado final:** una sola rama STG (`stg`), una sola base (`hyl-wai-stg`), una sola URL fija (alias de git-branch, no una URL de deploy suelta que se congela) — `https://dashboard-seguroautoqualitas-git-stg-albers-projects-52295059.vercel.app`. Pendiente aparte no bloqueante: merge `stg`→`main` sigue sin hacerse.
-
-**⚠️ Reapertura y cierre definitivo (10 jul, misma noche) — hallazgo operativo importante:** tras dar el bug por cerrado, se reprodujo una vez más. Causa: **borrar la rama de GitHub y quitar el `DATABASE_URL`/env vars de Vercel NO borra un deployment ya construido.** La URL vieja congelada del 2026-07-09 (`...-ezmyflosl-...vercel.app`, snapshot de antes del guard `VERCEL_ENV`) seguía viva y respondiendo con el código/env de ese día — Alberto probó "Tomar conversación" ahí y **le llegó un WhatsApp real a su propio teléfono desde el número de negocio de PROD** (confirmado en persona, no por logs). Sin impacto a un lead real (fue al propio teléfono de Alberto), pero confirma que el riesgo del bug era completamente real, no solo teórico. **Fix:** `vercel rm` sobre esa URL específica — deployment eliminado, **verificado por el Arquitecto con `curl` directo → 404**, y `vercel ls` sin deployments viejos de esa rama. **Lección para cualquier retiro futuro de rama/entorno: borrar rama + env var no basta — hay que borrar también los deployments ya construidos (`vercel rm <url>`), o confirmar con `vercel ls` que no queda ninguno vivo con config vieja.** Además, el guard `VERCEL_ENV` original (`b08bc4d`) bloqueaba TODO lo que no fuera Production — lo cual impedía probar el propio flujo ya arreglado en `stg`; se afinó (commit `6fb4bee`, verificado por el Arquitecto en el código) para permitir específicamente `Production` + el Preview de la rama `stg` (`VERCEL_GIT_COMMIT_REF === 'stg'`), bloqueando cualquier otra rama por defecto. **✅ Cierre final verificado E2E por Alberto (no solo por inspección de config):** probó "Tomar conversación" en la URL fija de `stg`, el lead aparece correcto desde la base consolidada `hyl-wai-stg`, y el mensaje llegó por el **número de WhatsApp de STG**, no el de PROD. | Dashboard (Vercel) | ✅ Resuelto (10 jul) — cerrado con verificación E2E real + verificación independiente del Arquitecto en cada paso (git, `vercel env ls`, `vercel ls`, `curl` a la URL retirada) |
-
-**Detalle Bug #6 (regex placas — RESUELTO 9 jul):**
-- Detectado de forma convergente por dos vías independientes: (a) handoff del Arquitecto a Agente n8n del 8 jul (`docs/2026-07-08-handoff-agente-n8n-bug6-regex-placas-6-7-caracteres.md`); (b) Agente Mejoras Conversación lo identificó por separado como "M13" (`Agente-MejorasConversacion/informes/parches/M13-validador-placas.md`) y confirmó un caso real en producción el mismo 9 jul (`informes/correcciones/2026-07-09-caso-004.md`): placa válida `96F841` (6 caracteres) rechazada, bloqueando al lead.
-- Nodo `Validate Personal Data` (`@n8n/n8n-nodes-langchain.toolCode`), campo `jsCode`: `const placasRegex = /^[A-Z0-9]{7}$/;` → `/^[A-Z0-9]{6,7}$/`. México usa formatos válidos de 6 y 7 caracteres.
-- Verificado que Django no tiene validación propia de formato de placas (grep exhaustivo sobre `aguayo-co/HYL-WAI`, cero resultados) — no hay segunda capa que reconciliar, a diferencia del Bug #10 con la serie/VIN.
-- Aplicado por Agente n8n: commit `d3e9307` (rama `stg`, repo `Agente-n8n`) — confirmado en vivo por el Arquitecto contra la instancia de n8n de STG (`placasRegex = /^[A-Z0-9]{6,7}$/` en el JSON real). Desplegado a **PRODUCCIÓN** el 9 jul, según reporte de Agente n8n (PUT→200, activate→200, `webhookId` sin cambios `18c1b498-...`, 62 nodos, `AI Agent.systemMessage` actualizado a "6-7 caracteres" en sus 2 menciones, `Phone Number ID Guard` del Bug #15 intacto). **✅ Verificado de forma independiente por el Arquitecto el 10 jul, en vivo contra la API de PROD** (Alberto compartió el `N8N_API_KEY` de producción): los 5 puntos del reporte coinciden exactos — regex, ambas menciones del prompt, guard con su condición `phone_number_id == 1028815256982638` sin tocar, mismo `webhookId`, 62 nodos.
+| # | Bug | Sistema | Estado | Detalle |
+|---|---|---|---|---|
+| 1 | Historiales vacíos ~76% de sesiones (mayoría = leads que nunca respondieron) | n8n | 🟡 Activo | `docs/bugs/bug-01-historiales-vacios.md` |
+| 2 | Prefijo `57` (Colombia) en `session_id` en vez de `52` (México) — nace en Django, `qualitas/models.py` | Django | 🟠 Alto — activo | `docs/bugs/bug-02-prefijo-57.md` |
+| 3 | TEST_EMAILS no filtrados en n8n — Meta cobra mensajes de prueba | n8n | 🟡 Medio | `docs/bugs/bug-03-test-emails.md` |
+| 4 | 4 leads reales sin `whatsapp_session` (IDs: 837, 834, 810, 802) | n8n | 🟡 Medio | `docs/bugs/bug-04-leads-sin-session.md` |
+| 5 | `conversation_phase` siempre stuck en `greeting` | Django | 🟡 Medio | `docs/bugs/bug-05-conversation-phase-stuck.md` |
+| 6 | Regex placas rechazaba 6 caracteres | n8n | ✅ Resuelto (9 jul, verificado en prod 10 jul) | `docs/bugs/bug-06-regex-placas.md` |
+| 7 | Django no escribe `estatus_pago='PAGADO'` al confirmar pago | Django | 🟠 Alto — workaround activo en Dashboard (ver abajo) | `docs/bugs/bug-07-estatus-pago.md` |
+| 8 | `_generar_bloque_492` no incluía teléfono celular en XML SOAP | Django | ✅ Resuelto (verificado 10 jul) | `docs/bugs/bug-08-telefono-soap.md` |
+| 9 | `POST /api/emitir-externo/` devuelve HTTP 400 recurrente sin causa logueada | Django | 🔴 Crítico | `docs/bugs/bug-09-emision-400.md` |
+| 10 | AI Agent enviaba ciudad/estado en vez de VIN en `Issue_Policy` | n8n | ✅ Resuelto en prod (10 jul, confirmado con tráfico real) | `docs/bugs/bug-10-vin-issue-policy.md` |
+| 11 | Sesión pegada a la 1ª cotización al recotizar — lead cae del funnel WhatsApp | n8n | 🟠 Alto — registrado, en pausa (Alberto lo piensa) | `docs/bugs/bug-11-recotizar-session.md` |
+| 12 | Inbound Meta→n8n caído por `webhookId` compartido entre workflows | n8n | ✅ Resuelto — cerrado por decisión de Alberto (10 jul) | `docs/bugs/bug-12-inbound-caido.md` |
+| 13 | Follow-up de cotización puede enviar el precio de otra forma de pago | Django + n8n | 🟠 Alto | `docs/bugs/bug-13-forma-pago-followup.md` |
+| 14 | Deflect "fuera de alcance" mata conversaciones reales con `qid` válido | n8n | 🔴 Crítico | `docs/bugs/bug-14-deflect-fuera-de-alcance.md` |
+| 15 | Meta entregaba mensajes del número de test también al webhook de PROD | Meta Business Manager | ✅ Resuelto (10 jul) | `docs/bugs/bug-15-meta-cruce-stg-prod.md` |
+| 16 | `WEBHOOK_URL`/`N8N_TOKEN` de staging eran idénticos a los de producción | Django (Heroku) | ✅ Resuelto (7 jul) | `docs/bugs/bug-16-webhook-credenciales-compartidas.md` |
+| 17 | Botón "Tomar conversación" del Dashboard en STG disparaba WhatsApp real por PROD | Dashboard (Vercel) | ✅ Resuelto (10 jul) | `docs/bugs/bug-17-webhook-proactivo-stg.md` |
 
 **Workaround activo para Bug #7 en Dashboard:**
 ```js
@@ -270,277 +208,25 @@ d.estatus_pago === 'PAGADO' ||
 ```
 `conversation_phase = 'completed'` lo setea n8n al recibir confirmación verificada de la pasarela de pago — no es auto-declaración del usuario. El guard `numero_poliza != null` evita falsos positivos.
 
-**Detalle Bug #8 (RESUELTO — verificado 10 jul):**
-- Trazabilidad original: el dato llegaba correctamente hasta `_generar_bloque_492` en `qualitas/services.py` pero el método no llamaba a `d.get('telefono')` — campo nunca se añadía al XML.
-- **Fix aplicado por Juan** (commit `eaa48bb`, "fix: enviar celular del asegurado a qualitas", 2 jul): `_generar_bloque_492` ahora normaliza el teléfono (`telefono_digitos`, quita prefijo `52`/`521` si viene con 12-13 dígitos) y agrega `<ConsideracionesAdicionalesDA NoConsideracion="40"><TipoRegla>86</TipoRegla><ValorRegla>{telefono_digitos}</ValorRegla></ConsideracionesAdicionalesDA>` cuando el resultado son exactamente 10 dígitos.
-- **Verificado por el Arquitecto (10 jul):** commit confirmado ancestro directo de lo desplegado en producción ahora mismo (`65e313d`, release Heroku 313 del 10 jul) — el fix lleva más de una semana en vivo. Issue `aguayo-co/HYL-WAI#70` cerrado el mismo 2 jul.
-
-**Detalle Bug #9 (emisión 400):**
-- El nodo `Issue Policy` en n8n hace `POST https://seguroautoqualitas.com/api/emitir-externo/` (endpoint de Django, no Quálitas directo).
-- Django responde `400 {"status":"error","msg":"Experimentamos intermitencias…"}` — mensaje enlatado genérico.
-- Buscando por `request_id` en Papertrail **no hay más líneas**: la vista no loguea el fault real ni el campo que falla. `service=708ms` sugiere rechazo en validación de Django, no caída de Quálitas.
-- El error **no se guarda en BD** (`qualitas_cotizacionrespuestaxml` es de cotización, no de emisión; `qualitas_leadactionevent` no registra fallos de emisión).
-- Probablemente **no** es el Bug #8 (teléfono ausente daría emisión con campo vacío, no 400).
-- Pista para Juan: `QUALITAS_AMBIENTE_FLAG = 0` (verificar si es el valor correcto para emisión en vivo).
-- Petición doble a Juan: (a) causa raíz del campo que falla; (b) **observabilidad** — loguear el fault de Quálitas y devolver la causa en un campo `detail`.
-- Repetido al menos 2 veces el 1 jul 2026 (12:49:32 y 13:05:15 CDMX). request_id ejemplo: `f00e2d0d-927b-33a1-66dc-e6193db0a1f1`.
-
-**Detalle Bug #10 (VIN↔ciudad/estado en Issue_Policy):**
-- Auditoría completa de las 5 emisiones históricas vía `n8n_chat_histories` (`Calling Issue_Policy` + regex sobre `parameters18_Value`): 3 de 5 con valor incorrecto (`Hidalgo`, `Ciudad de México`, `Ciudad General Escobedo` en vez del VIN).
-- En los 2 casos auditados a fondo, el VIN se capturó y validó correctamente en la conversación (`Validate_Personal_Data` sin error) — el error ocurre solo al construir la llamada `Issue_Policy`.
-- `qualitas_cotizacion.serie_vehiculo` y `whatsapp_sessions.captured_data` NO son fuente del VIN — ambos quedan `NULL`/`{}` en los casos revisados; el dato viaja directo de la conversación al tool call, sin pasar por columna dedicada en Postgres.
-- Issue abierto: `aguayo-co/HYL-WAI` #83.
-
-**Historia del fix fallido (2 jul 2026) — hipótesis original DESCARTADA:**
-- Hipótesis original: el AI "seguía el patrón" del domicilio porque `serie` estaba intercalado entre campos de domicilio (`...colonia → serie → placas...`). Fix aplicado: reordenar `bodyParameters` para agrupar `serie`+`placas` tras `telefono`, separados del domicilio.
-- El fix se validó en staging con VIN reconocible `TESTVIN1234567890` y se desplegó a producción. **Pero la validación era engañosa:** un token obviamente-VIN es inconfundible; el modelo lo colocaba bien por falta de ambigüedad, no porque el reorden funcionara.
-
-**Recurrencia 3 jul 2026 y CAUSA RAÍZ REAL (confirmada por comparación controlada):**
-- Nueva póliza en prod con `serie/VIN = "Gómez Palacio"` (ciudad de Durango). El fix del reorden NO resolvió.
-- **El reorden era cosmético:** cambió la posición en el array `bodyParameters`, pero los identificadores `$fromAI` siguen siendo `parameters18_Value` (serie) y `parameters19_Value` (placas) — numéricamente *después* del bloque domicilio (13–17). El esquema que ve el modelo no cambió.
-- **Causa real: la descripción del campo `serie` en `$fromAI` no define QUÉ es el campo.** Dice `` `From **user input** (captured in Group 2), NOT from quotation API` `` — una nota de *procedencia*, no de *contenido*. Todos los demás campos SÍ definen contenido (`teléfono 10 dígitos`, `placas 7 alfanuméricos`, `CP 5 dígitos`). Sin saber que debe ser un VIN, el modelo agarra otro string del usuario del Grupo 2 → la ciudad del domicilio.
-- **Comparación controlada que lo confirma:** `serie` (param 18) y `placas` (param 19) son adyacentes, con el mismo reorden y la misma vecindad. La única diferencia es la descripción. `placas` (con descripción de contenido) sale bien (`GAL126D`); `serie` (sin ella) sale mal. → la posición/reorden NO es la causa; la descripción SÍ.
-
-**Fix correcto (pendiente de aplicar — handoff a Agente n8n):**
-- Nodo `Issue Policy`, campo `serie` (`parameters18_Value`). Cambiar la descripción `$fromAI` de la nota de procedencia a una definición de contenido, p. ej.: `Número de serie / VIN del vehículo capturado del usuario en Grupo 2: 5-20 caracteres alfanuméricos, SIN espacios, NUNCA un nombre de ciudad/estado/colonia (NO es un dato de domicilio).`
-- Ojo: el bot acepta **5-20 caracteres alfanuméricos** para serie (así lo define el system prompt), NO estrictamente un VIN de 17. Una validación defense-in-depth debe ser `^[A-Za-z0-9]{5,20}$` (sin espacios) — rechaza "Gómez Palacio" (tiene espacio, y suele exceder/variar) pero acepta series cortas legítimas. No usar regex de VIN-17.
-- **IMPORTANTE — el layout `$fromAI` real:** los campos del tool son claves opacas (`parameters1_Value`…`parameters21_Value`) ordenadas por número; `serie`(18) queda justo tras `colonia`(17). El "reorden" del 2 jul cambió el array pero NO los números `$fromAI`, así que el layout que ve el modelo no cambió → confirma que el reorden fue inútil y que la descripción es la única palanca.
-
-**⚠️ Estado de validación (3 jul 2026) — causa raíz REFINADA y por qué un fix de solo-descripción NO es certificable:**
-
-Se montó un harness de reproducción (system prompt real + schema real con claves opacas `parametersN_Value` en orden numérico real) y se corrió Claude Sonnet con descripción VIEJA vs NUEVA:
-- **Ronda 1-2 (escenarios sintéticos, 48 muestras):** 48/48 VIN correcto, VIEJA y NUEVA por igual. No reprodujo.
-- **Ronda 3 (transcript REAL de la sesión fallida `528717955153`, 12 muestras):** 12/12 VIN correcto. **NO reprodujo el fallo ni con la conversación exacta que produjo `serie="Gómez Palacio"` en producción.**
-- **Total: 60 muestras, 0 fallos.**
-
-**Por qué el harness no reproduce (comprobado contra el workflow real):** el nodo `Anthropic Chat Model` (AI Agent) corre `claude-sonnet-4-5-20250929` a **`temperature: 0.7`**, maxTokens 2000. El harness usa Sonnet 4.6 a temperatura efectiva baja. Dos diferencias decisivas:
-1. **Temperature 0.7 sobre una tarea de tool-call/extracción estructurada** — el fallo es un evento de cola de muestreo (raro, estocástico). No se puede fijar 0.7 en los subagentes → no se reproduce la tirada mala.
-2. **Modelo 4.5 vs 4.6** — 4.6 sigue instrucciones mejor y evita la confusión; 4.5 a temp alta a veces mete el token de ubicación sobrante.
-
-**Anatomía del fallo real (sesión `528717955153`, póliza `7620098065` — otra afectada, PAGADA):** VIN `3N1CN8AE40531V` capturado, validado y mostrado en el resumen correctamente. En `Issue_Policy`: `parameters17`(colonia)=`"Gómez Palacio Centro"`, `parameters18`(serie)=`"Gómez Palacio"` (la ciudad). Disparador: el CP 35000 devolvió colonia≈ciudad casi idénticas ("Gómez Palacio Centro" / "Gómez Palacio"); el modelo llenó colonia y metió el token de ciudad sobrante en `serie`(18), que va justo después con clave opaca y descripción que no dice "VIN".
-
-**Causa raíz multi-factor (la descripción era solo 1 de 3-4 factores):**
-- (a) **Temperature 0.7** en una extracción de tool-call — el factor dominante y el más barato de arreglar. Debería ser **0** (o ~0.1). Este solo cambio elimina casi toda la aleatoriedad que causa la substitución.
-- (b) Descripción de `serie` pobre (solo procedencia) — reduce probabilidad pero no la elimina.
-- (c) Clave opaca `parameters18_Value` pegada al bloque domicilio (17=colonia) — estructural; el reorden del 2 jul no lo tocó.
-- (d) Modelo 4.5 (opcional: 4.6 acertó 100% en pruebas).
-
-**Conclusión clave — un fix de prompt/descripción NUNCA es "certificable a 100%":** sobre un modelo estocástico a temp 0.7, cualquier fix de texto solo *baja la probabilidad*, no la garantiza; y no se puede medir la mejora por replay porque el entorno de test no reproduce la tirada mala. Lo único que **garantiza** que una ciudad no llegue a Quálitas es un **guard determinista** antes de emitir:
-- Rechazar `serie` si contiene espacios o no cumple `^[A-Za-z0-9]{5,20}$`, o si `serie == colonia`/`ciudad`. "Gómez Palacio" tiene espacio → bloqueado deterministamente. Esto SÍ es testeable/certificable con casos unitarios.
-
-**Plan recomendado (orden de prioridad):**
-1. **`temperature: 0`** en el nodo AI Agent (cambio de un campo; el mayor y más fiable lever para un tool-call). Probablemente EL fix.
-2. **Descripción de `serie`** → definición de contenido (defense-in-depth, baja más la probabilidad).
-3. **Guard determinista** (Code node en n8n antes de `Issue_Policy`, e idealmente validación en Django `/api/emitir-externo/`) — lo único que da certeza real.
-4. (Opcional) subir el modelo del AI Agent a Sonnet 4.6.
-
-- El reorden del 2 jul fue inútil (no cambió las claves `$fromAI`). Póliza `7620098065` (Sandra Luz Hernández, PAGADA) se suma a `7620096850` en la lista de reemisión manual con Quálitas.
-
-**Corrección de arquitectura (4 jul, hallada por el Agente n8n):** `Issue Policy`, `Validate Personal Data`, `Get Quotation Data`, `Search Colony` NO son nodos en serie — son **tools colgadas del AI Agent** (`ai_tool`), invocadas por el modelo cuando decide. Implicaciones:
-- No hay un "antes de Issue Policy" lineal donde meter un Code node. La validación determinista de la serie en la ruta de emisión vive en **Django** (que ya está desplegado y ES el único gate de emisión).
-- `Validate Personal Data` e `Issue Policy` son tool calls **independientes**, cada una con su propia extracción `$fromAI`. Endurecer `Validate` NO caza la divergencia observada (Validate recibió el VIN, Issue Policy re-extrajo la ciudad) — solo rechaza en captura. El gate de emisión es Django.
-- No existe hoy ningún store determinista y referenciable del VIN: `whatsapp_sessions.captured_data` está `{}` (Bug #5). El VIN solo vive en la conversación y llega a las tools vía IA.
-
-**Decisión (4 jul): Opción A (cierre seguro ya) + Opción B diferida.**
-- **Opción A (✅ ejecutada por Agente n8n, rama `stg`, commit `591569f` — pendiente validación en staging):** (1) prompt del bot → VIN-17 (4 menciones de longitud actualizadas; echoes `[SERIE]` intactos); (2) manejo del `400 invalid_vehicle_serie` a nivel prompt — se verificó el ruteo: `Issue Policy` es un `ai_tool`, su 400 vuelve al Agent como resultado de tool; sin excepción caía en el mensaje genérico (dead-end), corregido en el prompt para re-preguntar según `details.reason`; (3) regex de serie dentro de `Validate Personal Data` endurecida a la canónica + normalización (defensa temprana). Django es el backstop que garantiza que ninguna ciudad se emita.
-- **Set de pruebas ejecutado desde aquí (4 jul, sin staging) sobre el JSON modificado del Agente n8n:** Nivel 1 — gate Django `vehicle_series.py` **certificado 31/31** contra corpus adversarial (determinista). Nivel 2 — **paridad total** regex `Validate Personal Data` ↔ Django (byte-idéntica). Nivel 4 — lógica IA del prompt **9/9** (manejo del 400 re-pregunta por `reason`; serie de 14 chars rechazada). **Nivel 3 — HALLAZGO:** el tool `Issue Policy` tiene `options:{}` (sin `neverError`) → un 400 lanza error genérico y el body con `code:"invalid_vehicle_serie"` probablemente NO llega al Agent → la lógica del 400 (correcta) queda como código muerto. **Fix pendiente Agente n8n:** activar "Never Error" (`options.response.response.neverError=true`) en `Issue Policy`; verificar que otros errores (no-serie) sigan disparando `[api_error:issue_policy]`. Freebie opcional: actualizar la descripción `$fromAI` de `serie` en `Issue Policy` a VIN-17.
-- **3 checkpoints a validar en staging antes de prod:** (1) **crítico** — confirmar que el `httpRequestTool` de `Issue Policy` pasa el BODY del 400 (con `code`/`details.reason`) al AI Agent; si no, la excepción de C3a no puede leer el código y cae en dead-end (probar forzando `matches_geographic_field`). (2) El manejo del 400 es prompt-level → probabilístico (temp 0.7); correr 2-3 veces. Peor caso = emisión atascada, nunca póliza mala (Django es el gate). (3) Django `stg`→prod y n8n suben juntos.
-- **✅ Bug #10 COMPLETO del lado n8n (rama `stg`, 5 commits: `829f469` baseline → `591569f` Opción A → `9d54c35` naming `_stg`+inactive → `a5da2e2` neverError+freebie → `2570dea` línea load-bearing de detección desde body).** Cadena: neverError→body siempre vuelve→detección (`link_pago`=éxito / `status:error`|`code`=fallo)→ruteo (`invalid_vehicle_serie`=re-pregunta / otro=`[api_error:issue_policy]`)→`details.reason`. Validado sin staging: gate 31/31, paridad regex, prompt 9/9. **Pendiente único: validación runtime E2E en staging, luego merge `stg`→`main` junto con Django.** **Verificación final del JSON v3 (4 jul, sin staging): estática 100% (neverError, línea load-bearing verbatim, VIN-17, regex canónica, `_stg`/inactive) + comportamiento IA 12/12 en las 5 ramas de clasificación del resultado de issue_policy (éxito→link / error genérico→`[api_error]` / 400 geo→re-pregunta / 400 vin→re-pregunta / captura 14ch→rechaza). Staging pasó de 'descubrir' a 'confirmar'.**
-- **Opción B (diferida — tarea de arquitectura aparte):** persistir el VIN validado en `whatsapp_sessions.captured_data` y que `Issue Policy` lo lea deterministamente vía `={{ $('Load Session').first().json.captured_data.serie }}` (patrón precedente — `Issue Policy` ya referencia `Load Session` con éxito). Saca a la IA del mapeo final (satisface el principio de Alberto "mapeo sin interpretación de IA") y de paso arregla el Bug #5. Es un mini-proyecto, no un cambio mínimo.
-- **Rollout:** Django `stg`→prod y los cambios de n8n suben JUNTOS (o Django después de que n8n maneje el 400), o habrá emisiones atascadas.
-
-**✅ RESOLUCIÓN (4 jul 2026) — plan definitivo de defensa en capas + decisión de formato:**
-- **Decisión de negocio (Alberto):** `serie` debe ser **exactamente 17 caracteres (VIN completo)**; el bot rechaza todo lo que no cumpla. Quálitas requiere el VIN completo → la regex estricta es correcta.
-- **Regex canónica (Django y n8n deben coincidir):** `^[A-HJ-NPR-Z0-9]{8}[0-9X][A-HJ-NPR-Z0-9]{8}$` (17 chars, sin espacios/guiones/acentos, sin I/O/Q, 9º carácter dígito o X). Normalizar antes: `String(serie).trim().toUpperCase()`.
-- **Capa 1 — Django (Juan, ✅ hecho, rama `stg`):** autoridad final. Valida serie + `matches_geographic_field` (rechaza colonia/ciudad/municipio/estado) + contrato de error `400 {code:"invalid_vehicle_serie", reason: empty|matches_geographic_field|invalid_vin_format}`. Guía: `aguayo-co/HYL-WAI:docs/guia-n8n-validacion-serie-vin.md`.
-- **Capa 2 — n8n mapeo rígido (Agente n8n, ⏳):** `Issue_Policy.serie`/`placas` leen el valor ya validado (reutilizar el de `Validate Personal Data`), NO un `$fromAI` nuevo. El valor emitido = el validado por construcción.
-- **Capa 3 — n8n consistencia + validación cliente (Agente n8n, ⏳):** (a) actualizar el systemMessage del AI Agent: serie = exactamente 17 chars VIN (no "5-20"), coach al usuario; (b) Code node determinista antes de `Issue_Policy` que normaliza + valida con la regex; si falla, re-preguntar, NO llamar a Django; (c) manejar `400 invalid_vehicle_serie` → parar, re-preguntar, re-validar, sin auto-reintento.
-- **Temperatura:** se queda en 0.7. Con el mapeo rígido + validación determinista, la correctitud no depende del muestreo — no hace falta tocarla.
-- **INCONSISTENCIA a corregir en lockstep:** el prompt del bot decía "5-20 caracteres"; DEBE pasar a "exactamente 17" o el bot aceptará series que Django rechaza (loop muerto). Parte de Capa 3(a).
-- **Pólizas con serie inválida a reemitir con Quálitas:** `7620096850` (VIN=ciudad) y `7620098065` (Sandra Luz, serie `3N1CN8AE40531V` = 14 chars, VIN incompleto). Auditar el resto con la regex.
-
-**✅ ENTORNO DE STAGING E2E LISTO (6 jul 2026) — vía para validar el fix antes de prod:** el workflow con el fix (rama `stg` de `aibanez82/Agente-n8n`) fue **importado a una instancia n8n de staging separada** (`n8n-xlqk.srv1810257.hstgr.cloud`, aislada de prod → cierra también el Bug #12) por el Agente n8n y **verificado por el Arquitecto contra la API viva**: workflow `WhatsApp Insurance Quotation Bot_stg` id `dNqtM20ij6ecZYAX`, inactivo, VIN-17 presente, `{5,20}`=0, 0 refs a prod, Django→`hyl-wai-stg`, creds Postgres/Anthropic de staging. Meta App de test creada (7 jul), E2E en marcha. Detalle e historia: `docs/iniciativas/entorno-pruebas-staging.md`, handoff `docs/2026-07-06-handoff-agente-n8n-import-staging-bug10.md`, reporte del ejecutor `Agente-n8n:docs/2026-07-06-resultado-import-staging.md`.
-
-**✅ Bloqueador de schema resuelto (7 jul):** `rate_limit_data` (y drift relacionado) era tabla operativa de n8n, no migración Django — confirmado por el Arquitecto y de forma independiente por Juan. Columna agregada en staging por el Agente n8n (`ALTER TABLE ... ADD COLUMN IF NOT EXISTS rate_limit_data jsonb DEFAULT '{}'::jsonb` + `UPDATE ... WHERE rate_limit_data IS NULL`, versión de Juan). Desbloquea `Load Session`, `Update Phase in DB` e `Increment KB Counter`.
-
-**✅ Aislamiento re-confirmado en vivo por el Agente n8n (7 jul):** 0 refs a `seguroautoqualitas.com`; `Issue Policy` → `hyl-wai-stg-...herokuapp.com`; los 9 nodos Postgres → credencial `Postgres STG` (`5wlLe3gD07CLIM7U`); corriendo en la instancia separada `n8n-xlqk.srv1810257.hstgr.cloud`, workflow `dNqtM20ij6ecZYAX`. Cierra la duda válida de Juan sobre si staging apuntaba a prod — no es el caso.
-
-**Nota de proceso (gap detectado 7 jul):** el handoff `docs/2026-07-07-handoff-agente-n8n-verificacion-aislamiento-staging.md` **nunca llegó al Agente n8n** — quedó solo en este repo, no se copió a `Agente-n8n/handoffs/` como marca la convención del 6 jul. No bloqueó nada porque las mismas verificaciones se re-pidieron directo en el mensaje de seguimiento, pero confirma que la convención "dejar copia en el repo del ejecutor" necesita que alguien (Alberto) la ejecute explícitamente — el Arquitecto no tiene forma de empujarla él mismo al no tener escritura en ese repo. **✅ "hola" enviado y confirmado (7 jul), ejecución success.** Faltan las 2 pruebas restantes del E2E: serie inválida (debe re-preguntar, nunca emitir, repetir 2-3×) y serie válida de 17 (debe llegar a Quálitas sandbox como VIN, no ciudad). Detalle: `docs/2026-07-07-respuesta-agente-n8n-rate-limit-data-no-es-migracion.md`, `docs/2026-07-06-handoff-agente-n8n-fase-e2e-staging-bug10.md`.
-
-**Pólizas afectadas — pendiente re-auditar:**
-- Confirmadas históricas (2 jul): 3 de 5 con valor incorrecto (`Hidalgo`, `Ciudad de México`, `Ciudad General Escobedo`).
-- Póliza `7620096850` ya `PAGADO` con VIN incorrecto — reemisión manual directa con Quálitas.
-- Nueva del 3 jul (`serie = "Gómez Palacio"`) — identificar número de póliza y añadir a la lista de reemisión manual.
-- Correr la auditoría SQL sobre `n8n_chat_histories` (ver más abajo) para el conteo total actualizado tras esta recurrencia.
-
----
-
-**Detalle Bug #11 (sesión pegada a la 1ª cotización al recotizar) — REGISTRADO, EN PAUSA (Alberto lo piensa):**
-- **Síntoma (Dashboard agent, 4 jul):** el funnel "VÍA WHATSAPP" pierde leads — 46 enviados hoy, solo 37 en el funnel; los 9 faltantes recibieron el mensaje y varios conversan activamente, pero el dashboard no los ve. 9/9 verificado.
-- **Causa raíz:** `whatsapp_sessions` es **única por teléfono** (`session_id='52'+telefono`). Al recotizar (común: 2-4 cotizaciones por número), se crea cotización nueva pero la fila de sesión ya existe y **su `quotation_id` NO se actualiza** → queda pegado a la 1ª cotización. El join del dashboard (`whatsapp_sessions.quotation_id = qualitas_cotizacion.id`) no encuentra la cotización nueva → lead fuera del funnel.
-- **✅ Dónde vive el fix — CORREGIDO 9 jul, leído directo del código:** el bot de conversación NUNCA escribe `quotation_id` (solo lo lee de la BD). Pero **NO hay ningún "workflow del webhook de lead creado" en n8n** — eso era una inferencia nunca verificada (confirmado por API: PROD solo tiene 3 workflows, ninguno de "lead creado"). El `quotation_id` se asigna con un **`INSERT INTO whatsapp_sessions` de SQL crudo dentro de Django** (`qualitas/models.py`, en el `serve()` de la landing page, justo después de enviar el WhatsApp inicial vía Meta Graph API directo). **El fix es un cambio de Django, no de n8n:** cambiar ese `INSERT` a `INSERT ... ON CONFLICT (session_id) DO UPDATE SET quotation_id = EXCLUDED.quotation_id, ...`. Ver la corrección completa de arquitectura más arriba (sección "Regla crítica de arquitectura").
-- **Arquitectura — NO "sesión por cotización":** WhatsApp = un hilo por número, y `n8n_chat_histories` (memoria) se llavea por `session_id=teléfono`. Lo correcto: una sesión por teléfono apuntando a la cotización **más reciente** → UPSERT de `quotation_id`.
-- **DECISIÓN PENDIENTE de Alberto:** al actualizar `quotation_id`, ¿(a) resetear a `greeting` + limpiar `captured_data` (recotización = conversación fresca; recomendado, porque el historial y `captured_data` arrastran contexto/serie del auto anterior y si recotiza otro auto quedan mal), o (b) mantener fase/captured_data y solo cambiar `quotation_id`? Depende de por qué recotiza la gente (mismo auto más barato vs otro auto).
-- **Prerrequisito para el fix:** solo la decisión (a)/(b) — ya NO hace falta exportar ningún workflow (no existe). El cambio es en `qualitas/models.py` de `aguayo-co/HYL-WAI`, tarea de **Juan**, no del Agente n8n.
-- **Mitigación dashboard (aprobada como interina):** asociar la sesión por teléfono al lead más reciente + reetiquetar "Recotizaciones" en UI. El arreglo limpio es upstream (Django).
-- **Relación:** encaja con el proyecto CSF (el `captured_data` debe resetear en recotización) y con Bug #4 (leads sin whatsapp_session).
-
-## Kommo CRM — integración en curso
-
-Kommo es el CRM de escalada humana del ecosistema. Ya está parcialmente integrado: cuando el bot decide derivar, envía un mensaje WA al lead con un link a Kommo.
-
-**Plan activo:** Base ($15/user/mes). Incluye API v4 completa.
-
-**Feature en diseño — botón "Pasar a Kommo" en el Dashboard:**
-
-Caso de uso: Alberto ve en el dashboard un lead caliente que no está respondiendo al bot y quiere intervenir manualmente como humano.
-
-Flujo propuesto:
-```
-Modal del lead en Dashboard
-    ↓ click "Pasar a Kommo"
-    ↓
-Next.js → Kommo API v4 POST /leads/complex
-    ↓
-Crea contacto + lead en Kommo con:
-  - Nombre (si el bot ya lo capturó)
-  - Teléfono
-  - Vehículo + precio cotizado
-  - Nota con link a conversación WA
-    ↓
-Alberto atiende el lead directamente desde Kommo
-```
-
-**Pendiente para implementar:**
-- Subdominio Kommo de Alberto
-- API token Kommo (Ajustes → Integraciones → API → Token largo)
-- Nombre del pipeline y etapa destino en Kommo
-- Agregar `KOMMO_API_TOKEN` y `KOMMO_SUBDOMAIN` a Vercel
-
-**Repo donde se implementa:** `aibanez82/Dashboard_seguroautoqualitas`
-**Archivo clave:** nuevo endpoint `pages/api/kommo-lead.js` + botón en modal del dashboard
-
 ---
 
 ## Agente Mejoras Conversación — protocolo de uso
 
-**Repo:** `aibanez82/Agente-MejorasConversacion`
-**Rol:** especializado en CÓMO conversa el bot (abandono y tono/trato). Nunca modifica nada — solo analiza y propone. Dos modos de entrada, misma tubería de salida.
+Repo: `aibanez82/Agente-MejorasConversacion`. Analiza abandono (Postgres) y tono/trato (capturas de pantalla de WhatsApp), propone cambios de copy — nunca modifica nada él mismo. Protocolo completo (los 2 modos de entrada, riesgos transversales que el Arquitecto valida antes de aprobar un cambio de tono): `docs/protocolos/agente-mejoras-conversacion.md`.
 
-### Modo 1 — Análisis de abandono (Postgres)
-
-**Credencial DB:** `readonly_leads` en Heroku `hyl-wai-production` (read-only, no puede modificar nada)
-
-> **Patrón de permisos `readonly_leads`:** cada tabla nueva que crea Django NO tiene permiso para
-> `readonly_leads` hasta que el dueño de la BD ejecute un `GRANT SELECT` específico. Cuando el
-> Dashboard/reporting quiera leer una tabla nueva y dé `permission denied`, la solución es
-> `GRANT SELECT ON <tabla> TO readonly_leads;` — **nunca** el grant masivo `ON ALL TABLES`
-> (expondría `auth_user` con hashes de contraseñas). El rol dueño es el de `DATABASE_URL`
-> (puede granear). Grants aplicados 1 jul 2026: `qualitas_whatsappmessage`, `qualitas_leadactionevent`.
-**Output:** archivos en `informes/YYYY-MM-DD-analisis.md`
-
-**Cómo activarlo:** Alberto abre el proyecto en Claude Code y dice:
-> "Analiza las conversaciones del [fecha inicio] al [fecha fin]"
-
-**Qué produce (4 pasos internos automáticos):**
-1. Query A — leads con abandono (phase en greeting/data_capture/summary_confirmation + last_activity > 48h)
-2. Query B — leads exitosos (referencia de conversaciones que llegaron a póliza)
-3. Clasificación por outcome + análisis del último mensaje del bot antes del silencio
-4. Informe Markdown con mapa de abandono + análisis de copy + hasta 5 recomendaciones concretas de cambio de texto en n8n
-
-**Limitación activa — Bug #1:**
-~76% de sesiones no tienen historial en `n8n_chat_histories` (medido 1 jul 2026: 154/203). El agente lo detecta y lo anota, pero el análisis de copy solo cubre el ~24% de conversaciones con datos. Nota: gran parte de ese "vacío" son leads que nunca respondieron (ver Bug #1 reinterpretado), no pérdida de datos. Los resultados son válidos pero parciales.
-
-### Modo 2 — Análisis de tono/trato (capturas de pantalla)
-
-Alberto le pasa capturas de pantalla de conversaciones WhatsApp reales cuando detecta un problema de tono (ej.: el bot trata de "usted" y el caso pide un trato más cercano). El agente identifica QUÉ parte del `systemMessage` del nodo **AI Agent** (n8n) está generando ese tono y propone la modificación EXACTA (frase, ubicación, redacción nueva) — igual que en Modo 1, solo propone, nunca escribe.
-
-**Regla de acceso al `systemMessage`:** el Agente Mejoras Conversación NO tiene acceso directo a n8n. El `systemMessage` completo vive exportado en `docs/n8n-workflows/WhatsApp Insurance Quotation Bot.json` (fuente de verdad en este repo). Cuando este análisis lo requiera, **el Arquitecto extrae y entrega el fragmento relevante como contexto de solo lectura** para ese análisis puntual — consistente con "los ejecutores nunca se hablan entre sí, todo pasa por mí".
-
-**Riesgo transversal que el Arquitecto valida antes de aprobar un cambio de tono (Mejoras no lo ve):**
-- **Hitos por LIKE:** un cambio de tono puede tocar sin querer alguna de las frases exactas de las que dependen los hitos (`confirmo_cobertura`, `poliza_emitida_wa`, etc. — ver "Regla de estado real de un lead").
-- **Bug #10/#14:** el `systemMessage` (~24K chars) también contiene las instrucciones de serie VIN-17, el manejo del `400 invalid_vehicle_serie` y las SECURITY RULES del deflect fuera de alcance — un cambio de tono cerca de esas secciones puede chocar con ellas.
-
-### Tubería común — Mejoras → Arquitecto → Agente n8n (NO lateral)
-
-Tanto las recomendaciones de copy (Modo 1) como las de tono (Modo 2) se traducen en cambios al `systemMessage` del nodo **AI Agent** en n8n. El **Agente n8n es el ejecutor** de ese cambio (no Mejoras, no Alberto a mano). Pero **Mejoras y n8n NO se comunican directamente** (regla de oro: los ejecutores no se hablan). La tubería es:
-
-```
-Agente Mejoras Conversación  → analiza abandono o tono, propone cambios de copy (informe)
-        ↓
-Arquitecto (yo)              → valida, traduce a cambio EXACTO (qué frase, qué nodo)
-                               y CHEQUEA IMPACTO TRANSVERSAL antes de aprobar
-        ↓
-Agente n8n                   → aplica el cambio en el JSON, commit/push
-        ↓
-Alberto                      → importa en n8n
-```
-
-Es el mismo patrón usado para el Bug #10 (diagnóstico → prompt para el Agente n8n → ejecución). El punto de encuentro de los dos ejecutores es el Arquitecto, nunca el otro agente.
+**Tubería (regla de oro — Mejoras y n8n NO se hablan entre sí):** Agente Mejoras Conversación propone el cambio de copy → **Arquitecto** valida, traduce a cambio EXACTO (qué frase, qué nodo) y chequea impacto transversal → **Agente n8n** aplica el cambio en el JSON y hace commit/push → Alberto lo importa en n8n.
 
 ---
 
 ## Agente n8n — protocolo de uso
 
-**Repo:** `aibanez82/Agente_n8n` (nombre a confirmar cuando se cree)
-**Rol:** Ejecutor Nivel 3, especializado en workflows n8n. Yo (Arquitecto) diagnostico y le paso el bug/nodo a tocar; Agente n8n ejecuta el cambio en el JSON. Nunca decide qué tocar de forma autónoma.
-
-**Flujo v1 (handoff manual, sin clonar repos entre sí):**
-```
-Arquitecto diagnostica → identifica workflow + nodo exacto a modificar
-    ↓
-Alberto baja la última versión del JSON
-  (docs/n8n-workflows/ en este repo, o export fresco de n8n)
-    ↓
-Alberto se lo pasa a Agente n8n desde una carpeta local
-    ↓
-Agente n8n analiza, propone mejora, modifica el JSON
-    ↓
-Agente n8n hace commit/push a su propio repo
-    ↓
-Alberto importa el JSON manualmente en n8n (producción)
-    ↓
-Alberto actualiza docs/n8n-workflows/ en Agente-Arquitecto
-  con la versión final importada (mantener fuente de verdad sincronizada)
-```
-
-**Punto de atención:** como Agente n8n no tiene clonado este repo, el JSON que modifica vive solo en su propio repo hasta que Alberto lo reimporta a producción y lo vuelve a traer aquí. Si se salta el último paso, `docs/n8n-workflows/` en este repo queda desactualizado respecto a lo que corre en producción — mismo riesgo que ya existía con el backup manual (ver `docs/architecture/backup-policy-n8n.md`).
-
-**✅ Nombre de repo confirmado:** `aibanez82/Agente-n8n` (con guion). Clonado en local en `~/claude-projects/Agente-n8n` (8 jul) y con push directo habilitado — mismo `gh auth` (scope `repo`) que el resto de los repos de esta cuenta, sin setup adicional. Esto cierra el gap de "no tengo escritura en ese repo": ahora puedo dejar handoffs directamente en `Agente-n8n/handoffs/` en vez de depender de que Alberto los copie.
+Repo: `aibanez82/Agente-n8n` (clonado en `~/claude-projects/Agente-n8n`, push directo habilitado desde el Arquitecto). Ejecutor Nivel 3 especializado en workflows n8n — el Arquitecto diagnostica el bug/nodo a tocar, el Agente n8n ejecuta el cambio en el JSON y nunca decide qué tocar de forma autónoma. Protocolo completo (flujo v1 de handoff manual, puntos de atención): `docs/protocolos/agente-n8n.md`.
 
 ---
 
 ## Entorno de pruebas / staging (iniciativa activa)
 
-Staging end-to-end para replicar bug fixes antes de prod (gitflow `stg`→`main`). Objetivo inmediato: validar el fix del **Bug #10** (VIN/serie) E2E antes de mergear. Detalle vivo: `docs/iniciativas/entorno-pruebas-staging.md`.
-
-**Nuevo participante (8 jul): Agente QA & Testing** (`aibanez82/Agente_QATest_Qualitas`) se incorpora para **liderar las pruebas E2E en STG** — poder correr un flujo completo sin llenar la landing a mano, y validar cambios de `systemMessage` (¿el bot ahora se comporta como queremos?). Contexto del ecosistema y del entorno STG ya cargado en su `context/ARQUITECTO.md`. **Pendiente de diseño (Arquitecto):** el método para generar el lead+cotización inicial sin pasar por la landing — hoy ese flujo lo dispara el webhook "lead creado" de Django hacia n8n, y el payload/contrato exacto para simularlo sintéticamente en STG todavía no está documentado. **Aviso importante para cualquier prueba WhatsApp real en STG:** el Bug #15 sigue activo — cada mensaje a STG también se procesa en PROD hasta que se despliegue la mitigación retenida (`docs/2026-07-08-handoff-agente-n8n-bug15-filtro-phone-number-id-prod.md`).
-
-**Principio rector:** stack paralelo completo; cada componente de staging apunta SOLO a gemelos de staging, nunca a prod (riesgo #1 = staging escribiendo/disparando contra prod).
-
-**Mapa prod → staging:**
-
-| Componente | Staging | Estado |
-|---|---|---|
-| Backend/landing | `hyl-wai-stg` (`https://hyl-wai-stg-d1085ad74dbf.herokuapp.com`, deploy desde rama `stg`) | ✅ existe |
-| Base de datos | Addon Postgres propio de `hyl-wai-stg` | ✅ (`STG_DATABASE_URL`) |
-| n8n (bot WA) | **Instancia SEPARADA** en Hostinger `https://n8n-xlqk.srv1810257.hstgr.cloud` (servidor `srv1810257` ≠ prod `srv1325340`; BD/encryption key propias) | ✅ viva, API habilitada. Decisión clave: instancia separada para NO recaer en el Bug #12 (webhookId compartido) |
-| Número WhatsApp | 2ª Meta App + número de test (Cloud API) | ✅ creada (7 jul) — E2E en pruebas con Agente n8n |
-| Quálitas | Sandbox QA (`QUALITAS_URL`→`qa.qualitas.com.mx`; el switch es la URL, NO `QUALITAS_AMBIENTE_FLAG`) | ✅ credenciales QA + `QUALITAS_AMBIENTE_FLAG=0` (valor de prueba) ya en Heroku `hyl-wai-stg` — confirmado por Alberto 7 jul |
-| Dashboard | `stg` (Vercel git-branch alias fijo) → `hyl-wai-stg` (`dei0jssp8kr5kv`) | ✅ Consolidado (10 jul) — única rama/base/URL de STG, ver detalle en Bug #17 |
-
-**Hecho y verificado por el Arquitecto (6 jul):**
-- Instancia n8n stg aislada + API (`N8N_STG_API_KEY` en `.env.local`).
-- Credencial **Postgres STG** `5wlLe3gD07CLIM7U` + **Anthropic STG** `aHI51VvnRnPixCx5`.
-- Workflow del bot **con el fix Bug #10 importado** (desde `aibanez82/Agente-n8n` rama `stg`): `WhatsApp Insurance Quotation Bot_stg` id **`dNqtM20ij6ecZYAX`**, **inactivo**, 61 nodos, 0 refs a prod, VIN-17 presente, Django→`hyl-wai-stg`. Ejecutado por el Agente n8n vía API, verificado contra la instancia viva.
-
-**✅ 2ª Meta App de test creada (7 jul) — bloqueador del E2E resuelto.** Alberto está corriendo pruebas E2E con el Agente n8n (handoff v2). Pendiente reporte de resultado.
-
-**Fase E2E ya especificada (handoff v2, modelo OAuth2 nativo):** el trigger `whatsAppTrigger` de n8n es **OAuth2** (`clientId`=App ID / `clientSecret`=App Secret); `whatsAppApi` (Send) pide `accessToken`+`businessAccountId` (WABA). Modelo A (nativo) elegido porque prod usa ese trigger → staging debe ser gemelo fiel. Requiere: 6 secretos de Juan (`STG_WA_ACCESS_TOKEN`, `STG_WA_BUSINESS_ACCOUNT_ID`, `STG_WA_APP_ID`, `STG_WA_APP_SECRET`, `STG_WA_PHONE_NUMBER_ID`), whitelist de la redirect URL OAuth de n8n en la App, y un **"Connect" OAuth2 manual de Alberto** en la UI (la API no lo hace). Handoff: `Agente-n8n:handoffs/2026-07-06-fase-e2e-staging-bug10.md` (canónico en `docs/2026-07-06-handoff-agente-n8n-fase-e2e-staging-bug10.md`).
-
-**Convención de handoffs (aprendida 6 jul):** todo handoff a un ejecutor se deja en el repo de ESE ejecutor (`<repo>/handoffs/`) y se comunica con la **ruta absoluta completa** + ubicación git. Nunca solo en el repo del Arquitecto.
-
-**Gotchas de import por API n8n (reutilizables):** (1) reducir el export a `{name,nodes,connections,settings}` (rechaza `active`/`id`/`tags`/`shared`/`activeVersion`/`pinData`); (2) filtrar `settings` a claves válidas — `binaryMode`/`availableInMCP` dan 400; (3) el import heredó el `webhookId 18c1b498` de prod (Bug #12) → regenerar en la fase E2E.
+Staging end-to-end paralelo a prod (gitflow `stg`→`main`) para validar bug fixes antes de desplegar. Instancia n8n STG: `https://n8n-xlqk.srv1810257.hstgr.cloud`. **Principio rector:** cada componente de staging apunta SOLO a gemelos de staging, nunca a prod. Mapa completo prod→staging, credenciales, gotchas de import: `docs/iniciativas/entorno-pruebas-staging.md`.
 
 ---
 
@@ -557,15 +243,15 @@ Staging end-to-end para replicar bug fixes antes de prod (gitflow `stg`→`main`
 | ~~PAT fine-grained para repo `aguayo-co/HYL-WAI`~~ | ✅ Resuelto (9 jul) — `gh auth` (scope `repo`) ya permitía clonar directo, sin PAT nuevo |
 | Reconectar Notion al workspace `aguayo` | ⏳ Pendiente |
 | Subir `BUGS_N8N.md` al repo Dashboard | ⏳ Pendiente |
-| Integración Kommo — botón "Pasar a Kommo" en Dashboard | ⏳ Pendiente (falta subdominio + API token + pipeline de Alberto) |
-| `n8n_chat_histories` sin columna de timestamp (confirmado por el Dashboard agent: 855 filas, `additional_kwargs`/`response_metadata` vacíos, sin `created_at` — hora real inexistente). **Fix = migración de BD por Juan/dueño del rol `DATABASE_URL`, NO el agente n8n (es DDL, y `DEFAULT now()` no requiere tocar el workflow).** DDL correcta en **dos pasos** (para que el histórico quede NULL/honesto en vez de horas falsas): `ALTER TABLE n8n_chat_histories ADD COLUMN created_at timestamptz;` y luego `ALTER TABLE n8n_chat_histories ALTER COLUMN created_at SET DEFAULT now();`. ⚠️ NO usar `NOT NULL DEFAULT now()` en un solo paso: rellenaría las 855 filas viejas con horas idénticas falsas (reintroduce "colapsado a una hora"). Aplicar igual a `_archive` y que el archivado **preserve** `created_at` (no regenerar con `now()`). Grants: no hace falta nuevo GRANT (columna nueva hereda el SELECT de la tabla). Dashboard ya aplicó parche interino y **está desplegado en prod** (commit `05576eb` en `main`): mensajes n8n sin reloj, "hora aproximada"; solo Django pinta hora exacta vía `sent_at`. **Columna vs JSON zanjado con evidencia del workflow:** hay 3 puntos de escritura — 2 nodos stock LangChain `memoryPostgresChat` (bot principal, la mayoría de mensajes, SIN hook para el JSON) + 1 Postgres custom `executeQuery` (workflow proactivo). La opción JSON solo cubriría los proactivos → inconsistente; la columna `DEFAULT now()` cubre los 3 por igual. | ⏳ Pendiente externo (Juan) — **issue [`aguayo-co/HYL-WAI#87`](https://github.com/aguayo-co/HYL-WAI/issues/87)**. **✅ DDL validado end-to-end en STG (10 jul)** por el Arquitecto: aplicado en `hyl-wai-stg`, confirmado que los 3 puntos de escritura llenan `created_at` solos vía `DEFAULT now()` sin tocar workflows, que el archivado (`archivar_historial_chats`, `qualitas/utils.py:99`) preserva la hora real al copiar con `SELECT *`, y confirmado con tráfico real de hoy (sesión `525551074144` recotizando en vivo). Dashboard ya tiene el código con fallback defensivo desplegado en prod (commit `546d4c3` + `c5cde84` tras un incidente breve y ya resuelto — ver `Dashboard_SeguroAuto:docs/2026-07-10-mensaje-arquitecto-entornos-stg-prod-dashboard.md`) — no requiere deploy nuevo tras el DDL. **Comentario con el checklist + evidencia publicado en el issue** ([`#87`](https://github.com/aguayo-co/HYL-WAI/issues/87#issuecomment-4938326221), 10 jul) pidiéndole a Juan aplicar el mismo DDL en PROD. **Confirmado que ni el Arquitecto ni Agente n8n pueden hacerlo directamente:** el rol `readonly_leads` de PROD rechaza `ALTER TABLE` (`"must be owner of table"`, probado en transacción con rollback) — a diferencia de STG, donde el rol sí es dueño de la base. | ver también `docs/estrategia/2026-07-01-conversacion-completa-wa-n8n-django.md` |
+| Integración Kommo — botón "Pasar a Kommo" en Dashboard | ⏳ Pendiente (falta subdominio + API token + pipeline de Alberto). Detalle: `docs/iniciativas/kommo-crm.md` |
+| `n8n_chat_histories` sin columna de timestamp — DDL diseñada y validada end-to-end en STG, pendiente que Juan la aplique en PROD | ⏳ Pendiente externo (Juan) — issue [`aguayo-co/HYL-WAI#87`](https://github.com/aguayo-co/HYL-WAI/issues/87). Detalle completo (DDL en dos pasos, evidencia, checklist): `docs/architecture/n8n-chat-histories-created-at.md` |
 | Issue #74 (`aguayo-co/HYL-WAI`) — follow-up 15 min dejó de enviarse desde 2026-06-30 ~21:11 UTC | ⏳ Causa raíz sin determinar. Requiere acceso Heroku (config vars, releases, scheduler) — Alberto va a dar token OAuth read-only vía Vercel env Plain |
 | Propuesta arquitectura BD — tabla canónica `whatsapp_event` (dual-write desde n8n/Django/Dashboard, reemplaza joins frágiles y LIKE de hitos) | 💡 Documentada como plan de destino, sin decisión de implementar aún |
 | Alerta de emisión fallida (Bug #9) — workflow `Bot Error Handler` en n8n + tarjeta "Emisión falló" en Dashboard | ⏸️ En pausa — implica desarrollo de n8n (Error Workflow + extracción de datos de la ejecución fallida). Spec lista en `docs/estrategia/2026-07-02-alerta-emision-fallida-quálitas.md` |
 | ~~Crear repo `Agente_n8n` en GitHub + confirmar nombre final~~ | ✅ Resuelto (8 jul) — repo es `aibanez82/Agente-n8n`, clonado local, push directo habilitado |
 | `N8N_TOKEN` con valor real hardcodeado como default en `qualitas/views.py:905` (rama `stg`) | ⚠️ Seguridad — hallazgo del 6 jul al auditar config vars de `hyl-wai-stg`. Mover a solo-env y rotar el token — pedir a Juan. Ver `docs/iniciativas/entorno-pruebas-staging.md` |
 | Revisar cumplimiento de la política de IA de WhatsApp de Meta (enero 2026, interacciones deben ser "task-specific") | ⏳ Pendiente — priorizar sobre el escalado de volumen. Ver `docs/estrategia/2026-07-06-evaluacion-plataformas-conversacion-whatsapp.md` |
-| Cómo saber con certeza si un cliente pagó la póliza — la doc oficial SOAP de Quálitas (`docs/qualitas-api/`: WsEmision, WsTarifas, WsImpresion, Matriz de Captura) **no documenta ningún endpoint ni campo de consulta de estatus de pago** (verificado 7 jul). Solo cubre `FormaPago` (método/frecuencia) y los recibos generados al emitir — nada sobre si un recibo/link de pago fue efectivamente pagado. Hoy la única señal automatizada es `qualitas_polizaemitida.estatus_pago`, que depende de un webhook externo de Quálitas hacia Django no documentado en su spec (ver Bug #7 y su workaround). Detectado por Alberto al revisar una conversación con póliza emitida y link de pago enviado, sin forma de confirmar el pago desde ahí. **No es dependencia de Juan** — la resolución probable es manual: Laura (Hylant) reporta ventas/pagos confirmados en una hoja Excel al día siguiente. | 💡 Sin investigar — definir si conviene formalizar el reporte de Laura como fuente de verdad (p. ej. cargarlo al Dashboard) en vez de perseguir un mecanismo automático de Quálitas |
+| Cómo saber con certeza si un cliente pagó la póliza — Quálitas no documenta un endpoint de estatus de pago | 💡 Sin investigar — ver `docs/architecture/estatus-pago-qualitas.md` |
 
 ---
 
@@ -629,7 +315,10 @@ Comando de arranque: `cd ~/claude-projects/<repo> && claude`
 
 - **Persistencia entre máquinas — NUNCA usar memoria local:** Alberto trabaja desde al menos 3 laptops. La carpeta de memoria del agente (`.claude/…/memory/`) es **local a cada máquina y no se sincroniza** → se pierde al cambiar de equipo. Por tanto, TODA iniciativa, plan, backlog o cualquier cosa que deba conservarse se guarda **en git** (en `docs/iniciativas/` para iniciativas/backlog, o el `docs/` que corresponda) y se hace commit+push. Nunca en memoria.
 - **Git:** siempre `user.email = a.ibanez@gmail.com` / `user.name = aibanez82`
-- **Timezone (estándar de consistencia):** almacenar SIEMPRE el instante absoluto en `timestamptz` (UTC interno); convertir a `America/Mexico_City` (UTC-6, sin horario de verano desde 2023) SOLO en presentación (dashboard), nunca en la BD ni antes. Nunca usar `timestamp without time zone` ni comparar tz-naive con tz-aware. Verificado 4 jul: Django ya cumple (`TIME_ZONE="UTC"` + `USE_TZ=True` → todos los `DateTimeField` son `timestamptz`); el `created_at` nuevo de `n8n_chat_histories` es `timestamptz`. **⚠️ HALLAZGO CONFIRMADO (4 jul, auditoría information_schema):** Django `qualitas_*` todas `timestamptz` ✅, PERO `whatsapp_sessions` y `whatsapp_sessions_archive` tienen sus 6 columnas de tiempo (`created_at`/`last_activity`/`updated_at`) como **`timestamp without time zone` (NAIVE)**. n8n les escribe `NOW()` → el valor queda en la zona de la sesión de n8n; al compararse con timestamptz de Django o con el scheduler de follow-up → desfase ±6h. **Candidato fuerte a causa del Issue #74** (follow-up de 15 min caído). **Zona confirmada (4 jul): n8n escribe en UTC** (last_activity máx 21:06 solo es un pasado coherente si es UTC; sería futuro si fuese México). DDL de migración (Juan): `ALTER TABLE whatsapp_sessions ALTER COLUMN created_at TYPE timestamptz USING created_at AT TIME ZONE 'UTC', ALTER COLUMN last_activity TYPE timestamptz USING last_activity AT TIME ZONE 'UTC', ALTER COLUMN updated_at TYPE timestamptz USING updated_at AT TIME ZONE 'UTC';` — idem `whatsapp_sessions_archive`. n8n no requiere cambios (sigue escribiendo `NOW()`). Verificar Issue #74 tras migrar (probable fix del desfase del scheduler). DDL final en issue #87. Query de auditoría: `SELECT table_name, column_name, data_type FROM information_schema.columns WHERE table_schema='public' AND (data_type LIKE 'timestamp%' OR column_name ~ '(_at$|last_activity|fecha|occurred|sent|queued)') ORDER BY data_type, table_name;` — cualquier `timestamp without time zone` es bandera.
+- **Timezone (estándar de consistencia):** almacenar SIEMPRE el instante absoluto en `timestamptz` (UTC interno); convertir a `America/Mexico_City` SOLO en presentación (dashboard), nunca en la BD ni antes. Nunca usar `timestamp without time zone` ni comparar tz-naive con tz-aware. Hallazgo completo (auditoría `information_schema`, tablas afectadas, DDL de migración, query de auditoría reutilizable): `docs/architecture/timezone.md`.
 - **GitHub Issues:** labels con caracteres exactos incluyendo acentos (e.g. `crítico`)
 - **DB:** usar siempre `lib/db.js` del Dashboard — nunca conexiones directas ad-hoc
 - **n8n API:** `https://n8n.srv1325340.hstgr.cloud/api/v1/` con header `X-N8N-API-KEY`
+- **Convención de handoffs (aprendida 6 jul):** todo handoff a un ejecutor se deja en el repo de ESE ejecutor (`<repo>/handoffs/`) y se comunica con la **ruta absoluta completa** + ubicación git. Nunca solo en el repo del Arquitecto.
+
+> **Disciplina de CLAUDE.md:** este archivo se carga completo en cada turno — tamaño máximo **15 KB**. Aquí solo viven hechos estables y reglas operativas. Cronologías, evidencia, hallazgos e investigaciones de bugs van SIEMPRE a `docs/bugs/bug-NN-*.md` (crear el archivo si no existe); en la tabla de bugs solo se actualiza la línea de estado. Al cerrar un bug: estado → ✅ con fecha, y todo lo demás al archivo de detalle. Verificar `wc -c CLAUDE.md` tras cada edición.

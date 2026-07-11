@@ -155,3 +155,40 @@ Con instancia separada el riesgo de `webhookId` compartido desaparece, pero SIGU
    - ✅ **Serie inválida — PASA.** Probado 2 veces con el mismo VIN base: con espacio (`1HGCM82633 004352`) y truncado a 13 caracteres (`1HGCM82633A00`). El bot detectó ambos casos correctamente y re-preguntó sin intentar avanzar — nunca llegó a `Issue_Policy`.
    - ⏳ **Serie válida — en curso.** Alberto está enviando `1HGCM82633A004352` (17 caracteres válidos) para confirmar que el flujo completa hasta emisión en sandbox con el VIN correcto (no ciudad/estado) en el tool call.
    - Éxito final = 0 emisiones con ciudad en el campo `serie`.
+
+---
+
+## Consolidado desde CLAUDE.md (10 jul 2026, adelgazamiento)
+
+Bloque movido verbatim desde `CLAUDE.md`, sección "Entorno de pruebas / staging (iniciativa activa)", al adelgazar el archivo. CLAUDE.md ahora solo referencia este documento con 3 líneas.
+
+## Entorno de pruebas / staging (iniciativa activa)
+
+Staging end-to-end para replicar bug fixes antes de prod (gitflow `stg`→`main`). Objetivo inmediato: validar el fix del **Bug #10** (VIN/serie) E2E antes de mergear. Detalle vivo: `docs/iniciativas/entorno-pruebas-staging.md`.
+
+**Nuevo participante (8 jul): Agente QA & Testing** (`aibanez82/Agente_QATest_Qualitas`) se incorpora para **liderar las pruebas E2E en STG** — poder correr un flujo completo sin llenar la landing a mano, y validar cambios de `systemMessage` (¿el bot ahora se comporta como queremos?). Contexto del ecosistema y del entorno STG ya cargado en su `context/ARQUITECTO.md`. **Pendiente de diseño (Arquitecto):** el método para generar el lead+cotización inicial sin pasar por la landing — hoy ese flujo lo dispara el webhook "lead creado" de Django hacia n8n, y el payload/contrato exacto para simularlo sintéticamente en STG todavía no está documentado. **Aviso importante para cualquier prueba WhatsApp real en STG:** el Bug #15 sigue activo — cada mensaje a STG también se procesa en PROD hasta que se despliegue la mitigación retenida (`docs/2026-07-08-handoff-agente-n8n-bug15-filtro-phone-number-id-prod.md`).
+
+**Principio rector:** stack paralelo completo; cada componente de staging apunta SOLO a gemelos de staging, nunca a prod (riesgo #1 = staging escribiendo/disparando contra prod).
+
+**Mapa prod → staging:**
+
+| Componente | Staging | Estado |
+|---|---|---|
+| Backend/landing | `hyl-wai-stg` (`https://hyl-wai-stg-d1085ad74dbf.herokuapp.com`, deploy desde rama `stg`) | ✅ existe |
+| Base de datos | Addon Postgres propio de `hyl-wai-stg` | ✅ (`STG_DATABASE_URL`) |
+| n8n (bot WA) | **Instancia SEPARADA** en Hostinger `https://n8n-xlqk.srv1810257.hstgr.cloud` (servidor `srv1810257` ≠ prod `srv1325340`; BD/encryption key propias) | ✅ viva, API habilitada. Decisión clave: instancia separada para NO recaer en el Bug #12 (webhookId compartido) |
+| Número WhatsApp | 2ª Meta App + número de test (Cloud API) | ✅ creada (7 jul) — E2E en pruebas con Agente n8n |
+| Quálitas | Sandbox QA (`QUALITAS_URL`→`qa.qualitas.com.mx`; el switch es la URL, NO `QUALITAS_AMBIENTE_FLAG`) | ✅ credenciales QA + `QUALITAS_AMBIENTE_FLAG=0` (valor de prueba) ya en Heroku `hyl-wai-stg` — confirmado por Alberto 7 jul |
+| Dashboard | `stg` (Vercel git-branch alias fijo) → `hyl-wai-stg` (`dei0jssp8kr5kv`) | ✅ Consolidado (10 jul) — única rama/base/URL de STG, ver detalle en Bug #17 |
+
+**Hecho y verificado por el Arquitecto (6 jul):**
+- Instancia n8n stg aislada + API (`N8N_STG_API_KEY` en `.env.local`).
+- Credencial **Postgres STG** `5wlLe3gD07CLIM7U` + **Anthropic STG** `aHI51VvnRnPixCx5`.
+- Workflow del bot **con el fix Bug #10 importado** (desde `aibanez82/Agente-n8n` rama `stg`): `WhatsApp Insurance Quotation Bot_stg` id **`dNqtM20ij6ecZYAX`**, **inactivo**, 61 nodos, 0 refs a prod, VIN-17 presente, Django→`hyl-wai-stg`. Ejecutado por el Agente n8n vía API, verificado contra la instancia viva.
+
+**✅ 2ª Meta App de test creada (7 jul) — bloqueador del E2E resuelto.** Alberto está corriendo pruebas E2E con el Agente n8n (handoff v2). Pendiente reporte de resultado.
+
+**Fase E2E ya especificada (handoff v2, modelo OAuth2 nativo):** el trigger `whatsAppTrigger` de n8n es **OAuth2** (`clientId`=App ID / `clientSecret`=App Secret); `whatsAppApi` (Send) pide `accessToken`+`businessAccountId` (WABA). Modelo A (nativo) elegido porque prod usa ese trigger → staging debe ser gemelo fiel. Requiere: 6 secretos de Juan (`STG_WA_ACCESS_TOKEN`, `STG_WA_BUSINESS_ACCOUNT_ID`, `STG_WA_APP_ID`, `STG_WA_APP_SECRET`, `STG_WA_PHONE_NUMBER_ID`), whitelist de la redirect URL OAuth de n8n en la App, y un **"Connect" OAuth2 manual de Alberto** en la UI (la API no lo hace). Handoff: `Agente-n8n:handoffs/2026-07-06-fase-e2e-staging-bug10.md` (canónico en `docs/2026-07-06-handoff-agente-n8n-fase-e2e-staging-bug10.md`).
+
+
+**Gotchas de import por API n8n (reutilizables):** (1) reducir el export a `{name,nodes,connections,settings}` (rechaza `active`/`id`/`tags`/`shared`/`activeVersion`/`pinData`); (2) filtrar `settings` a claves válidas — `binaryMode`/`availableInMCP` dan 400; (3) el import heredó el `webhookId 18c1b498` de prod (Bug #12) → regenerar en la fase E2E.
