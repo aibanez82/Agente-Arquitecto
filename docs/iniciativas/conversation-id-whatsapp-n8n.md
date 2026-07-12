@@ -42,7 +42,7 @@ Resuelve de raíz **Issue #21** (confirmado en la auditoría E2E del 11 jul: `se
 | Juan / Django | Rama lista y shadow-safe. Falta merge a `stg` + deploy cuando Agente n8n esté listo para probar `dual`. Debe correr la migración 0033 en STG antes de cualquier prueba. | `aguayo-co/HYL-WAI` |
 | Agente n8n | Reescribir `Session Context Builder`, `Merge Session Data`, `Load Session`, el nodo de cierre de pago, el INSERT de Retomar Conversación. | `Agente-n8n/handoffs/2026-07-12-handoff-conversation-id-whatsapp.md` |
 | Agente QA | Plan de pruebas fases 3-4 en staging. | `Agente_QATest_Qualitas/handoffs/2026-07-12-handoff-test-conversation-id-whatsapp.md` |
-| Alberto | Validar en Meta Business Manager que la plantilla `cotizacion_inicial_link` tiene botón quick-reply en posición 0 **antes** de pasar Django a `dual` en cualquier ambiente. | Meta Business Manager |
+| Juan | Validar en Meta Business Manager (él es el dueño de la cuenta Meta) que la plantilla `cotizacion_inicial_link` tiene botón quick-reply en posición 0 **antes** de pasar Django a `dual` en cualquier ambiente. Correr la migración 0033 en STG. Mergear la rama a `stg` + deploy con el flag correspondiente. | Meta Business Manager / Heroku |
 
 ## Riesgos / cosas a vigilar
 
