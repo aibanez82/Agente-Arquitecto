@@ -214,6 +214,8 @@ Repo: `aibanez82/Agente-n8n` (clonado en `~/claude-projects/Agente-n8n`, push di
 
 Staging end-to-end paralelo a prod (gitflow `stg`→`main`) para validar bug fixes antes de desplegar. Instancia n8n STG: `https://n8n-xlqk.srv1810257.hstgr.cloud`. **Principio rector:** cada componente de staging apunta SOLO a gemelos de staging, nunca a prod. Mapa completo prod→staging, credenciales, gotchas de import: `docs/iniciativas/entorno-pruebas-staging.md`.
 
+**Iniciativa activa (12 jul):** Juan propone mover la identidad conversacional de n8n de `phone_number` a `conversation_id` (resuelve de raíz Issue #21). Validado, handoffs enviados a Agente n8n y Agente QA, nada desplegado aún. Detalle: `docs/iniciativas/conversation-id-whatsapp-n8n.md`.
+
 ---
 
 ## Pendientes de infraestructura
