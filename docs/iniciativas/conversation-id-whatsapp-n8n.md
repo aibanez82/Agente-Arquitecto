@@ -96,6 +96,10 @@ Al probar un click de botón real en STG, la ejecución tronó: `Detect Jailbrea
 
 Agente n8n lo encontró de forma independiente (issue #33), arregló el caso del botón (`chatInput = "Continuar cotización"`, ya en vivo en STG) y pidió coordinación antes de ampliar a los demás tipos no-texto. Le di luz verde para extender el mismo patrón (placeholder descriptivo por tipo). Es un fix independiente de esta iniciativa — puede subir a PROD antes, no hace falta esperar a `dual`.
 
+## Bug cruzado con M19 — shape real del botón de Meta no reconocido (13 jul, issue #35, resuelto)
+
+Al validar M19 con tráfico real, Agente n8n encontró que el botón real de plantilla de Meta llega como `{type:"button", button:{payload,...}}`, no `{type:"interactive", interactive:{button_reply}}` — el único shape que `Session Context Builder` reconocía. Consecuencia directa para esta iniciativa: **cualquier click real de botón caía a `lookupMode: phone_open_sessions` en vez de `payload_v1`**, ignorando silenciosamente la resolución por `quotation_id`. Ya corregido (commit `d4ed837`) y verificado en vivo por el Arquitecto — cruzado además con una ejecución E2E real que llegó hasta emisión de póliza (`7620098629`, cotización 1691, confirmada en BD STG). Esto también resuelve, de facto, la "Prueba adicional (click quick reply v2 real)" que quedaba pendiente en fase 3 — aunque falta repetirla explícitamente ahora que el shape correcto está reconocido.
+
 ## Riesgos / cosas a vigilar
 
 - **Sequencing:** n8n y Dashboard pueden prepararse en paralelo, pero probar `dual` de verdad requiere que Django esté desplegado en `shadow`/`dual` en STG primero — coordinar con Juan el momento del merge + deploy a `hyl-wai-stg`.
