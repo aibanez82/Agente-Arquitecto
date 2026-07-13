@@ -40,17 +40,24 @@ Resuelve de raíz **Issue #21** (confirmado en la auditoría E2E del 11 jul: `se
 | Quién | Qué | Dónde |
 |---|---|---|
 | Juan / Django | Rama lista y shadow-safe. Falta merge a `stg` + deploy cuando Agente n8n esté listo para probar `dual`. Debe correr la migración 0033 en STG antes de cualquier prueba. | `aguayo-co/HYL-WAI` |
-| Agente n8n | Reescribir `Session Context Builder`, `Merge Session Data`, `Load Session`, el nodo de cierre de pago, el INSERT de Retomar Conversación. | `Agente-n8n/handoffs/2026-07-12-handoff-conversation-id-whatsapp.md` |
-| Agente QA | Plan de pruebas fases 3-4 en staging. | `Agente_QATest_Qualitas/handoffs/2026-07-12-handoff-test-conversation-id-whatsapp.md` |
+| Agente n8n | Reescribir `Session Context Builder`, `Merge Session Data`, `Load Session`, el nodo de cierre de pago, el INSERT de Retomar Conversación. **Actualizado 12 jul tarde:** requiere además reestructurar `Check Session Exists`/`Load Session`/`Session Router` (ver abajo) — no basta con tocar solo `Session Context Builder`. | `Agente-n8n/handoffs/2026-07-12-handoff-conversation-id-whatsapp.md` |
+| Code Agent Dashboard | Endpoint proactivo (`n8n-proactive-message.js`), quitar fallback `'52'+telefono` en `LeadModal.js`, resolver conversación por `cotizacion_id` en `conversation.js`, exponer columnas nuevas en `db-leads.js`, actualizar `CLAUDE.md` propio. | `Dashboard_SeguroAuto/docs/2026-07-12-handoff-conversation-id-whatsapp.md` |
+| Agente QA | Plan de pruebas fases 3-4 en staging (n8n + Django). Pendiente sumar los 4 casos del Dashboard (legacy, v2, multi-cotización, sin sesión) cuando el Code Agent tenga su parte lista. | `Agente_QATest_Qualitas/handoffs/2026-07-12-handoff-test-conversation-id-whatsapp.md` |
 | Juan | Validar en Meta Business Manager (él es el dueño de la cuenta Meta) que la plantilla `cotizacion_inicial_link` tiene botón quick-reply en posición 0 **antes** de pasar Django a `dual` en cualquier ambiente. Correr la migración 0033 en STG. Mergear la rama a `stg` + deploy con el flag correspondiente. | Meta Business Manager / Heroku |
+
+## Actualización (12 jul, tarde) — Juan amplió el documento con 2 hallazgos
+
+1. **Nuevo alcance: Dashboard.** Juan auditó el zip del Dashboard y entregó `docs/reporte-alberto-dashboard-conversation-id-whatsapp.md` — reemplaza cualquier guía previa tipo `resumen-fix-whatsapp-sessions-n8n.md`. Hallazgo principal: el endpoint proactivo valida `session_id.startsWith('52')`, que es falso en v2, y `LeadModal.js` inventa `session_id = '52'+telefono` cuando falta — ambos rompen con `conversation_id`. El funnel principal NO se rompe (sigue uniendo por `quotation_id`). Traducido a handoff concreto arriba.
+2. **Corrección estructural en n8n, validada contra el export real de STG (no PROD).** La cadena STG es `Session Context Builder -> Check Session Exists -> Session Router -> Load Session/Fallback Flag -> Merge Session Data`. `Check Session Exists`/`Load Session` solo buscan por `session_id` literal, y `Session Context Builder` no consulta Postgres — así que reescribir solo ese nodo (como decía mi handoff original) **no alcanza**: payload v1, mensajes sin payload y desambiguación seguirían cayendo en fallback. Hace falta un nodo `Resolve Session` nuevo, o reescribir `Check Session Exists`/`Load Session` en sitio. Ya corregido en el handoff del Agente n8n.
 
 ## Riesgos / cosas a vigilar
 
-- **Sequencing:** n8n puede prepararse en paralelo, pero probar `dual` de verdad requiere que Django esté desplegado en `shadow`/`dual` en STG primero — coordinar con Juan el momento del merge + deploy a `hyl-wai-stg`.
+- **Sequencing:** n8n y Dashboard pueden prepararse en paralelo, pero probar `dual` de verdad requiere que Django esté desplegado en `shadow`/`dual` en STG primero — coordinar con Juan el momento del merge + deploy a `hyl-wai-stg`.
 - Este cambio toca el mismo workflow de pago que **#7** y el mismo INSERT silencioso de **#4** — conviene resolverlos en la misma pasada, no en dos handoffs separados que reabran el mismo nodo dos veces.
 - STG no tiene todavía las columnas nuevas — no está migrado. Confirmar con Juan que la migración 0033 corrió ahí antes de que Agente n8n empiece a probar contra `Postgres STG`.
 - No pasar producción a `enforced` sin pasar por `shadow` y `dual` primero (explícito en el documento de Juan — respetar el orden).
+- La reestructuración de `Check Session Exists`/`Load Session`/`Session Router` es más invasiva de lo que se pensó inicialmente — vale la pena que el Agente n8n confirme cuál de las 2 opciones (nodo nuevo vs. reescribir en sitio) eligió antes de que avance mucho.
 
 ## Estado
 
-🟡 12 jul: propuesta validada, handoffs enviados a Agente n8n y Agente QA. Nada desplegado todavía en ningún ambiente.
+🟡 12 jul (tarde): propuesta ampliada a Dashboard + corregida estructuralmente en n8n. Handoffs actualizados/enviados a Agente n8n, Agente QA y Code Agent Dashboard. Nada desplegado todavía en ningún ambiente.
