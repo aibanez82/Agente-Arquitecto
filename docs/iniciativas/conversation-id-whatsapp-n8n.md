@@ -77,6 +77,19 @@ Alberto activó los 3 workflows STG para probar y `Resolve Session` tronó: `val
 - Aplicado por Agente n8n en caliente (commit `b03e6bf`, rama `stg` de `Agente-n8n`) sin desactivar el workflow para no interrumpir la prueba en curso.
 - Verificado de nuevo por el Arquitecto post-fix: `active: true` sin cambios, `webhookId` sin cambios, query confirmada con el cast vía API. Revisión cruzada de las otras 2 queries nuevas (Payment Confirmation, Retomar Conversacion) — sin el mismo patrón, no necesitaban cambio.
 
+## Fase 3 (QA) — 3 de 4 checks confirmados, 1 desbloqueado por el fix del #32 (13 jul)
+
+Agente QA corrió fase 3 de forma híbrida (tráfico STG real + lectura directa Postgres + cruce estático de código, sin necesidad de activar n8n para los primeros 3 checks) y **encontró el mismo bug del `Resolve Session` de forma independiente** — lo abrió como Issue #32 antes de ver mi handoff, y cruzó referencia sola al notarlo. Buena señal de que el tracker funciona sin pasar todo por mí.
+
+| Check | Resultado |
+|---|---|
+| 1. Payload v1 sigue funcionando | ✅ Confirmado con evidencia real (`qualitas_whatsappmessage` de cotizaciones 1686/1687) |
+| 2. Sesión legacy sigue encontrándose | ✅ Confirmado contra 2 filas legacy reales de marzo 2026 |
+| 3. Pago sin `conversation_id` cierra por teléfono | 🟡 Confirmado por contrato de código (Django + query del nodo), no por un pago real disparado a propósito |
+| 4. Mensaje sin payload resuelve por teléfono | 🟡 Diseño correcto, pero bloqueado por el #32 — pendiente de repetir en vivo ahora que está resuelto |
+
+Le pasé el GO a QA para repetir el check #4 en vivo y la prueba de click v2 real (esta última no aplica todavía en `shadow`, solo cuando Juan pase a `dual`). Con el check #4 confirmado, fase 3 queda completa y es luz verde para pedirle a Juan el cambio a `dual`.
+
 ## Riesgos / cosas a vigilar
 
 - **Sequencing:** n8n y Dashboard pueden prepararse en paralelo, pero probar `dual` de verdad requiere que Django esté desplegado en `shadow`/`dual` en STG primero — coordinar con Juan el momento del merge + deploy a `hyl-wai-stg`.
