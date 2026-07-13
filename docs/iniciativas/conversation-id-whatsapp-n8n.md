@@ -50,6 +50,16 @@ Resuelve de raíz **Issue #21** (confirmado en la auditoría E2E del 11 jul: `se
 1. **Nuevo alcance: Dashboard.** Juan auditó el zip del Dashboard y entregó `docs/reporte-alberto-dashboard-conversation-id-whatsapp.md` — reemplaza cualquier guía previa tipo `resumen-fix-whatsapp-sessions-n8n.md`. Hallazgo principal: el endpoint proactivo valida `session_id.startsWith('52')`, que es falso en v2, y `LeadModal.js` inventa `session_id = '52'+telefono` cuando falta — ambos rompen con `conversation_id`. El funnel principal NO se rompe (sigue uniendo por `quotation_id`). Traducido a handoff concreto arriba.
 2. **Corrección estructural en n8n, validada contra el export real de STG (no PROD).** La cadena STG es `Session Context Builder -> Check Session Exists -> Session Router -> Load Session/Fallback Flag -> Merge Session Data`. `Check Session Exists`/`Load Session` solo buscan por `session_id` literal, y `Session Context Builder` no consulta Postgres — así que reescribir solo ese nodo (como decía mi handoff original) **no alcanza**: payload v1, mensajes sin payload y desambiguación seguirían cayendo en fallback. Hace falta un nodo `Resolve Session` nuevo, o reescribir `Check Session Exists`/`Load Session` en sitio. Ya corregido en el handoff del Agente n8n.
 
+## Dashboard — completado en rama, bloqueado en la misma migración (12 jul, noche)
+
+El Code Agent del Dashboard implementó los 6 puntos del checklist en rama `fix/conversation-id-whatsapp-n8n` (commit `c18bf18`, pusheada, **sin mergear a `main`**). Reportó y el Arquitecto verificó en vivo:
+
+- **STG todavía no tiene la migración 0033** — confirmado directo contra la Postgres de `hyl-wai-stg` (vía Heroku API + Heroku Platform, no solo el acceso readonly del sandbox del Dashboard): `whatsapp_sessions` no tiene `conversation_id`/`lead_id`/`status`/`closed_at`, y `django_migrations` se detiene en `0032`. `WHATSAPP_CONVERSATION_ID_MODE` ni siquiera está seteado como config var en `hyl-wai-stg` todavía.
+- El código nuevo del Dashboard, al depender de esas columnas, **rompe con error SQL duro si se corre hoy** — el Code Agent lo verificó honestamente contra PROD antes de asumir éxito, y correctamente no mergeó ni desplegó nada.
+- ⚠️ **Riesgo operativo a vigilar:** Vercel genera Preview automático por rama — el Preview de `fix/conversation-id-whatsapp-n8n` en el Dashboard va a mostrar `/api/db-leads` roto (500) hasta que la migración aterrice en STG. No es un bug nuevo si alguien lo abre por error.
+- Spot-check del Arquitecto sobre `pages/api/n8n-proactive-message.js`: el diff coincide con el handoff (SELECT ampliado, validación sobre `phone_number`, payload nuevo a n8n). Sin objeciones.
+- Las 4 pruebas mínimas quedan pendientes de correr contra STG una vez migrado — coordinar con Agente QA.
+
 ## Riesgos / cosas a vigilar
 
 - **Sequencing:** n8n y Dashboard pueden prepararse en paralelo, pero probar `dual` de verdad requiere que Django esté desplegado en `shadow`/`dual` en STG primero — coordinar con Juan el momento del merge + deploy a `hyl-wai-stg`.
