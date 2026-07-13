@@ -90,6 +90,12 @@ Agente QA corrió fase 3 de forma híbrida (tráfico STG real + lectura directa 
 
 Le pasé el GO a QA para repetir el check #4 en vivo y la prueba de click v2 real (esta última no aplica todavía en `shadow`, solo cuando Juan pase a `dual`). Con el check #4 confirmado, fase 3 queda completa y es luz verde para pedirle a Juan el cambio a `dual`.
 
+## Bug aparte encontrado en la misma sesión — chatInput vacío truena Detect Jailbreak (13 jul)
+
+Al probar un click de botón real en STG, la ejecución tronó: `Detect Jailbreak` recibe un turno vacío (`chatInput=""`) cuando el mensaje no es texto plano, y Anthropic lo rechaza (`user messages must have non-empty content`), sin `errorWorkflow` configurado — el cliente se queda sin respuesta. **No es un bug de esta iniciativa** — confirmé que el mismo código vive en PROD hoy (latente: solo no se dispara porque `WHATSAPP_TEMPLATE_QUOTE_INITIAL_HAS_BUTTON=false` ahí, pero cualquier imagen/sticker/audio real de un cliente lo dispara igual).
+
+Agente n8n lo encontró de forma independiente (issue #33), arregló el caso del botón (`chatInput = "Continuar cotización"`, ya en vivo en STG) y pidió coordinación antes de ampliar a los demás tipos no-texto. Le di luz verde para extender el mismo patrón (placeholder descriptivo por tipo). Es un fix independiente de esta iniciativa — puede subir a PROD antes, no hace falta esperar a `dual`.
+
 ## Riesgos / cosas a vigilar
 
 - **Sequencing:** n8n y Dashboard pueden prepararse en paralelo, pero probar `dual` de verdad requiere que Django esté desplegado en `shadow`/`dual` en STG primero — coordinar con Juan el momento del merge + deploy a `hyl-wai-stg`.
