@@ -60,6 +60,15 @@ El Code Agent del Dashboard implementó los 6 puntos del checklist en rama `fix/
 - Spot-check del Arquitecto sobre `pages/api/n8n-proactive-message.js`: el diff coincide con el handoff (SELECT ampliado, validación sobre `phone_number`, payload nuevo a n8n). Sin objeciones.
 - Las 4 pruebas mínimas quedan pendientes de correr contra STG una vez migrado — coordinar con Agente QA.
 
+## n8n — completado en STG, verificado por el Arquitecto (12 jul, noche)
+
+Agente n8n subió los 3 workflows a STG vía API, **inactivos**. Verificado en vivo por el Arquitecto contra la instancia STG (no solo tomando el reporte por bueno): `active: false` en los 3, conteo de nodos exacto (66/6/4), `webhookId` de los triggers principales sin cambios respecto al pre-existente. Todo coincide con lo reportado.
+
+- **Decisión estructural:** tomó la opción recomendada del handoff — nodo `Resolve Session` nuevo (repotenciando `Check Session Exists`) + `Session Resolution` (Code) que interpreta el resultado, en vez de reescribir `Check Session Exists`/`Load Session` en sitio. `Load Session` quedó eliminado de la cadena, su lógica absorbida por los nodos nuevos.
+- **Hallazgo no anticipado por el handoff:** `Format & Validate Message` (Payment Confirmation) descartaba por completo `conversation_id`/`cotizacion_id`/`lead_id` del payload — el handoff decía "no toca esa parte", pero en los hechos si había que tocarla para que propagara esos campos. Corregido.
+- **Riesgo abierto, sin resolver a propósito:** los nombres de campo de `quotation_data` usados en el mensaje de desambiguación (`marca`/`submarca`/`modelo`/`cobertura`/`forma_pago`/`prima_total`) son **best-effort**, sin confirmar contra una fila real de STG — el propio Agente n8n lo marcó como pendiente de que QA lo verifique antes de darlo por bueno. No implementó el fallback a `/api/cotizacion/detalle/` por candidato (mencionado como alternativa en el handoff) — quedó fuera de alcance a propósito para no ampliar riesgo sin poder probarlo.
+- **Aparte, no relacionado con este handoff:** encontró `.env`/`.env.local` con secretos reales de prod y STG commiteados en el historial de `Agente-n8n` (commit `6a1bf78`, 11 jul). Decisión tomada con Alberto: repo privado, riesgo bajo, no se reescribe el historial; se agregó `.gitignore` para que no se repita. **Pendiente sin decidir: rotar las keys expuestas.**
+
 ## Riesgos / cosas a vigilar
 
 - **Sequencing:** n8n y Dashboard pueden prepararse en paralelo, pero probar `dual` de verdad requiere que Django esté desplegado en `shadow`/`dual` en STG primero — coordinar con Juan el momento del merge + deploy a `hyl-wai-stg`.
@@ -70,4 +79,4 @@ El Code Agent del Dashboard implementó los 6 puntos del checklist en rama `fix/
 
 ## Estado
 
-🟡 12 jul (tarde): propuesta ampliada a Dashboard + corregida estructuralmente en n8n. Handoffs actualizados/enviados a Agente n8n, Agente QA y Code Agent Dashboard. Nada desplegado todavía en ningún ambiente.
+🟡 12 jul (noche): **n8n y Dashboard, listos y verificados por el Arquitecto — ambos bloqueados en el mismo punto.** Único pendiente real: **Juan** — correr la migración 0033 en STG, confirmar el template de Meta, mergear y desplegar `hyl-wai-stg` con el flag. Sin movimiento de su parte desde el 12 jul (verificado — rama sin commits nuevos). Nada activado ni desplegado en ningún ambiente todavía. Cuando Juan confirme migración: (1) avisar a Agente QA para fase 3, (2) pedirle a QA que verifique los nombres de campo de `quotation_data` en el mensaje de desambiguación antes de la fase 4.
