@@ -69,6 +69,14 @@ Agente n8n subió los 3 workflows a STG vía API, **inactivos**. Verificado en v
 - **Riesgo abierto, sin resolver a propósito:** los nombres de campo de `quotation_data` usados en el mensaje de desambiguación (`marca`/`submarca`/`modelo`/`cobertura`/`forma_pago`/`prima_total`) son **best-effort**, sin confirmar contra una fila real de STG — el propio Agente n8n lo marcó como pendiente de que QA lo verifique antes de darlo por bueno. No implementó el fallback a `/api/cotizacion/detalle/` por candidato (mencionado como alternativa en el handoff) — quedó fuera de alcance a propósito para no ampliar riesgo sin poder probarlo.
 - **Aparte, no relacionado con este handoff:** encontró `.env`/`.env.local` con secretos reales de prod y STG commiteados en el historial de `Agente-n8n` (commit `6a1bf78`, 11 jul). Decisión tomada con Alberto: repo privado, riesgo bajo, no se reescribe el historial; se agregó `.gitignore` para que no se repita. **Pendiente sin decidir: rotar las keys expuestas.**
 
+## Bug bloqueante encontrado y resuelto (13 jul) — tipo de parámetro mixto en `Resolve Session`
+
+Alberto activó los 3 workflows STG para probar y `Resolve Session` tronó: `value "525551074144" is out of range for type integer`. Causa raíz: `$2` se reutilizaba contra `session_id`/`conversation_id`/`phone_number` (`varchar`) y `quotation_id` (`integer`) en la misma sentencia — Postgres resuelve un solo tipo por parámetro en todo el statement, y al tocar `quotation_id` fijaba `$2` como `integer`. Rompía 2 de los 3 `lookupMode` en la práctica (`phone_open_sessions` y `payload_v2`), no solo el caso del teléfono largo.
+
+- Fix verificado por el Arquitecto en vivo contra la Postgres real de STG **antes** de mandarlo (las 3 rutas probadas, incluida una fila real de la prueba de Alberto): `quotation_id::text = $2`.
+- Aplicado por Agente n8n en caliente (commit `b03e6bf`, rama `stg` de `Agente-n8n`) sin desactivar el workflow para no interrumpir la prueba en curso.
+- Verificado de nuevo por el Arquitecto post-fix: `active: true` sin cambios, `webhookId` sin cambios, query confirmada con el cast vía API. Revisión cruzada de las otras 2 queries nuevas (Payment Confirmation, Retomar Conversacion) — sin el mismo patrón, no necesitaban cambio.
+
 ## Riesgos / cosas a vigilar
 
 - **Sequencing:** n8n y Dashboard pueden prepararse en paralelo, pero probar `dual` de verdad requiere que Django esté desplegado en `shadow`/`dual` en STG primero — coordinar con Juan el momento del merge + deploy a `hyl-wai-stg`.
