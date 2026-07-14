@@ -78,7 +78,13 @@ Anidado por grupo (no plano) para que "¿qué porcentaje lleva?" sea tan simple 
 - `Save Policy Data` nunca se disparaba — su condición de éxito dependía de `link_pago`, que viene `null` en una emisión genuinamente exitosa.
 - `$now.toISO()` como parámetro corrompía el parseo del resto de la query.
 
-Verificado por el Arquitecto contra la Postgres real de STG: fila de cotización 1702 con `captured_data` completo (grupo1+grupo2+grupo3, datos reales — nombre, RFC, placas, domicilio). El mecanismo funciona. `policy_data` sigue por confirmar con una fila que haya llegado a emisión completa.
+Verificado por el Arquitecto contra la Postgres real de STG: fila de cotización 1702 con `captured_data` completo (grupo1+grupo2+grupo3, datos reales — nombre, RFC, placas, domicilio). El mecanismo funciona.
+
+**Actualización 14 jul — `policy_data` sigue sin funcionar, y `conversation_phase` resuelve la necesidad original de todos modos.** Nota completa de Agente n8n: `Agente-n8n:docs/2026-07-14-nota-para-juan-estados-persistidos-captured-data-policy-data.md`.
+
+- `policy_data` falló en las 4 conversaciones de prueba, incluso después del fix tentativo del 14 jul (referencia a `Session Resolution`) — verificado por el Arquitecto: cotización 1705 llegó a `conversation_phase = 'payment_pending'` con `policy_data: {}`. Sin fix definitivo todavía.
+- **No es un bloqueante real**: `conversation_phase` (columna ya existente, determinística — se actualiza en la cadena principal del workflow, no depende de que el LLM decida llamar una tool) progresa `greeting → data_capture → summary_confirmation → policy_issuance → payment_pending → completed`. `payment_pending` es exactamente "póliza emitida, link de pago enviado, esperando pago" — confirmado sin una sola falla en las 4 pruebas. Es la señal que la política de seguimiento proactivo necesitaba para el escenario "link de pago expira", sin depender de `policy_data` en absoluto.
+- `captured_data` sí queda validado para el escenario "70% completado": `count(keys(captured_data))/3`, con la advertencia honesta de que sigue dependiendo de que el LLM llame la tool en el turno correcto — vale monitorear consistencia antes de construir lógica de negocio dura sobre esto (no solo dashboards informativos).
 
 Alberto decidió no rotar las keys expuestas del hallazgo anterior (secretos en git) por ahora — sin relación con esta iniciativa, se deja anotado para no repreguntar.
 
