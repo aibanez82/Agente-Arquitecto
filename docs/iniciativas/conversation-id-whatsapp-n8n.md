@@ -108,6 +108,10 @@ Al validar M19 con tráfico real, Agente n8n encontró que el botón real de pla
 - No pasar producción a `enforced` sin pasar por `shadow` y `dual` primero (explícito en el documento de Juan — respetar el orden).
 - La reestructuración de `Check Session Exists`/`Load Session`/`Session Router` es más invasiva de lo que se pensó inicialmente — vale la pena que el Agente n8n confirme cuál de las 2 opciones (nodo nuevo vs. reescribir en sitio) eligió antes de que avance mucho.
 
+## Cierre del día (14 jul) — M19 (4 adendas), M1, M20, M21 completos; persistencia incremental nueva
+
+Todo verificado en vivo por el Arquitecto. Ver `Agente-n8n:docs/2026-07-14-resumen-dia-arquitecto-mejoras-conversacion.md` para el detalle completo del ejecutor. Resumen: M19 con sus 4 adendas (variación de aperturas, negritas, calidez en corrección, apertura cálida en resumen), M1 completo (resultó no estar aplicado en absoluto pese al reporte inicial), M20 (otro vehículo), M21 (KB "adultos mayores", nodo confirmado vía log real: `RAG IA Agent`), y la nueva capacidad de persistencia incremental (`docs/iniciativas/persistencia-incremental-datos-capturados.md`). Issue #37 (edad máxima) resuelto del lado n8n, mitad de Django pendiente. Nada de esto se aplicó a PROD todavía — todo vive en STG por diseño.
+
 ## Estado
 
 🟡 12 jul (noche): **n8n y Dashboard, listos y verificados por el Arquitecto — ambos bloqueados en el mismo punto.** Único pendiente real: **Juan** — correr la migración 0033 en STG, confirmar el template de Meta, mergear y desplegar `hyl-wai-stg` con el flag. Sin movimiento de su parte desde el 12 jul (verificado — rama sin commits nuevos). Nada activado ni desplegado en ningún ambiente todavía. Cuando Juan confirme migración: (1) avisar a Agente QA para fase 3, (2) pedirle a QA que verifique los nombres de campo de `quotation_data` en el mensaje de desambiguación antes de la fase 4.

@@ -72,7 +72,15 @@ Anidado por grupo (no plano) para que "¿qué porcentaje lleva?" sea tan simple 
 
 ## Estado y próximo paso
 
-🟡 13 jul: diseño corregido, convertido en handoff para Agente n8n — ver `Agente-n8n:handoffs/2026-07-13-handoff-persistencia-incremental-captured-data.md`. Alberto decidió no rotar las keys expuestas del hallazgo anterior (secretos en git) por ahora — sin relación con esta iniciativa, se deja anotado para no repreguntar.
+✅ 14 jul: **implementado y verificado en vivo.** 4 tools nuevas (`Save Group1/2/3 Progress`, `Save Policy Data`) conectadas al `AI Agent`. Tomó 4 rondas de bugs reales antes de funcionar de punta a punta — todos documentados en `Agente-n8n:docs/2026-07-14-*.md`:
+- Conteo de parámetros mal diagnosticado al inicio (fix corregido después).
+- Causa real: `$fromAI` con cadena vacía le hace perder a n8n una posición de parámetro completa — gotcha general para cualquier tool con campos opcionales, no solo estas 4.
+- `Save Policy Data` nunca se disparaba — su condición de éxito dependía de `link_pago`, que viene `null` en una emisión genuinamente exitosa.
+- `$now.toISO()` como parámetro corrompía el parseo del resto de la query.
+
+Verificado por el Arquitecto contra la Postgres real de STG: fila de cotización 1702 con `captured_data` completo (grupo1+grupo2+grupo3, datos reales — nombre, RFC, placas, domicilio). El mecanismo funciona. `policy_data` sigue por confirmar con una fila que haya llegado a emisión completa.
+
+Alberto decidió no rotar las keys expuestas del hallazgo anterior (secretos en git) por ahora — sin relación con esta iniciativa, se deja anotado para no repreguntar.
 
 ## Relacionado
 
