@@ -1,5 +1,21 @@
 # Plan de despliegue a producción — 14 jul 2026
 
+## ✅ Resultado — verificado en vivo (14 jul, tarde)
+
+**Track B se portó a PROD** — workflow `BtOaZm7WlZT-24V7hqCnF` actualizado 14:47 UTC (08:47 CDMX),
+70 nodos, activo. **Sin que quedara registro aquí de que el gate (6ª prueba, issue #38) se cerró
+antes de portar** — desviación del plan, dejarla explícita para no repetirla.
+
+Verificación en vivo del Arquitecto: ejecuciones del workflow desde el port en adelante, todas
+`status=success`. 4 leads creados el 14 jul (IDs 1302-1305, canales LANDING/WHATSAPP) — los 4 con
+email en `TEST_EMAILS` del Dashboard (Juan probando, QA, `rarefe@hotmail.com`), por eso el
+Dashboard mostraba "0 leads + 4 test" y generó una alarma falsa de "no llegan leads". **Alberto
+confirmó el mismo día que sí llega todo bien a PROD.**
+
+**Track A (Django shadow) NO se desplegó** — `hyl-wai-production` sigue en el release de marzo,
+sin release nuevo el 14 jul. Sigue pendiente, en paralelo, sin bloquear nada.
+
+
 > Origen: Juan pide subir "todo lo de hoy" a producción. Su recomendación (sección F de su
 > reporte) habla de desplegar Django en `shadow` con monitoreo 24-72h y no pasar a `dual` hasta
 > confirmar el workflow de n8n actualizado en staging.
