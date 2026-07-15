@@ -1,7 +1,7 @@
 # CLAUDE.md — Ecosistema IA Quálitas/Insurmind
 
 > Fuente de verdad del Arquitecto-IA-Qualitas.
-> Actualizado: 29 junio 2026 (v2 — botón "Tomar conversación").
+> Actualizado: 14 julio 2026 (limpieza — cronologías e ítems resueltos movidos a `docs/`).
 
 ---
 
@@ -68,7 +68,7 @@ Observabilidad:
 
 **Regla crítica de arquitectura:** Django y n8n comparten la misma BD Postgres.
 
-**✅ CORRECCIÓN (9 jul 2026):** Django **NO** dispara ningún webhook a n8n al crear el lead. Lo que realmente pasa: (a) Django genera el PDF de cotización; (b) manda el primer WhatsApp **directo vía Meta Graph API**, sin pasar por n8n; (c) hace un `INSERT INTO whatsapp_sessions` por SQL crudo — **ahí nace el prefijo 57 vs 52 del Bug #2**. Cronología completa, el hallazgo pendiente sobre la tabla `NumeroPruebaWhatsapp`, y la implicación para el Bug #11: `docs/bugs/bug-02-prefijo-57.md`.
+Django **NO** dispara ningún webhook a n8n al crear el lead. Lo que realmente pasa: (a) Django genera el PDF de cotización; (b) manda el primer WhatsApp **directo vía Meta Graph API**, sin pasar por n8n; (c) hace un `INSERT INTO whatsapp_sessions` por SQL crudo — ahí nace el prefijo 57 vs 52 del Bug #2. Cronología completa: `docs/bugs/bug-02-prefijo-57.md`.
 
 Aparte de esto, Django SÍ dispara **un webhook real** a n8n:
 1. **Al confirmar el pago** — n8n actualiza `conversation_phase = 'completed'` y envía mensaje WA al cliente (`enviar_webhook_whatsapp` en `qualitas/views.py`, hacia el workflow "Payment Confirmation")
@@ -181,7 +181,7 @@ n8n escribe a Postgres directamente (credencial `"Postgres account"` en el workf
 
 **A partir del 11 jul 2026, el estado vigente de todos los bugs vive en `github.com/aibanez82/qualitas-issues` (privado) — NO en este archivo.** Cualquier agente del ecosistema (y Juan) puede abrir/comentar issues ahí directamente; solo el Arquitecto cierra/certifica. Convenciones completas en el `README.md` de ese repo.
 
-**Por qué se movió:** mantener una tabla de bugs aquí Y en otros 4 repos generaba desincronización real — el 11 jul detectamos que este mismo archivo llevaba 9 días reportando el Issue #74 como pendiente cuando ya estaba resuelto. Un solo tracker con estado (abierto/cerrado) evita que vuelva a pasar.
+**Por qué se movió:** mantener una tabla de bugs aquí Y en otros 4 repos generaba desincronización real (detalle del incidente que lo disparó: `docs/architecture/pendientes-resueltos-historial.md`). Un solo tracker con estado evita que vuelva a pasar.
 
 **Qué SÍ va en `qualitas-issues`:** defectos técnicos (código, esquema, queries, regex, integraciones). **Qué NO va ahí:** recomendaciones de copy/tono — esas siguen la tubería normal (ver "Agente Mejoras Conversación" abajo).
 
@@ -227,21 +227,20 @@ Staging end-to-end paralelo a prod (gitflow `stg`→`main`) para validar bug fix
 | Regenerar token Meta Business API | ⚠️ Urgente |
 | Corrección Bug #7 en Django — Juan Aguayo (Issue #69 `aguayo-co/HYL-WAI`) | ⏳ Pendiente externo |
 | Corrección Bug #8 en Django — Juan Aguayo (Issue #70 `aguayo-co/HYL-WAI`) | ⏳ Pendiente externo |
-| Política de backup automático de workflows n8n | ✅ Activo (`.github/workflows/backup-n8n.yml`, cron diario 06:00 CDMX + disparo manual). Rotar `N8N_API_KEY` de GitHub Actions — se pegó en texto plano en una sesión de chat el 30 jun 2026, hay que revocarla en n8n y generar una nueva |
+| Política de backup automático de workflows n8n | ✅ Activo (`.github/workflows/backup-n8n.yml`, cron diario 06:00 CDMX + disparo manual). Rotar `N8N_API_KEY` de GitHub Actions (se pegó en texto plano en un chat el 30 jun) |
 | Tab 2.0 del Dashboard | ⏳ Instrucciones ya dadas al Code Agent |
-| ~~PAT fine-grained para repo `aguayo-co/HYL-WAI`~~ | ✅ Resuelto (9 jul) — `gh auth` (scope `repo`) ya permitía clonar directo, sin PAT nuevo |
 | Reconectar Notion al workspace `aguayo` | ⏳ Pendiente |
 | Subir `BUGS_N8N.md` al repo Dashboard | ⏳ Pendiente |
 | Integración Kommo — botón "Pasar a Kommo" en Dashboard | ⏳ Pendiente (falta subdominio + API token + pipeline de Alberto). Detalle: `docs/iniciativas/kommo-crm.md` |
-| `n8n_chat_histories` sin columna de timestamp | ✅ Resuelto — Juan aplicó la DDL en PROD entre el 10 y 11 jul, verificado en vivo por el Arquitecto. Detalle: `docs/architecture/n8n-chat-histories-created-at.md` |
-| `whatsapp_sessions`/`whatsapp_sessions_archive` con columnas de tiempo naive | ✅ Resuelto — migradas a `timestamptz` en PROD, verificado en vivo por el Arquitecto 11 jul. No era la causa del Issue #74 (ver abajo, ese se cerró por otra vía). Detalle: `docs/architecture/timezone.md` |
-| ~~Issue #74 (`aguayo-co/HYL-WAI`) — follow-up 15 min dejó de enviarse desde 2026-06-30 ~21:11 UTC~~ | ✅ Resuelto — cerrado por Juan el **2 jul** (confirmado independientemente vía `gh issue view 74`, 11 jul), antes de que se documentara aquí como pendiente. Causa real: el follow-up dependía del cron/trigger de n8n; Juan lo movió a un comando idempotente de Django (`enviar_seguimientos_whatsapp`, usa n8n solo como fuente de actividad) + fix de inanición del scheduler (PR #77, commit `0c9a26f`). No tuvo relación con el timezone naive de arriba — era una hipótesis nuestra que no se confirmó. |
-| Propuesta arquitectura BD — tabla canónica `whatsapp_event` (dual-write desde n8n/Django/Dashboard, reemplaza joins frágiles y LIKE de hitos) | 💡 Documentada como plan de destino, sin decisión de implementar aún |
-| Alerta de emisión fallida (Bug #9) — workflow `Bot Error Handler` en n8n + tarjeta "Emisión falló" en Dashboard | ⏸️ En pausa — implica desarrollo de n8n (Error Workflow + extracción de datos de la ejecución fallida). Spec lista en `docs/estrategia/2026-07-02-alerta-emision-fallida-quálitas.md` |
-| ~~Crear repo `Agente_n8n` en GitHub + confirmar nombre final~~ | ✅ Resuelto (8 jul) — repo es `aibanez82/Agente-n8n`, clonado local, push directo habilitado |
-| `N8N_TOKEN` con valor real hardcodeado como default en `qualitas/views.py:905` (rama `stg`) | ⚠️ Seguridad — hallazgo del 6 jul al auditar config vars de `hyl-wai-stg`. Mover a solo-env y rotar el token — pedir a Juan. Ver `docs/iniciativas/entorno-pruebas-staging.md` |
-| Revisar cumplimiento de la política de IA de WhatsApp de Meta (enero 2026, interacciones deben ser "task-specific") | ⏳ Pendiente — priorizar sobre el escalado de volumen. Ver `docs/estrategia/2026-07-06-evaluacion-plataformas-conversacion-whatsapp.md` |
-| Cómo saber con certeza si un cliente pagó la póliza — Quálitas no documenta un endpoint de estatus de pago | ⏳ En construcción — Agente Conciliación (creado 14 jul), ver `docs/architecture/estatus-pago-qualitas.md` y `docs/protocolos/agente-conciliacion.md` |
+| Propuesta arquitectura BD — tabla canónica `whatsapp_event` | 💡 Plan de destino, sin decisión de implementar. Detalle: `docs/architecture/whatsapp-event-canonico-propuesta.md` |
+| Alerta de emisión fallida (Bug #9) — workflow `Bot Error Handler` en n8n + tarjeta "Emisión falló" en Dashboard | ⏸️ En pausa. Spec: `docs/estrategia/2026-07-02-alerta-emision-fallida-quálitas.md` |
+| `N8N_TOKEN` con valor real hardcodeado como default en `qualitas/views.py:905` (rama `stg`) | ⚠️ Seguridad — mover a solo-env y rotar el token, pedir a Juan. Ver `docs/iniciativas/entorno-pruebas-staging.md` |
+| Revisar cumplimiento de la política de IA de WhatsApp de Meta (interacciones deben ser "task-specific") | ⏳ Pendiente — priorizar sobre el escalado de volumen. Ver `docs/estrategia/2026-07-06-evaluacion-plataformas-conversacion-whatsapp.md` |
+| Cómo saber con certeza si un cliente pagó la póliza | ⏳ En construcción — Agente Conciliación (creado 14 jul). Ver `docs/architecture/estatus-pago-qualitas.md` y `docs/protocolos/agente-conciliacion.md` |
+
+Ítems ya resueltos (PAT de HYL-WAI, creación del repo Agente-n8n, columnas de timestamp en
+`n8n_chat_histories`/`whatsapp_sessions`, Issue #74 de HYL-WAI) se archivaron en
+`docs/architecture/pendientes-resueltos-historial.md` — ya no son accionables.
 
 ---
 
