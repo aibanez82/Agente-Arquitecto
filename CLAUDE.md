@@ -101,6 +101,7 @@ Wagtail es un CMS construido sobre Django. **No son dos sistemas separados** —
 | Agente QA | `aibanez82/Agente_QATest_Qualitas` | Claude Code | Tests end-to-end |
 | Agente Mejoras Conv. | `aibanez82/Agente-MejorasConversacion` | Claude Code | Analiza abandono y tono/trato, propone copy — nunca modifica nada él mismo. Protocolo: `docs/protocolos/agente-mejoras-conversacion.md` |
 | Agente n8n | `aibanez82/Agente-n8n` | Claude Code | Entiende workflows n8n, propone mejoras, modifica los JSON y sube a git — Alberto importa manualmente en n8n |
+| Agente Conciliación | `aibanez82/Agente-Conciliacion` | Playwright + Postgres, cron GH Actions | Entra al portal de Quálitas (login simple, sin captcha) y verifica estatus de pago real por póliza — escribe en tabla propia `conciliacion_pagos`, nunca en `qualitas_polizaemitida`. 🆕 Repo creado 14 jul, sin lógica de scraping real todavía (falta URL/selectores del portal). Protocolo: `docs/protocolos/agente-conciliacion.md` |
 | Arquitecto | `aibanez82/Agente-Arquitecto` | Este repo | Documentación transversal, workflows n8n, spec SOAP Quálitas |
 
 **Accesos de Alberto:**
@@ -240,7 +241,7 @@ Staging end-to-end paralelo a prod (gitflow `stg`→`main`) para validar bug fix
 | ~~Crear repo `Agente_n8n` en GitHub + confirmar nombre final~~ | ✅ Resuelto (8 jul) — repo es `aibanez82/Agente-n8n`, clonado local, push directo habilitado |
 | `N8N_TOKEN` con valor real hardcodeado como default en `qualitas/views.py:905` (rama `stg`) | ⚠️ Seguridad — hallazgo del 6 jul al auditar config vars de `hyl-wai-stg`. Mover a solo-env y rotar el token — pedir a Juan. Ver `docs/iniciativas/entorno-pruebas-staging.md` |
 | Revisar cumplimiento de la política de IA de WhatsApp de Meta (enero 2026, interacciones deben ser "task-specific") | ⏳ Pendiente — priorizar sobre el escalado de volumen. Ver `docs/estrategia/2026-07-06-evaluacion-plataformas-conversacion-whatsapp.md` |
-| Cómo saber con certeza si un cliente pagó la póliza — Quálitas no documenta un endpoint de estatus de pago | 💡 Sin investigar — ver `docs/architecture/estatus-pago-qualitas.md` |
+| Cómo saber con certeza si un cliente pagó la póliza — Quálitas no documenta un endpoint de estatus de pago | ⏳ En construcción — Agente Conciliación (creado 14 jul), ver `docs/architecture/estatus-pago-qualitas.md` y `docs/protocolos/agente-conciliacion.md` |
 
 ---
 
@@ -255,6 +256,7 @@ Repos clonados:
 - `~/claude-projects/Agente-n8n` (push directo habilitado desde el Arquitecto, 8 jul)
 - `~/claude-projects/Agente_QATest_Qualitas` (push directo habilitado desde el Arquitecto, 8 jul)
 - `~/claude-projects/HYL-WAI` (✅ clonado 9 jul — `gh auth` con scope `repo` ya alcanzaba, no hizo falta PAT nuevo)
+- `~/claude-projects/Agente-Conciliacion` (🆕 creado 14 jul, push directo habilitado desde el Arquitecto)
 
 Comando de arranque: `cd ~/claude-projects/<repo> && claude`
 
@@ -274,7 +276,7 @@ Comando de arranque: `cd ~/claude-projects/<repo> && claude`
    │ Lectura │       │ • Agente QA             │
    │ Código  │       │ • Agente Mejoras Conv.  │
    │ APIs    │       │ • Agente n8n            │
-   │         │       │ • Agente Conversión (⏳) │
+   │         │       │ • Agente Conciliación   │
    └─────────┘       └─────────────────────────┘
               (nunca se hablan entre sí)
 ```
@@ -287,7 +289,8 @@ Comando de arranque: `cd ~/claude-projects/<repo> && claude`
 | Dashboard Qualitas | Ejecutor código dashboard | ✅ Activo |
 | Agente QA | Tests end-to-end · nuevo objetivo (8 jul): liderar pruebas E2E en STG sin pasar por la landing, y validar cambios de `systemMessage` | ✅ Activo |
 | Agente Mejoras Conversación | Análisis abandono (Postgres) + análisis de tono/trato (capturas WA) → recomendaciones de copy/tono para n8n | ✅ Activo |
-| Agente n8n | Entiende workflows n8n, propone mejoras, modifica JSON | 🆕 En construcción |
+| Agente n8n | Entiende workflows n8n, propone mejoras, modifica JSON | ✅ Activo |
+| Agente Conciliación | Verifica estatus de pago real por póliza contra el portal de Quálitas (Playwright, sin AI en el loop de scraping) | 🆕 En construcción |
 | Agente Conversión | Reintentos + seguimiento | ⏳ Futuro |
 
 ---
