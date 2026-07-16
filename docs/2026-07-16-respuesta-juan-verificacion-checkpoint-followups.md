@@ -73,14 +73,17 @@ Dashboard) dependa de la prioridad de `conversation_id` — por lo que sé hoy, 
 `conversation_id` en su payload, así que el cambio debería ser seguro, pero que Agente n8n lo
 confirme antes de tocarlo.
 
-## 3. Sigue abierto — no lo resolvió ni el handoff original ni este reporte
+## 3. Descartado — solapamiento con el scheduler viejo de 15 min
 
-- **Solapamiento con el scheduler viejo de 15 min** (`WHATSAPP_FOLLOWUPS_ENABLED=1`, activo hoy en
-  STG y PROD, `qualitas/whatsapp_followups.py`, Bug #13/Issue #74). El código mantiene ambos como
-  rutas separadas del mismo comando (`--message-key`), pero nada evita que un mismo lead califique
-  para los dos sistemas en paralelo. Hoy no hay riesgo real porque `checkpoint_followups` sigue
-  apagado, pero antes de activar envío real en STG conviene que Juan confirme qué pasa si ambos
-  aplican al mismo lead — mensaje duplicado o contradictorio es el riesgo.
+Alberto aclaró y confirmé en código: ese mecanismo (`WHATSAPP_FOLLOWUPS_ENABLED=1`,
+`qualitas/whatsapp_followups.py`) no se solapa con `checkpoint_followups`. El nombre "15 min" es
+histórico — el delay real en STG es `WHATSAPP_QUOTE_FIRST_FOLLOWUP_DELAY_MINUTES=4` — y solo se
+dispara cuando el cliente **no ha respondido nada** a la plantilla inicial
+(`evaluate_n8n_activity_for_followup` lo bloquea con `n8n_human_message_detected` en cuanto hay
+cualquier mensaje humano, y exige `conversation_phase == 'greeting'`). `checkpoint_followups` exige
+lo contrario: mensaje humano reciente y fase ya avanzada. Poblaciones mutuamente excluyentes por
+diseño — no hace falta que Juan resuelva nada aquí. (Bug #13 sigue siendo un problema real, pero
+aislado al scheduler viejo, no afecta a este parche.)
 
 ## 4. Nota aparte, no bloqueante — plantilla de Meta
 
@@ -111,8 +114,11 @@ sistema solo manda texto libre dentro de la ventana de 24h, tal como documentó 
 
 1. Agente n8n corrige el nodo de `Retomar Conversacion` (STG, luego PROD) para que la clave de
    inserción sea `body.session_id` sin fallback a `conversation_id`.
-2. Juan confirma qué hacer con el solapamiento del scheduler de 15 min antes de activar envío real.
-3. Alberto comparte el token de `N8N_PROACTIVE_WA_MESSAGE_TOKEN` por canal seguro para que Juan lo
+2. Alberto comparte el token de `N8N_PROACTIVE_WA_MESSAGE_TOKEN` por canal seguro para que Juan lo
    configure en `hyl-wai-stg` junto con `N8N_PROACTIVE_WA_MESSAGE_URL`.
-4. Con eso, activar `WHATSAPP_CHECKPOINT_FOLLOWUPS_ENABLED=true` en STG solo en modo `--dry-run`
+3. Con eso, activar `WHATSAPP_CHECKPOINT_FOLLOWUPS_ENABLED=true` en STG solo en modo `--dry-run`
    primero, revisar candidatos reales, y solo después probar envío real con números autorizados.
+
+(El solapamiento con el scheduler viejo de 15 min que se preguntaba en una versión anterior de este
+documento queda descartado — ver punto 3 arriba: son poblaciones mutuamente excluyentes por diseño,
+no requiere que Juan resuelva nada.)
