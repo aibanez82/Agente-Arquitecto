@@ -1,6 +1,6 @@
 # Iniciativa — Conversation ID como identidad conversacional WhatsApp (12 jul 2026)
 
-> Estado: 🟡 Propuesta validada por el Arquitecto, handoffs enviados. **Nada desplegado todavía** — ni en STG ni en PROD.
+> Estado (🔴 corregido 16 jul — ver sección "Estado" al final): **YA ESTÁ DESPLEGADO EN PROD**, en modo `shadow`. Las secciones de abajo con fecha 12-14 jul describen el proceso en STG y quedaron desactualizadas — el pase a PROD ocurrió sin que quedara registrado aquí. Verificado en vivo el 16 jul contra Postgres/Heroku/n8n de PROD, no asumido.
 > Guardado en git (no en memoria local) para persistir entre las 3 laptops de Alberto.
 
 ## Origen
@@ -115,3 +115,17 @@ Todo verificado en vivo por el Arquitecto. Ver `Agente-n8n:docs/2026-07-14-resum
 ## Estado
 
 🟡 12 jul (noche): **n8n y Dashboard, listos y verificados por el Arquitecto — ambos bloqueados en el mismo punto.** Único pendiente real: **Juan** — correr la migración 0033 en STG, confirmar el template de Meta, mergear y desplegar `hyl-wai-stg` con el flag. Sin movimiento de su parte desde el 12 jul (verificado — rama sin commits nuevos). Nada activado ni desplegado en ningún ambiente todavía. Cuando Juan confirme migración: (1) avisar a Agente QA para fase 3, (2) pedirle a QA que verifique los nombres de campo de `quotation_data` en el mensaje de desambiguación antes de la fase 4.
+
+---
+
+## 🔴 Corrección — 16 jul 2026: esto ya está en PROD, no solo en STG
+
+Alberto preguntó "¿tienes cosas en STG pendientes de migrar a PROD?" y, al verificar en vivo (no confiando en el "Estado" de arriba, que resultó estar desactualizado), se descubrió que Juan ya mergeó y desplegó esta iniciativa a producción, en algún punto no documentado entre el 12 jul y hoy. Verificado directo, sin asumir nada de los docs:
+
+- **Django (PROD):** `git merge-base --is-ancestor origin/fix/conversation-id-whatsapp-n8n origin/main` → sí es ancestro. `hyl-wai-production` tiene `WHATSAPP_CONVERSATION_ID_MODE=shadow` (Heroku config-vars API). Postgres PROD: `whatsapp_sessions` ya tiene las 4 columnas nuevas y **62 filas con `conversation_id` poblado**.
+- **n8n (PROD):** el workflow `WhatsApp Insurance Quotation Bot` activo en `n8n.srv1325340.hstgr.cloud` (id `BtOaZm7WlZT-24V7hqCnF`) ya tiene los nodos `Resolve Session`/`Session Router` y ya no tiene `Load Session` — la reestructuración que se hizo en STG está viva en PROD (81 nodos totales).
+- **`hyl-wai-stg`** también está en `shadow` — ambos ambientes coinciden, no hay drift entre ellos en este punto.
+- **Lo único que sigue realmente pendiente:** la rama `fix/conversation-id-whatsapp-n8n` del **Dashboard** (`aibanez82/Dashboard_seguroautoqualitas`) NO está mergeada a `main` (verificado con `git merge-base`). Bajo riesgo mientras Django/n8n sigan en `shadow` (el funnel principal sigue uniendo por `quotation_id`, según el propio hallazgo del 12 jul), pero hace falta mergearla antes de que alguien pase el flag a `dual`.
+- El salto `shadow → dual` (payload v2 real, click de quick-reply real) sigue sin decidirse/coordinarse — no hay evidencia de que haya ocurrido.
+
+**Por qué el doc no lo reflejaba:** el patrón de trabajo de esta iniciativa fue "Agente n8n reporta a STG, Arquitecto verifica STG" — nadie volvió a verificar contra PROD después del 12-13 jul, y aparentemente Juan desplegó su parte directo sin pasar por un handoff explícito de "ya hice merge a main". **Lección: cuando Juan es el que ejecuta un paso (no un agente Nivel 3 de este ecosistema), no hay garantía de que quede reportado aquí — conviene chequear periódicamente el estado real en PROD de las iniciativas donde Juan tiene una tarea pendiente, no solo confiar en que avise.**

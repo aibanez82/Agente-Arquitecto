@@ -215,7 +215,7 @@ Repo: `aibanez82/Agente-n8n` (clonado en `~/claude-projects/Agente-n8n`, push di
 
 Staging end-to-end paralelo a prod (gitflow `stg`→`main`) para validar bug fixes antes de desplegar. Instancia n8n STG: `https://n8n-xlqk.srv1810257.hstgr.cloud`. **Principio rector:** cada componente de staging apunta SOLO a gemelos de staging, nunca a prod. Mapa completo prod→staging, credenciales, gotchas de import: `docs/iniciativas/entorno-pruebas-staging.md`.
 
-**Iniciativa activa (12 jul):** Juan propone mover la identidad conversacional de n8n de `phone_number` a `conversation_id` (resuelve de raíz Issue #21). Validado, handoffs enviados a Agente n8n y Agente QA, nada desplegado aún. Detalle: `docs/iniciativas/conversation-id-whatsapp-n8n.md`.
+**Conversation ID (Issue #21):** identidad conversacional de n8n movida de `phone_number` a `conversation_id`. **Ya desplegado en PROD** (verificado 16 jul: Django en `hyl-wai-production` con `WHATSAPP_CONVERSATION_ID_MODE=shadow`, n8n PROD ya tiene los nodos `Resolve Session`/`Session Router`) — no solo en STG como decía esta línea hasta el 15 jul. Pendiente real: mergear a `main` la rama del Dashboard (`fix/conversation-id-whatsapp-n8n`, bajo riesgo mientras siga en `shadow`) y decidir con Juan el paso a `dual`. Detalle: `docs/iniciativas/conversation-id-whatsapp-n8n.md`.
 
 ---
 
@@ -234,7 +234,7 @@ Staging end-to-end paralelo a prod (gitflow `stg`→`main`) para validar bug fix
 | Integración Kommo — botón "Pasar a Kommo" en Dashboard | ⏳ Pendiente (falta subdominio + API token + pipeline de Alberto). Detalle: `docs/iniciativas/kommo-crm.md` |
 | Propuesta arquitectura BD — tabla canónica `whatsapp_event` | 💡 Plan de destino, sin decisión de implementar. Detalle: `docs/architecture/whatsapp-event-canonico-propuesta.md` |
 | Alerta de emisión fallida (Bug #9) — workflow `Bot Error Handler` en n8n + tarjeta "Emisión falló" en Dashboard | ⏸️ En pausa. Spec: `docs/estrategia/2026-07-02-alerta-emision-fallida-quálitas.md` |
-| `N8N_TOKEN` con valor real hardcodeado como default en `qualitas/views.py:905` (rama `stg`) | ⚠️ Seguridad — mover a solo-env y rotar el token, pedir a Juan. Ver `docs/iniciativas/entorno-pruebas-staging.md` |
+| `N8N_TOKEN` con valor real hardcodeado como default en `qualitas/views.py:905` (confirmado también en `main`, 16 jul — no es solo `stg`) | ⚠️ Seguridad — mover a solo-env y rotar el token, pedir a Juan. Ver `docs/iniciativas/entorno-pruebas-staging.md` |
 | Revisar cumplimiento de la política de IA de WhatsApp de Meta (interacciones deben ser "task-specific") | ⏳ Pendiente — priorizar sobre el escalado de volumen. Ver `docs/estrategia/2026-07-06-evaluacion-plataformas-conversacion-whatsapp.md` |
 | Cómo saber con certeza si un cliente pagó la póliza | ⏳ En construcción — Agente Conciliación (creado 14 jul). Ver `docs/architecture/estatus-pago-qualitas.md` y `docs/protocolos/agente-conciliacion.md` |
 
