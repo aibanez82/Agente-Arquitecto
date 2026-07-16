@@ -219,6 +219,8 @@ Staging end-to-end paralelo a prod (gitflow `stg`→`main`) para validar bug fix
 
 **Conversation ID (Issue #21):** identidad conversacional de n8n movida de `phone_number` a `conversation_id`. **Ya desplegado en PROD** (verificado 16 jul: Django en `hyl-wai-production` con `WHATSAPP_CONVERSATION_ID_MODE=shadow`, n8n PROD ya tiene los nodos `Resolve Session`/`Session Router`) — no solo en STG como decía esta línea hasta el 15 jul. Pendiente real: mergear a `main` la rama del Dashboard (`fix/conversation-id-whatsapp-n8n`, bajo riesgo mientras siga en `shadow`) y decidir con Juan el paso a `dual`. Detalle: `docs/iniciativas/conversation-id-whatsapp-n8n.md`.
 
+**Recordatorios por fecha mencionada (16 jul, handoff a Juan):** cuando el cliente da fecha para no contratar todavía (vencimiento, quincena, o fecha explícita tipo "el sábado 18" — caso real: lead 1385/cotización 2837), Haiku extrae, Python calcula, se envía vía el webhook proactivo existente. **Bloqueante:** falta plantilla de Meta aprobada para re-enganche fuera de la ventana 24h (fila en Pendientes de infraestructura). Detalle: `docs/iniciativas/2026-07-10-recordatorios-seguimiento-por-fecha-mencionada-design.md`, handoff: `docs/2026-07-16-handoff-juan-recordatorios-fecha-mencionada.md`.
+
 ---
 
 ## Pendientes de infraestructura
@@ -239,6 +241,7 @@ Staging end-to-end paralelo a prod (gitflow `stg`→`main`) para validar bug fix
 | `N8N_TOKEN` con valor real hardcodeado como default en `qualitas/views.py:905` (confirmado también en `main`, 16 jul — no es solo `stg`) | ⚠️ Seguridad — mover a solo-env y rotar el token, pedir a Juan. Ver `docs/iniciativas/entorno-pruebas-staging.md` |
 | Revisar cumplimiento de la política de IA de WhatsApp de Meta (interacciones deben ser "task-specific") | ⏳ Pendiente — priorizar sobre el escalado de volumen. Ver `docs/estrategia/2026-07-06-evaluacion-plataformas-conversacion-whatsapp.md` |
 | Cómo saber con certeza si un cliente pagó la póliza | ⏳ En construcción — Agente Conciliación (creado 14 jul). Ver `docs/architecture/estatus-pago-qualitas.md` y `docs/protocolos/agente-conciliacion.md` |
+| Plantilla de Meta aprobada para re-enganche fuera de ventana 24h | ⚠️ Bloqueante para "Recordatorios por fecha mencionada" (arriba) y rescates tipo Bug #12. Pedida a Juan 16 jul, no sometida aún |
 
 Ítems ya resueltos (PAT de HYL-WAI, creación del repo Agente-n8n, columnas de timestamp en
 `n8n_chat_histories`/`whatsapp_sessions`, Issue #74 de HYL-WAI) se archivaron en
