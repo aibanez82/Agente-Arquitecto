@@ -1,6 +1,6 @@
 # Iniciativa — Seguimiento automático de leads estancados (15-16 jul 2026)
 
-> Estado: 🟡 Django implementado y verificado en STG (16 jul, commit `789443b`, migración `0041`). **Bloqueante encontrado: n8n no cumple el contrato que el propio Juan especificó** (ver sección "Verificación de la implementación" abajo). Nada activado para envío real todavía, nada en PROD.
+> Estado: 🟡 Django implementado y verificado en STG (16 jul, commit `789443b`, migración `0041`). Fix mínimo del gap de `session_id`/`conversation_id` en n8n ya aplicado y verificado en vivo (commit `a933049` en `Agente-n8n:stg`) — pero **Juan mandó un plan más estricto y completo** (`docs/2026-07-16-plan-juan-n8n-stg-proactive-wa-message-session-id.md` en `Agente-n8n`) que exige fallar si falta `session_id` (sin caer a `phone_number`), validación de payload, idempotencia y 4 pruebas obligatorias — **en curso, handoff enviado** (`Agente-n8n:handoffs/2026-07-16-handoff-plan-juan-session-id.md`). Nada activado para envío real todavía, nada en PROD.
 > Guardado en git (no en memoria local) para persistir entre las 3 laptops de Alberto.
 > Ejecutor: Agente n8n. Reporte fuente: `Agente-n8n:docs/2026-07-16-resumen-arquitecto-seguimiento-leads-estancados.md`.
 
@@ -84,9 +84,10 @@ iniciativa paralela de "recordatorios por fecha mencionada".
 
 ## Pendiente / no cerrado
 
-- **🔴 Bloqueante:** que Agente n8n corrija el nodo de `Retomar Conversacion` (STG, luego PROD) para
-  que la clave de inserción sea `body.session_id` sin fallback a `conversation_id` — ver sección de
-  verificación arriba.
+- **🟡 En curso:** fix mínimo ya aplicado y verificado (quita prioridad de `conversation_id`), pero
+  Juan pide un plan más estricto y completo (sin fallback a `phone_number`, validación de payload,
+  idempotencia, 4 pruebas obligatorias A/B/C/D) — handoff enviado a Agente n8n 16 jul, pendiente de
+  reporte y verificación del Arquitecto.
 - Django ya implementado en STG — pendiente solo activarlo (ver siguiente punto), no arrancar desde cero.
 - Alberto tiene pendiente compartirle a Juan el token de autenticación del webhook (ya generado, falta mandarlo por canal seguro, no por git) y `N8N_PROACTIVE_WA_MESSAGE_URL`/`_TOKEN` siguen sin configurarse en `hyl-wai-stg`.
 - `delay_mins` finales de producción sin definir — el fixture actual (`delay_mins=1`) es explícitamente solo para pruebas en STG.
