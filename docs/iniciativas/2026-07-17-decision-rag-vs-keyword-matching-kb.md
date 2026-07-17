@@ -3,6 +3,8 @@
 > Responde a: `Agente-MejorasConversacion/docs/2026-07-17-pregunta-arquitecto-rag-vs-keyword-matching.md`
 > Issue técnico: `github.com/aibanez82/qualitas-issues/issues/42`
 
+> ⚠️ **SUPERSEDIDO el mismo día (17 jul 2026):** Alberto y Juan decidieron directamente migrar a RAG real ya, sin esperar al trigger de abajo. La recomendación de "esperar" de este documento ya NO aplica — queda como registro de las condiciones de mercado del 17-jul y del razonamiento a favor de esperar (invalidado por decisión explícita del negocio, que tiene prioridad). Plan de migración vigente: `docs/iniciativas/2026-07-17-migracion-rag-kb-pgvector-design.md`.
+
 ## Verificación
 
 Confirmado contra el export real de producción (`docs/n8n-workflows/WhatsApp Insurance Quotation Bot.json`, nodo `search_knowledge_base1`, no la copia `pre-deploy-2026-07-14/`): es un objeto JS con 11 secciones, cada una con `keywords` fijas y `q.includes(stripAccents(kw))`. Sin nodo de embeddings ni vector store en el workflow. El hallazgo de Mejoras Conversación es preciso.
