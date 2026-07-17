@@ -1,6 +1,6 @@
 # Iniciativa — Seguimiento automático de leads estancados (15-16 jul 2026)
 
-> Estado: 🟢 Django y n8n completos y verificados en STG (16 jul). Django: `checkpoint_followups`, migración `0041`, commit `789443b`. n8n: `Retomar Conversacion_stg` implementa el plan estricto de Juan (`session_id` sin ningún fallback, validación de payload, idempotencia) **más** una rama legacy para no romper el botón "Tomar conversación" del Dashboard (validación dual por presencia de `checkpoint`+`idempotency_key`) — 5 pruebas (A-E) verificadas en vivo por el Arquitecto contra la API de n8n y la Postgres de STG, no solo confiadas al reporte del ejecutor. **Único pendiente para activar envío real:** que Alberto comparta el token con Juan y Juan configure `N8N_PROACTIVE_WA_MESSAGE_URL`/`_TOKEN` en `hyl-wai-stg`. Nada en PROD todavía — decisión aparte.
+> Estado: 🟡 Configuración completa en STG (17 jul): Django y n8n verificados, token/URL configurados, `WHATSAPP_CHECKPOINT_FOLLOWUPS_ENABLED=true` + `DRY_RUN_DEFAULT=false`. **Primer intento de envío real (cotización 1717, checkpoint `vin_plates_captured`) falló con `n8n_http_403`** — causa encontrada y corregida (17 jul): la credencial `httpHeaderAuth` del webhook tenía el token sin el prefijo `Bearer ` que Django manda por contrato. Fix aplicado por Agente n8n (`PATCH /api/v1/credentials`) y verificado en vivo por el Arquitecto con curl real contra el webhook (`Bearer <token>` → 200, formato viejo → 403). **Pendiente: que Juan repita el envío real** — primera prueba end-to-end de punta a punta todavía sin confirmar. Nada en PROD todavía — decisión aparte.
 > Guardado en git (no en memoria local) para persistir entre las 3 laptops de Alberto.
 > Ejecutor: Agente n8n. Reporte fuente: `Agente-n8n:docs/2026-07-16-resumen-arquitecto-seguimiento-leads-estancados.md`.
 
@@ -111,8 +111,6 @@ Con esto, el lado de n8n queda completo. Detalle completo:
 
 ## Pendiente / no cerrado
 
-- **Django y n8n ya implementados y verificados en STG — solo falta activar.** Ver punto siguiente.
-- Alberto tiene pendiente compartirle a Juan el token de autenticación del webhook (ya generado, falta mandarlo por canal seguro, no por git) y `N8N_PROACTIVE_WA_MESSAGE_URL`/`_TOKEN` siguen sin configurarse en `hyl-wai-stg`.
+- **Bloqueante activo (17 jul):** ya corregido el 403 de autenticación (credencial sin `Bearer`, fix aplicado y verificado). Falta que Juan repita `heroku run -a hyl-wai-stg -- python manage.py enviar_seguimientos_whatsapp --message-key checkpoint_followups --limit 1` — todavía no hay ninguna prueba real de punta a punta confirmada (Django → n8n → WhatsApp → `LeadActionEvent`).
 - `delay_mins` finales de producción sin definir — el fixture actual (`delay_mins=1`) es explícitamente solo para pruebas en STG.
 - Autenticación del webhook en **PROD sigue sin aplicar** — decisión aparte, pendiente de coordinar (ese workflow tiene uso manual activo hoy). El fix de validación dual/`session_id` tampoco se aplicó a PROD todavía — sería un segundo paso coordinado, no automático.
-- Sin verificación end-to-end todavía con un lead real de principio a fin (Django → n8n → WhatsApp → `LeadActionEvent`) — las pruebas A-E fueron con payloads sintéticos, no con un lead real progresando por el flujo. Puede correr en cuanto se configure el token.
