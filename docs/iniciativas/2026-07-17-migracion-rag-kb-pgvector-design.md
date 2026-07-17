@@ -53,12 +53,14 @@ CREATE INDEX kb_chunks_embedding_idx ON kb_chunks
 
 **Unidad de chunking: por par P:/R:, no por sección completa.** Las secciones actuales mezclan 5-15 preguntas distintas bajo un mismo bloque `content`; si se embebe la sección completa, la búsqueda semántica pierde precisión y se vuelve a concatenar contenido irrelevante (el mismo problema que hoy causa respuestas largas/genéricas cuando matchean varias `keywords`). 114 chunks pequeños y específicos son mejor unidad de recuperación que 11 chunks grandes.
 
-**Verificar antes de ejecutar:** confirmar que el plan de Heroku Postgres soporta `CREATE EXTENSION vector` (requiere Standard-0 o superior; Essential-* no lo soporta). Si el plan actual no alcanza, es un upgrade de plan a decidir con Alberto antes de empezar — bloqueante, no lo puede resolver un agente ejecutor.
+**✅ Verificado en vivo (17 jul 2026), vía `pg_available_extensions` directo contra ambas BD:** el Postgres real que usa `DATABASE_URL` en PROD (`postgresql-flexible-50432`, plan `heroku-postgresql:standard-0`, Postgres 17.10) y en STG (mismo plan, Postgres 17.9) tienen la extensión `vector` disponible (`default_version 0.8.1`, aún no instalada). Ya no es un bloqueante.
+
+**Nota de paso:** `hyl-wai-production` tiene un segundo addon de Postgres adjunto (`postgresql-amorphous-98884`, plan `essential-0`, que NO soportaría pgvector) pero no es el que usa `DATABASE_URL` — no afecta esta migración, solo dejarlo anotado para no confundirlo.
 
 ## 4. Plan de migración (fases)
 
 ### Fase 0 — Prerrequisitos (Alberto)
-- [ ] Confirmar plan de Heroku Postgres soporta pgvector (o hacer upgrade).
+- [x] Plan de Heroku Postgres soporta pgvector — verificado en vivo 17 jul (ver §3).
 - [ ] Provisionar `OPENAI_API_KEY` — nueva, no existe hoy en el ecosistema. Agregar como credencial en n8n (PROD y STG por separado) y, si se necesita fuera de n8n para el script de backfill, como env var donde corresponda.
 
 ### Fase 1 — Extracción de contenido (Arquitecto, análisis; sin ejecución de código)
