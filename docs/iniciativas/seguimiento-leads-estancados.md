@@ -109,8 +109,26 @@ Con esto, el lado de n8n queda completo. Detalle completo:
 - `reporte-alberto-n8n-checkpoint-followups-whatsapp.md` (Juan, entregado 16 jul) — contrato de datos detallado de lo implementado, verificado por el Arquitecto (ver sección arriba).
 - `Agente-Arquitecto:docs/2026-07-16-respuesta-juan-verificacion-checkpoint-followups.md` — la verificación y el gap encontrado.
 
+## Reporte de Juan (17 jul, tarde) — retomó tras el fix del 403
+
+- Promovió a `hyl-wai-stg` los cambios de `checkpoint_followups`/`proactive-wa-message`: flags de envío real activos, comando principal corre.
+- Agregó un **comando nuevo de reintento auditable** — reintenta intentos fallidos específicos sin tocar la BD a mano (no estaba en el contrato original, es una herramienta operativa que se agregó sobre la marcha).
+- Validó que la cotización 1717 (la del 403 original) queda **detectable como retryable** por el comando nuevo.
+- Corrió dry-run de `checkpoint_followups`: hay candidatos elegibles.
+- **Todavía no reporta un envío real confirmado** — lo de arriba es detección/dry-run, no el WhatsApp de verdad saliendo. Ver pendiente abajo.
+
+**Nuevo bloqueante que reporta:** Heroku Scheduler estándar (el addon básico) no soporta intervalos menores a 10 minutos (solo 10min/hourly/daily). Para una cadencia de 3 minutos hacen falta Advanced Scheduler, Cron To Go, o un proceso `clock` (dyno propio corriendo un loop).
+
+**Diagnóstico del Arquitecto (17 jul):** este bloqueante NO impide la primera prueba E2E real — esa sigue sin depender de ningún scheduler automático, se puede disparar a mano con el mismo comando ya usado para el 403 (`heroku run -a hyl-wai-stg -- python manage.py enviar_seguimientos_whatsapp --message-key checkpoint_followups --limit 1`). Son dos pendientes independientes, no uno bloqueando al otro.
+
+Sobre el scheduler en sí, antes de elegir herramienta vale la pena que Juan confirme **si el intervalo de 3 minutos es un requisito real de producción o un artefacto de querer iterar rápido en STG** (mismo patrón que el fixture `delay_mins=1`, explícitamente marcado como "solo pruebas"). Si en producción los checkpoints van a tener delays de horas (como el rescate manual que Alberto hace hoy), el Heroku Scheduler estándar (10 min/hourly) alcanza sin agregar nada nuevo. Si de verdad se necesita sub-10-min en producción, entre las tres opciones que menciona:
+- **Cron To Go** — addon real vigente en Heroku Elements, soporta intervalos de 1 minuto, sin dyno adicional que mantener. Es la opción de menor fricción si el requisito es real.
+- **Proceso `clock`** (dyno tipo worker con loop propio) — cero addon nuevo, pero suma un dyno permanente a mantener (costo + superficie de fallo nueva: reinicios, memory leaks de un proceso long-running).
+- **Advanced Scheduler** — verificar primero si sigue disponible en el marketplace actual de Heroku antes de asumirlo como opción.
+
 ## Pendiente / no cerrado
 
-- **Bloqueante activo (17 jul):** ya corregido el 403 de autenticación (credencial sin `Bearer`, fix aplicado y verificado). Falta que Juan repita `heroku run -a hyl-wai-stg -- python manage.py enviar_seguimientos_whatsapp --message-key checkpoint_followups --limit 1` — todavía no hay ninguna prueba real de punta a punta confirmada (Django → n8n → WhatsApp → `LeadActionEvent`).
+- **Bloqueante activo (17 jul):** ya corregido el 403 de autenticación (credencial sin `Bearer`, fix aplicado y verificado). Falta que Juan repita `heroku run -a hyl-wai-stg -- python manage.py enviar_seguimientos_whatsapp --message-key checkpoint_followups --limit 1` — todavía no hay ninguna prueba real de punta a punta confirmada (Django → n8n → WhatsApp → `LeadActionEvent`). Independiente del bloqueante del scheduler (ver arriba), no depende de él.
+- **Nuevo (17 jul):** decisión de scheduler para cadencia <10 min pendiente — primero confirmar si es requisito real de producción o solo de pruebas STG (ver diagnóstico arriba) antes de elegir Cron To Go / clock process / Advanced Scheduler.
 - `delay_mins` finales de producción sin definir — el fixture actual (`delay_mins=1`) es explícitamente solo para pruebas en STG.
 - Autenticación del webhook en **PROD sigue sin aplicar** — decisión aparte, pendiente de coordinar (ese workflow tiene uso manual activo hoy). El fix de validación dual/`session_id` tampoco se aplicó a PROD todavía — sería un segundo paso coordinado, no automático.
