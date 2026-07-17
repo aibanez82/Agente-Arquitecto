@@ -147,8 +147,20 @@ Con esto, el lado de n8n queda completo. Detalle completo:
 
 **✅ Resuelto (17 jul, confirmado por Alberto):** el intervalo de 3 minutos era un artefacto de querer iterar rápido en STG (mismo patrón que el fixture `delay_mins=1`, explícitamente "solo pruebas") — **no es un requisito real de producción**. No hace falta ningún addon nuevo ni dyno adicional: el Heroku Scheduler estándar (10 min/hourly/daily) alcanza para producción. Para seguir iterando rápido en STG mientras se prueba, usar `heroku run` manual (como ya se hizo para el fix del 403) en vez de montar un scheduler de alta frecuencia solo para pruebas — se descartan Cron To Go, Advanced Scheduler y el proceso `clock` para esta iniciativa.
 
+## 🔴 Scheduler de Heroku en STG: nunca existió ningún job (17 jul, noche — Arquitecto)
+
+Alberto probó en vivo por WhatsApp (STG, 525551074144) esperando que el recordatorio automático saltara ~10 min después de dejar de responder. No saltó. Diagnóstico:
+
+- **Flags confirmados activos vía Heroku config-vars API** (`hyl-wai-stg`): `WHATSAPP_CHECKPOINT_FOLLOWUPS_ENABLED=true` (release 175, 17 jul 04:09:46 UTC) y `WHATSAPP_CHECKPOINT_FOLLOWUPS_DRY_RUN_DEFAULT=false` (release 176, 17 jul 12:26:00 UTC) — no es un problema de flags ni de dry-run.
+- El Heroku Scheduler **estándar** (a diferencia de Advanced Scheduler) no expone sus jobs por la Platform API — solo por el dashboard web. Verificado ahí directamente (Alberto autenticado en Heroku): **`dashboard.heroku.com/apps/hyl-wai-stg/scheduler` muestra "When you create a new job in this app it will appear here" — no hay ningún job creado.**
+- El add-on Scheduler (`scheduler-graceful-93653`) tiene `created_at: 2026-07-17T16:41:59Z` — se (re)provisionó el mismo día, ~2h53min antes de la prueba de Alberto. Los jobs viven dentro del propio add-on (no en config vars ni en release history), así que si existió un job antes, se perdió al recrear el add-on; más probable: nunca se creó ninguno.
+- Los envíos reales que sí se ven en `qualitas_leadcheckpointfollowupattempt` (16:37 UTC, 19:08 UTC — ver sección "Reporte de Juan" arriba) vinieron de `heroku run` manual, no de un cron corriendo en background.
+
+**Causa raíz: no es un bug de n8n, BD ni de timing — nadie ha creado el job `enviar_seguimientos_whatsapp --message-key checkpoint_followups` en el Scheduler de STG.** Acción pendiente: crear el job manualmente en esa misma página del dashboard, con la cadencia deseada para pruebas (p. ej. 10 min) — decisión ya tomada arriba de que el Scheduler estándar alcanza, solo falta el paso de crear el job.
+
 ## Pendiente / no cerrado
 
-- **Bloqueante activo (17 jul):** ya corregido el 403 de autenticación (credencial sin `Bearer`, fix aplicado y verificado). Falta que Juan repita `heroku run -a hyl-wai-stg -- python manage.py enviar_seguimientos_whatsapp --message-key checkpoint_followups --limit 1` — todavía no hay ninguna prueba real de punta a punta confirmada (Django → n8n → WhatsApp → `LeadActionEvent`).
+- **Bloqueante nuevo (17 jul, noche):** crear el job del Scheduler en STG — ver sección justo arriba. Sin esto, ninguna prueba de timing automático va a saltar nunca, sin importar cuánto se espere.
+- **Bloqueante previo (17 jul, resuelto):** el 403 de autenticación (credencial sin `Bearer`) ya se corrigió y verificó. Falta repetir `heroku run -a hyl-wai-stg -- python manage.py enviar_seguimientos_whatsapp --message-key checkpoint_followups --limit 1` una vez exista el job del Scheduler, para tener también la prueba automática (no solo manual) de punta a punta.
 - `delay_mins` finales de producción sin definir — el fixture actual (`delay_mins=1`) es explícitamente solo para pruebas en STG.
 - Autenticación del webhook en **PROD sigue sin aplicar** — decisión aparte, pendiente de coordinar (ese workflow tiene uso manual activo hoy). El fix de validación dual/`session_id` tampoco se aplicó a PROD todavía — sería un segundo paso coordinado, no automático.
