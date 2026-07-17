@@ -117,3 +117,14 @@ Alberto entregó el primer PDF del lote: Condiciones Generales completas de Auto
 ## 7. Quién ejecuta
 
 Diseño: Arquitecto (este documento). Ejecución del script de ingesta de la primera fuente: **Agente n8n** (ya tiene la credencial `OPENAI_API_KEY` y ya tocó la tabla hermana `kb_chunks`) — handoff entregado, ver §6. Si el corpus crece a más PDFs con cadencia alta, reevaluar si conviene desacoplarlo a un script standalone en vez de vivir dentro de n8n.
+
+## 8. ✅ Sign-off del Arquitecto (17 jul 2026) — primera fuente cerrada
+
+Verificado independientemente contra Postgres STG y n8n STG (no solo leído el reporte de Agente n8n, `Agente-n8n:docs/2026-07-17-ingesta-corpus-documental-doc-chunks-condiciones-generales.md`):
+
+- `doc_sources` id 1: metadata coincide exacto con lo pedido en el handoff.
+- `doc_chunks`: 152/152 filas, 152 `chunk_hash` distintos, 0 embeddings nulos, `vector_dims(embedding) = 1536` en el 100% — confirmado por query directa, no por el reporte.
+- **Retrieval re-verificado de forma independiente:** generé mi propio embedding de la query de prueba "qué cubre la cobertura de robo total del vehículo" (workflow temporal propio en n8n STG, credencial `OpenAI KB Embeddings STG` nunca leída en texto plano, workflow creado → disparado → **borrado** de inmediato, confirmado 404 tras el borrado) y corrí la búsqueda de similitud coseno yo mismo contra `doc_chunks`: los 5 resultados y sus distancias coinciden **exactos** (4 decimales) con lo reportado por Agente n8n. No hay divergencia.
+- Confirmado que no quedó ningún workflow temporal residual en STG (3 workflows totales, ninguno con nombre `TEMP`).
+
+Con esto, la primera fuente del corpus Tier 2 queda cerrada. Pendiente real: solo la ingesta de más PDFs del lote cuando lleguen (§6), no hay nada abierto de esta fuente.
