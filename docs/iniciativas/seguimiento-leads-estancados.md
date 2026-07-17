@@ -14,6 +14,34 @@ Alberto viene rescatando manualmente conversaciones de WhatsApp que se quedan a 
 
 **Principio de diseño clave:** no se agrega ningún campo de estado nuevo en `qualitas_lead` ni en `whatsapp_sessions`. Ya existen tres fuentes distintas compitiendo por decir "en qué estado está un lead" (`Lead.estado`, `conversation_phase`, `LeadActionEvent`) y confirmaron que dos ya están desincronizadas en producción (un lead con `captured_data` completo seguía en `estado='COTIZACION_INICIADA'`). Los checkpoints se derivan en vivo; los reintentos se cuentan contando eventos en `LeadActionEvent`, no con un contador nuevo.
 
+## Tabla de reglas de reintentos (`qualitas_leadfollowuppolicy`, verificado en vivo contra STG 17 jul)
+
+21 filas: 7 checkpoints × 3 intentos. `payment_link_sent` desactivado a propósito en STG (validación de pagos pendiente). Todos con `delay_mins=1` porque es el fixture de pruebas rápidas en STG — **en producción estos valores están sin definir todavía** (ver Pendiente).
+
+| Checkpoint | Intento | Delay (min) | Activo | Mensaje |
+|---|---|---|---|---|
+| `quote_sent` | 1 | 1 | ✅ | "Hola, soy de SeguroAuto. ¿Te ayudo a continuar con tu cotización?" |
+| `quote_sent` | 2 | 1 | ✅ | "Sigo por aquí para ayudarte a completar tus datos y avanzar con tu seguro." |
+| `quote_sent` | 3 | 1 | ✅ | "Último recordatorio por ahora: si quieres continuar tu cotización, respóndeme por aquí." |
+| `personal_data_captured` | 1 | 1 | ✅ | "Gracias. Para continuar, compárteme tu VIN o placas cuando puedas." |
+| `personal_data_captured` | 2 | 1 | ✅ | "¿Me ayudas con el VIN o las placas para seguir con tu cotización?" |
+| `personal_data_captured` | 3 | 1 | ✅ | "Último recordatorio: falta VIN o placas para continuar con tu seguro." |
+| `vin_plates_captured` | 1 | 1 | ✅ | "Perfecto. Ahora necesito tu dirección para continuar." |
+| `vin_plates_captured` | 2 | 1 | ✅ | "¿Me compartes tu dirección para avanzar con la emisión?" |
+| `vin_plates_captured` | 3 | 1 | ✅ | "Último recordatorio: falta tu dirección para seguir con el proceso." |
+| `address_captured` | 1 | 1 | ✅ | "Gracias. ¿Requieres factura para esta póliza?" |
+| `address_captured` | 2 | 1 | ✅ | "Solo me falta confirmar si necesitas factura. ¿Sí o no?" |
+| `address_captured` | 3 | 1 | ✅ | "Último recordatorio: falta confirmar si requieres factura." |
+| `rfc_digits_pending` | 1 | 1 | ✅ | "Para facturar, necesito tu RFC completo con homoclave." |
+| `rfc_digits_pending` | 2 | 1 | ✅ | "¿Me compartes tu RFC completo para continuar con la factura?" |
+| `rfc_digits_pending` | 3 | 1 | ✅ | "Último recordatorio: falta RFC completo con homoclave para facturar." |
+| `summary_pending` | 1 | 1 | ✅ | "Ya tengo el resumen listo. ¿Me confirmas si seguimos?" |
+| `summary_pending` | 2 | 1 | ✅ | "¿Quieres que avancemos con la emisión de tu póliza?" |
+| `summary_pending` | 3 | 1 | ✅ | "Último recordatorio: falta tu confirmación para continuar." |
+| `payment_link_sent` | 1-3 | 1 | ⛔ | "Mensaje de pago desactivado en STG hasta validar pagos." |
+
+`rfc_digits_pending` solo aplica si el cliente pidió factura en `address_captured`; si dijo que no, ese checkpoint se salta y va directo a `summary_pending`.
+
 ## Coordinación con Juan — arquitectura de funnel
 
 Juan trae en paralelo una propuesta más grande (`Lead.estado` como verdad comercial canónica, separada de canal/conversación/pago, con migración de datos). Es la base correcta de fondo, pero es una migración de producción de riesgo medio-alto. Se acordó **no esperarla**: Juan adoptó el diseño de checkpoints como "parche temporal" a implementar primero, dejando su arquitectura grande para después. Explícitamente fuera de alcance del parche: tocar `Lead.estado`, los choices, o declarar pagos desde n8n.
