@@ -165,11 +165,17 @@ $ python manage.py enviar_seguimientos_whatsapp --message-key checkpoint_followu
 Basic · Every 10 minutes · Last Run: Never · Next Due: July 17, 2026 8:19 PM UTC
 ```
 
-Pendiente confirmar que el primer corrido automático (≈20:19 UTC) efectivamente inserta filas nuevas en `qualitas_leadcheckpointfollowupattempt` sin intervención manual — eso cerraría, además del job en sí, la prueba de punta a punta 100% automática.
+**✅ Confirmado (17 jul, 20:11 UTC) — primera prueba 100% automática de punta a punta, verificada en vivo por el Arquitecto:**
+
+- Dashboard Scheduler: `Last Run: July 17, 2026 8:10 PM UTC` (ya no "Never").
+- `qualitas_leadcheckpointfollowupattempt` id=4: cotización **1751**, checkpoint `vin_plates_captured`, intento 1, `status=sent`, `idempotency_key=checkpoint_followup:1751:vin_plates_captured:1`, `created_at=2026-07-17T20:11:06Z`.
+- `n8n_chat_histories` id=1872, `session_id=525551074144`, tipo `ai`: *"Perfecto. Ahora necesito tu dirección para continuar."* — coincide exacto con la plantilla de intento 1 de `vin_plates_captured`.
+
+Sin ningún `heroku run` manual de por medio — Scheduler → Django → n8n → BD funcionando solo. Falta únicamente que Alberto confirme recepción real en el WhatsApp del número de pruebas (paridad con la confirmación de entrega real que ya se hizo con la cotización 1750).
 
 ## Pendiente / no cerrado
 
-- **Verificar primer corrido automático del Scheduler (~20:19 UTC, 17 jul):** confirmar en Postgres STG que generó intentos nuevos sin que nadie corriera `heroku run` a mano.
+- Confirmar recepción real en WhatsApp (525551074144) del mensaje automático de cotización 1751 — verificación visual/manual, no de BD.
 - **Bloqueante previo (17 jul, resuelto):** el 403 de autenticación (credencial sin `Bearer`) ya se corrigió y verificó. Falta repetir `heroku run -a hyl-wai-stg -- python manage.py enviar_seguimientos_whatsapp --message-key checkpoint_followups --limit 1` una vez exista el job del Scheduler, para tener también la prueba automática (no solo manual) de punta a punta.
 - `delay_mins` finales de producción sin definir — el fixture actual (`delay_mins=1`) es explícitamente solo para pruebas en STG.
 - Autenticación del webhook en **PROD sigue sin aplicar** — decisión aparte, pendiente de coordinar (ese workflow tiene uso manual activo hoy). El fix de validación dual/`session_id` tampoco se aplicó a PROD todavía — sería un segundo paso coordinado, no automático.
