@@ -156,11 +156,20 @@ Alberto probó en vivo por WhatsApp (STG, 525551074144) esperando que el recorda
 - El add-on Scheduler (`scheduler-graceful-93653`) tiene `created_at: 2026-07-17T16:41:59Z` — se (re)provisionó el mismo día, ~2h53min antes de la prueba de Alberto. Los jobs viven dentro del propio add-on (no en config vars ni en release history), así que si existió un job antes, se perdió al recrear el add-on; más probable: nunca se creó ninguno.
 - Los envíos reales que sí se ven en `qualitas_leadcheckpointfollowupattempt` (16:37 UTC, 19:08 UTC — ver sección "Reporte de Juan" arriba) vinieron de `heroku run` manual, no de un cron corriendo en background.
 
-**Causa raíz: no es un bug de n8n, BD ni de timing — nadie ha creado el job `enviar_seguimientos_whatsapp --message-key checkpoint_followups` en el Scheduler de STG.** Acción pendiente: crear el job manualmente en esa misma página del dashboard, con la cadencia deseada para pruebas (p. ej. 10 min) — decisión ya tomada arriba de que el Scheduler estándar alcanza, solo falta el paso de crear el job.
+**Causa raíz: no es un bug de n8n, BD ni de timing — nadie había creado el job `enviar_seguimientos_whatsapp --message-key checkpoint_followups` en el Scheduler de STG.**
+
+**✅ Resuelto (17 jul, noche):** Juan creó el job directo en el dashboard. Verificado por el Arquitecto en la misma pantalla:
+
+```
+$ python manage.py enviar_seguimientos_whatsapp --message-key checkpoint_followups --limit 20
+Basic · Every 10 minutes · Last Run: Never · Next Due: July 17, 2026 8:19 PM UTC
+```
+
+Pendiente confirmar que el primer corrido automático (≈20:19 UTC) efectivamente inserta filas nuevas en `qualitas_leadcheckpointfollowupattempt` sin intervención manual — eso cerraría, además del job en sí, la prueba de punta a punta 100% automática.
 
 ## Pendiente / no cerrado
 
-- **Bloqueante nuevo (17 jul, noche):** crear el job del Scheduler en STG — ver sección justo arriba. Sin esto, ninguna prueba de timing automático va a saltar nunca, sin importar cuánto se espere.
+- **Verificar primer corrido automático del Scheduler (~20:19 UTC, 17 jul):** confirmar en Postgres STG que generó intentos nuevos sin que nadie corriera `heroku run` a mano.
 - **Bloqueante previo (17 jul, resuelto):** el 403 de autenticación (credencial sin `Bearer`) ya se corrigió y verificó. Falta repetir `heroku run -a hyl-wai-stg -- python manage.py enviar_seguimientos_whatsapp --message-key checkpoint_followups --limit 1` una vez exista el job del Scheduler, para tener también la prueba automática (no solo manual) de punta a punta.
 - `delay_mins` finales de producción sin definir — el fixture actual (`delay_mins=1`) es explícitamente solo para pruebas en STG.
 - Autenticación del webhook en **PROD sigue sin aplicar** — decisión aparte, pendiente de coordinar (ese workflow tiene uso manual activo hoy). El fix de validación dual/`session_id` tampoco se aplicó a PROD todavía — sería un segundo paso coordinado, no automático.
