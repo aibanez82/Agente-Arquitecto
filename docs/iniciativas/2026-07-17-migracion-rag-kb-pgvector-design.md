@@ -59,23 +59,23 @@ CREATE INDEX kb_chunks_embedding_idx ON kb_chunks
 
 ## 4. Plan de migración (fases)
 
-### Fase 0 — Prerrequisitos (Alberto)
+### Fase 0 — Prerrequisitos (Alberto) — ✅ completa
 - [x] Plan de Heroku Postgres soporta pgvector — verificado en vivo 17 jul (ver §3).
-- [ ] Provisionar `OPENAI_API_KEY` — nueva, no existe hoy en el ecosistema. Agregar como credencial en n8n (PROD y STG por separado) y, si se necesita fuera de n8n para el script de backfill, como env var donde corresponda.
+- [x] `OPENAI_API_KEY` provisionada 17 jul, entregada directo a Agente n8n (nunca pasó por el Arquitecto).
 
-### Fase 1 — Extracción de contenido (Arquitecto, análisis; sin ejecución de código)
-- Parsear el código actual de `search_knowledge_base1` y producir un CSV/JSON intermedio con los ~114 pares `{section, question, content, source_clause}` — sin tocar el workflow todavía. Esto es trabajo de una sola pasada, determinista (el código fuente ya tiene el patrón `P: ... R: ...` consistente).
+### Fase 1 — Extracción de contenido (Arquitecto) — ✅ completa
+- 112 pares `{section, question, content, source_clause}` extraídos del código real (no ~114, número exacto tras parseo determinista). Entregados en `Agente-n8n/handoffs/2026-07-17-kb-chunks-extracted.json`.
 
-### Fase 2 — Backfill en STG (Agente n8n, ejecuta)
-- Crear la tabla `kb_chunks` en el Postgres de STG (`CREATE EXTENSION vector` + DDL de arriba).
-- Workflow n8n de un solo uso (o script) que recorra el JSON intermedio de la Fase 1, llame a OpenAI Embeddings por cada chunk, e inserte en `kb_chunks`. ~114 llamadas, costo trivial (<$0.01 con `text-embedding-3-small`).
-- Reemplazar el nodo `search_knowledge_base1` (Code tool) por un **Vector Store Tool node** (`@n8n/n8n-nodes-langchain.toolVectorStore` sobre `vectorStorePGVector`) conectado a `kb_chunks`, con un nodo `Embeddings OpenAI` alimentando la query. `k` (número de chunks recuperados) a definir en pruebas — punto de partida sugerido: `k=3`.
-- Mantener el mismo contrato de salida hacia el agente (si no hay match relevante por umbral de similitud, devolver algo equivalente a `NOT_FOUND` para no romper la lógica de escalamiento del `systemMessage` del `RAG IA Agent`).
+### Fase 2 — Backfill en STG (Agente n8n) — ✅ completa, verificado en vivo por el Arquitecto
+- Extensión `vector` + tabla `kb_chunks` (schema exacto al diseño) creadas en Postgres STG.
+- 112/112 chunks insertados con embeddings de `text-embedding-3-small` — verificado directo: conteo por sección idéntico al JSON fuente, 0 filas con dimensión de embedding ≠ 1536, 112 preguntas distintas.
+- Nodo `search_knowledge_base1` reemplazado. **Drift real vs. este diseño:** no existe ya un nodo separado `toolVectorStore` en la versión de n8n de STG — quedó consolidado dentro de `vectorStorePGVector` en modo "Retrieve Documents (As Tool for AI Agent)" (`mode: retrieve-as-tool`). Confirmado en la UI real por Agente n8n, y verificado por el Arquitecto vía API (`GET /workflows/dNqtM20ij6ecZYAX`): conexión `Embeddings OpenAI --ai_embedding--> search_knowledge_base1 --ai_tool--> RAG IA Agent` intacta, `systemMessage` con la regla `NOT_FOUND` sin tocar. `k` no aplica igual que en el diseño original — el modo "as tool" deja que el LLM decida relevancia sobre los documentos recuperados, no hay corte duro configurado; a vigilar en el barrido de QA.
 
-### Fase 3 — Validación en STG (Agente QA, ejecuta)
-- Correr como caso de prueba **las mismas reformulaciones que expusieron el bug**: "tienes alguna promoción" / "tienes algún descuento" / "algún precio especial" (M33) deben ahora devolver el mismo contenido de MSI las tres. Igual con la pregunta de M36 (Extensión RC al Titular con vehículo de otra categoría) una vez Juan confirme el contenido real de esa restricción.
-- Regresión: probar al menos 1-2 preguntas por cada una de las 11 secciones para confirmar que el contenido recuperado coincide con el que devolvía el keyword matching (no debe haber pérdida de cobertura, solo ganancia de recall en reformulaciones).
-- Sign-off explícito de Alberto antes de pasar a PROD (mismo gate que cualquier cambio a este nodo).
+### Fase 3 — Validación en STG (Agente QA) — 🟡 parcial
+- **Ya hecho, verificado en vivo por el Arquitecto contra `n8n_chat_histories` real (no solo el resumen):** Alberto probó 4 casos reales por WhatsApp (17 jul, 19:29-19:34 UTC, sesión `525551074144`) — variante de M33 sin la palabra "promoción" ("algún descuento si pago con tarjeta?"), pregunta con fraseo informal sin ninguna keyword literal ("si choco y es mi culpa, qué pasa con el otro carro?"), y sin querer, **el caso M36** ("cubres extension de RC?" + "Y si voy manejando un camión?"). Los 4 recuperaron contenido relevante y correcto, ninguno cayó en el fallback indebidamente.
+  - **Hallazgo no planeado sobre M36:** el modo de falla cambió — antes el bot daba una respuesta que sonaba completa pero omitía la restricción real; ahora responde "depende del tipo específico de vehículo" y pregunta uso personal/comercial, en vez de afirmar cobertura sin fundamento. **No es M36 resuelto** (sigue sin existir el dato real de la restricción de categoría/peso — Juan sigue sin confirmarlo, sigue sin chunk dedicado), pero el riesgo de que el cliente crea que está cubierto cuando no lo está bajó con la migración misma, sin que fuera el objetivo.
+- **Pendiente real:** el barrido sistemático de Agente QA — 1-2 preguntas por cada una de las 11 secciones, para confirmar que no hay pérdida de cobertura vs. el keyword matching viejo. Las pruebas de Alberto son una señal fuerte pero no reemplazan esta validación formal.
+- Sign-off explícito de Alberto antes de pasar a PROD (mismo gate que cualquier cambio a este nodo) — sigue sin darse.
 
 ### Fase 4 — Deploy a PROD (Agente n8n ejecuta el JSON; Alberto importa)
 - Backfill de `kb_chunks` en Postgres PROD (mismo proceso de Fase 2).
