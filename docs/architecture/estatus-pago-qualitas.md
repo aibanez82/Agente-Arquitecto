@@ -2,6 +2,18 @@
 
 Movido desde `CLAUDE.md`, sección "Pendientes de infraestructura", al adelgazar el archivo (10 jul 2026).
 
+## ✅ Mecanismo real confirmado (17 jul 2026) — no es un webhook, es un redirect de navegador
+
+Se revisó la documentación oficial estructurada de Quálitas (`aguayo-co/HYL-WAI:docs/qualitas-documentacion-webservices/`, entregada 17 jul) buscando si Quálitas notifica el pago por webhook u otro medio — **no lo documenta en absoluto**, esa carpeta solo cubre cotización/emisión/tarifas/impresión, no el webservice de pago (OPL).
+
+Cruzando esto con el código real de Django (`qualitas/services.py`), se confirmó el mecanismo real:
+
+1. `generar_link_pasarela()` llama a `genWebPay` de Quálitas (`QUALITAS_URL_PAGO`) pasando **URLs de redirección del navegador**: `usucces`/`ufail` (`request.build_absolute_uri(reverse('pago_exitoso'))` / `pago_fallido`).
+2. Cuando el cliente termina de pagar en la pasarela de Quálitas, **el navegador del cliente** es redirigido a `pago_exitoso` (o `pago_fallido`) con el número de póliza en el query string — no hay llamada servidor-a-servidor de Quálitas hacia Django.
+3. `pago_exitoso` (`qualitas/views.py:945`) es lo que realmente marca `estatus_pago='PAGADO'`, dispara la descarga de documentos, y — si `origen == 'WhatsApp IA'` — llama a `enviar_webhook_whatsapp(poliza_obj)` (el webhook hacia n8n que actualiza `conversation_phase='completed'`).
+
+**Por qué esto es frágil, no solo "no documentado":** depende de que el navegador del cliente complete el round-trip de vuelta a Django después de pagar. Si cierra la pestaña, pierde conexión, o la app de WhatsApp/navegador móvil mata la sesión antes de la redirección, Quálitas procesó el pago pero **Django nunca se entera** — no hay ningún mecanismo de respaldo servidor-a-servidor (ni webhook, ni polling de estatus) encontrado en el código ni en la documentación. Esto no es un vacío de documentación que se pueda resolver pidiéndole el dato a Quálitas — es una limitación real de cómo está construida la integración hoy, y es exactamente la razón de fondo por la que hace falta un mecanismo independiente de verificación (ver Agente Conciliación abajo).
+
 ## ⏳ En construcción — Agente Conciliación (14 jul 2026)
 
 Alberto confirmó que el portal de Quálitas es un login simple, sin captcha, y que el volumen
