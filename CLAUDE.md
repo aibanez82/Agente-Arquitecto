@@ -215,7 +215,7 @@ Repo: `aibanez82/Agente-n8n` (clonado en `~/claude-projects/Agente-n8n`, push di
 
 Staging end-to-end paralelo a prod (gitflow `stg`→`main`) para validar bug fixes antes de desplegar. Instancia n8n STG: `https://n8n-xlqk.srv1810257.hstgr.cloud`. **Principio rector:** cada componente de staging apunta SOLO a gemelos de staging, nunca a prod. Mapa completo prod→staging, credenciales, gotchas de import: `docs/iniciativas/entorno-pruebas-staging.md`.
 
-**Seguimiento automático de leads estancados (15-17 jul):** 7 checkpoints, hasta 3 reintentos. Configurado y activado en STG; 403 inicial (credencial sin `Bearer`) corregido 17 jul. **Pendiente: primera prueba end-to-end real sin confirmar.** Detalle: `docs/iniciativas/seguimiento-leads-estancados.md`.
+**Seguimiento automático de leads estancados (15-17 jul):** 7 checkpoints, hasta 3 reintentos. ✅ Primera prueba E2E real confirmada en STG 17 jul (cotización 1750): cliente respondió de verdad al mensaje proactivo, verificado en BD (Django + `n8n_chat_histories`). Detalle: `docs/iniciativas/seguimiento-leads-estancados.md`.
 
 **Conversation ID (Issue #21):** identidad conversacional de n8n movida de `phone_number` a `conversation_id`. **Ya desplegado en PROD** (verificado 16 jul: Django en `hyl-wai-production` con `WHATSAPP_CONVERSATION_ID_MODE=shadow`, n8n PROD ya tiene los nodos `Resolve Session`/`Session Router`) — no solo en STG como decía esta línea hasta el 15 jul. Pendiente real: mergear a `main` la rama del Dashboard (`fix/conversation-id-whatsapp-n8n`, bajo riesgo mientras siga en `shadow`) y decidir con Juan el paso a `dual`. Detalle: `docs/iniciativas/conversation-id-whatsapp-n8n.md`.
 
