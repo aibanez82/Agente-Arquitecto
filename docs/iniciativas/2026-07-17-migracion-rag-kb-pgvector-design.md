@@ -84,7 +84,7 @@ CREATE INDEX kb_chunks_embedding_idx ON kb_chunks
 
 ### Fase 5 — Mantenimiento post-migración
 - El contenido de `kb_chunks` se actualiza agregando/editando filas (re-embeber solo la fila tocada) en vez de tocar código JS — **esto simplifica** la tubería Mejoras Conversación → Arquitecto → Agente n8n descrita en el CLAUDE.md: ya no hace falta pensar en colisiones de `keywords`, solo en si el contenido nuevo/corregido está bien redactado.
-- M36 sigue bloqueado en el mismo punto: falta que Juan confirme la restricción real de categoría/peso de "Extensión RC al Titular" antes de poder escribir ese chunk correctamente.
+- **✅ M36 resuelto (17 jul 2026), sin esperar a Juan:** `kb_chunks` id 34 actualizado por Agente n8n (commit `31367e4`) con la restricción real de categoría (Automóvil/Pick-up del titular, NO camiones/carga/Uber-taxi), embedding regenerado, retrieval verificado. Corroborado independientemente por el Arquitecto contra la Cláusula 8.1 del PDF de Condiciones Generales — el texto coincide. Ver `docs/iniciativas/2026-07-17-corpus-documental-pdfs-qualitas-design.md` §6.
 
 ## 5. Riesgos y mitigaciones
 
