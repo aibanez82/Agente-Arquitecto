@@ -1,6 +1,6 @@
 # Iniciativa — Seguimiento automático de leads estancados (15-16 jul 2026)
 
-> Estado: 🟡 Django implementado y verificado en STG (16 jul, commit `789443b`, migración `0041`). Fix mínimo del gap de `session_id`/`conversation_id` en n8n ya aplicado y verificado en vivo (commit `a933049` en `Agente-n8n:stg`) — pero **Juan mandó un plan más estricto y completo** (`docs/2026-07-16-plan-juan-n8n-stg-proactive-wa-message-session-id.md` en `Agente-n8n`) que exige fallar si falta `session_id` (sin caer a `phone_number`), validación de payload, idempotencia y 4 pruebas obligatorias — **en curso, handoff enviado** (`Agente-n8n:handoffs/2026-07-16-handoff-plan-juan-session-id.md`). Nada activado para envío real todavía, nada en PROD.
+> Estado: 🟢 Django y n8n completos y verificados en STG (16 jul). Django: `checkpoint_followups`, migración `0041`, commit `789443b`. n8n: `Retomar Conversacion_stg` implementa el plan estricto de Juan (`session_id` sin ningún fallback, validación de payload, idempotencia) **más** una rama legacy para no romper el botón "Tomar conversación" del Dashboard (validación dual por presencia de `checkpoint`+`idempotency_key`) — 5 pruebas (A-E) verificadas en vivo por el Arquitecto contra la API de n8n y la Postgres de STG, no solo confiadas al reporte del ejecutor. **Único pendiente para activar envío real:** que Alberto comparta el token con Juan y Juan configure `N8N_PROACTIVE_WA_MESSAGE_URL`/`_TOKEN` en `hyl-wai-stg`. Nada en PROD todavía — decisión aparte.
 > Guardado en git (no en memoria local) para persistir entre las 3 laptops de Alberto.
 > Ejecutor: Agente n8n. Reporte fuente: `Agente-n8n:docs/2026-07-16-resumen-arquitecto-seguimiento-leads-estancados.md`.
 
@@ -70,6 +70,33 @@ scheduler viejo) — no sirve para esta iniciativa (que solo manda texto libre e
 diseño explícito de Juan), pero confirma que el camino de aprobación con Meta ya es viable para la
 iniciativa paralela de "recordatorios por fecha mencionada".
 
+## ✅ Gap de n8n cerrado (16 jul, verificado en vivo por el Arquitecto)
+
+Juan mandó un plan más completo y estricto que el fix mínimo inicial
+(`docs/2026-07-16-plan-juan-n8n-stg-proactive-wa-message-session-id.md` en `Agente-n8n`): `session_id`
+sin ningún fallback (ni a `conversation_id` ni a `phone_number` — si falta, el webhook debe fallar),
+validación completa de payload, e idempotencia real del lado de n8n. Agente n8n lo implementó
+(`Retomar Conversacion_stg`, commit `eb656c5`) y en el camino encontró que esa validación estricta
+rompía el botón "Tomar conversación" del Dashboard (payload mínimo sin `timestamp`/`checkpoint`/etc.)
+— lo reportó como riesgo bloqueante en vez de parchearlo por su cuenta. El Arquitecto verificó
+contra el código real del Dashboard (`pages/api/n8n-proactive-message.js`: solo manda 3 campos, y ni
+siquiera lee la respuesta JSON de n8n, solo el status HTTP) y decidió la opción más limpia: **un solo
+webhook, con validación dual** — estricta solo si el payload trae `checkpoint`+`idempotency_key`
+(caso Django), laxa si no (caso Dashboard). Cero cambios necesarios en Django o en el Dashboard.
+
+Implementado (commit `ef5e0af`, nodo nuevo `IF Is Checkpoint Followup?`) y **verificado en vivo por
+el Arquitecto contra la API real de n8n** (12 nodos, condición del IF, conexiones del grafo — no
+solo el reporte del ejecutor): coincide exactamente. 5 pruebas (A-E) corridas por Agente n8n contra
+el webhook real de STG con verificación directa en Postgres, incluida una Prueba E que replica el
+payload exacto del Dashboard. De paso, el ejecutor encontró y documentó un gotcha nuevo de n8n: un
+valor vacío (`""`) en una línea de `queryReplacement` de un nodo Postgres hace que n8n pierda esa
+posición de parámetro por completo (mismo patrón que el gotcha ya conocido de `$fromAI` con cadena
+vacía) — fix fue no dejar `timestamp` vacío nunca, usar `new Date().toISOString()` como respaldo.
+
+Con esto, el lado de n8n queda completo. Detalle completo:
+`Agente-n8n:docs/2026-07-16-respuesta-plan-juan-session-id.md` y
+`Agente-n8n:docs/2026-07-16-respuesta-validacion-dual-proactive-wa-message.md`.
+
 ## Documentos (en `Agente-n8n`)
 
 - `docs/2026-07-15-handoff-para-juan-seguimiento-automatico-leads-estancados.md` — diseño original.
@@ -84,12 +111,8 @@ iniciativa paralela de "recordatorios por fecha mencionada".
 
 ## Pendiente / no cerrado
 
-- **🟡 En curso:** fix mínimo ya aplicado y verificado (quita prioridad de `conversation_id`), pero
-  Juan pide un plan más estricto y completo (sin fallback a `phone_number`, validación de payload,
-  idempotencia, 4 pruebas obligatorias A/B/C/D) — handoff enviado a Agente n8n 16 jul, pendiente de
-  reporte y verificación del Arquitecto.
-- Django ya implementado en STG — pendiente solo activarlo (ver siguiente punto), no arrancar desde cero.
+- **Django y n8n ya implementados y verificados en STG — solo falta activar.** Ver punto siguiente.
 - Alberto tiene pendiente compartirle a Juan el token de autenticación del webhook (ya generado, falta mandarlo por canal seguro, no por git) y `N8N_PROACTIVE_WA_MESSAGE_URL`/`_TOKEN` siguen sin configurarse en `hyl-wai-stg`.
 - `delay_mins` finales de producción sin definir — el fixture actual (`delay_mins=1`) es explícitamente solo para pruebas en STG.
-- Autenticación del webhook en **PROD sigue sin aplicar** — decisión aparte, pendiente de coordinar (ese workflow tiene uso manual activo hoy).
-- Sin verificación end-to-end todavía: falta provocar un lead estancado real en STG y confirmar que el reintento completo (Django → n8n → WhatsApp → `LeadActionEvent`) funciona, y debe esperar a que se corrija el gap de `session_id` de n8n primero (si no, el mensaje se perdería igual aunque Django marque `sent`).
+- Autenticación del webhook en **PROD sigue sin aplicar** — decisión aparte, pendiente de coordinar (ese workflow tiene uso manual activo hoy). El fix de validación dual/`session_id` tampoco se aplicó a PROD todavía — sería un segundo paso coordinado, no automático.
+- Sin verificación end-to-end todavía con un lead real de principio a fin (Django → n8n → WhatsApp → `LeadActionEvent`) — las pruebas A-E fueron con payloads sintéticos, no con un lead real progresando por el flujo. Puede correr en cuanto se configure el token.
