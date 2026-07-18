@@ -95,10 +95,16 @@ CREATE INDEX kb_chunks_embedding_idx ON kb_chunks
 - **Fallback de media no soportada** (sticker/video/audio/document/location/contacts) — `2026-07-18-deploy-prod-fallback-media-no-soportada.md`. Confirmado con sticker/audio/video reales por WhatsApp (mismo código que STG); document/location/contacts sin prueba real en ningún ambiente.
 - **Fallback de `doc_chunks`** (corpus PDF completo, 152 chunks, solo si `kb_chunks` da `NOT_FOUND`, grounding estricto) — `2026-07-18-deploy-prod-fallback-doc-chunks.md`. Detalle de diseño y validación de grounding: `docs/iniciativas/2026-07-17-corpus-documental-pdfs-qualitas-design.md` §9. Confirmado en vivo por el Arquitecto: tabla `doc_chunks` existe en Postgres PROD, 152 filas (`pg_stat_user_tables`).
 
-**Pendiente real (no cerrado):**
-- Verificación conversacional E2E por WhatsApp en PROD — quedó marcada "pendiente" en los docs de deploy de RAG general, M33, M36/M38 y fallback `doc_chunks`. Solo el fallback de media no soportada tiene confirmación real en PROD (mismo código ya probado en STG).
-- `requiere_factura` (fix) y **M39** siguen solo en STG, no promovidos — decisión aparte, a propósito.
-- Commit a este repo (`docs/n8n-workflows/`) del JSON refrescado de PROD post-deploy, como exige la política de backup — pendiente de confirmar si Agente n8n ya lo hizo en su propio repo o si falta sincronizarlo aquí.
+**Verificación E2E — actualizado tras respuesta de Agente n8n (18 jul):**
+- ✅ **RAG general**: confirmado por trace real en PROD (Alberto probó 4 casos por WhatsApp — métodos de pago, MSI por banco, adultos mayores, fuera de dominio — verificado contra `n8n_chat_histories`, no solo apariencia).
+- ✅ **M36/M38**: confirmado por trace real en PROD (caso de camión, 2 fraseos distintos).
+- ✅ **Media no soportada**: `sticker`/`audio`/`video` confirmados en STG (mismo código en PROD).
+- 🔴 **`doc_chunks` fallback**: sigue SIN verificación E2E real en PROD — solo se verificó retrieval directo contra Postgres. Único de los 5 items grandes sin ese cierre.
+- 🔴 **Bug activo encontrado en PROD, no resuelto ahí todavía**: al probar en vivo `document`/`location`/`contacts` del fallback de media, se encontró que el `Intent Router` a veces clasifica `[MEDIA_NO_SOPORTADA]` como `out_of_scope` — suma al contador que puede suspender a un cliente real. Fix aplicado y verificado E2E, pero **solo en STG**, no promovido a PROD. Es lo más urgente del estado actual. Tracker: `qualitas-issues#46`.
+
+**Otros pendientes reales:**
+- `requiere_factura` (fix) y **M39** siguen solo en STG, no promovidos — bloqueados en que ninguno de los dos puede originar un mensaje de WhatsApp entrante para hacer la verificación E2E; `requiere_factura` además necesita probar explícitamente la rama NO.
+- **Backup de `docs/n8n-workflows/` en este repo: confirmado desactualizado (61 nodos vs 84 reales), y la causa es más grave de lo que parecía** — el GitHub Action de backup automático lleva **deshabilitado manualmente desde el 6 jul** (falló 3 veces con 401 por `N8N_API_KEY` vencida, alguien lo apagó y nadie lo reactivó). No es solo que falte un commit puntual. Detalle y pasos para reactivar: `docs/architecture/backup-policy-n8n.md`.
 
 ### Fase 5 — Mantenimiento post-migración
 - El contenido de `kb_chunks` se actualiza agregando/editando filas (re-embeber solo la fila tocada) en vez de tocar código JS — **esto simplifica** la tubería Mejoras Conversación → Arquitecto → Agente n8n descrita en el CLAUDE.md: ya no hace falta pensar en colisiones de `keywords`, solo en si el contenido nuevo/corregido está bien redactado.

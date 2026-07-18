@@ -88,3 +88,24 @@ generar una nueva, luego `gh secret set N8N_API_KEY --repo aibanez82/Agente-Arqu
 **Regla para cualquier script futuro que lea de la n8n API:** nunca escribir la respuesta cruda
 de `GET /workflows/{id}` a un archivo — siempre pasar por un whitelist de campos como
 `toExportFormat()`.
+
+## 🔴 Estado real (verificado 18 jul 2026): deshabilitado, no solo desactualizado
+
+Alberto preguntó por el estado del deploy RAG y, al verificar, se encontró que el workflow lleva
+sin correr desde el 6 jul — no era solo que nadie hiciera commit manual.
+
+Verificado vía `gh api repos/aibanez82/Agente-Arquitecto/actions/workflows`: la Action está
+**`disabled_manually`**, `updated_at: 2026-07-06T16:48:44-06:00`. Los 3 runs anteriores a esa
+fecha (4, 5, 6 jul) fallaron con `401 {"message":"unauthorized"}` — la `N8N_API_KEY` vencida (la
+misma pendiente de rotar arriba, nunca rotada). Alguien deshabilitó la Action manualmente el
+mismo día del 3er fallo consecutivo, y nadie la volvió a activar desde entonces.
+
+**Consecuencia:** el único contenido de `docs/n8n-workflows/` desde entonces es un snapshot
+manual puntual (commit `901347b`, 13 jul, "antes del despliegue del 14 jul") — ya desactualizado
+otra vez: 61 nodos contra los 84 reales en PROD hoy (migración RAG, M33, M36/M38, fallbacks de
+media/`doc_chunks`, ninguno reflejado).
+
+**Para reactivar:** (1) rotar `N8N_API_KEY` en n8n UI, (2) `gh secret set N8N_API_KEY --repo
+aibanez82/Agente-Arquitecto` con el valor nuevo, (3) `gh workflow enable backup-n8n.yml --repo
+aibanez82/Agente-Arquitecto`, (4) disparar un `workflow_dispatch` manual para refrescar el
+snapshot ya mismo en vez de esperar al cron de las 06:00.
