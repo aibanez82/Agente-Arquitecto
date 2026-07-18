@@ -212,11 +212,13 @@ del diseño: artefacto `propuesta-reintentos` de Alberto.
 3. **Salida explícita en intento 3 ("contéstame 'no, gracias' y no te vuelvo a escribir")** —
    pendiente de decisión de Alberto, pero ya no es solo copy: se resuelve con el mismo mecanismo
    unificado del gap de abajo.
-4. **✅ Aplicado (18 jul) — quitar "Soy Uriel, de Quálitas." de `quote_sent/1`.** Ese saludo ya
-   va en la plantilla de Meta del primer contacto; repetirlo en el primer recordatorio es
-   redundante. Nuevo texto: "¡Hola! 😊 Tu cotización para tu **[MARCA MODELO AÑO]** por
-   **$[PRECIO] MXN** sigue guardada — ¿seguimos con el trámite?" (pendiente de subir a STG, sigue
-   dependiendo de la interpolación de variables del punto 1).
+4. **✅ Aplicado y verificado en STG (18 jul) — quitar "Soy Uriel, de Quálitas." de `quote_sent/1`.**
+   Ese saludo ya va en la plantilla de Meta del primer contacto; repetirlo en el primer recordatorio
+   es redundante. `UPDATE` corrido directo por el Arquitecto contra Postgres STG (acceso de
+   escritura ya establecido ahí), confirmado `rowCount=1` y texto releído: "¡Hola! 😊 Tu cotización
+   para tu *[MARCA MODELO AÑO]* por *$[PRECIO] MXN* sigue guardada — ¿seguimos con el trámite?".
+   Las 18 filas de STG ahora coinciden 100% con la versión final de la tabla de arriba. Sigue
+   bloqueado el placeholder real hasta la interpolación de variables del punto 1.
 
 ## 🔴 Gap confirmado (18 jul) — el sistema no detecta que un lead declinó, y mecanismo unificado de fix
 
