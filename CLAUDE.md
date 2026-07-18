@@ -63,7 +63,9 @@ Dashboard (Next.js · Vercel)
 Observabilidad:
 ├── GA4 → visitas landing
 ├── Meta Business API → métricas WhatsApp (enviados/leídos/respondidos)
-└── Dashboard → funnel completo
+├── Dashboard → funnel completo
+└── n8n PROD "Monitor Qualitas SIO PROD" (18 jul) → chequeo cada 10 min contra el SOAP real de
+    Quálitas, alerta por Telegram si cae (repetida mientras siga caído) y al recuperarse
 ```
 
 **Regla crítica de arquitectura:** Django y n8n comparten la misma BD Postgres.
