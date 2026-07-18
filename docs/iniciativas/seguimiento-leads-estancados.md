@@ -196,32 +196,46 @@ artefacto `propuesta-reintentos` de Alberto.
    Decisión de Alberto: es copy de marketing intencional, no una afirmación fáctica de negocio
    (no requiere verificar que la tarifa cambie literalmente día a día). Se mantiene tal cual.
 3. **Salida explícita en intento 3 ("contéstame 'no, gracias' y no te vuelvo a escribir")** —
-   pendiente de decisión de Alberto. Implica más que copy: requiere que Juan agregue un mecanismo
-   nuevo (flag/tabla) que `enviar_seguimientos_whatsapp` respete de forma permanente, distinto del
-   tope de 3 intentos por checkpoint que ya existe.
+   pendiente de decisión de Alberto, pero ya no es solo copy: se resuelve con el mismo mecanismo
+   unificado del gap de abajo.
 4. **✅ Aplicado (18 jul) — quitar "Soy Uriel, de Quálitas." de `quote_sent/1`.** Ese saludo ya
    va en la plantilla de Meta del primer contacto; repetirlo en el primer recordatorio es
    redundante. Nuevo texto: "¡Hola! 😊 Tu cotización para tu **[MARCA MODELO AÑO]** por
    **$[PRECIO] MXN** sigue guardada — ¿seguimos con el trámite?" (pendiente de subir a STG, sigue
    dependiendo de la interpolación de variables del punto 1).
 
-## 🔴 Gap confirmado (18 jul) — el sistema no detecta que un lead declinó explícitamente
+## 🔴 Gap confirmado (18 jul) — el sistema no detecta que un lead declinó, y mecanismo unificado de fix
 
 Verificado contra el código real: `evaluate_checkpoint_followup_candidate`
 (`qualitas/whatsapp_checkpoint_followups.py`) nunca revisa el contenido de los mensajes del
 cliente — solo fase/checkpoint, que el último mensaje sea del bot, ventana de 24h y tope de 3
 intentos. El `systemMessage` del `AI Agent` en PROD sí tiene una regla de "escalamiento
 inmediato" si el usuario dice que quiere cancelar, pero esa reacción es solo conversacional — no
-toca `conversation_phase` ni `captured_data`, que es lo único que Django mira. **Resultado: si un
-lead escribe "ya no me interesa", "no me escribas más" o "ya contraté con otra compañía", el bot
-puede responder algo en el momento, pero el siguiente recordatorio programado de ese checkpoint se
-manda igual, horas después.**
+persiste nada. **Resultado: si un lead escribe "ya no me interesa", "no me escribas más" o "ya
+contraté con otra compañía", el siguiente recordatorio programado de ese checkpoint se manda
+igual, horas después.**
 
-Esto es independiente de la decisión #3 de arriba (la frase explícita de "no, gracias") — existe
-con o sin ella. **Prioridad para el checklist de Juan, antes de PROD:** el `AI Agent` necesita
-reconocer la intención de declinar y persistirla (en `captured_data` o un flag nuevo), y
-`evaluate_checkpoint_followup_candidate` necesita revisarla antes de mandar cualquier recordatorio
-— no solo cuando el lead usa la frase de salida propuesta en el punto 3.
+**Mecanismo de fix — reparto real de trabajo (18 jul, corregido tras revisar más código):**
+
+- **De Alberto/n8n (Agente n8n), sin depender de Juan:** el `AI Agent` reconoce la intención de
+  declinar (orgánica, o el "no, gracias" explícito del punto 3 si se activa) y hace
+  `UPDATE whatsapp_sessions SET status = 'closed'` directo por Postgres — n8n ya tiene ese acceso
+  (mismo patrón que el `UPDATE` del copy del 17 jul). **No hace falta columna nueva:** `status`
+  ya existe (migración de `conversation_id`) y `'closed'` ya es un valor reconocido en este mismo
+  código base.
+- **De Juan, cambio mínimo con precedente exacto en su propio código:** verificado que el
+  scheduler viejo (`qualitas/n8n_whatsapp_activity.py:109-110`) **ya respeta `status`** —
+  `if status in {"completed","closed","archived","expired"}: no elegible`. El sistema nuevo
+  (`whatsapp_checkpoint_followups.py`) **no tiene ese check en absoluto** — captura `status` en
+  metadata pero nunca lo evalúa. Pedirle a Juan que agregue las mismas 2 líneas (mismo patrón,
+  ya probado en su código) a `evaluate_checkpoint_followup_candidate`. Bajo riesgo, no es diseño
+  nuevo.
+- Con esto, decisión #3 (arriba) y este gap se cierran con el mismo mecanismo — no son dos
+  proyectos separados.
+- **Efecto colateral a tener presente (no necesariamente malo):** `status != 'open'/'active'`
+  también saca al lead de la lista de "conversaciones activas" que usa `whatsapp_conversations.py`
+  (filtro ya existente ahí) — razonable para un lead que declinó, pero vale la pena que Alberto lo
+  sepa antes de activarlo.
 
 ## Pendiente / no cerrado
 
