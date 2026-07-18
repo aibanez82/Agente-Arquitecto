@@ -232,14 +232,8 @@ Staging end-to-end paralelo a prod (gitflow `stg`→`main`) para validar bug fix
 | Corrección Bug #7 en Django — Juan Aguayo (Issue #69 `aguayo-co/HYL-WAI`) | ⏳ Pendiente externo |
 | Corrección Bug #8 en Django — Juan Aguayo (Issue #70 `aguayo-co/HYL-WAI`) | ⏳ Pendiente externo |
 | Política de backup automático de workflows n8n | ✅ Activo (`.github/workflows/backup-n8n.yml`, cron diario 06:00 CDMX + disparo manual). Rotar `N8N_API_KEY` de GitHub Actions (se pegó en texto plano en un chat el 30 jun) |
-| Tab 2.0 del Dashboard | ⏳ Instrucciones ya dadas al Code Agent |
-| Reconectar Notion al workspace `aguayo` | ⏳ Pendiente |
-| Subir `BUGS_N8N.md` al repo Dashboard | ⏳ Pendiente |
-| Integración Kommo — botón "Pasar a Kommo" en Dashboard | ⏳ Pendiente (falta subdominio + API token + pipeline de Alberto). Detalle: `docs/iniciativas/kommo-crm.md` |
 | Propuesta arquitectura BD — tabla canónica `whatsapp_event` | 💡 Plan de destino, sin decisión de implementar. Detalle: `docs/architecture/whatsapp-event-canonico-propuesta.md` |
-| Alerta de emisión fallida (Bug #9) — workflow `Bot Error Handler` en n8n + tarjeta "Emisión falló" en Dashboard | ⏸️ En pausa. Spec: `docs/estrategia/2026-07-02-alerta-emision-fallida-quálitas.md` |
 | `N8N_TOKEN` con valor real hardcodeado como default en `qualitas/views.py:905` (confirmado también en `main`, 16 jul — no es solo `stg`) | ⚠️ Seguridad — mover a solo-env y rotar el token, pedir a Juan. Ver `docs/iniciativas/entorno-pruebas-staging.md` |
-| Revisar cumplimiento de la política de IA de WhatsApp de Meta (interacciones deben ser "task-specific") | ⏳ Pendiente — priorizar sobre el escalado de volumen. Ver `docs/estrategia/2026-07-06-evaluacion-plataformas-conversacion-whatsapp.md` |
 | Cómo saber con certeza si un cliente pagó la póliza | ⏳ En construcción — Agente Conciliación (creado 14 jul). Ver `docs/architecture/estatus-pago-qualitas.md` y `docs/protocolos/agente-conciliacion.md` |
 | Plantilla de Meta aprobada para re-enganche fuera de ventana 24h | ⚠️ Bloqueante para "Recordatorios por fecha mencionada" (arriba) y rescates tipo Bug #12. Pedida a Juan 16 jul, no sometida aún |
 | Migración KB del bot a RAG real (pgvector + OpenAI embeddings) | 🟡 Desplegado en STG 17 jul (112 chunks, verificado en vivo). Falta barrido sistemático de Agente QA (11 secciones) + sign-off de Alberto antes de PROD. Detalle: `docs/iniciativas/2026-07-17-migracion-rag-kb-pgvector-design.md` |
