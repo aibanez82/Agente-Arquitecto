@@ -1,5 +1,7 @@
 # Corpus documental de PDFs de Quálitas — arquitectura de ingesta y consulta (17 jul 2026)
 
+> 🔴 **Revertido parcialmente 18 jul 2026 (ver §9):** a pedido directo de Alberto, el `RAG IA Agent` SÍ consulta ahora este corpus en vivo — pero solo como **fallback**, tras un `NOT_FOUND` de `kb_chunks`, con grounding estricto. Ya en PROD. La decisión original de abajo ("NUNCA en vivo") queda superada; se conserva el resto del diseño (Tier 1/Tier 2, promoción manual como camino principal).
+>
 > Decisión de Alberto (17 jul 2026): el corpus es **fuente interna, con promoción manual al KB del bot** — el `RAG IA Agent` de WhatsApp NUNCA consulta este corpus en vivo. Volumen actual: decenas de PDFs en carpeta local/Drive (lote recién entregado por Quálitas), objetivo declarado: debe seguir funcionando a 10.000 PDFs.
 > Relacionado: `docs/iniciativas/2026-07-17-migracion-rag-kb-pgvector-design.md` (el KB curado `kb_chunks` ya migrado a pgvector — esta iniciativa es un sistema hermano, no lo sustituye).
 
@@ -128,3 +130,13 @@ Verificado independientemente contra Postgres STG y n8n STG (no solo leído el r
 - Confirmado que no quedó ningún workflow temporal residual en STG (3 workflows totales, ninguno con nombre `TEMP`).
 
 Con esto, la primera fuente del corpus Tier 2 queda cerrada. Pendiente real: solo la ingesta de más PDFs del lote cuando lleguen (§6), no hay nada abierto de esta fuente.
+
+## 9. 🔴 Cambio de alcance (18 jul 2026) — `doc_chunks` pasa a ser fallback en vivo del bot
+
+Alberto pidió directo a Agente n8n (no un handoff del Arquitecto) que el `RAG IA Agent` consulte `doc_chunks` cuando `kb_chunks` no tenga respuesta, en vez de dar el mensaje genérico de "no conozco esta respuesta". Esto reversa la decisión de la cabecera de este doc — confirmado explícitamente con Alberto antes de tocar el nodo, alcance acotado a **solo fallback**, nunca fuente primaria.
+
+**Diseño (aplicado primero en STG, `Agente-n8n:docs/2026-07-18-fallback-doc-chunks-en-rag-ia-agent-stg.md`):** nodo nuevo `search_doc_corpus` (`vectorStorePGVector`, `topK: 8`, sobre `doc_chunks`) + regla de grounding estricta en el `systemMessage` de `RAG IA Agent` (usar solo lo escrito literalmente en el fragmento recuperado, prohibido completar con conocimiento general; si ningún fragmento responde directo, tratarlo igual que `NOT_FOUND`). Dos iteraciones: la primera (topK default 4, grounding laxo) alucinó una cobertura inexistente porque el chunk correcto no entraba en el top-4 — corregido subiendo a `topK: 8` y endureciendo la regla, verificado con el mismo caso antes de aplicar. Validado E2E real por WhatsApp en STG (18 jul): caso con dato real en `doc_chunks` (auto sustituto — citó teléfono/horario/deducible exactos), caso que `kb_chunks` ya resuelve (no activó el fallback) y caso fuera de dominio (sin regresión).
+
+**A PROD el mismo 18 jul** (`Agente-n8n:docs/2026-07-18-deploy-prod-fallback-doc-chunks.md`): `doc_sources`/`doc_chunks` creadas en Postgres PROD (152 filas, reusando embeddings de STG), nodos agregados al workflow real de PROD, texto del `systemMessage` idéntico byte a byte al ya validado en STG — por eso no se repitió la ronda de pruebas de grounding en PROD. Retrieval real verificado (el chunk de "Auto Sustituto" aparece en posición 5 de 8, dentro del `topK`). **Pendiente:** verificación E2E conversacional real por WhatsApp contra PROD (solo se hizo en STG hasta ahora).
+
+**Riesgo residual, documentado y no resuelto:** a diferencia de `kb_chunks`, ningún humano revisó los 152 chunks de `doc_chunks` uno por uno antes de que pudieran llegar a un cliente real por esta vía — el grounding estricto reduce el riesgo de alucinación pero no lo elimina.

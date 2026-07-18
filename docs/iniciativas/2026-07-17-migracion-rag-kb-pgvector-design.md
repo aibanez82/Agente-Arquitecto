@@ -71,16 +71,34 @@ CREATE INDEX kb_chunks_embedding_idx ON kb_chunks
 - 112/112 chunks insertados con embeddings de `text-embedding-3-small` — verificado directo: conteo por sección idéntico al JSON fuente, 0 filas con dimensión de embedding ≠ 1536, 112 preguntas distintas.
 - Nodo `search_knowledge_base1` reemplazado. **Drift real vs. este diseño:** no existe ya un nodo separado `toolVectorStore` en la versión de n8n de STG — quedó consolidado dentro de `vectorStorePGVector` en modo "Retrieve Documents (As Tool for AI Agent)" (`mode: retrieve-as-tool`). Confirmado en la UI real por Agente n8n, y verificado por el Arquitecto vía API (`GET /workflows/dNqtM20ij6ecZYAX`): conexión `Embeddings OpenAI --ai_embedding--> search_knowledge_base1 --ai_tool--> RAG IA Agent` intacta, `systemMessage` con la regla `NOT_FOUND` sin tocar. `k` no aplica igual que en el diseño original — el modo "as tool" deja que el LLM decida relevancia sobre los documentos recuperados, no hay corte duro configurado; a vigilar en el barrido de QA.
 
-### Fase 3 — Validación en STG (Agente QA) — 🟡 parcial
+### Fase 3 — Validación en STG (Agente QA) — 🟡 parcial, superada por decisión de Alberto (ver Fase 4)
 - **Ya hecho, verificado en vivo por el Arquitecto contra `n8n_chat_histories` real (no solo el resumen):** Alberto probó 4 casos reales por WhatsApp (17 jul, 19:29-19:34 UTC, sesión `525551074144`) — variante de M33 sin la palabra "promoción" ("algún descuento si pago con tarjeta?"), pregunta con fraseo informal sin ninguna keyword literal ("si choco y es mi culpa, qué pasa con el otro carro?"), y sin querer, **el caso M36** ("cubres extension de RC?" + "Y si voy manejando un camión?"). Los 4 recuperaron contenido relevante y correcto, ninguno cayó en el fallback indebidamente.
   - **Hallazgo no planeado sobre M36:** el modo de falla cambió — antes el bot daba una respuesta que sonaba completa pero omitía la restricción real; ahora responde "depende del tipo específico de vehículo" y pregunta uso personal/comercial, en vez de afirmar cobertura sin fundamento. **No es M36 resuelto** (sigue sin existir el dato real de la restricción de categoría/peso — Juan sigue sin confirmarlo, sigue sin chunk dedicado), pero el riesgo de que el cliente crea que está cubierto cuando no lo está bajó con la migración misma, sin que fuera el objetivo.
-- **Pendiente real:** el barrido sistemático de Agente QA — 1-2 preguntas por cada una de las 11 secciones, para confirmar que no hay pérdida de cobertura vs. el keyword matching viejo. Las pruebas de Alberto son una señal fuerte pero no reemplazan esta validación formal.
-- Sign-off explícito de Alberto antes de pasar a PROD (mismo gate que cualquier cambio a este nodo) — sigue sin darse.
+- **Barrido sistemático de Agente QA (11 secciones) — nunca se corrió.** Alberto decidió no esperarlo y pidió el deploy a PROD directo (18 jul) — ver Fase 4. Las 4 pruebas de Alberto en STG (17 jul) fueron el gate real que se usó.
 
-### Fase 4 — Deploy a PROD (Agente n8n ejecuta el JSON; Alberto importa)
-- Backfill de `kb_chunks` en Postgres PROD (mismo proceso de Fase 2).
-- Import del workflow actualizado en n8n PROD.
-- Commit del JSON exportado a este repo (`docs/n8n-workflows/`), como exige la política de backup existente.
+### Fase 4 — Deploy a PROD — ✅ completa (18 jul 2026)
+
+> 🔴 **Gap de proceso:** ejecutado por Agente n8n a pedido directo de Alberto ("Go"), sin pasar por handoff formal del Arquitecto ni por el barrido de QA de Fase 3. Detectado y verificado en vivo por el Arquitecto a raíz de que Alberto preguntó "¿ya está en PROD?" y este doc decía que no — no se detectó por seguimiento proactivo. Mismo patrón que el gap de `conversation_id` (`docs/iniciativas/conversation-id-whatsapp-n8n.md`): cuando Alberto instruye directo a un ejecutor, el estado real puede divergir de este repo hasta la próxima verificación.
+
+**Hallazgo antes de desplegar (Agente n8n, `Agente-n8n:docs/2026-07-18-migracion-rag-prod-preparada-drift-contenido-encontrado.md`):** el KB del nodo `Code` viejo de PROD ya tenía contenido más nuevo que el `kb_chunks` de STG (118 preguntas en 13 secciones vs. 112 en 11) — el fix de M33 (MSI por banco) se había aplicado el 17 jul directo al código de PROD, sin pasar por STG. Reemplazar con el `kb_chunks` de STG tal cual habría borrado ese contenido. Se reconstruyó `kb_chunks` desde el código real de PROD antes de migrar (con un efecto secundario detectado y corregido: revirtió sin querer el fix de contenido de M36 en STG, arreglado el mismo día).
+
+**Ejecutado** (`Agente-n8n:docs/2026-07-18-deploy-prod-migracion-rag-kb-chunks.md`), verificado de forma independiente por el Arquitecto contra la API de n8n PROD y Postgres PROD (no solo el reporte):
+- Schema (`CREATE EXTENSION vector` + tabla `kb_chunks` + índice HNSW) en Postgres PROD.
+- 118 filas backfilleadas reusando embeddings ya calculados en STG. Confirmado en vivo por el Arquitecto vía `pg_stat_user_tables`: 118 filas.
+- Nodo `search_knowledge_base1` en PROD confirmado como `vectorStorePGVector` (modo `retrieve-as-tool`, `tableName: kb_chunks`) — ya no es el `toolCode` viejo. Nodo nuevo `Embeddings OpenAI` agregado, credencial `OpenAI KB Embeddings PROD`.
+- Retrieval real verificado (3 queries, similitud coseno directa contra PROD) — top-1 correcto en las 3, incluidas las 2 secciones nuevas que no existían en el `kb_chunks` viejo de STG.
+- `systemMessage` de `RAG IA Agent` no se tocó en este paso.
+
+**El mismo 18 jul, también a PROD** (detalle en `Agente-n8n:docs/`, cada uno con su propio doc de deploy y verificación independiente del Agente n8n):
+- **M33** (reemplazo puntual del bloque de promociones/MSI en `AI Agent`) — `2026-07-18-deploy-prod-m33-reemplazo.md`.
+- **M36 (refuerzo) + M38** (edge cases de camión y confianza/legitimidad, + regla 7 de `RAG IA Agent`) — `2026-07-18-deploy-prod-m36-m38-y-fix-regresion-kb-chunks.md`.
+- **Fallback de media no soportada** (sticker/video/audio/document/location/contacts) — `2026-07-18-deploy-prod-fallback-media-no-soportada.md`. Confirmado con sticker/audio/video reales por WhatsApp (mismo código que STG); document/location/contacts sin prueba real en ningún ambiente.
+- **Fallback de `doc_chunks`** (corpus PDF completo, 152 chunks, solo si `kb_chunks` da `NOT_FOUND`, grounding estricto) — `2026-07-18-deploy-prod-fallback-doc-chunks.md`. Detalle de diseño y validación de grounding: `docs/iniciativas/2026-07-17-corpus-documental-pdfs-qualitas-design.md` §9. Confirmado en vivo por el Arquitecto: tabla `doc_chunks` existe en Postgres PROD, 152 filas (`pg_stat_user_tables`).
+
+**Pendiente real (no cerrado):**
+- Verificación conversacional E2E por WhatsApp en PROD — quedó marcada "pendiente" en los docs de deploy de RAG general, M33, M36/M38 y fallback `doc_chunks`. Solo el fallback de media no soportada tiene confirmación real en PROD (mismo código ya probado en STG).
+- `requiere_factura` (fix) y **M39** siguen solo en STG, no promovidos — decisión aparte, a propósito.
+- Commit a este repo (`docs/n8n-workflows/`) del JSON refrescado de PROD post-deploy, como exige la política de backup — pendiente de confirmar si Agente n8n ya lo hizo en su propio repo o si falta sincronizarlo aquí.
 
 ### Fase 5 — Mantenimiento post-migración
 - El contenido de `kb_chunks` se actualiza agregando/editando filas (re-embeber solo la fila tocada) en vez de tocar código JS — **esto simplifica** la tubería Mejoras Conversación → Arquitecto → Agente n8n descrita en el CLAUDE.md: ya no hace falta pensar en colisiones de `keywords`, solo en si el contenido nuevo/corregido está bien redactado.
