@@ -175,6 +175,31 @@ Sin ningún `heroku run` manual de por medio — Scheduler → Django → n8n �
 
 **✅ Cerrado del todo (17 jul, minutos después) — entrega real confirmada, no solo `status=sent`:** Alberto recibió el mensaje por WhatsApp y respondió `"ok!"`. Verificado en `n8n_chat_histories`: id=1873 (`human`, contexto `qid=1751 | phase=data_capture`) → id=1874 (`ai`, *"Listo, Juan. Necesito tu dirección..."*) — el bot retomó la conversación con normalidad, mismo patrón que la validación previa de la cotización 1750. Con esto, el bloqueante del Scheduler en STG queda cerrado por completo: job creado, corrida automática sin intervención manual, y entrega + continuación real confirmadas.
 
+## Copy rediseñado (Agente Mejoras Conversación, 17 jul) — ya cargado en STG
+
+Los 18 mensajes activos de `qualitas_leadfollowuppolicy` en STG **ya no son los que aparecen en
+la tabla más arriba** (esa tabla quedó desactualizada tras el commit del 17 jul,
+`Agente-n8n:docs/2026-07-17-cargados-18-textos-checkpoint-followups-stg.md`) — fueron
+reemplazados por la propuesta de Agente Mejoras Conversación: corrige la marca a "Uriel, de
+Quálitas", usa vehículo/precio como gancho en apertura y cierre, y cambia el tono del intento 3 de
+"último recordatorio" a un cierre sin presión. Texto completo comparado (actual vs. propuesto):
+artefacto `propuesta-reintentos` de Alberto.
+
+**3 decisiones abiertas del diseño, resueltas/pendientes (18 jul, con Alberto):**
+1. **Interpolación de variables** — `quote_sent/1` y `summary_pending/1` tienen los placeholders
+   `[MARCA MODELO AÑO]`/`$[PRECIO] MXN` literales, sin resolver — salen tal cual en WhatsApp hoy.
+   Requiere que Juan modifique `render_policy_message` en `whatsapp_checkpoint_followups.py` para
+   exponer esos datos (reusar `resolver_opcion_cotizacion_whatsapp`/`obtener_precio_anual_real`
+   como en `whatsapp_followups.py`). **Pendiente: Alberto lo cierra directo con Juan.** No debe
+   promoverse a PROD con los corchetes literales.
+2. **✅ Resuelto — "precio preferencial... solo está disponible hoy" (`summary_pending/2`).**
+   Decisión de Alberto: es copy de marketing intencional, no una afirmación fáctica de negocio
+   (no requiere verificar que la tarifa cambie literalmente día a día). Se mantiene tal cual.
+3. **Salida explícita en intento 3 ("contéstame 'no, gracias' y no te vuelvo a escribir")** —
+   pendiente de decisión de Alberto. Implica más que copy: requiere que Juan agregue un mecanismo
+   nuevo (flag/tabla) que `enviar_seguimientos_whatsapp` respete de forma permanente, distinto del
+   tope de 3 intentos por checkpoint que ya existe.
+
 ## Pendiente / no cerrado
 
 - `delay_mins` finales de producción sin definir — el fixture actual (`delay_mins=1`) es explícitamente solo para pruebas en STG.
