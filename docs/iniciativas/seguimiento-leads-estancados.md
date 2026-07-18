@@ -25,7 +25,11 @@ Alberto viene rescatando manualmente conversaciones de WhatsApp que se quedan a 
 el último mensaje del bot, intento 2 = 5 min desde el mensaje del intento 1 (~10 min desde el
 mensaje original), intento 3 = 10 min desde el mensaje del intento 2 (~20 min desde el original).
 `delay_mins` se mide desde el último mensaje del bot, no es acumulado en la BD — la cadena sale
-sola con estos 3 valores. `payment_link_sent` sigue desactivado (validación de pagos pendiente).
+sola con estos 3 valores. `payment_link_sent` sigue desactivado — **confirmado explícitamente por
+Alberto (18 jul)**: el riesgo de decirle a un cliente que falta pagar cuando ya pagó (estatus de
+pago poco confiable, sin webhook de Quálitas, mismo motivo por el que existe Agente Conciliación)
+es peor que un recordatorio de dato faltante. Queda apagado hasta que Agente Conciliación tenga
+estatus de pago confiable — no hay fecha objetivo todavía.
 
 | Checkpoint | Intento | `delay_mins` | Activo | Mensaje |
 |---|---|---|---|---|
