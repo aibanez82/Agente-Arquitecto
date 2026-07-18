@@ -213,9 +213,10 @@ del diseño: artefacto `propuesta-reintentos` de Alberto.
 2. **✅ Resuelto — "precio preferencial... solo está disponible hoy" (`summary_pending/2`).**
    Decisión de Alberto: es copy de marketing intencional, no una afirmación fáctica de negocio
    (no requiere verificar que la tarifa cambie literalmente día a día). Se mantiene tal cual.
-3. **Salida explícita en intento 3 ("contéstame 'no, gracias' y no te vuelvo a escribir")** —
-   pendiente de decisión de Alberto, pero ya no es solo copy: se resuelve con el mismo mecanismo
-   unificado del gap de abajo.
+3. **❌ Decidido — NO se activa la salida explícita en intento 3.** Alberto (18 jul): le parece
+   muy dura/tajante ("contéstame 'no, gracias' y no te vuelvo a escribir"). El mecanismo de
+   detección de declinación (gap de abajo) sigue construyéndose igual — cubre la declinación
+   orgánica del lead en cualquier momento, solo que el intento 3 no invita explícitamente a usarla.
 4. **✅ Aplicado y verificado en STG (18 jul) — quitar "Soy Uriel, de Quálitas." de `quote_sent/1`.**
    Ese saludo ya va en la plantilla de Meta del primer contacto; repetirlo en el primer recordatorio
    es redundante. `UPDATE` corrido directo por el Arquitecto contra Postgres STG (acceso de
