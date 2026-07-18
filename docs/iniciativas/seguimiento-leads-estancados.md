@@ -199,6 +199,29 @@ artefacto `propuesta-reintentos` de Alberto.
    pendiente de decisión de Alberto. Implica más que copy: requiere que Juan agregue un mecanismo
    nuevo (flag/tabla) que `enviar_seguimientos_whatsapp` respete de forma permanente, distinto del
    tope de 3 intentos por checkpoint que ya existe.
+4. **✅ Aplicado (18 jul) — quitar "Soy Uriel, de Quálitas." de `quote_sent/1`.** Ese saludo ya
+   va en la plantilla de Meta del primer contacto; repetirlo en el primer recordatorio es
+   redundante. Nuevo texto: "¡Hola! 😊 Tu cotización para tu **[MARCA MODELO AÑO]** por
+   **$[PRECIO] MXN** sigue guardada — ¿seguimos con el trámite?" (pendiente de subir a STG, sigue
+   dependiendo de la interpolación de variables del punto 1).
+
+## 🔴 Gap confirmado (18 jul) — el sistema no detecta que un lead declinó explícitamente
+
+Verificado contra el código real: `evaluate_checkpoint_followup_candidate`
+(`qualitas/whatsapp_checkpoint_followups.py`) nunca revisa el contenido de los mensajes del
+cliente — solo fase/checkpoint, que el último mensaje sea del bot, ventana de 24h y tope de 3
+intentos. El `systemMessage` del `AI Agent` en PROD sí tiene una regla de "escalamiento
+inmediato" si el usuario dice que quiere cancelar, pero esa reacción es solo conversacional — no
+toca `conversation_phase` ni `captured_data`, que es lo único que Django mira. **Resultado: si un
+lead escribe "ya no me interesa", "no me escribas más" o "ya contraté con otra compañía", el bot
+puede responder algo en el momento, pero el siguiente recordatorio programado de ese checkpoint se
+manda igual, horas después.**
+
+Esto es independiente de la decisión #3 de arriba (la frase explícita de "no, gracias") — existe
+con o sin ella. **Prioridad para el checklist de Juan, antes de PROD:** el `AI Agent` necesita
+reconocer la intención de declinar y persistirla (en `captured_data` o un flag nuevo), y
+`evaluate_checkpoint_followup_candidate` necesita revisarla antes de mandar cualquier recordatorio
+— no solo cuando el lead usa la frase de salida propuesta en el punto 3.
 
 ## Pendiente / no cerrado
 
