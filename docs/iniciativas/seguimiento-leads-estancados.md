@@ -237,6 +237,22 @@ igual, horas después.**
   (filtro ya existente ahí) — razonable para un lead que declinó, pero vale la pena que Alberto lo
   sepa antes de activarlo.
 
+**✅ Implementado y verificado en STG (18 jul), certificado por el Arquitecto.** Nodo nuevo `Mark
+Session Closed` (tool del `AI Agent`) + 2 cambios en el `systemMessage`: el bullet existente
+"quiere cancelar" ahora también cierra la sesión (decisión de Alberto: sí debe marcar
+`status='closed'`, independiente del escalamiento a humano), y un bloque nuevo "DECLINACIÓN
+EXPLÍCITA DEL LEAD" que cierra sin escalar. Verificado en vivo por el Arquitecto: nodo confirmado
+en el workflow real de STG, ejecuciones 402 (declinación, sin link de agente) y 403 (cancelación,
+con link) coinciden exacto por trace, `whatsapp_sessions.status='closed'` + `closed_at` confirmado
+en Postgres STG. **Pendiente: promover a PROD** (handoff enviado). La frase de copy "no, gracias"
+del intento 3 sigue sin implementar a propósito — cae en este mismo mecanismo si se activa después.
+
+**⚠️ Recordatorio: esto solo escribe el flag — Juan todavía no lo lee.** Hasta que Juan agregue el
+check de `status` en `evaluate_checkpoint_followup_candidate` (2 líneas, mismo patrón que
+`n8n_whatsapp_activity.py:109-110`), un lead marcado `closed` seguirá recibiendo recordatorios
+automáticos igual. No bloqueante para seguir probando n8n, pero sí bloqueante antes de activar
+envío real en PROD.
+
 ## Pendiente / no cerrado
 
 - `delay_mins` finales de producción sin definir — el fixture actual (`delay_mins=1`) es explícitamente solo para pruebas en STG.
