@@ -265,8 +265,12 @@ Session Closed` (tool del `AI Agent`) + 2 cambios en el `systemMessage`: el bull
 EXPLÍCITA DEL LEAD" que cierra sin escalar. Verificado en vivo por el Arquitecto: nodo confirmado
 en el workflow real de STG, ejecuciones 402 (declinación, sin link de agente) y 403 (cancelación,
 con link) coinciden exacto por trace, `whatsapp_sessions.status='closed'` + `closed_at` confirmado
-en Postgres STG. **Pendiente: promover a PROD** (handoff enviado). La frase de copy "no, gracias"
-del intento 3 sigue sin implementar a propósito — cae en este mismo mecanismo si se activa después.
+en Postgres STG. **✅ Promovido a PROD (18 jul, noche), certificado por el Arquitecto:** nodo `Mark
+Session Closed` y ambos bloques de `systemMessage` confirmados en el workflow real de PROD;
+ejecución 3103 (*"ya no me interesa"*) releída — `Mark Session Closed` ejecutado, respuesta sin
+link de agente, `status='closed'` + `closed_at` confirmados en Postgres PROD. La frase de copy
+"no, gracias" del intento 3 sigue sin implementar — Alberto decidió NO activarla (18 jul, "muy
+dura"), cae en este mismo mecanismo si cambia de opinión después.
 
 **⚠️ Recordatorio: esto solo escribe el flag — Juan todavía no lo lee.** Hasta que Juan agregue el
 check de `status` en `evaluate_checkpoint_followup_candidate` (2 líneas, mismo patrón que
