@@ -74,3 +74,18 @@ porcentaje fijo incorrecto.
 
 **Aplicar primero en STG**, verificar retrieval directo contra Postgres antes de promover a
 PROD — mismo estándar que `kb_chunks.id=38` hoy.
+
+## ✅ Cerrado (19 jul) — aplicado y verificado en STG y PROD
+
+**STG:** chunk nuevo (`id=119`) + chunk de Robo Parcial editado (`id=94`), más una **regla 9
+nueva** en el `systemMessage` de `RAG IA Agent` que Agente n8n agregó por iniciativa propia (no
+estaba en este spec original): "NO OFREZCAS EL LINK DE AGENTE ESPECIALIZADO EN RESPUESTAS
+INFORMATIVAS COMPLETAS" — necesaria porque, sin ella, el modelo tendía a cerrar respuestas
+correctas de deducible con una oferta de agente no solicitada. E2E real confirmado por WhatsApp
+en STG (ejecución 444).
+
+**PROD:** verificado en vivo por el Arquitecto — 87 nodos sin cambio, `active=true`, regla 9
+confirmada presente en el `systemMessage` real, `kb_chunks` en 120 filas (119→120, coincide con
+chunk nuevo `id=120` + edición de `id=94`). Sin E2E real por WhatsApp en PROD todavía (no
+reproducible a demanda), pero verificación matemática sólida (embeddings idénticos a los ya
+validados en STG). Detalle: `Agente-n8n:docs/2026-07-19-deploy-prod-m43-deducible-danos-materiales.md`.
