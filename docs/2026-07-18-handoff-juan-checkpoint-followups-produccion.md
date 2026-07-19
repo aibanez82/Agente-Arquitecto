@@ -70,13 +70,6 @@ conjunto de valores. Cambio pequeño, con precedente directo en tu código, no e
    --message-key checkpoint_followups --limit 20`, cada 10 minutos.
 8. **Ambos** — verificar unos días en dry-run, luego coordinar el cambio a envío real
    (`ENABLED=true`, `DRY_RUN_DEFAULT=false`).
-- [ ] Setear los flags empezando seguro: `WHATSAPP_CHECKPOINT_FOLLOWUPS_ENABLED=false` y
-      `WHATSAPP_CHECKPOINT_FOLLOWUPS_DRY_RUN_DEFAULT=true` primero — activar envío real después,
-      coordinado con Alberto, mismo patrón que se siguió en STG.
-- [ ] Crear el job del Heroku Scheduler en `hyl-wai-production` — **a mano en el dashboard web**
-      (el Scheduler estándar de Heroku no expone sus jobs por la Platform API, solo por la UI):
-      `python manage.py enviar_seguimientos_whatsapp --message-key checkpoint_followups --limit 20`,
-      cada 10 minutos.
 
 ### Tabla de mensajes y `delay_mins` reales de PROD
 
