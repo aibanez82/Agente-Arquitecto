@@ -13,6 +13,28 @@
 > Handoff consolidado usado para el despliegue: `docs/2026-07-18-handoff-juan-checkpoint-followups-produccion.md`.
 > Ejecutor original en STG: Agente n8n. Reporte fuente: `Agente-n8n:docs/2026-07-16-resumen-arquitecto-seguimiento-leads-estancados.md`.
 
+## 🔴 Bloqueante nuevo antes de envío real (18 jul, noche) — auth del webhook PROD
+
+El webhook `proactive-wa-message` (workflow `Retomar Conversacion`, PROD) **sigue sin
+autenticación** — verificado en vivo: nodo `Webhook` sin `authentication` ni `credentials`, a
+diferencia de STG (`headerAuth` desde el 16 jul). No se puede pasar a envío real de
+`checkpoint_followups` sin esto.
+
+**Orden estricto, NO invertir:**
+1. Dashboard (Code Agent) agrega el header `Authorization` a `n8n-proactive-message.js` +
+   2 env vars nuevas en Vercel — handoff ya enviado:
+   `Dashboard_seguroautoqualitas:docs/2026-07-18-handoff-auth-webhook-proactive-wa-message.md`.
+   Es aditivo, no rompe nada mientras n8n no lo exija.
+2. **Solo después de que el Arquitecto confirme que el paso 1 está desplegado**, Agente n8n activa
+   `headerAuth` en el webhook de PROD — handoff ya enviado, pero marcado explícitamente "NO
+   actives esto todavía":
+   `Agente-n8n:handoffs/2026-07-18-handoff-auth-webhook-prod-retomar-conversacion.md`.
+
+**Por qué el orden importa:** este mismo webhook lo usa el botón "Tomar conversación" del
+Dashboard, con uso real hoy (59 ejecuciones exitosas desde el 2 de julio). Si se activa la
+autenticación antes de que el Dashboard mande el header, se rompe esa función en producción real
+para agentes reales.
+
 ## Origen
 
 Alberto viene rescatando manualmente conversaciones de WhatsApp que se quedan a medias (cliente recibe la cotización o llega a un punto del flujo y deja de contestar), mandando un mensaje de seguimiento horas después con buenos resultados. Arrancó el 15 jul a partir de una pregunta operativa sobre el lead #1353 y terminó en un acuerdo de implementación con Juan.
