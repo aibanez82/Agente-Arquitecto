@@ -376,3 +376,33 @@ Juan revirtió `DRY_RUN_DEFAULT` a `true` — confirmado en vivo (`ENABLED=true`
 4. **Verificar en STG primero** (con el filtro de horario ya puesto ahí) antes de repetir en PROD.
 
 **No tocar `DRY_RUN_DEFAULT` de nuevo hasta que los 4 puntos estén resueltos.**
+
+## 🌙 Cierre de sesión (19 jul, madrugada) — para retomar mañana
+
+**Estado real de PROD en este momento** (todo verificado en vivo, no asumido):
+- `WHATSAPP_CHECKPOINT_FOLLOWUPS_ENABLED=true`, `WHATSAPP_CHECKPOINT_FOLLOWUPS_DRY_RUN_DEFAULT=true`
+  — estado seguro, cero riesgo de envío real.
+- Scheduler corriendo cada 5 min (Advanced Scheduler), dry-run limpio, última corrida detectó 8
+  candidatos elegibles.
+- Tabla + fixture (21 filas), interpolación, guard de `status` cerrado, workflow robusto de
+  `Retomar Conversacion` — todo confirmado en PROD.
+- Se le mandó una corrección al Agente n8n porque su último reporte de pendientes traía 2 de 4
+  puntos desactualizados (tabla e interpolación, que ya estaban resueltos) — pendiente confirmar
+  que actualizó su tracking.
+
+**Único bloqueante real para volver a intentar envío real: el filtro de horario (9am-8pm
+`America/Mexico_City`)** — decidido, sin construir. Patrón a seguir (mismo que el guard de
+`status`): una condición más en `evaluate_checkpoint_followup_candidate()`
+(`qualitas/whatsapp_checkpoint_followups.py`), comparando la hora local contra la ventana; fuera
+de horario → `ineligible`, se reintenta solo en la siguiente corrida del Scheduler ya dentro de la
+ventana.
+
+**Para retomar mañana, en este orden:**
+1. Especificar y armar el handoff del filtro de horario (Arquitecto → Agente n8n o Juan, según a
+   quién le toque tocar `whatsapp_checkpoint_followups.py` — probablemente Juan, es código Django).
+2. Aplicar y verificar primero en STG.
+3. Promover a PROD, verificado.
+4. Solo entonces: coordinar con Juan una prueba de envío real controlada (un solo candidato,
+   `DRY_RUN_DEFAULT=false` brevemente, dentro de la ventana de horario) — punto 4 del casi-incidente
+   de arriba.
+5. Si sale bien, decidir con Alberto el paso a envío real sostenido.
