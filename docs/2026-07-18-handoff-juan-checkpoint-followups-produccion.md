@@ -105,6 +105,46 @@ Conciliación lo resuelva.
 `rfc_digits_pending` solo aplica si el cliente pidió factura en `address_captured`; si dijo que
 no, ese checkpoint se salta y va directo a `summary_pending`.
 
+### SQL del fixture (paso 5, lo corre Alberto en cuanto exista la tabla)
+
+```sql
+-- Correr SOLO después de que Juan confirme que python manage.py migrate ya corrió en PROD.
+-- {vehiculo} y {precio} no se resuelven hasta que el fix del punto 1 esté desplegado —
+-- mientras tanto salen vacíos (no rotos), gracias a _SafeFormatDict en render_policy_message().
+
+INSERT INTO qualitas_leadfollowuppolicy (checkpoint, attempt, delay_mins, message_template, active, created_at, updated_at) VALUES
+('quote_sent', 1, 5, '¡Hola! 😊 Tu cotización para tu {vehiculo} por {precio} sigue guardada — ¿seguimos con el trámite?', true, NOW(), NOW()),
+('quote_sent', 2, 5, '¿Seguimos con tu cotización? Nada más faltan un par de datos y queda lista tu póliza.', true, NOW(), NOW()),
+('quote_sent', 3, 10, 'Por ahora no te escribo más — tu cotización queda guardada, así que si quieres retomarla más adelante, contéstame por aquí cuando gustes.', true, NOW(), NOW()),
+
+('personal_data_captured', 1, 5, '¡Seguimos por aquí! Ya tengo tus datos — solo me falta el VIN o las placas para avanzar con tu seguro.', true, NOW(), NOW()),
+('personal_data_captured', 2, 5, '¿Me compartes el VIN o las placas cuando puedas? Es lo único que falta para seguir.', true, NOW(), NOW()),
+('personal_data_captured', 3, 10, 'Por ahora no insisto más — en cuanto me compartas el VIN o las placas, seguimos. Aquí quedo.', true, NOW(), NOW()),
+
+('vin_plates_captured', 1, 5, 'Ya con eso, solo me falta tu dirección para continuar con la emisión.', true, NOW(), NOW()),
+('vin_plates_captured', 2, 5, '¿Me compartes tu dirección para seguir avanzando?', true, NOW(), NOW()),
+('vin_plates_captured', 3, 10, 'Por ahora no insisto más — con tu dirección seguimos cuando quieras. Aquí quedo.', true, NOW(), NOW()),
+
+('address_captured', 1, 5, 'Ya casi terminamos — ¿necesitas factura para esta póliza?', true, NOW(), NOW()),
+('address_captured', 2, 5, 'Solo me falta saber si requieres factura, ¿sí o no?', true, NOW(), NOW()),
+('address_captured', 3, 10, 'Por ahora no insisto más — nada más dime si requieres factura y seguimos. Aquí quedo.', true, NOW(), NOW()),
+
+('rfc_digits_pending', 1, 5, 'Para tu factura necesito tu RFC completo con homoclave.', true, NOW(), NOW()),
+('rfc_digits_pending', 2, 5, '¿Me compartes tu RFC completo para terminar tu factura?', true, NOW(), NOW()),
+('rfc_digits_pending', 3, 10, 'Por ahora no insisto más — en cuanto tenga tu RFC, genero tu factura. Aquí quedo.', true, NOW(), NOW()),
+
+('summary_pending', 1, 5, 'Tu resumen ya está listo: {vehiculo}, {precio}. ¿Seguimos con la emisión de tu póliza?', true, NOW(), NOW()),
+('summary_pending', 2, 5, 'Tu precio preferencial por contratar en digital solo está disponible hoy — ¿confirmamos y avanzamos con tu póliza?', true, NOW(), NOW()),
+('summary_pending', 3, 10, 'Por ahora no insisto más — tu cotización sigue lista si decides retomarla. Aquí quedo.', true, NOW(), NOW()),
+
+('payment_link_sent', 1, 5, 'Mensaje de pago desactivado hasta validar estatus de pago confiable.', false, NOW(), NOW()),
+('payment_link_sent', 2, 5, 'Mensaje de pago desactivado hasta validar estatus de pago confiable.', false, NOW(), NOW()),
+('payment_link_sent', 3, 5, 'Mensaje de pago desactivado hasta validar estatus de pago confiable.', false, NOW(), NOW());
+
+-- Verificación después de correr (debe devolver 21 filas):
+-- SELECT checkpoint, attempt, delay_mins, active FROM qualitas_leadfollowuppolicy ORDER BY checkpoint, attempt;
+```
+
 ---
 
 ## Nota aparte, no bloqueante para este despliegue
