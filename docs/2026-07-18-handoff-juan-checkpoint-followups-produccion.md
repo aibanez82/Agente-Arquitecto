@@ -52,11 +52,24 @@ conjunto de valores. Cambio pequeño, con precedente directo en tu código, no e
 
 ---
 
-## 3. Desplegar a `hyl-wai-production`
+## 3. Desplegar a `hyl-wai-production` — orden exacto de pasos
 
-- [ ] Correr la migración `0041_lead_checkpoint_followups` en Postgres PROD.
-- [ ] Cargar el fixture de `qualitas_leadfollowuppolicy` en PROD con el copy final (tabla
-      completa abajo) y los `delay_mins` reales de producción.
+1. **Juan** — terminar los fixes de los puntos 1 y 2 arriba en la rama `stg`, verificar.
+2. **Juan** — mergear `stg` → `main` (todo el feature de `checkpoint_followups` completo, no
+   estaba en `main` todavía).
+3. **Juan** — desplegar `main` a `hyl-wai-production` (el deploy normal de siempre).
+4. **Juan** — correr la migración: `python manage.py migrate` contra `hyl-wai-production` (vía
+   `heroku run` o el mecanismo de deploy que uses — **no crear las tablas por SQL directo**, eso
+   deja a Django sin registro en `django_migrations` y rompe migraciones futuras).
+5. **Alberto** — en cuanto Juan confirme que el paso 4 terminó, cargar el fixture de 21 filas en
+   `qualitas_leadfollowuppolicy` (SQL ya preparado, ver tabla abajo). No depende de los pasos 6-7.
+6. **Juan** — setear en `hyl-wai-production`: `WHATSAPP_CHECKPOINT_FOLLOWUPS_ENABLED=false`,
+   `WHATSAPP_CHECKPOINT_FOLLOWUPS_DRY_RUN_DEFAULT=true` (arranque seguro, mismo patrón que STG).
+7. **Juan** — crear el job del Heroku Scheduler en `hyl-wai-production`, a mano en el dashboard
+   web (el Scheduler estándar no tiene API): `python manage.py enviar_seguimientos_whatsapp
+   --message-key checkpoint_followups --limit 20`, cada 10 minutos.
+8. **Ambos** — verificar unos días en dry-run, luego coordinar el cambio a envío real
+   (`ENABLED=true`, `DRY_RUN_DEFAULT=false`).
 - [ ] Setear los flags empezando seguro: `WHATSAPP_CHECKPOINT_FOLLOWUPS_ENABLED=false` y
       `WHATSAPP_CHECKPOINT_FOLLOWUPS_DRY_RUN_DEFAULT=true` primero — activar envío real después,
       coordinado con Alberto, mismo patrón que se siguió en STG.
