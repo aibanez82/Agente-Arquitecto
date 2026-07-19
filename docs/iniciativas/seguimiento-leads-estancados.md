@@ -7,9 +7,13 @@
 > release 320), y el job de envío creado en **Advanced Scheduler** (no el Scheduler estándar —
 > decisión explícita: con `delay_mins` cortos como 5/5/10, el piso de 10 min del Scheduler
 > estándar habría añadido hasta ~10 min de imprecisión extra sobre cada intento). Webhook de PROD
-> ya con autenticación completa (Dashboard + n8n, E2E real confirmado — ver sección abajo). Falta:
-> correr unos días en dry-run y coordinar con Alberto/Juan el paso a envío real
-> (`ENABLED=true`/`DRY_RUN_DEFAULT=false`).
+> ya con autenticación completa (Dashboard + n8n, E2E real confirmado — ver sección abajo).
+> **19 jul, madrugada: casi se activó envío real a las 11pm — ver sección "Casi-incidente" abajo.**
+> Estado seguro actual: `ENABLED=true`, `DRY_RUN_DEFAULT=true` (confirmado en vivo). Falta antes
+> de activar envío real de verdad: (1) filtro de horario 9am-8pm CDMX (decidido, sin construir
+> todavía — Alberto lo dejó como pendiente explícito), (2) configurar
+> `N8N_PROACTIVE_WA_MESSAGE_URL`/`N8N_PROACTIVE_WA_MESSAGE_TOKEN` en PROD (no existen — ver
+> abajo), ambos antes de volver a tocar `DRY_RUN_DEFAULT`.
 > Guardado en git (no en memoria local) para persistir entre las 3 laptops de Alberto.
 > Handoff consolidado usado para el despliegue: `docs/2026-07-18-handoff-juan-checkpoint-followups-produccion.md`.
 > Ejecutor original en STG: Agente n8n. Reporte fuente: `Agente-n8n:docs/2026-07-16-resumen-arquitecto-seguimiento-leads-estancados.md`.
@@ -316,3 +320,40 @@ envío real en PROD.
 - Autenticación del webhook en **PROD sigue sin aplicar** — decisión aparte, pendiente de coordinar (ese workflow tiene uso manual activo hoy). El fix de validación dual/`session_id` tampoco se aplicó a PROD todavía — sería un segundo paso coordinado, no automático.
 - **✅ Re-confirmado (18 jul, verificado directo en Postgres PROD):** el sistema `checkpoint_followups` en su conjunto sigue sin existir en PROD — tabla `qualitas_leadfollowuppolicy` no existe ahí (`relation does not exist`). Coherente con todo lo de arriba: nada de esta iniciativa se ha promovido.
 - **🔴 Hallazgo nuevo, sistema aparte (18 jul):** la plantilla de WhatsApp Business `cotizacion_followup_15m` — del mecanismo viejo de recordatorio a 15 min (`qualitas/whatsapp_followups.py`, activo en PROD desde el 25 jun, deliberadamente no unificado con `checkpoint_followups` por riesgo de baneo de Meta) — tiene copy desactualizado ("Hola, soy de SeguroAuto...") pese a que el copy de `checkpoint_followups` ya se rediseñó ("Uriel, de Quálitas..."). El contenido vive en una plantilla aprobada por Meta Business Manager, no en código ni BD — nadie la actualizó cuando se rediseñó el copy. Pendiente: actualizar y re-someter esa plantilla a aprobación en Meta (fuera del alcance de n8n/Django). Detalle: `Agente-n8n:docs/2026-07-18-hallazgo-plantilla-meta-cotizacion-followup-15m-desactualizada.md`.
+
+## 🔴 Casi-incidente (19 jul, madrugada) — casi se manda envío real a las 11pm, y falta config real
+
+Al activar `ENABLED=true`/`DRY_RUN_DEFAULT=false` (paso 8 del handoff a Juan,
+`docs/2026-07-19-handoff-juan-activar-envio-real-checkpoint-followups.md`), Alberto notó que eran
+las 11pm hora CDMX — 8 leads reales estaban `eligible` y a punto de recibir su primer recordatorio
+automático a una hora inapropiada. **No existe ningún filtro de horario en el diseño original.**
+
+Se pidió revertir de inmediato. Verificado en logs de Heroku en tiempo real: la corrida de las
+05:30 UTC (justo después del cambio) **no mandó nada real** — no por el flag, sino porque
+`N8N_PROACTIVE_WA_MESSAGE_URL` **nunca se configuró en `hyl-wai-production`** (confirmado directo
+contra `config-vars`, no solo por el log: la variable no existe, tampoco
+`N8N_PROACTIVE_WA_MESSAGE_TOKEN`). El camino de envío real de `checkpoint_followups` nunca se
+había ejercitado en PROD hasta ese momento — el dry-run de toda la noche solo probó la lógica de
+elegibilidad (`evaluate_checkpoint_followup_candidate`), que nunca toca la red; el código de envío
+real (`send_due_checkpoint_followups` → llamada a n8n) es un camino completamente separado que
+nunca se había ejecutado.
+
+Juan revirtió `DRY_RUN_DEFAULT` a `true` — confirmado en vivo (`ENABLED=true`,
+`DRY_RUN_DEFAULT=true`, estado seguro, cero riesgo de envío real).
+
+**Antes de volver a intentar el envío real, faltan 3 cosas, en este orden:**
+1. **Filtro de horario — decidido, sin construir.** Alberto: **9am a 8pm hora CDMX**. Falta
+   especificar y aplicar el fix (mismo patrón que el check de `status` de hoy: una condición más
+   en `evaluate_checkpoint_followup_candidate`, comparando la hora local de
+   `America/Mexico_City` contra la ventana — fuera de horario, `ineligible` y se reintenta solo en
+   la siguiente corrida del Scheduler ya dentro de la ventana). Alberto lo dejó explícitamente
+   como pendiente, no urgente esta noche.
+2. **Configurar `N8N_PROACTIVE_WA_MESSAGE_URL` y `N8N_PROACTIVE_WA_MESSAGE_TOKEN` en PROD** — la
+   URL es la del mismo webhook `Retomar Conversacion` ya autenticado hoy
+   (`https://n8n.srv1325340.hstgr.cloud/webhook/proactive-wa-message`); el token puede ser el
+   mismo que ya tiene el Dashboard (`N8N_PROACTIVE_WEBHOOK_TOKEN`), no hace falta generar uno
+   nuevo — es el mismo webhook con la misma autenticación.
+3. **Verificar en STG primero** (con el filtro de horario y las variables ya puestas ahí) antes de
+   repetir en PROD.
+
+**No tocar `DRY_RUN_DEFAULT` de nuevo hasta que los 3 puntos estén resueltos.**
