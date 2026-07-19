@@ -341,19 +341,29 @@ nunca se había ejecutado.
 Juan revirtió `DRY_RUN_DEFAULT` a `true` — confirmado en vivo (`ENABLED=true`,
 `DRY_RUN_DEFAULT=true`, estado seguro, cero riesgo de envío real).
 
-**Antes de volver a intentar el envío real, faltan 3 cosas, en este orden:**
+**Antes de volver a intentar el envío real, faltan 4 cosas:**
 1. **Filtro de horario — decidido, sin construir.** Alberto: **9am a 8pm hora CDMX**. Falta
    especificar y aplicar el fix (mismo patrón que el check de `status` de hoy: una condición más
    en `evaluate_checkpoint_followup_candidate`, comparando la hora local de
    `America/Mexico_City` contra la ventana — fuera de horario, `ineligible` y se reintenta solo en
    la siguiente corrida del Scheduler ya dentro de la ventana). Alberto lo dejó explícitamente
-   como pendiente, no urgente esta noche.
-2. **Configurar `N8N_PROACTIVE_WA_MESSAGE_URL` y `N8N_PROACTIVE_WA_MESSAGE_TOKEN` en PROD** — la
-   URL es la del mismo webhook `Retomar Conversacion` ya autenticado hoy
-   (`https://n8n.srv1325340.hstgr.cloud/webhook/proactive-wa-message`); el token puede ser el
-   mismo que ya tiene el Dashboard (`N8N_PROACTIVE_WEBHOOK_TOKEN`), no hace falta generar uno
-   nuevo — es el mismo webhook con la misma autenticación.
-3. **Verificar en STG primero** (con el filtro de horario y las variables ya puestas ahí) antes de
-   repetir en PROD.
+   como pendiente, no urgente esa noche.
+2. **✅ Resuelto (19 jul) — `N8N_PROACTIVE_WA_MESSAGE_URL` y `N8N_PROACTIVE_WA_MESSAGE_TOKEN`
+   configurados en PROD**, verificado directo contra `config-vars` de Heroku. El token reusa el
+   mismo valor que ya tenía el Dashboard (`N8N_PROACTIVE_WEBHOOK_TOKEN`, mismo webhook/auth) —
+   quedó además una variable duplicada con ese nombre viejo, sin efecto (Django no la lee), se
+   puede borrar cuando se quiera.
+3. **🔴 Nuevo, crítico — promover a PROD la versión robusta de `Retomar Conversacion`.**
+   Verificado en vivo: el workflow de PROD (`96XfJZcwvlHnVJLko3G8-`) sigue en su versión vieja de
+   **3 nodos** (solo se le agregó autenticación hoy) — nunca se promovió la reconstrucción de STG
+   (`nYRaRzU83qDLuEWI`, 12 nodos: validación, idempotencia, `IF Is Checkpoint Followup?`, y el fix
+   de prioridad `session_id`/teléfono del 16-17 jul). Confirmado que el bug original sigue vivo en
+   PROD: el `INSERT` a `n8n_chat_histories` resuelve la clave con
+   `conversation_id || session_id || phone_number` — al revés de lo que necesita
+   `checkpoint_followups` (que sí manda `conversation_id` en el payload). Sin este fix, un
+   recordatorio real quedaría insertado bajo la clave equivocada y el bot principal nunca lo vería
+   en la conversación. Handoff enviado:
+   `Agente-n8n:handoffs/2026-07-19-handoff-promover-retomar-conversacion-robusto-prod.md`.
+4. **Verificar en STG primero** (con el filtro de horario ya puesto ahí) antes de repetir en PROD.
 
-**No tocar `DRY_RUN_DEFAULT` de nuevo hasta que los 3 puntos estén resueltos.**
+**No tocar `DRY_RUN_DEFAULT` de nuevo hasta que los 4 puntos estén resueltos.**
