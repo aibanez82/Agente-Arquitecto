@@ -353,17 +353,26 @@ Juan revirtió `DRY_RUN_DEFAULT` a `true` — confirmado en vivo (`ENABLED=true`
    mismo valor que ya tenía el Dashboard (`N8N_PROACTIVE_WEBHOOK_TOKEN`, mismo webhook/auth) —
    quedó además una variable duplicada con ese nombre viejo, sin efecto (Django no la lee), se
    puede borrar cuando se quiera.
-3. **🔴 Nuevo, crítico — promover a PROD la versión robusta de `Retomar Conversacion`.**
-   Verificado en vivo: el workflow de PROD (`96XfJZcwvlHnVJLko3G8-`) sigue en su versión vieja de
-   **3 nodos** (solo se le agregó autenticación hoy) — nunca se promovió la reconstrucción de STG
-   (`nYRaRzU83qDLuEWI`, 12 nodos: validación, idempotencia, `IF Is Checkpoint Followup?`, y el fix
-   de prioridad `session_id`/teléfono del 16-17 jul). Confirmado que el bug original sigue vivo en
-   PROD: el `INSERT` a `n8n_chat_histories` resuelve la clave con
-   `conversation_id || session_id || phone_number` — al revés de lo que necesita
-   `checkpoint_followups` (que sí manda `conversation_id` en el payload). Sin este fix, un
-   recordatorio real quedaría insertado bajo la clave equivocada y el bot principal nunca lo vería
-   en la conversación. Handoff enviado:
-   `Agente-n8n:handoffs/2026-07-19-handoff-promover-retomar-conversacion-robusto-prod.md`.
+3. **✅ Resuelto (19 jul) — versión robusta de `Retomar Conversacion` promovida a PROD**, verificada
+   de forma independiente por el Arquitecto (no solo por el reporte de Agente n8n):
+   - **Estructura**: 12 nodos en PROD (antes 3), `webhookId` sin cambio
+     (`afd2b47d-bd99-4525-93a6-42764b8f56df`), credencial correcta de PROD
+     (`Retomar Conversacion Header Auth PROD`, `9BE6CuKVOiuZBgDq`), `active=true`. `Normalize &
+     Validate` confirma `session_id: String(body.session_id || "").trim()` — sin fallback a
+     `conversation_id`, el bug de prioridad queda genuinamente corregido.
+   - **Envío real de prueba (ejecución 3135)**: pasó por `Insert History` con éxito, clave
+     `session_id` (no `conversation_id`) — confirmado a nivel de configuración del nodo.
+   - **Idempotencia (ejecución 3136)**: reenvío con el mismo `idempotency_key` fue directo a
+     `Build Already-Processed Response` (`status: "already_processed"`), nunca tocó `Insert
+     History` — sin duplicar.
+   - **Postgres PROD**: 0 filas bajo la clave de sesión de prueba y 0 bajo la clave incorrecta
+     (`conversation_id`) — la fila de prueba fue borrada como se reportó.
+   - **Bonus — camino "Tomar conversación" del Dashboard sigue intacto** (ejecución 3137, payload
+     real sin `checkpoint`, teléfono `525551074144`): fila real `id=7327` en `n8n_chat_histories`,
+     `created_at` coincide exacto con la ejecución — el uso manual activo hoy no se rompió.
+
+   Reporte de Agente n8n certificado. `DRY_RUN_DEFAULT` sigue en `true`, sin riesgo de tráfico
+   automático real. Detalle: `Agente-n8n:handoffs/2026-07-19-handoff-promover-retomar-conversacion-robusto-prod.md`.
 4. **Verificar en STG primero** (con el filtro de horario ya puesto ahí) antes de repetir en PROD.
 
 **No tocar `DRY_RUN_DEFAULT` de nuevo hasta que los 4 puntos estén resueltos.**
