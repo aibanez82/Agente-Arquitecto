@@ -1,8 +1,17 @@
 # Iniciativa — Seguimiento automático de leads estancados (15-16 jul 2026)
 
-> Estado: ✅ **Scheduler automático funcionando en STG de punta a punta (17 jul), confirmado con entrega real — no solo `200` de n8n.** Job del Heroku Scheduler creado (cada 10 min); primera corrida 100% automática (sin `heroku run` manual) a las 20:10 UTC generó un intento real sobre cotización 1751 (`vin_plates_captured`, intento 1), Alberto lo recibió por WhatsApp y respondió — el bot retomó la conversación con normalidad. Antes de esto, Juan ya había corrido el comando manualmente dos veces sobre cotización 1750 (16:37 UTC y 19:08 UTC), con la misma verificación de entrega real (el cliente de prueba respondió 4 min después del intento 1). Todo verificado por el Arquitecto directo contra Postgres STG (`qualitas_leadcheckpointfollowupattempt` y `n8n_chat_histories`). Nada en PROD todavía — decisión aparte.
+> Estado: ✅ **Desplegado a `hyl-wai-production` (18-19 jul 2026), arranque seguro.** Código
+> (interpolación + check de `status`) mergeado y desplegado (release 319, `a49a7838`), migración
+> `0041` corrida (2 tablas nuevas confirmadas), fixture de 21 filas cargado (verificado por
+> conteo, `pg_stat_user_tables`), flags en arranque seguro (`ENABLED=false`, `DRY_RUN_DEFAULT=true`,
+> release 320), y el job de envío creado en **Advanced Scheduler** (no el Scheduler estándar —
+> decisión explícita: con `delay_mins` cortos como 5/5/10, el piso de 10 min del Scheduler
+> estándar habría añadido hasta ~10 min de imprecisión extra sobre cada intento). Falta: correr
+> unos días en dry-run y coordinar con Alberto/Juan el paso a envío real
+> (`ENABLED=true`/`DRY_RUN_DEFAULT=false`).
 > Guardado en git (no en memoria local) para persistir entre las 3 laptops de Alberto.
-> Ejecutor: Agente n8n. Reporte fuente: `Agente-n8n:docs/2026-07-16-resumen-arquitecto-seguimiento-leads-estancados.md`.
+> Handoff consolidado usado para el despliegue: `docs/2026-07-18-handoff-juan-checkpoint-followups-produccion.md`.
+> Ejecutor original en STG: Agente n8n. Reporte fuente: `Agente-n8n:docs/2026-07-16-resumen-arquitecto-seguimiento-leads-estancados.md`.
 
 ## Origen
 
