@@ -6,32 +6,33 @@
 > conteo, `pg_stat_user_tables`), flags en arranque seguro (`ENABLED=false`, `DRY_RUN_DEFAULT=true`,
 > release 320), y el job de envío creado en **Advanced Scheduler** (no el Scheduler estándar —
 > decisión explícita: con `delay_mins` cortos como 5/5/10, el piso de 10 min del Scheduler
-> estándar habría añadido hasta ~10 min de imprecisión extra sobre cada intento). Falta: correr
-> unos días en dry-run y coordinar con Alberto/Juan el paso a envío real
+> estándar habría añadido hasta ~10 min de imprecisión extra sobre cada intento). Webhook de PROD
+> ya con autenticación completa (Dashboard + n8n, E2E real confirmado — ver sección abajo). Falta:
+> correr unos días en dry-run y coordinar con Alberto/Juan el paso a envío real
 > (`ENABLED=true`/`DRY_RUN_DEFAULT=false`).
 > Guardado en git (no en memoria local) para persistir entre las 3 laptops de Alberto.
 > Handoff consolidado usado para el despliegue: `docs/2026-07-18-handoff-juan-checkpoint-followups-produccion.md`.
 > Ejecutor original en STG: Agente n8n. Reporte fuente: `Agente-n8n:docs/2026-07-16-resumen-arquitecto-seguimiento-leads-estancados.md`.
 
-## 🔴 Bloqueante nuevo antes de envío real (18 jul, noche) — auth del webhook PROD
+## ✅ Cerrado (19 jul, madrugada) — auth del webhook PROD
 
-El webhook `proactive-wa-message` (workflow `Retomar Conversacion`, PROD) **sigue sin
-autenticación** — verificado en vivo: nodo `Webhook` sin `authentication` ni `credentials`, a
-diferencia de STG (`headerAuth` desde el 16 jul). No se puede pasar a envío real de
-`checkpoint_followups` sin esto.
+El webhook `proactive-wa-message` (workflow `Retomar Conversacion`, PROD) ya tiene autenticación
+completa, desplegada en 2 fases sin romper nada del lado real:
 
-**Orden estricto, NO invertir:**
-1. Dashboard (Code Agent) agrega el header `Authorization` a `n8n-proactive-message.js` +
-   2 env vars nuevas en Vercel — handoff ya enviado:
-   `Dashboard_seguroautoqualitas:docs/2026-07-18-handoff-auth-webhook-proactive-wa-message.md`.
-   Es aditivo, no rompe nada mientras n8n no lo exija.
-2. **Solo después de que el Arquitecto confirme que el paso 1 está desplegado**, Agente n8n activa
-   `headerAuth` en el webhook de PROD — handoff ya enviado, pero marcado explícitamente "NO
-   actives esto todavía":
-   `Agente-n8n:handoffs/2026-07-18-handoff-auth-webhook-prod-retomar-conversacion.md`.
+1. **Dashboard**: `pages/api/n8n-proactive-message.js` ya manda `Authorization: Bearer <token>`
+   (commit `800feb7`), env vars `N8N_PROACTIVE_WEBHOOK_TOKEN`/`N8N_PROACTIVE_WEBHOOK_TOKEN_STG`
+   cargadas en Vercel — verificado en vivo por el Arquitecto (código en `main`, env vars
+   confirmadas).
+2. **n8n**: nodo `Webhook` de PROD con `authentication: headerAuth` + credencial `Retomar
+   Conversacion Header Auth PROD` — verificado en vivo (403 sin header, 403 con header
+   incorrecto, ambos probados directo por el Arquitecto).
+3. **E2E real confirmado**: Alberto usó "Tomar conversación" en el Dashboard PROD sobre un lead
+   real (teléfono 524461134053, mensaje "Hola, imaginamos que nos cotizaste por error.") —
+   ejecución **3128** en n8n, trace completo verificado (`Webhook` → `Execute a SQL query` →
+   `Send message`), WhatsApp real entregado (`wamid` real). Una ejecución posterior (3130) fue la
+   prueba deliberada de payload vacío de Agente n8n, error esperado, no un problema.
 
-**Por qué el orden importa:** este mismo webhook lo usa el botón "Tomar conversación" del
-Dashboard, con uso real hoy (59 ejecuciones exitosas desde el 2 de julio). Si se activa la
+**Por qué el orden importó:** este mismo webhook lo usa el botón "Tomar conversación" del
 autenticación antes de que el Dashboard mande el header, se rompe esa función en producción real
 para agentes reales.
 
