@@ -1,6 +1,21 @@
 # Bug #2 — Prefijo 57 (Colombia) en session_id en lugar de 52 (México)
 
-**Sistema:** Django · **Estado:** 🟡 Medio (bajado de 🟠 Alto el 11 jul — ver reevaluación abajo)
+**Sistema:** Django · **Estado:** ✅ Resuelto (cerrado 20 jul — ver abajo)
+
+## Cierre (20 jul 2026)
+
+Verificado en vivo: la tabla `NumeroPruebaWhatsapp` **sigue sin existir** en la Postgres de
+producción (`information_schema.tables`, confirmado de nuevo hoy — la duda pendiente de las
+secciones de abajo queda resuelta: sigue sin existir, no es un problema de `DATABASE_URL` distinto).
+Pero ya no importa: Juan mergeó a `main` (commit `384cac7`, rama
+`fix/numeros-prueba-whatsapp-internacionales`) una reescritura de la función,
+`normalize_whatsapp_phone` (`qualitas/whatsapp_conversations.py:178-206`), que envuelve la consulta
+en `try/except` — si la tabla no existe (o cualquier otro error), cae siempre al default seguro
+`52`. El comportamiento correcto para clientes reales ya no depende de que esa tabla exista: existe
+o no, el código nunca vuelve a asignar `57` a un número mexicano real. Cierra issue #2 en
+`qualitas-issues`.
+
+**Estado histórico antes del cierre (referencia):**
 
 ## Reevaluación (11 jul) — bajado a Medio
 
