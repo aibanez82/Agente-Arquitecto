@@ -59,14 +59,36 @@ Script: `scripts/2026-07-20-crear-tabla-leads-metepec.sql` — **aplicar primero
 ## Cómo se llena, por ahora
 
 Manual — Alberto corre el `INSERT`/`UPDATE` en STG vía TablePlus, igual que el fixture de
-`checkpoint_followups`. No hay ningún proceso automático todavía que escriba o actualice esta
-tabla (ni Django, ni n8n, ni un agente dedicado).
+`checkpoint_followups`. El `INSERT` inicial (entrega a METEPEC) se automatiza vía la nueva rama
+de n8n descrita en [2026-07-20-agente-mtp-correo-metepec.md](2026-07-20-agente-mtp-correo-metepec.md).
+
+**Decidido 20 jul — quién actualiza `estado_metepec`/`fecha_cierre_metepec`/`monto_cierre_metepec`:**
+Agente Conciliación (no un agente nuevo), ya que `leads_metepec` es standalone igual que su propia
+`conciliacion_pagos` — no viola la regla de "nunca tocar tablas de Django". Diferencia técnica clave
+frente a lo que Agente Conciliación hace hoy: para `qualitas_polizaemitida` conocemos el número de
+póliza de antemano; para `leads_metepec` no — METEPEC emite por su cuenta, así que hay que
+**buscarla** en el portal (por VIN/teléfono/nombre, o listado por clave de agente 27614 si el
+portal lo permite).
+
+**Resuelto (20 jul, verificado en vivo por Alberto, pantalla "Consulta de póliza"):** el portal
+NO permite listar por clave de agente — solo búsqueda puntual con un único campo, filtrable por
+Número de póliza, **Número de serie (VIN)**, RFC, Nombre o Placas. Como `leads_metepec` ya
+captura el VIN, el mecanismo queda: por cada fila con `estado_metepec = 'pendiente'`, Agente
+Conciliación busca por VIN en ese mismo buscador — mismo patrón de búsqueda puntual que ya iba a
+construir para `conciliacion_pagos`, solo cambia el identificador (VIN en vez de número de póliza
+conocido). Falta mapear qué muestra la pantalla de resultado (estatus, fecha de emisión, prima)
+una vez que se construya el scraper real — pendiente normal de Agente Conciliación, no un
+bloqueante nuevo.
 
 ## Pendiente / a definir
 
 - Confirmar en STAGING que el script corre limpio antes de replicarlo en PROD.
 - Decidir si esto necesita un agente/proceso propio (tipo Agente Conciliación) más adelante, o si
   se mantiene manual — depende de cuántos leads reales se entreguen a METEPEC por semana.
+  **En progreso:** ver [2026-07-20-agente-mtp-correo-metepec.md](2026-07-20-agente-mtp-correo-metepec.md)
+  — automatización vía rama nueva del workflow n8n para los casos de plataforma digital y
+  renovación (los que hoy el bot detecta o debería detectar de forma categórica, no el resto
+  de escalamientos ad-hoc).
 - Definir con Alberto/Highland qué constituye "vendida" de forma verificable (¿METEPEC reporta
   manualmente como Laura con las pólizas normales, o hay otro mecanismo?).
 - Sin vista en el Dashboard todavía — si se necesita, es trabajo aparte para el Dashboard Code

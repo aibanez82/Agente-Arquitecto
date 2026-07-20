@@ -39,3 +39,12 @@ Se activa el cron diario (descomentar schedule: en .github/workflows/conciliar.y
 **Estado (14 jul 2026):** repo recién creado con esqueleto — sin lógica de scraping real. Falta
 que Alberto comparta acceso al portal (URL, usuario, contraseña) para poder mapear los
 selectores reales de login, búsqueda de póliza, y el campo de estatus de pago.
+
+**Segunda responsabilidad decidida (20 jul):** además de conciliar `qualitas_polizaemitida`,
+Agente Conciliación también actualiza `estado_metepec`/`fecha_cierre_metepec`/
+`monto_cierre_metepec` en la tabla standalone `leads_metepec` (leads entregados al contact
+center de Highland — ver `docs/iniciativas/2026-07-20-leads-metepec-seguimiento-comisiones.md`).
+Mismo patrón de búsqueda puntual en el portal ("Consulta de póliza"), pero por **Número de
+serie (VIN)** en vez de número de póliza conocido, porque para estos leads no tenemos número de
+antemano (los emite METEPEC). No viola la regla de "nunca tocar tablas de Django" — `leads_metepec`
+es standalone, igual que `conciliacion_pagos`.
