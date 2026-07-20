@@ -189,6 +189,8 @@ n8n escribe a Postgres directamente (credencial `"Postgres account"` en el workf
 
 Los `docs/bugs/bug-NN-*.md` de este repo (y equivalentes en los otros repos de agentes) siguen existiendo como el cuaderno de investigación largo — cronología, SQL, decisiones — cada issue del tracker enlaza al suyo. No se borró nada.
 
+**`qualitas-issues` también es inbox de captura rápida (20 jul):** ideas/bugs dictados fuera de casa, prefijo `QUALITAS:`. Al iniciar sesión (o "revisa QUALITAS"): `gh issue list --repo aibanez82/qualitas-issues --state open`, triangular (reasignar/directo/contexto), cerrar con comentario de destino — nunca ejecutar trabajo de otro repo. Detalle: `docs/protocolos/qualitas-issues-inbox.md`.
+
 **Workaround activo para Bug #7 en Dashboard** (documentado en detalle en `docs/bugs/bug-07-estatus-pago.md` y en el issue correspondiente):
 ```js
 // Condición correcta para detectar póliza pagada
