@@ -26,7 +26,8 @@ Script: `scripts/2026-07-20-crear-tabla-leads-metepec.sql` — **aplicar primero
 ### Campos
 
 - **Identificación y snapshot del lead**: `id`, `lead_id`/`cotizacion_id` (referencia laxa,
-  opcional), `nombre`, `telefono`, `email`, `vehiculo_descripcion`, `codigo_postal` — snapshot al
+  opcional), `nombre`, `telefono`, `email`, `vehiculo_descripcion`, `vin` (número de serie del
+  vehículo, para identificar el caso ante Highland/METEPEC), `codigo_postal` — snapshot al
   momento de la entrega, no un join en vivo, por si el dato en Django cambia después.
 - **La oportunidad**: `fecha_oportunidad_creada` (cuándo nació el lead en nuestro funnel),
   `monto_poliza_cotizado` (precio cotizado al momento de la entrega).

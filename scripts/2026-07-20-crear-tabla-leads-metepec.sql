@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS leads_metepec (
   telefono                       text NOT NULL,
   email                          text,
   vehiculo_descripcion           text,           -- ej. "Nissan Versa 2022"
+  vin                            text,           -- numero de serie del vehiculo
   codigo_postal                  text,
 
   fecha_oportunidad_creada       timestamptz,    -- cuándo nació el lead en nuestro funnel
@@ -45,3 +46,4 @@ CREATE TABLE IF NOT EXISTS leads_metepec (
 CREATE INDEX IF NOT EXISTS idx_leads_metepec_lead_id       ON leads_metepec (lead_id);
 CREATE INDEX IF NOT EXISTS idx_leads_metepec_cotizacion_id ON leads_metepec (cotizacion_id);
 CREATE INDEX IF NOT EXISTS idx_leads_metepec_estado        ON leads_metepec (estado_metepec);
+CREATE INDEX IF NOT EXISTS idx_leads_metepec_vin            ON leads_metepec (vin);
