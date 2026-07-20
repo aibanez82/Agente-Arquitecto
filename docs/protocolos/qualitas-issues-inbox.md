@@ -32,6 +32,27 @@ Issue en ese repo.
    coordinar y reasignar. Se respeta la regla de oro: todo pasa por el Arquitecto,
    los ejecutores nunca se hablan entre sí lateralmente.
 
+## Cómo mostrar la bandeja cuando Alberto la pide (añadido 20 jul 2026)
+
+Cuando Alberto pide ver lo capturado — cualquier frase equivalente: "dame las ideas de Alberto",
+"los pendientes que te hablé", "qué registré en la app", "revisa la bandeja" — **NO listar el
+backlog completo**.
+
+**Filtro base:** label `triage`. **Origen opcional** según cómo lo pida:
+- "en la app" / "que te hablé" / "que te conté" → añade label `src:app`
+- "por voz" / "nota de voz" → añade label `src:voz`
+- "en iOS" / "en el iPhone" → añade label `src:ios`
+- Si no especifica canal, mostrar todos los `triage`.
+
+Comando:
+```
+gh issue list --repo aibanez82/qualitas-issues --label triage[,src:app] --state open
+```
+
+Para cada uno, una línea: `[#n] resumen · tipo (idea/feature/bug) · repo destino · prioridad`.
+Al final preguntar cuáles trackear y cuáles descartar. Al procesar uno, quitarle `triage` (el
+label de canal se queda como registro de origen — no se borra).
+
 ## Relación con la función existente de `qualitas-issues`
 
 No reemplaza la función de tracker de bugs técnicos ya documentada en CLAUDE.md —
