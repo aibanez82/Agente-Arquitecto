@@ -422,3 +422,11 @@ horario sigue sin existir en `origin/main` de `HYL-WAI` — sigue siendo el úni
 Handoff con el patch exacto (mismo patrón que el guard de `status`, sin campo nuevo en BD) enviado
 a Juan: `docs/2026-07-21-handoff-juan-filtro-horario-checkpoint-followups.md`. Pendiente: que Juan
 lo aplique (STG → PROD) y coordinar la prueba de envío real controlada.
+
+**21 jul, 20:48 CDMX — Alberto decide activar envío real esta misma noche, sin esperar al filtro
+de horario**, confirmado explícitamente dos veces tras advertirle que repite el escenario del
+casi-incidente del 19 jul (fuera de la ventana 9am-8pm). Handoff aparte con el riesgo documentado
+y recomendación de acotar la prueba (`--limit 1` manual antes de dejar el Scheduler automático sin
+vigilancia), más el recordatorio obligatorio de revertir `DRY_RUN_DEFAULT=true` en cuanto termine
+el monitoreo de esta noche:
+`docs/2026-07-21-handoff-juan-activar-envio-real-checkpoint-followups-noche.md`.
