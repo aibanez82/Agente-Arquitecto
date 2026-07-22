@@ -406,3 +406,19 @@ ventana.
    `DRY_RUN_DEFAULT=false` brevemente, dentro de la ventana de horario) — punto 4 del casi-incidente
    de arriba.
 5. Si sale bien, decidir con Alberto el paso a envío real sostenido.
+
+## 20-21 jul — ensayo de un día sin filtro, y handoff del filtro enviado
+
+**20 jul:** Alberto decidió activar envío real ese mismo día sin esperar al filtro de horario
+(`docs/2026-07-20-handoff-juan-activar-envio-real-checkpoint-followups-sin-filtro-horario.md`),
+con reversión obligatoria a `DRY_RUN_DEFAULT=true` antes de las 8pm CDMX. Durante el ensayo se
+encontró `qualitas-issues#43` (a veces `requiere_factura` no persiste tras la respuesta del
+usuario → lead huérfano de `checkpoint_followups`; criticidad media, abierto, no bloqueante). Juan
+mergeó además `a909c83` (guards de validación de políticas + admin Wagtail) — no toca el horario.
+
+**21 jul, mañana — verificado en vivo:** reversión del 20 jul sí se hizo a tiempo — confirmado
+directo contra Heroku API (`ENABLED=true`, `DRY_RUN_DEFAULT=true`, estado seguro). El filtro de
+horario sigue sin existir en `origin/main` de `HYL-WAI` — sigue siendo el único bloqueante real.
+Handoff con el patch exacto (mismo patrón que el guard de `status`, sin campo nuevo en BD) enviado
+a Juan: `docs/2026-07-21-handoff-juan-filtro-horario-checkpoint-followups.md`. Pendiente: que Juan
+lo aplique (STG → PROD) y coordinar la prueba de envío real controlada.
