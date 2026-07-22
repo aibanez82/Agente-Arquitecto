@@ -1,6 +1,12 @@
-# Agente MTP — automatizar entrega de leads a METEPEC (plataforma digital + renovación)
+# Agente MTP — automatizar entrega de leads a METEPEC (plataforma digital)
 
 > Añadido: 20 julio 2026. Continúa [leads-metepec-seguimiento-comisiones](2026-07-20-leads-metepec-seguimiento-comisiones.md).
+> **Corrección 22 jul:** renovación sale por completo de este alcance — Alberto decidió que
+> ningún caso de renovación va a METEPEC (si es póliza Hylant se resuelve directo emitiendo;
+> si no es Hylant, no es un lead convertible, no vale la pena mandarlo). Detalle:
+> [casuística de renovación](2026-07-22-casuistica-renovacion.md). Todo lo de renovación en este
+> documento (diseño de correo, alcance, plantilla) queda obsoleto — se conserva solo como
+> referencia histórica de lo que se descartó y por qué.
 
 ## Qué es esto
 
