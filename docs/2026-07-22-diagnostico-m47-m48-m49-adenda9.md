@@ -62,18 +62,34 @@ es un fix quirúrgico sobre un bloque que YA existe: (a) sumarle la frase de rec
 y la prohibición explícita de "tipo de negocio" en `AI Agent`, y (b) replicar el mismo guardrail
 en `RAG IA Agent`, que hoy no lo tiene en absoluto.
 
-## Adenda 9 — confirmado: gap real, Adenda 7 no lo cubre
+## Adenda 9 — confirmado: gap real, Adenda 7 no lo cubre (corrección sobre mi primer diagnóstico)
 
-Adenda 7 está confirmada live en PROD, pero su alcance es exactamente tan estrecho como decía la
-nota del 14-jul: el propio texto del prompt dice *"Esta excepción aplica SOLO a este caso (CASO
-A1); en cualquier otro punto de entrada a la conversación... preséntate normalmente"*. CASO A1 es
-específicamente clic en el botón "Continuar cotización" de la plantilla de Meta o una confirmación
-explícita tipo "sí"/"ok".
+**Corrección:** en mi primera lectura interpreté mal el alcance de Adenda 7 — el texto real dice
+*"Esta excepción aplica SOLO a este caso (CASO A)"*, no "CASO A1" como escribí antes. O sea, la
+excepción de "no te vuelvas a presentar" ya cubre **todo** CASO A (paquete es null): tanto A1
+(confirmación explícita) como el mensaje-comentario genérico. No es ahí donde está el gap.
 
-El camino de Adenda 9 (`canal=LANDING`, `quote_document_sent=true`, primer mensaje del cliente es
-un comentario, no una confirmación) cae en la rama "para CUALQUIER OTRO mensaje" de CASO A, que sí
-vuelve a presentar a Uriel — de ahí el duplicado. No hay superposición con Adenda 7, es un gap
-adicional y real. Amplía la excepción de "no te vuelvas a presentar" a esta rama también.
+**El gap real está en CASO B** (paquete tiene valor — cliente seleccionó cobertura en la landing).
+El `systemMessage` de `AI Agent` para CASO B solo dice "1. Saluda al cliente mencionando el
+vehículo..." — sin ninguna excepción de "no repitas Soy Uriel". Como el WhatsApp inicial que manda
+Django (vía plantilla de Meta, gestionada en Wagtail — `qualitas/whatsapp_quote_preview.py`,
+`nombre_plantilla_meta`) ya incluye la presentación de Uriel **también para leads que seleccionaron
+paquete en la landing** (mismo patrón que CASO A, confirmado empíricamente por el síntoma real de
+L1674), el bot la repite en su primera respuesta real porque nada se lo impide.
+
+No hace falta ningún flag nuevo de `canal`/`quote_document_sent` en el contexto — la detección ya
+existe (`paquete` no-null = CASO B, ya se usa para bifurcar A vs B). El fix es replicar en CASO B
+la misma excepción que ya tiene CASO A.
+
+**Hallazgo aparte, no pedido pero relevante:** al rastrear de dónde sale `quote_document_sent`
+confirmé que la feature "Entrega de cotización quick reply" (`docs/iniciativas/2026-07-19-entrega-cotizacion-quick-reply-whatsapp.md`)
+**ya está construida y activa en PROD** (nodos `qdr-*`: `quoteDocumentAction?`, `Fetch Quotation
+Document`, `Send Quote Document`, `Mark Delivery Sent`, `Insert Quote Delivery History`) — esa
+iniciativa seguía marcada como *"sin handoff enviado, pendiente de decidir"*. Esto **sube de
+prioridad** el pendiente de seguridad ya trackeado (`N8N_TOKEN` hardcodeado en
+`qualitas/views.py:905`): ese token hoy gatea de verdad el acceso a PDFs de cotización de
+clientes reales, no es un riesgo hipotético. Actualizo esa iniciativa y lo marco en el mensaje de
+cierre de este turno.
 
 ## Plan de fix — orden recomendado
 

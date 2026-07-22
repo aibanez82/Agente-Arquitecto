@@ -81,7 +81,20 @@ es la rama determinística de entrega (pasos 3 en adelante del runbook: `quoteDo
 HTTP a Django, entrega a Meta, idempotencia, manejo de errores) — construir y validar en STG,
 igual que cualquier otro cambio de este workflow.
 
-## Pendiente
+## Estado — ✅ construida y activa en PROD (confirmado 22 jul — cierre no documentado hasta hoy)
 
-Sin handoff enviado todavía — pendiente de decidir con Alberto si se arma ahora o se prioriza
-contra el filtro de horario de `checkpoint_followups` (ver `docs/iniciativas/seguimiento-leads-estancados.md`).
+No fue un salto por fuera del Arquitecto: sí hubo handoff, urgente y autorizado por Alberto,
+21-jul ~21:00 (`Agente-n8n/handoffs/2026-07-21-handoff-urgente-promover-entrega-cotizacion-prod.md`)
+— Django PROD había cambiado esa tarde a `resumen_quick_reply` y n8n PROD se quedó sin la rama de
+entrega durante ~6 horas con leads reales tocando "Ver Cotización" sin recibir el PDF. Lo que
+faltó fue el cierre: nunca quedó un reporte confirmando que se aplicó. Verificado ahora (22 jul)
+directo contra el JSON vivo de PROD (API, `BtOaZm7WlZT-24V7hqCnF`): los nodos `qdr-*`
+(`quoteDocumentAction?`, `Fetch Quotation Document`, `Send Quote Document`, `Mark Delivery Sent`,
+`Insert Quote Delivery History`, idempotencia por Data Table) están completos y activos.
+
+**Consecuencia:** el riesgo de seguridad de arriba (`N8N_TOKEN` hardcodeado gateando el acceso a
+PDFs de cotización) **ya es real, no hipotético** — sube de prioridad en Pendientes de
+infraestructura de `CLAUDE.md`. Recomiendo rotar y mover a solo-env pronto, no como parte de un
+futuro despliegue.
+
+Encontrado como efecto colateral de verificar Adenda 9 de M19 (`docs/2026-07-22-diagnostico-m47-m48-m49-adenda9.md`) — el log `quote_document_sent` que insertan estos nodos en `n8n_chat_histories` es justo la pista que usó Mejoras Conv. para reportar ese hallazgo.
