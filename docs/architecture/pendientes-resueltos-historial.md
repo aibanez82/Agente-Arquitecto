@@ -28,3 +28,11 @@ un fix de inanición del scheduler (PR #77, commit `0c9a26f`).
 **Hipótesis descartada:** en su momento se sospechó relación con las columnas de timestamp
 tz-naive documentadas en `docs/architecture/timezone.md` — se investigó y **no** era la causa;
 issue y timezone se resolvieron por vías independientes.
+
+## Migración KB del bot a RAG real (pgvector + OpenAI embeddings)
+
+✅ Resuelto — completa y cerrada en PROD desde **18 jul 2026**. `kb_chunks` (119 filas) +
+fallback `doc_chunks` (152 filas). E2E real confirmado para RAG general, M36/M38,
+`kb_chunks.id=38` y el fallback de `doc_chunks` (Cláusula 8ª, verificado contra el PDF). Guard
+defensivo de tool-call crudo desplegado en PROD/STG (issue #47, cerrado). Sin pendientes
+urgentes al cierre. Detalle: `docs/iniciativas/2026-07-17-migracion-rag-kb-pgvector-design.md`.

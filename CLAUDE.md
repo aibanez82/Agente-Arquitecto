@@ -240,7 +240,7 @@ Staging end-to-end paralelo a prod (gitflow `stg`→`main`) para validar bug fix
 | `N8N_TOKEN` con valor real hardcodeado como default en `qualitas/views.py:905` (confirmado también en `main`, 16 jul — no es solo `stg`) | ⚠️ Seguridad — mover a solo-env y rotar el token, pedir a Juan. Ver `docs/iniciativas/entorno-pruebas-staging.md` |
 | Cómo saber con certeza si un cliente pagó la póliza | ⏳ En construcción — Agente Conciliación (creado 14 jul). Ver `docs/architecture/estatus-pago-qualitas.md` y `docs/protocolos/agente-conciliacion.md` |
 | Plantilla de Meta aprobada para re-enganche fuera de ventana 24h | ⚠️ Bloqueante para "Recordatorios por fecha mencionada" (arriba) y rescates tipo Bug #12. Pedida a Juan 16 jul, no sometida aún |
-| Migración KB del bot a RAG real (pgvector + OpenAI embeddings) | ✅ Completa y cerrada en PROD desde 18 jul (`kb_chunks` 119 filas + fallback `doc_chunks` 152). E2E real confirmado para RAG general, M36/M38, `kb_chunks.id=38` y el fallback de `doc_chunks` (Cláusula 8ª, verificado contra el PDF). Guard defensivo de tool-call crudo desplegado en PROD/STG (issue #47, cerrado). Sin pendientes urgentes. Detalle: `docs/iniciativas/2026-07-17-migracion-rag-kb-pgvector-design.md` |
+| Exponer `fecha_inicio` en `generate_xml_payload` (`HYL-WAI/qualitas/services.py:452-454`, hoy fijo a hoy+1) | ⏳ Pendiente externo — Juan. Bloquea M47/M48 (activación diferida en renovación). Detalle: `docs/2026-07-22-diagnostico-m47-m48-m49-adenda9.md` |
 
 Ítems ya resueltos (PAT de HYL-WAI, creación del repo Agente-n8n, columnas de timestamp en
 `n8n_chat_histories`/`whatsapp_sessions`, Issue #74 de HYL-WAI) se archivaron en
