@@ -29,26 +29,40 @@ pedir permisos sobre tablas de Django:
   lead tomado a la vez
 - `dashboard_message_audit` — auditoría de mensajes enviados desde el Inbox
 
-## Estado (23 jul 2026)
+## Estado (23 jul 2026, actualizado tras verificación E2E del agente del Dashboard)
 
-- ✅ Código implementado en rama `stg` del Dashboard (escrituras fallan con error controlado
-  hasta que exista la infraestructura — mismo patrón usado con Metepec).
+- ✅ Código implementado y **desplegado en STG**, gateado igual que Conciliación/Metepec
+  (`entorno !== 'production'`) — nada visible en producción todavía.
 - ✅ Las 3 tablas ya existen en Postgres STG (creadas por el Arquitecto el 23 jul, mismo rol
   `DATABASE_URL`/`u81gb6n2j32hnm` que usa Heroku `hyl-wai-stg`, que ya tenía `CREATE` amplio en
   el schema `public` — el `GRANT` explícito que pedía el handoff no hizo falta, el rol ya es
-  owner).
-- ⚠️ **Sin verificar con certeza:** que el `DATABASE_URL` de Preview (rama `stg`) en Vercel del
-  proyecto Dashboard apunte exactamente a esa misma DB — está marcado Sensitive/Encrypted en
-  Vercel y `vercel env pull` lo trae vacío (mismo problema ya documentado con el de producción),
-  así que se infirió por coincidencia de patrón con Conciliación/Metepec, no se comparó cadena
-  contra cadena. Confirmar en el primer INSERT real desde el Inbox desplegado.
-- ⏳ **Bloqueante — pendiente de Alberto:** definir en Vercel (Preview de `stg`) las env vars
-  `JWT_SECRET` (nuevo, firma la cookie de sesión individual, reemplaza `SESSION_TOKEN`
-  compartido) y `ADMIN_BOOTSTRAP_TOKEN` (de un solo uso, para crear el primer usuario admin
-  desde `pages/api/admin/agents.js`). Ninguna de las dos aplicada todavía.
-- ⏳ Tras desplegar: verificación de 4 pasos pedida por el agente del Dashboard (crear admin,
-  alta de agentes de prueba, tomar lead + enviar mensaje + confirmar fila en
-  `dashboard_message_audit`, prueba de concurrencia con 2 agentes sobre el mismo lead).
-- 🔴 Fuera de alcance por ahora: aplicar lo mismo en PROD (bloqueado hasta validar flujo
-  completo en STG + confirmación explícita de Alberto) y borrar `PROACTIVE_MESSAGE_PASSWORD` de
-  Vercel (solo cuando el login nuevo esté confirmado funcionando).
+  owner). **Verificado también por el agente del Dashboard** con INSERT+ROLLBACK real contra la
+  base — columnas, índice único y escritura funcionan como espera el código.
+- ✅ **Login individual end-to-end confirmado** — Alberto creó su usuario admin y entró. En el
+  camino se encontraron y arreglaron 3 bugs reales (todos ya cerrados, no requieren seguimiento):
+  1. `bcryptjs` se empaquetaba en el bundle Edge de `middleware.js` (incompatible) — movido a
+     `lib/password.js`, solo API routes (Node).
+  2. `middleware.js` bloqueaba su propio endpoint de bootstrap del primer admin (esa request no
+     tiene cookie de sesión todavía por definición) — excluido explícitamente.
+  3. El bootstrap manual vía `fetch()` en consola fallaba silenciosamente — reemplazado por
+     `/bootstrap-admin`, pantalla simple que manda el POST sin DevTools.
+  Además: el filtro de `TEST_EMAILS` escondía los 7 leads de prueba disponibles en STG — se
+  ajustó para que solo aplique en producción, con etiqueta "TEST" visible en STG.
+- ⚠️ **Lección operativa, no bloqueante:** al forzar un redeploy manual para tomar las env vars
+  nuevas, un `vercel deploy` suelto casi generó un deployment sin el scope de rama `stg` — mismo
+  patrón de riesgo que el Bug #17 (ver `docs/bugs/bug-17-webhook-proactivo-stg.md`). Se evitó a
+  tiempo con `vercel redeploy` sobre el deployment correcto. Registrado como recurrencia en
+  [issue #29](https://github.com/aibanez82/qualitas-issues/issues/29) (purga de deployments
+  Preview viejos) — el fix de #17 sigue dependiendo de disciplina humana, no de un guard
+  estructural.
+- ⏳ **Único pendiente real — decisión de Alberto, no código:** probar "tomar lead + enviar
+  mensaje real" dispara un WhatsApp genuino vía `n8n-proactive-message.js`; los únicos leads
+  disponibles en STG son los de prueba (Juan Aguayo, `test@test.com`). El agente del Dashboard
+  no lo ejecutó solo por eso. Opciones para Alberto: probar con su propio teléfono desde la UI,
+  autorizar un lead de prueba, o esperar a que aparezca un lead real en la bandeja. La prueba de
+  concurrencia (2 agentes tomando el mismo lead) sí se puede correr ya — no dispara mensajes.
+- 🔴 Fuera de alcance por ahora: aplicar lo mismo en PROD (bloqueado hasta cerrar la
+  verificación completa en STG + confirmación explícita de Alberto — mismo DDL sin GRANT extra
+  a confirmar según el rol de PROD, + las mismas 2 env vars en Production de Vercel) y borrar
+  `PROACTIVE_MESSAGE_PASSWORD` de Vercel (solo cuando el login nuevo esté confirmado
+  funcionando).
