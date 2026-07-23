@@ -51,6 +51,31 @@ si es Hylant, se resuelve directo con esta casuística; si no es Hylant, no hay 
 a METEPEC, no es un lead que podamos convertir. Esa iniciativa se actualiza para reflejar que
 solo cubre plataforma digital.
 
+## Estado — 22 jul, verificado en vivo contra STG
+
+**FASE 1 (ruteo):** construida, desplegada y validada E2E en STG — confirmado independientemente
+contra la API de n8n STG (`dNqtM20ij6ecZYAX`). Sin bloqueante técnico, **pendiente decisión de
+Alberto de promover a PROD**. Se encontró y corrigió en el camino un bug real no anticipado en el
+handoff: `Parse Router Output` tenía su propia lista blanca de intents hardcodeada, sin
+`"renovacion"` — lo tumbaba en silencio al default `"contracting"` (no rompía el ruteo por
+coincidencia, pero sí el etiquetado). Corregido.
+
+**FASE 2 (casuística completa):** construida, desplegada y validada E2E en STG (los 3 caminos:
+CASO A, CASO B1, CASO B2). **Bloqueada para PROD** por Issue #114. CASO B1 se extendió (decisión
+directa de Alberto con el ejecutor) a captura completa de datos + resumen con `fecha_inicio`,
+terminando en confirmación **simulada** sin llamar `issue_policy` — marcado explícito como
+bloque temporal de STG, a reemplazar cuando Django soporte el campo.
+
+**Gobernanza:** Alberto incorporó directamente 8 ejemplos reales (7 positivos + 1 negativo) al
+valor `"renovacion"` del `Intent Router`, tomados de
+`Agente-MejorasConversacion:informes/2026-07-22-leads-renovacion-actualizado.md` — sin pasar por
+el Arquitecto primero. Revisión retroactiva (22 jul): los 8 ejemplos están citados con precisión
+y clasificados correctamente contra la regla ya acordada (Quálitas mencionado = renovación,
+aseguradora no especificada = no). Sin correcciones necesarias. Nota menor no bloqueante: uno de
+los ejemplos (lead 1385, "mi seguro vence el día 20 de julio") también es el caso de referencia
+de la iniciativa "Recordatorios por fecha mencionada" — si esa iniciativa se retoma, vale la pena
+revisar que ambas lógicas no reaccionen en conflicto ante el mismo tipo de mensaje.
+
 ## Pendiente de diseño — no cerrado todavía
 
 - **Ruteo:** hoy "renovación" se clasifica como `kb_query` en el Intent Router (Haiku) y por eso
