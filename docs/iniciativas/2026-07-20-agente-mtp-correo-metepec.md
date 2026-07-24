@@ -19,7 +19,7 @@ lógica determinística: armar payload → INSERT en `leads_metepec` → mandar 
 
 Hoy el bot maneja ~70-80% de los leads de forma autónoma por WhatsApp. El resto son
 casos que el bot no puede cerrar y hoy se resuelven mandando un correo manual (Alberto
-lo redacta a mano) al contact center de Highland (METEPEC), que cotiza/emite por
+lo redacta a mano) al contact center de Hylant (METEPEC), que cotiza/emite por
 teléfono.
 
 Dos categorías identificadas en el bot actual (auditado 20 jul):

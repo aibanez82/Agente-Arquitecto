@@ -1,4 +1,4 @@
--- Tabla propia de seguimiento de leads entregados a METEPEC (contact center de Highland).
+-- Tabla propia de seguimiento de leads entregados a METEPEC (contact center de Hylant).
 -- Nunca escribe en tablas de Django (qualitas_lead, qualitas_cotizacion, qualitas_polizaemitida)
 -- -- referencia laxa por id, sin FK real, misma filosofía que conciliacion_pagos
 -- (Agente-Conciliacion:migrations/001_create_conciliacion_pagos.sql).
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS leads_metepec (
   fecha_cierre_metepec           date,
   monto_cierre_metepec           numeric(12,2),
 
-  -- Seguimiento de la negociación de comisión con Highland por estas ventas.
+  -- Seguimiento de la negociación de comisión con Hylant por estas ventas.
   considerada_en_comision        boolean NOT NULL DEFAULT false,
   fecha_considerada_en_comision  timestamptz,
 

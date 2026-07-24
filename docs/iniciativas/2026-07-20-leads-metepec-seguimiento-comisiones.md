@@ -1,15 +1,15 @@
-# Seguimiento de leads entregados a METEPEC — para negociar comisión con Highland
+# Seguimiento de leads entregados a METEPEC — para negociar comisión con Hylant
 
 ## Contexto de negocio
 
-Modelo InsureMind/Quálitas: Highland paga pauta en Google Ads, los leads caen en la landing,
-InsureMind cierra la venta (100% web, 100% WhatsApp, o mixto) y recibe comisión de Highland por
+Modelo InsureMind/Quálitas: Hylant paga pauta en Google Ads, los leads caen en la landing,
+InsureMind cierra la venta (100% web, 100% WhatsApp, o mixto) y recibe comisión de Hylant por
 cada póliza vendida.
 
 Hoy no todos los leads se pueden cerrar por WhatsApp con el bot actual — hay preguntas muy
 concretas o clientes que no están listos para dar ciertos datos. Esos leads se le pasan a
-**METEPEC**, un contact center que Highland tiene aparte, para que ellos intenten cerrar la venta
-en vez de perder el lead. InsureMind quiere poder demostrarle a Highland cuántos de esos leads sí
+**METEPEC**, un contact center que Hylant tiene aparte, para que ellos intenten cerrar la venta
+en vez de perder el lead. InsureMind quiere poder demostrarle a Hylant cuántos de esos leads sí
 se cerraron gracias al trabajo previo hecho en la landing/WhatsApp, para negociar una comisión por
 haber participado en la venta — aunque el cierre final lo haga METEPEC.
 
@@ -27,7 +27,7 @@ Script: `scripts/2026-07-20-crear-tabla-leads-metepec.sql` — **aplicar primero
 
 - **Identificación y snapshot del lead**: `id`, `lead_id`/`cotizacion_id` (referencia laxa,
   opcional), `nombre`, `telefono`, `email`, `vehiculo_descripcion`, `vin` (número de serie del
-  vehículo, para identificar el caso ante Highland/METEPEC), `codigo_postal` — snapshot al
+  vehículo, para identificar el caso ante Hylant/METEPEC), `codigo_postal` — snapshot al
   momento de la entrega, no un join en vivo, por si el dato en Django cambia después.
 - **La oportunidad**: `fecha_oportunidad_creada` (cuándo nació el lead en nuestro funnel),
   `monto_poliza_cotizado` (precio cotizado al momento de la entrega).
@@ -38,7 +38,7 @@ Script: `scripts/2026-07-20-crear-tabla-leads-metepec.sql` — **aplicar primero
   `fecha_cierre_metepec`, `monto_cierre_metepec` (puede diferir del cotizado).
 - **Para la negociación de comisión**: `considerada_en_comision` (boolean),
   `fecha_considerada_en_comision` — para llevar control de qué ventas de METEPEC ya se
-  incluyeron en algún reporte/negociación con Highland y cuáles siguen pendientes de incluir.
+  incluyeron en algún reporte/negociación con Hylant y cuáles siguen pendientes de incluir.
 - `notas`, `creado_en`.
 
 ## Decisiones de diseño
@@ -89,7 +89,7 @@ bloqueante nuevo.
   — automatización vía rama nueva del workflow n8n para los casos de plataforma digital y
   renovación (los que hoy el bot detecta o debería detectar de forma categórica, no el resto
   de escalamientos ad-hoc).
-- Definir con Alberto/Highland qué constituye "vendida" de forma verificable (¿METEPEC reporta
+- Definir con Alberto/Hylant qué constituye "vendida" de forma verificable (¿METEPEC reporta
   manualmente como Laura con las pólizas normales, o hay otro mecanismo?).
 - Sin vista en el Dashboard todavía — si se necesita, es trabajo aparte para el Dashboard Code
   Agent.

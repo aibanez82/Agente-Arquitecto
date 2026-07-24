@@ -17,7 +17,7 @@ entre laptops.
 
 Tabla standalone (no es de Django, mismo criterio de propiedad que tu propia
 `conciliacion_pagos`) donde InsureMind registra los leads que le pasa a **METEPEC** — el
-contact center que Highland tiene aparte — cuando el bot de WhatsApp no puede cerrar la venta
+contact center que Hylant tiene aparte — cuando el bot de WhatsApp no puede cerrar la venta
 por sí solo. Hoy: casos de "plataforma digital" (Uber/Didi/taxi/flotilla). Más adelante:
 renovaciones de póliza.
 
@@ -29,7 +29,7 @@ renovaciones de póliza.
 
 ## Por qué te toca a vos
 
-InsureMind quiere poder demostrarle a Highland cuántos de esos leads sí se cerraron gracias al
+InsureMind quiere poder demostrarle a Hylant cuántos de esos leads sí se cerraron gracias al
 trabajo previo hecho en la landing/WhatsApp, para negociar una comisión por haber participado en
 la venta — aunque el cierre final lo haga METEPEC. Sin verificación automática, esto se queda en
 un reporte manual (como el de Laura de Hylant, pero peor: nadie lo está llevando hoy).
