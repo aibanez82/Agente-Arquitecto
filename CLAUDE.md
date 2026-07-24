@@ -240,7 +240,7 @@ Staging end-to-end paralelo a prod (gitflow `stg`→`main`) para validar bug fix
 | `N8N_TOKEN` con valor real hardcodeado como default en `qualitas/views.py:905` (confirmado también en `main`, 16 jul) | 🔴 Sube de prioridad (22 jul): ya gatea en PROD el acceso a PDFs de cotización reales (feature "entrega quick reply" resultó estar activa). Mover a solo-env y rotar, pedir a Juan. Ver `docs/iniciativas/entorno-pruebas-staging.md` |
 | Cómo saber con certeza si un cliente pagó la póliza | ⏳ En construcción — Agente Conciliación (creado 14 jul). Ver `docs/architecture/estatus-pago-qualitas.md` y `docs/protocolos/agente-conciliacion.md` |
 | Plantilla de Meta aprobada para re-enganche fuera de ventana 24h | ⚠️ Bloqueante para "Recordatorios por fecha mencionada" (arriba) y rescates tipo Bug #12. Pedida a Juan 16 jul, no sometida aún |
-| Exponer `fecha_inicio` en emisión de póliza (hoy fijo a hoy+1) — Issue #114 `aguayo-co/HYL-WAI` | ⏳ Pendiente externo — Juan. Bloquea M47/M48 (activación diferida en renovación) |
+| Exponer `fecha_inicio` en emisión de póliza — Issue #114 `aguayo-co/HYL-WAI` | ✅ Backend de Juan en `stg` (PR #116), **24 jul: aún no en `main`/PROD** (verificado). Falta merge a `main`+deploy, y lado n8n (tool de emisión + renovación + validar máximo futuro aceptado). Desbloquea M47/M48 — no promover a PROD hasta Django también esté en PROD |
 
 Ítems ya resueltos (PAT de HYL-WAI, creación del repo Agente-n8n, columnas de timestamp en
 `n8n_chat_histories`/`whatsapp_sessions`, Issue #74 de HYL-WAI) se archivaron en
