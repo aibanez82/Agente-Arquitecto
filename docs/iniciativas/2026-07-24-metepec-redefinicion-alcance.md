@@ -13,7 +13,7 @@ línea "Autos y Pickups Personales" de Quálitas.** El resto se entrega a METEPE
 de Hylant) para que ellos coticen/emitan por su cuenta, e InsureMind registra el lead para
 negociar comisión con Hylant por haber participado.
 
-## Lista autoritativa — qué va a METEPEC (10 categorías)
+## Lista autoritativa — qué va a METEPEC (11 categorías)
 
 Base: taxonomía de líneas de negocio de Quálitas (captura del portal, 24 jul) + casos extra que
 no son línea de negocio sino uso/estatus del vehículo.
@@ -32,10 +32,13 @@ De las líneas de negocio de Quálitas (todas MENOS "Autos y Pickups Personales"
 
 Categorías extra (no son línea de negocio de la imagen, se agregan aparte):
 
-9. **Plataforma** — Didi, Uber, Indriver (categoría SEPARADA de "Servicio Público de Pasajeros",
-   confirmado 24 jul — app de movilidad ≠ taxi/combi tradicional)
+9. **Plataforma** — Didi, Uber, Indriver. **Solo pasajeros** (NO reparto/Uber Eats/Rappi/Didi
+   Food — confirmado 24 jul). Categoría SEPARADA de "Servicio Público de Pasajeros" (app de
+   movilidad ≠ taxi/combi tradicional).
 10. **Salvamento** — no es una línea de negocio sino un ESTATUS del vehículo (recuperado/
     reconstruido); puede aplicar dentro de cualquier línea, pero operativamente = "a METEPEC".
+11. **Flotillas** — arreglo comercial de varios vehículos (confirmado 24 jul como categoría
+    propia, no se dobla en ninguna otra).
 
 **Se queda con el bot (único):** Autos y Pickups Personales (uso personal).
 
@@ -155,19 +158,23 @@ Primera categoría, es **Tipo 1** (mismo vehículo, distinto uso → `get_quotat
    va a contactar directamente para darte seguimiento a tu cotización."*
 5. Fallback si la tool falla: escalar con el link fijo (no perder el lead).
 
-**Datos a METEPEC** (de `get_quotation_data`: nombre, teléfono, email, `vehiculo_descripcion`;
-del cliente: `vin`; fijos: `cotizacion_id`, `motivo_entrega='plataforma'`).
+**Decisiones cerradas (24 jul):**
+- Plataforma = **solo pasajeros** (reparto NO entra aquí).
+- **No** se necesita saber cuál app (Uber/Didi/Indriver) — no se pregunta ni se manda.
+- **Datos a pedir = los mismos que un auto normal** (decisión de Alberto). Esto AMPLÍA el diseño
+  parqueado, que solo pedía VIN. Falta fijar la lista concreta de campos (ver abajo).
+
+**Datos a METEPEC** (de `get_quotation_data`: nombre, teléfono, email, CP, `vehiculo_descripcion`;
+del cliente: lo que el flujo normal pide además — VIN y, por confirmar, domicilio; fijos:
+`cotizacion_id`, `motivo_entrega='plataforma'`).
 
 **Correo:** STG `acer3500@gmail.com` · PROD `metepecaten@qualitas.com.mx` +CC Laura/Rafael.
-Asunto `27614 Cotización Plataforma Digital`. Cuerpo: plantilla existente (20 jul).
+Asunto `27614 Cotización Plataforma Digital`. Cuerpo: plantilla del 20 jul + los campos extra que
+salgan de "mismos datos que auto normal" (por confirmar).
 
-**Abierto en plataforma (pendiente de Alberto):**
-- ¿Incluye reparto (Uber Eats/Rappi/Didi Food) o solo pasajeros? (si es en moto → categoría
-  Motocicletas).
-- ¿Hylant necesita saber CUÁL plataforma (Uber/Didi/Indriver) para cotizar? Si sí, el bot lo
-  pregunta y se agrega al cuerpo.
-- **Flotillas** salió de la taxonomía final (no está en la imagen ni en los extras) — confirmar
-  si queda fuera de METEPEC, se dobla en otra categoría, o es una 11ª.
+**Único abierto en plataforma:** la lista EXACTA de "datos de auto normal" — en particular si el
+bot debe pedir **domicilio** además de VIN, o si METEPEC lo toma por teléfono. Ver "Próximos
+pasos".
 
 ## Próximos pasos (orden)
 
