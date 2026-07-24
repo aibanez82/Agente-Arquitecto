@@ -241,6 +241,7 @@ Staging end-to-end paralelo a prod (gitflow `stg`→`main`) para validar bug fix
 | Cómo saber con certeza si un cliente pagó la póliza | ⏳ En construcción — Agente Conciliación (creado 14 jul). Ver `docs/architecture/estatus-pago-qualitas.md` y `docs/protocolos/agente-conciliacion.md` |
 | Plantilla de Meta aprobada para re-enganche fuera de ventana 24h | ⚠️ Bloqueante para "Recordatorios por fecha mencionada" (arriba) y rescates tipo Bug #12. Pedida a Juan 16 jul, no sometida aún |
 | Exponer `fecha_inicio` en emisión de póliza — Issue #114 `aguayo-co/HYL-WAI` | ✅ Backend de Juan en `stg` (PR #116), **24 jul: aún no en `main`/PROD** (verificado). Falta merge a `main`+deploy, y lado n8n (tool de emisión + renovación + validar máximo futuro aceptado). Desbloquea M47/M48 — no promover a PROD hasta Django también esté en PROD |
+| `/api/emitir-externo/` no distingue causa del 400 — Issue #119 HYL-WAI (=#9) | ⏳ Pendiente externo — Juan |
 
 Ítems ya resueltos (PAT de HYL-WAI, creación del repo Agente-n8n, columnas de timestamp en
 `n8n_chat_histories`/`whatsapp_sessions`, Issue #74 de HYL-WAI) se archivaron en
