@@ -175,8 +175,9 @@ Asunto `27614 Cotización Plataforma Digital`. Cuerpo: plantilla existente del 2
 
 1. **Alberto:** entregar requisitos de datos por categoría para las **10 restantes** (plataforma
    ya cerrada). ← bloqueante actual.
-2. Arquitecto: mapear señales de detección por categoría para el `METEPEC Agent` (fina) y la
-   bandera gruesa de Haiku; diseñar la captura Tipo 1 vs Tipo 2 por categoría.
+2. ✅ Arquitecto: mapa de detección por categoría (gruesa Haiku + fina METEPEC Agent, Tipo 1 vs
+   Tipo 2, reglas de desambiguación) → [2026-07-24-metepec-mapa-deteccion.md](2026-07-24-metepec-mapa-deteccion.md).
+   Tiene 4 preguntas abiertas para Alberto que afinan la captura (no bloquean la detección gruesa).
 3. Arquitecto: diseñar plantilla de correo por categoría (parametrizar el sub-workflow por
    `motivo_entrega`).
 4. Verificar el JSON real parqueado (repo Agente-n8n, rama `feature/metepec-plataforma-digital`)
