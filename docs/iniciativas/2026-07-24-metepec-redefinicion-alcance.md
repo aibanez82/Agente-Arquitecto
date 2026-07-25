@@ -158,28 +158,23 @@ Primera categoría, es **Tipo 1** (mismo vehículo, distinto uso → `get_quotat
    va a contactar directamente para darte seguimiento a tu cotización."*
 5. Fallback si la tool falla: escalar con el link fijo (no perder el lead).
 
-**Decisiones cerradas (24 jul):**
-- Plataforma = **solo pasajeros** (reparto NO entra aquí).
+**Decisiones cerradas (24 jul) — plataforma 100% definida:**
+- Plataforma = **solo pasajeros** (reparto/Uber Eats/Rappi/Didi Food NO entra aquí).
 - **No** se necesita saber cuál app (Uber/Didi/Indriver) — no se pregunta ni se manda.
-- **Datos a pedir = los mismos que un auto normal** (decisión de Alberto). Esto AMPLÍA el diseño
-  parqueado, que solo pedía VIN. Falta fijar la lista concreta de campos (ver abajo).
+- **El bot solo pide VIN** (Opción B). METEPEC toma el resto de los datos por teléfono. Esto
+  coincide exactamente con el build parqueado — plataforma no requiere captura nueva, solo
+  moverla al carril `METEPEC Agent`.
 
-**Datos a METEPEC** (de `get_quotation_data`: nombre, teléfono, email, CP, `vehiculo_descripcion`;
-del cliente: lo que el flujo normal pide además — VIN y, por confirmar, domicilio; fijos:
-`cotizacion_id`, `motivo_entrega='plataforma'`).
+**Datos a METEPEC** — de `get_quotation_data`: nombre, teléfono, email, CP, `vehiculo_descripcion`;
+del cliente: `vin`; fijos: `cotizacion_id`, `motivo_entrega='plataforma'`.
 
 **Correo:** STG `acer3500@gmail.com` · PROD `metepecaten@qualitas.com.mx` +CC Laura/Rafael.
-Asunto `27614 Cotización Plataforma Digital`. Cuerpo: plantilla del 20 jul + los campos extra que
-salgan de "mismos datos que auto normal" (por confirmar).
-
-**Único abierto en plataforma:** la lista EXACTA de "datos de auto normal" — en particular si el
-bot debe pedir **domicilio** además de VIN, o si METEPEC lo toma por teléfono. Ver "Próximos
-pasos".
+Asunto `27614 Cotización Plataforma Digital`. Cuerpo: plantilla existente del 20 jul (sin cambios).
 
 ## Próximos pasos (orden)
 
-1. **Alberto:** entregar requisitos de datos por categoría (las 10) + cerrar los 3 abiertos de
-   plataforma de arriba. ← bloqueante actual.
+1. **Alberto:** entregar requisitos de datos por categoría para las **10 restantes** (plataforma
+   ya cerrada). ← bloqueante actual.
 2. Arquitecto: mapear señales de detección por categoría para el `METEPEC Agent` (fina) y la
    bandera gruesa de Haiku; diseñar la captura Tipo 1 vs Tipo 2 por categoría.
 3. Arquitecto: diseñar plantilla de correo por categoría (parametrizar el sub-workflow por
