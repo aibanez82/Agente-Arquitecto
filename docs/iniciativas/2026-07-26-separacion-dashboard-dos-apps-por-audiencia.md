@@ -50,8 +50,11 @@ Añadir una tercera app en el futuro (ej. portal self-service para Hylant) es tr
 
 ## Plan por fases (sin big-bang — Operación funciona, se extrae Admin)
 
-- **P0 — Monorepo-ify:** convertir a Turborepo, mover el código actual a `apps/operacion`, extraer `packages/auth`, `packages/db`, `packages/ui`. Operación intacta, sin cambio funcional. Verificar deploy.
-- **P1 — Crear `apps/admin`:** nuevo Vercel project + dominio + acceso restringido a Insurmind. **Mover** (no duplicar) Agentes, Conciliación, Comisiones desde Operación. Retirar el gate `VERCEL_ENV` (ya no hace falta). Quitar esas pestañas de Operación.
+> **Refinamiento 26 jul (tras leer el código):** la app es JS puro, sin path aliases, imports relativos. Mover el árbol completo a `apps/operacion` preserva todos los imports (cero reescritura). La extracción de paquetes tiene ~22 sitios de import a reescribir y su valor solo aparece con Admin — se mueve de P0 a **P1a**, para verificarla contra dos consumidores.
+
+- **P0 — Esqueleto monorepo (solo mover):** Turborepo + workspaces, mover `pages/components/lib/styles/public/middleware.js/next.config.js` a `apps/operacion` **verbatim** (sin extraer paquetes, sin tocar imports). `migrations/`, `docs/`, `*.md` se quedan en la raíz. Objetivo: Operación byte-a-byte igual + `turbo build`/`turbo dev` verdes + deploy Vercel monorepo funcionando. **Handoff:** `Dashboard_SeguroAuto/docs/2026-07-26-handoff-p0-monorepo-skeleton.md`.
+- **P1a — Extraer paquetes:** `packages/auth` (auth+password+roles), `packages/db` (db+db-prod), `packages/ui` (components+styles). Reescribir imports de Operación a `@repo/*`. Verificar Operación idéntica.
+- **P1b — Crear `apps/admin`:** nuevo Vercel project + dominio + acceso restringido a Insurmind. **Mover** (no duplicar) Agentes, Conciliación, Comisiones desde Operación, consumiendo los paquetes. Retirar el gate `VERCEL_ENV`. Quitar esas pestañas de Operación.
 - **P2 — Vistas nuevas en Admin:** Cambios de conducto, Monitoreo Qualitas+n8n.
 - **P3 — Pulido:** deep links cruzados (lead en Operación ↔ su conciliación/comisión en Admin), consolidar con `plan-adelgazamiento-agente-dashboard.md`.
 
