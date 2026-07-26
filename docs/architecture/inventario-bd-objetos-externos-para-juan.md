@@ -1,6 +1,6 @@
 # Inventario de objetos de BD creados FUERA de las migraciones de Django
 
-> Para: Juan Aguayo (despliegues/migraciones desde Heroku) · De: Arquitecto-IA-Qualitas · 24 jul 2026 · **actualizado 26 jul 2026** (añadidas `comisiones_facturas`/`comisiones_polizas`)
+> Para: Juan Aguayo (despliegues/migraciones desde Heroku) · De: Arquitecto-IA-Qualitas · 24 jul 2026 · **actualizado 26 jul 2026** (añadidas `comisiones_facturas`/`comisiones_recibos`; `comisiones_polizas` creada y luego retirada el mismo día por rediseño v2)
 > Verificado en vivo contra la BD de **PRODUCCIÓN** (`d779dc6ojpjvn5`) + análisis de las migraciones del repo `aguayo-co/HYL-WAI`.
 > **Propósito:** listar todo lo que existe en la Postgres de Heroku que **NO** producen las migraciones de Django, para que al desplegar/recrear un entorno sepas qué crear a mano.
 
@@ -8,7 +8,7 @@
 
 ## TL;DR — modelo de propiedad de la BD
 
-La BD tiene **88 tablas** (86 + `comisiones_facturas`/`comisiones_polizas`, creadas 26 jul 2026). Se dividen así:
+La BD tiene **88 tablas** (86 + `comisiones_facturas`/`comisiones_recibos`, creadas 26 jul 2026). Se dividen así:
 
 | Grupo | Quién lo crea | ¿En tus migraciones? |
 |---|---|---|
@@ -20,7 +20,7 @@ La BD tiene **88 tablas** (86 + `comisiones_facturas`/`comisiones_polizas`, crea
 | **`conciliacion_pagos`** | Externo (Agente Conciliación) | ❌ **No** |
 | **`dashboard_users`, `dashboard_conversation_claims`, `dashboard_message_audit`** | Externo (Dashboard, creadas 24 jul 2026) | ❌ **No** |
 | **`doc_sources`, `doc_chunks`, `kb_chunks`** | Externo (iniciativas RAG, pgvector) | ❌ **No** |
-| **`comisiones_facturas`, `comisiones_polizas`** | Externo (Dashboard, pestaña Comisiones, creadas 26 jul 2026) | ❌ **No** |
+| **`comisiones_facturas`, `comisiones_recibos`** | Externo (Dashboard, pestaña Comisiones, creadas 26 jul 2026) | ❌ **No** |
 | Extensión **`vector` (pgvector)** | Externo (para las tablas RAG) | ❌ **No** |
 
 **El punto crítico para ti:** tus migraciones **0032** y **0033** dan por hecho que `whatsapp_sessions` y `n8n_chat_histories` **ya existen** (usan guardas `_table_exists` y abortan en silencio si no). Es decir, en un entorno nuevo, **esas dos tablas base deben crearse ANTES de correr las migraciones**, o Django no las aumentará y n8n las creará luego incompletas → drift.
@@ -190,7 +190,9 @@ CREATE INDEX kb_chunks_embedding_idx ON kb_chunks USING hnsw (embedding vector_c
 
 ### `comisiones_*` (Dashboard — pestaña Comisiones, solo rol admin; creadas 26 jul 2026)
 
-Standalone, sin FK a `qualitas_*` (mismo criterio que `conciliacion_pagos`): `numero_poliza` es un snapshot laxo, no una FK real a `qualitas_polizaemitida`. La FK `comisiones_polizas.factura_id → comisiones_facturas.id` sí es real porque ambas son nuestras. Créalas como el rol **`ufdg7frlrnm5on`** (el mismo que usa `CONCILIACION_DATABASE_URL`) para que quede dueño y no haga falta GRANT — el Dashboard lee y escribe estas tablas por esa conexión (`lib/db-prod.js`), no por `DATABASE_URL`. Verificado en vivo el 26 jul: owner `ufdg7frlrnm5on`, con INSERT/UPDATE.
+> **Nota (26 jul, v2):** `comisiones_polizas` se retiró (`DROP`) — la comisión pasó de "7% plano por póliza" a "% por **recibo pagado**" (fuente `conciliacion_pagos`). La reemplaza `comisiones_recibos`. Diseño: `Agente-Arquitecto/docs/iniciativas/2026-07-26-comisiones-v2-por-recibo-pagado-design.md`.
+
+Standalone, sin FK a `qualitas_*` ni a `conciliacion_pagos` (snapshot laxo, mismo criterio que el resto). La FK `comisiones_recibos.factura_id → comisiones_facturas.id` sí es real (ambas nuestras). Créalas como el rol **`ufdg7frlrnm5on`** (el mismo que usa `CONCILIACION_DATABASE_URL`) para que quede dueño y no haga falta GRANT — el Dashboard lee y escribe estas tablas por esa conexión (`lib/db-prod.js`), no por `DATABASE_URL`. Verificado en vivo el 26 jul: owner `ufdg7frlrnm5on`, con INSERT/UPDATE.
 
 ```sql
 CREATE TABLE IF NOT EXISTS comisiones_facturas (
@@ -206,17 +208,18 @@ CREATE TABLE IF NOT EXISTS comisiones_facturas (
   creado_en       TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS comisiones_polizas (
-  id                    SERIAL PRIMARY KEY,
-  numero_poliza         TEXT NOT NULL UNIQUE,       -- snapshot laxo, no FK a qualitas_polizaemitida
-  precio_poliza         NUMERIC(12,2) NOT NULL,     -- snapshot de qualitas_polizaemitida.precio_total al calcular
-  porcentaje_comision   NUMERIC(5,2) NOT NULL DEFAULT 7,
-  monto_comision        NUMERIC(12,2) NOT NULL,
-  factura_id            INTEGER REFERENCES comisiones_facturas(id),
-  creado_por            TEXT,
-  creado_en             TIMESTAMPTZ NOT NULL DEFAULT now()
+CREATE TABLE IF NOT EXISTS comisiones_recibos (
+  numero_recibo        TEXT PRIMARY KEY,           -- referencia laxa a conciliacion_pagos.numero_recibo (sin FK; snapshot)
+  numero_poliza        TEXT NOT NULL,
+  importe_recibo       NUMERIC(12,2) NOT NULL,     -- snapshot del importe pagado al facturar
+  porcentaje_comision  NUMERIC(5,2)  NOT NULL DEFAULT 7,
+  monto_comision       NUMERIC(12,2) NOT NULL,
+  factura_id           INTEGER REFERENCES comisiones_facturas(id),
+  creado_por           TEXT,
+  creado_en            TIMESTAMPTZ NOT NULL DEFAULT now()
 );
-CREATE INDEX IF NOT EXISTS idx_comisiones_polizas_factura_id ON comisiones_polizas(factura_id);
+CREATE INDEX IF NOT EXISTS idx_comisiones_recibos_factura_id    ON comisiones_recibos(factura_id);
+CREATE INDEX IF NOT EXISTS idx_comisiones_recibos_numero_poliza ON comisiones_recibos(numero_poliza);
 ```
 
 ---
@@ -249,4 +252,4 @@ Ambas usan guardas `_table_exists(...)` y `if connection.vendor != "postgresql":
 - **Django/Wagtail framework (ya en tus migraciones):** `auth_group`, `auth_group_permissions`, `auth_permission`, `auth_user`, `auth_user_groups`, `auth_user_user_permissions`, `django_admin_log`, `django_content_type`, `django_migrations`, `django_session`, `taggit_tag`, `taggit_taggeditem`, y todas las `wagtail*` (`wagtailcore_*`, `wagtailimages_*`, `wagtaildocs_*`, `wagtailredirects_*`, `wagtailforms_*`, `wagtailsearch_*`, `wagtailadmin_*`, `wagtailembeds_*`, `wagtailusers_userprofile`).
 - **Negocio Django `qualitas_*` (ya en tus migraciones):** `qualitas_abtestinginternalemail`, `qualitas_asegurado`, `qualitas_catalogoerrorqualitas`, `qualitas_catalogovehiculo`, `qualitas_cotizacion`, `qualitas_cotizacionrespuestaxml`, `qualitas_experimentdailymetric`, `qualitas_experimentvisitorassignment`, `qualitas_landingexperiment`, `qualitas_landingexperimentvariant`, `qualitas_lead`, `qualitas_leadactionevent`, `qualitas_leadadminsecuritysettings`, `qualitas_leadcheckpointfollowupattempt`, `qualitas_leadfollowuppolicy`, `qualitas_leadfollowuppolicyaudit`, `qualitas_leadoperationalinfo`, `qualitas_numbersblacklist`, `qualitas_numeropruebawhatsapp`, `qualitas_polizaemitida`, `qualitas_qualitaslandingpage`, `qualitas_sepomex`, `qualitas_trackingsettings`, `qualitas_whatsappmessage`, `qualitas_whatsappquotepreviewfragment`.
 - **Creadas por Django vía DDL crudo (migración 0032 — ya en tus migraciones):** `whatsapp_sessions_archive`, `n8n_chat_histories_archive`.
-- **EXTERNAS (no en tus migraciones — este documento):** `whatsapp_sessions`, `n8n_chat_histories`, `conciliacion_pagos`, `dashboard_users`, `dashboard_conversation_claims`, `dashboard_message_audit`, `doc_sources`, `doc_chunks`, `kb_chunks`, `comisiones_facturas`, `comisiones_polizas`.
+- **EXTERNAS (no en tus migraciones — este documento):** `whatsapp_sessions`, `n8n_chat_histories`, `conciliacion_pagos`, `dashboard_users`, `dashboard_conversation_claims`, `dashboard_message_audit`, `doc_sources`, `doc_chunks`, `kb_chunks`, `comisiones_facturas`, `comisiones_recibos`.
