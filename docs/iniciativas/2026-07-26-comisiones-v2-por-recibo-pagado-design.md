@@ -31,12 +31,16 @@ El dato correcto ya existe, en numérico limpio, poblado por el Agente Conciliac
 
 **Principio:** la comisión "sin facturar" se **calcula en vivo** desde `conciliacion_pagos` (7% × importe de recibos PAGADO). Solo se **persiste** al facturar, con **snapshot** de los importes para que la factura sea inmutable aunque el scraping cambie después.
 
+**% editable a nivel de RECIBO** (decisión de Alberto, 26 jul): `porcentaje_comision` se elige por recibo al facturar; default 7.
+
 ### DDL (lo corre Alberto como `ufdg7frlrnm5on`, igual que las tablas anteriores)
 
-```sql
--- comisiones_polizas está vacía; se retira en favor del grano por recibo
-DROP TABLE IF EXISTS comisiones_polizas;
+**Orden seguro (para no romper la Comisiones actual en prod, que aún referencia `comisiones_polizas`):**
+1. **Ahora / antes del deploy:** solo el `CREATE` (aditivo, no rompe nada).
+2. **Después de que el código v2 esté desplegado en prod:** `DROP TABLE comisiones_polizas;` (está vacía).
 
+```sql
+-- PASO 1 (ahora):
 CREATE TABLE IF NOT EXISTS comisiones_recibos (
   numero_recibo        text PRIMARY KEY,          -- referencia laxa a conciliacion_pagos.numero_recibo (sin FK; snapshot)
   numero_poliza        text NOT NULL,
@@ -49,6 +53,9 @@ CREATE TABLE IF NOT EXISTS comisiones_recibos (
 );
 CREATE INDEX IF NOT EXISTS idx_comisiones_recibos_factura_id   ON comisiones_recibos(factura_id);
 CREATE INDEX IF NOT EXISTS idx_comisiones_recibos_numero_poliza ON comisiones_recibos(numero_poliza);
+
+-- PASO 2 (después del deploy del código v2):
+-- DROP TABLE IF EXISTS comisiones_polizas;
 ```
 
 Sin FK a `conciliacion_pagos` (mismo criterio de snapshot que se usó con `precio_poliza`): si el portal re-scrapea o cambia un recibo, la comisión ya facturada no se mueve.
