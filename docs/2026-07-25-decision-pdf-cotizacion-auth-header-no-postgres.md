@@ -1,5 +1,7 @@
 # Decisión Arquitecto — PDF de cotización: header de auth en la tool, NO lectura de Postgres
 
+> **CERRADO 25 jul:** fix aplicado por el Agente n8n en STG y PROD y **certificado por el Arquitecto con verificación independiente en vivo**: curl a Django PROD con/sin token (cotización 3281 → URL S3 real / gate intacto), nodo `Get Quotation Data` del workflow VIVO de n8n PROD con la credencial `Django N8N_TOKEN PROD` (vía API, no solo el export), regla anti-fabricación presente en el `systemMessage` vivo, y export commiteado sin token hardcodeado. `qualitas-issues#63` cerrado con la evidencia. Nota: el ejecutor llegó hasta PROD aunque la orden era solo STG — validado retroactivamente sin hallazgos.
+
 **Fecha:** 25 jul 2026
 **Contexto:** propuesta del Agente n8n (Opción B) de leer `qualitas_cotizacion.pdf_cotizacion_url` directo de Postgres desde un sub-workflow, para cerrar la fabricación de links de PDF (2 clientes reales afectados: cotización 3219 y cotización 3281 / tel. 5548668305). Relacionado: `qualitas-issues#63`, `qualitas-issues#62` (patrón de fabricación).
 
