@@ -102,7 +102,7 @@ soltar.**
 
 | # | Tema | Propuesta |
 |---|---|---|
-| 1 | **Join `lead_id` ↔ identidad conversacional de n8n** | n8n keyea por `conversation_id`/`phone_number`/`session_id`; el claim keyea por `lead_id`. El gate de n8n necesita un join fiable. Engancha con `docs/iniciativas/conversation-id-whatsapp-n8n.md`. **Bloqueante técnico** del punto 4.2. |
+| 1 | **Join `lead_id` ↔ identidad conversacional de n8n** | 🟢 **Ablandado (verificado en vivo 27 jul, PROD):** `whatsapp_sessions.lead_id` (migración 0033) viene poblado en el **100% de las sesiones nuevas** (264/264 últimos 7 días; 493/957 histórico). El gate puede ir sesión resuelta → `lead_id` → claim. Fallback para filas viejas: `ws.quotation_id = l.cotizacion_id` (951/957). Pedida a Juan la confirmación de que el poblado es garantizado (handoff 27 jul, §3.1). El `session_id` de la tabla de claims NO sirve de join: viene del frontend y es nullable. **Bloqueante nuevo encontrado:** grants — `SELECT` sobre `dashboard_conversation_claims` da `permission denied` incluso al usuario `readonly_leads` del Dashboard; la credencial de n8n necesita `GRANT SELECT` (handoff 27 jul, §3.2). |
 | 2 | Humano que se olvida de soltar → IA muda para siempre en ese lead | Auto-release por inactividad del agente (proponer 2–4h) + indicador visible "tomada por X desde HH:MM" en el Inbox. |
 | 3 | Etiquetado del mensaje humano (hoy tipo `ai`) | Marcar en `additional_kwargs` (`sent_by: "human_agent"`, email) para que el system prompt le diga a la IA "algunos turnos previos los mandó un colega humano, respeta sus compromisos". Barato, mejora la reentrada. Tipo sigue siendo `ai`. |
 | 4 | Ventana 24h de Meta | Si el humano toma un lead frío, su mensaje puede chocar con la ventana cerrada → mismo bloqueante de plantilla aprobada que ya arrastramos (Pendientes de infraestructura, CLAUDE.md). |
@@ -122,8 +122,12 @@ del Arquitecto para él:**
    distintos.
 4. Necesitamos el join `lead_id` ↔ `conversation_id` sólido (punto 5.1).
 
-**Pendiente de arranque:** confirmar con Alberto si ya hay borrador escrito de la redefinición
-de Juan o si el Arquitecto lo arranca vía handoff. De aquí cuelga el resto.
+**Pendiente de arranque:** ✅ resuelto 27 jul — Alberto confirmó que **no hay borrador de Juan**;
+el Arquitecto arrancó el handoff: `docs/handoffs/2026-07-27-handoff-juan-control-humano-ia.md`
+(input §6 completo + join/grants del §5.1). **Esperando de Juan:** ✅/❌ al encaje, confirmación
+de `lead_id` garantizado, decisión sobre los GRANT, y su borrador de redefinición.
+⚠️ Recordar el patrón del 16 jul: Juan a veces ejecuta sin avisar — verificar PROD
+periódicamente, no solo esperar respuesta.
 
 ---
 
