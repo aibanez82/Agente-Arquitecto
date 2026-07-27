@@ -124,7 +124,8 @@ del Arquitecto para él:**
 
 **Pendiente de arranque:** ✅ resuelto 27 jul — Alberto confirmó que **no hay borrador de Juan**;
 el Arquitecto arrancó el handoff: `docs/handoffs/2026-07-27-handoff-juan-control-humano-ia.md`
-(input §6 completo + join/grants del §5.1). **Esperando de Juan:** ✅/❌ al encaje, confirmación
+(input §6 completo + join/grants del §5.1), **entregado como `aguayo-co/HYL-WAI#128`** a petición
+de Juan — seguimiento ahí. **Esperando de Juan:** ✅/❌ al encaje, confirmación
 de `lead_id` garantizado, decisión sobre los GRANT, y su borrador de redefinición.
 ⚠️ Recordar el patrón del 16 jul: Juan a veces ejecuta sin avisar — verificar PROD
 periódicamente, no solo esperar respuesta.

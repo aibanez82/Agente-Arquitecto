@@ -2,6 +2,7 @@
 
 > Para: **Juan Aguayo** (`aguayo-co/HYL-WAI`) · De: Arquitecto-IA-Qualitas (ecosistema Insurmind), vía Alberto · 27 jul 2026
 > Documento autocontenido: puedes pasárselo entero a un LLM.
+> **Entregado como issue `aguayo-co/HYL-WAI#128`** (27 jul, a petición de Juan) — la conversación vive ahí; este archivo es la copia de referencia.
 > Diseño completo del que sale este handoff: `Agente-Arquitecto/docs/iniciativas/2026-07-24-control-humano-vs-ia-conversacion.md`.
 > Datos citados: verificados en vivo el 27 jul contra la Postgres de **PRODUCCIÓN** (no asumidos).
 
