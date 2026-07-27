@@ -1,7 +1,7 @@
 # Cambio de conducto — registro de VIN cotizados y control de comisión
 
 > Iniciativa creada: 24 julio 2026.
-> Estado: **diseño aprobado por Alberto, sin construir.** Todo v1 es de nuestro lado (Dashboard), sin depender de Juan ni de Hylant.
+> Estado: **Fase 0 en manos del ejecutor Dashboard — handoff emitido 24 jul y refrescado 27 jul** (post-monorepo: `@repo/db/prod`, rol `dashboard_rw` con GRANTs por tabla, excepción `/api/cron/` en middleware, `vercel.json` en `apps/operacion`, pestaña admin-only). Handoff: `Dashboard_SeguroAuto:docs/2026-07-24-handoff-arquitecto-cambio-de-conducto.md` (rama `stg`, commit `149de4d`). Sin construir aún.
 
 ---
 
