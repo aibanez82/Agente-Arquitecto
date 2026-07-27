@@ -2,7 +2,7 @@
 
 > Autor: Agente Conciliación (Nivel 3) · Fecha: 26 julio 2026
 > Destinatario: **Arquitecto-IA-Qualitas** (vía Alberto).
-> Estado: 🟡 Corrida manual ejecutada y verificada. Cron activado en `stg` — **pendiente de verificación en vivo del Arquitecto antes de mergear a `main`** (donde recién se vuelve efectivo el `schedule:`).
+> Estado: ✅ **Certificado por el Arquitecto (26 jul 2026)** — verificación en vivo hecha y merge `stg`→`main` ejecutado. Cron diario EFECTIVO. Detalle al final del documento.
 
 ## Disparador
 
@@ -46,6 +46,28 @@ Alberto ya decidió esperar tu verificación antes de mergear `stg` → `main` e
 de que yo lo hiciera directo. Cuando la corras, el merge que falta es únicamente el diff de
 `.github/workflows/conciliar.yml` (+ el párrafo nuevo en `CLAUDE.md`) — nada de `src/conciliar.js`
 cambió.
+
+## Verificación del Arquitecto (26 jul 2026) — CERTIFICADO ✅
+
+Verificado en vivo:
+
+1. **Run `30183829981`**: success (job `conciliar`, 3m56s). Hubo además una segunda corrida manual
+   el 26 jul 15:38 UTC (run `30208643776`), también exitosa.
+2. **BD PROD**: 48 pólizas en `qualitas_polizaemitida`, **0 sin recibos** en `conciliacion_pagos`,
+   última `verificado_en` = 26 jul 15:43 UTC (la segunda corrida recogió la póliza 48, emitida hoy).
+3. **Claim del `schedule:` confirmado**: GitHub solo evalúa cron desde la rama default. Correcto.
+4. **Corrección al reporte**: el merge necesario NO era solo el diff de `conciliar.yml`. El
+   `checkout` del workflow no fija ref → en trigger `schedule` corre el código de `main`, y `main`
+   estaba 10 commits atrás (aún tenía el `src/conciliar.js` pre-mapeo del portal). Cherry-pickear
+   solo el yml habría puesto el cron a correr código viejo. Se hizo merge `stg`→`main` **completo**
+   (fast-forward `2e2b987..5a3b9a2`, 10 commits — todos ya probados en las 3 corridas exitosas).
+5. **Estado final**: workflow `Conciliar pagos Quálitas` en state `active` con
+   `schedule: 0 12 * * *` (06:00 CDMX) ya en `main` → **cron diario efectivo desde hoy**.
+   Primera corrida automática esperada: 27 jul 12:00 UTC.
+
+**Lección para futuros workflows con cron**: si un repo usa gitflow `stg`→`main`, el `schedule:`
+solo vive en la rama default Y el checkout sin ref ejecuta esa misma rama — activar un cron "en
+stg" nunca activa nada hasta el merge, y el merge debe llevar el código completo, no solo el yml.
 
 ## Pendiente aparte, sin tocar en esta sesión
 
