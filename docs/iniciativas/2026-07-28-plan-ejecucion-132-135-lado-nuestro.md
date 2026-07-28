@@ -108,6 +108,16 @@ Sobre el freeze `2ede413`. Orden = fases del issue; lo no-conversacional puede a
   Los 4 defectos de la spec confirmados por el Arquitecto contra el export congelado de Fase 0
   (incluye `transaction_id` leído del nivel equivocado → hoy siempre `undefined`). 6→6 nodos,
   3 mutados esperados.
+- **Correcciones de contrato cruzado (28-jul, handoff `2026-07-28-correcciones-contrato-cruzado-django.md`,
+  commit `49049ad` — ejecutar tras Fase 3):** auditoría del Arquitecto sobre el Django real de
+  `origin/stg` HYL-WAI. **C1 BLOQUEANTE Fase 7:** `m:` del payload v2 es `message_token`
+  (`secrets.token_hex(6)`) independiente del hex de `cv:` — nuestro check de igualdad habría
+  matado todo clic v2 en `dual`; se cambia a validación de formato. **C2:** shape real del error
+  de negocio encontrado en `views.py` (`status/code/field/msg/details.reason`) — el guard 30d se
+  alinea. **C3 menor:** v1 real lleva `l:` y `m:`. Confirmado además el body real de Payment
+  (sin `session_id` hoy — la prioridad queda inerte hasta que Juan lo añada; `transaction_id`
+  hardcodeado `txn_test_001` lado Juan). Contraste publicado en #132 + propuesta de checkpoint
+  de contrato cruzado pre-Fase 7.
 - **Fase 4:** Atención Humana dual-safe contra `dashboard_conversation_claims` (gate: paso 2b).
   POST + headerAuth, fencing/epoch, idempotencia durable pre-Meta, historial bajo `session_id`
   canónico, dedupe por `wamid`, retirar GETs mutables.
