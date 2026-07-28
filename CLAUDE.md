@@ -240,7 +240,7 @@ Staging end-to-end paralelo a prod (gitflow `stg`→`main`) para validar bug fix
 | `N8N_TOKEN` hardcodeado como default en `qualitas/views.py:1291` (`enviar_webhook_whatsapp`; el validador `:1041` ya es env-only) | 🔴 **Issue #130 `HYL-WAI`** (27 jul): quitar default, rotar, coordinar con Alberto el cambio simultáneo en credenciales n8n |
 | Cómo saber con certeza si un cliente pagó la póliza | ✅ Resuelto (26 jul) — Agente Conciliación, cron diario. Pendiente: qué hacer con `VENCIDO`/`CANCELADO`. Ver `docs/architecture/estatus-pago-qualitas.md` |
 | Plantilla de Meta aprobada para re-enganche fuera de ventana 24h | ⚠️ Bloqueante para "Recordatorios por fecha mencionada" (arriba) y rescates tipo Bug #12. Pedida a Juan 16 jul, no sometida aún |
-| Exponer `fecha_inicio` en emisión — Issue #114 `HYL-WAI` | ✅ **En PROD 27 jul** (PR #125, release v331 = `43bfaf2`, migraciones 0047–0052 verificadas). Máx. 30 días de diferimiento. Lado n8n construido en STG (`74dab12`, 27 jul): pendiente E2E de Alberto y promoción a PROD. Desbloquea M47/M48 |
+| Exponer `fecha_inicio` en emisión — Issue #114 `HYL-WAI` | ✅ Django en PROD 27 jul (PR #125, v331). **E2E n8n STG validado 28 jul** (pólizas reales, +0 y +30 exacto). Falta: fix prompt límite 30d (`qualitas-issues#66`, define SHA de freeze de #132) y promoción n8n a PROD. Desbloquea M47/M48 |
 | `/api/emitir-externo/` no distingue causa del 400 — Issue #119 HYL-WAI (=#9) | ⏳ Pendiente externo — Juan |
 
 Ítems ya resueltos (PAT de HYL-WAI, creación del repo Agente-n8n, columnas de timestamp en

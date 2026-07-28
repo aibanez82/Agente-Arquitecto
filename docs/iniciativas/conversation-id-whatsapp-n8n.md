@@ -173,3 +173,25 @@ de viabilidad: 118→126 nodos, 12/12 tests en Postgres 17). OK publicado en el 
    `feature/issue-128-n8n-data-relay`) se integra antes o dentro de la rama del port, y
    confirmarlo en el issue. Verificar también vigencia de la API key de n8n STG para el
    export fresco de Fase 0.
+
+## Actualización 28 jul 2026 (madrugada) — reparto confirmado, ruta 2 decidida, freeze pendiente de un SHA
+
+Juan confirmó en #132 el reparto propuesto (él: transform+precondiciones+tests; Agente-n8n:
+port sobre export vivo + deploy STG + sync git), aceptó pin data + Execute Workflow como
+integración STG (trigger Meta real = gate pre-PROD), y ya trabaja en su rama
+`fix/issue-132-whatsapp-dual-safe-port` (Django).
+
+**Decisión nuestra publicada (comentario 5100117924): ruta 2** — se congela `origin/stg`
+tal cual; el transform supersede `efcd374`. Evidencia: `efcd374` no existe en ninguna rama
+remota; la base de Atención Humana está íntegra en `origin/stg` (c19f12b, e139341, 779bcbc
+verificados como ancestros); la Fase 4 del port la reconstruye con requisitos más estrictos.
+
+**E2E #114 (fecha_inicio) validado la misma noche:** póliza 7620099607 (inicio hoy) y
+7620099608 (inicio +30 exacto, FechaInicio 2026-08-26 en XML). Hallazgo: pre-validación
+del límite 30 días por LLM inconsistente (+31 la aplicó, +49 prometió fecha imposible;
+recuperación digna ante el rechazo real del WS) → `qualitas-issues#66`. Fix de prompt
+en curso (Agente n8n); **ese commit define el SHA de freeze** — confirmarlo en #132 y
+desde ahí NO pushear más a `stg` hasta que exista la rama del port.
+
+Colateral: 2 leads con póliza emitida quedaron en `estado=COTIZACION_INICIADA` (601, 602,
+STG) — confirmación en vivo del gap de #135 §3.1 (emitir-externo no actualiza Lead.estado).
