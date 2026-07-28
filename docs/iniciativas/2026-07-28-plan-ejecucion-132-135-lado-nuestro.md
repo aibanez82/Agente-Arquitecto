@@ -121,9 +121,15 @@ Sobre el freeze `2ede413`. Orden = fases del issue; lo no-conversacional puede a
   (sin `session_id` hoy — la prioridad queda inerte hasta que Juan lo añada; `transaction_id`
   hardcodeado `txn_test_001` lado Juan). Contraste publicado en #132 + propuesta de checkpoint
   de contrato cruzado pre-Fase 7.
-- **Fase 4:** Atención Humana dual-safe contra `dashboard_conversation_claims` (gate: paso 2b).
-  POST + headerAuth, fencing/epoch, idempotencia durable pre-Meta, historial bajo `session_id`
-  canónico, dedupe por `wamid`, retirar GETs mutables.
+- **Fase 4:** 🔵 handoff entregado (28-jul, `Agente-n8n:handoffs/2026-07-28-fase4-atencion-humana-dual-safe.md`,
+  commit `d3d27c9`; ejecutar tras C1-C3) — Atención Humana dual-safe contra
+  `dashboard_conversation_claims` (gate paso 2b ✅). 3 webhooks GET sin auth → POST+headerAuth
+  (mismos webhookIds), mutación solo por `session_id` con claim validado (control_id+epoch),
+  liberar con fencing anti-stale, envío §10.4 (teléfono desde la fila, ledger
+  `dashboard_outbound_dispatch` con reserva pre-Meta, `provider_message_id`, historial canónico
+  con `sent_by=human_agent`), dedupe inbound por `wamid` (única mutación de Main), precedencia
+  humano/Metepec/terminal. Resuelve `qualitas-issues#57`. Ventana Fase 7 necesitará: credencial
+  headerAuth nueva + secreto al Dashboard + tabla en STG.
 - **Fase 5:** Metepec dual-safe (liberación POST autenticada por `session_id` exacto).
 - **Fase 6:** 🟡 adelanto certificado (28-jul, commit `be4bd50`, 33/33): harness PG17 local con
   DDL real de STG, fixtures, concurrencia determinística y baseline de caracterización.
