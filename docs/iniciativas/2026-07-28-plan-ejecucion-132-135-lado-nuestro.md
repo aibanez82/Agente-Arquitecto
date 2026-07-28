@@ -91,7 +91,12 @@ Sobre el freeze `2ede413`. Orden = fases del issue; lo no-conversacional puede a
   POST + headerAuth, fencing/epoch, idempotencia durable pre-Meta, historial bajo `session_id`
   canónico, dedupe por `wamid`, retirar GETs mutables.
 - **Fase 5:** Metepec dual-safe (liberación POST autenticada por `session_id` exacto).
-- **Fase 6:** suites offline + Postgres 17 local con concurrencia. *(no bloqueada por #67)*
+- **Fase 6:** 🟡 adelanto certificado (28-jul, commit `be4bd50`, 33/33): harness PG17 local con
+  DDL real de STG, fixtures, concurrencia determinística y baseline de caracterización.
+  **Inventario §9.1 completado:** `idx_whatsapp_sessions_phone_number UNIQUE` es el único
+  bloqueador físico del multi-sesión (los índices objetivo ya existen en STG); retiro propuesto
+  en la ventana Fase 7→8 con Django en `shadow` (comentado en #132). Bug 521/52 confirmado con
+  datos. Suites completas cuando existan Fases 2-5.
 - **Fase 7:** re-descarga inmediata pre-deploy, transform sobre contenido vivo, PUT
   `{name, nodes, connections, settings}`, verificar webhookIds intactos, GET posterior → git.
   Main y Payment coordinados, sin ventana larga de contratos distintos.
