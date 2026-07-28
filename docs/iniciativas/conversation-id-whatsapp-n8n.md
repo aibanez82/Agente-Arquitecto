@@ -154,3 +154,22 @@ arquitectura de funnel Fase 1. Reafirma: #132 bloqueante de `dual`, rollback sie
 (STG shadow → E2E → STG dual → ventana de observación → PROD shadow → PROD dual →
 `enforced` como iniciativa separada). Revisión del Arquitecto publicada con 4 puntos
 previos al sign-off. Detalle: `docs/2026-07-27-revision-plan-funnel-fase1-hyl-wai-135.md`.
+
+## Actualización 28 jul 2026 — conformidad del Arquitecto con #132, con 4 acuerdos previos
+
+Revisado el plan completo de #132 (8 fases, port por objetos desde export vivo, evidencia
+de viabilidad: 118→126 nodos, 12/12 tests en Postgres 17). OK publicado en el issue
+(https://github.com/aguayo-co/HYL-WAI/issues/132#issuecomment-5099851034) condicionado a
+4 acuerdos de arranque:
+
+1. **Reparto de ejecución** (la decisión de fondo): Juan aporta transform+tests; el
+   port/deploy STG y sync a git los ejecuta nuestro lado (Agente-n8n), según §24.2 de #135.
+   Pendiente de confirmación de Juan.
+2. **Fase 0 vs #114:** el congelamiento del target (`74dab12`) debe incluir o esperar al
+   E2E pendiente de #114 — mismo SHA.
+3. **Fase 8:** E2E en STG será con pin data + Execute Workflow (no hay trigger real de
+   Meta en STG — 1 trigger por Facebook App); pedimos reflejarlo en el plan de pruebas.
+4. **Deuda nuestra esta semana:** decidir si la rama del relay humano (`efcd374` /
+   `feature/issue-128-n8n-data-relay`) se integra antes o dentro de la rama del port, y
+   confirmarlo en el issue. Verificar también vigencia de la API key de n8n STG para el
+   export fresco de Fase 0.
