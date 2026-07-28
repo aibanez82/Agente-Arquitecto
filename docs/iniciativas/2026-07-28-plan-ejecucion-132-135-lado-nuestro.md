@@ -100,8 +100,14 @@ Sobre el freeze `2ede413`. Orden = fases del issue; lo no-conversacional puede a
   shape del error de negocio del guard es aproximación razonada (nunca se capturó un body real de
   Django). Reporte: `Agente-n8n:docs/2026-07-28-fase2-reporte-guards-y-folio.md`. `#66` sigue
   abierto hasta deploy (Fase 7) + re-test.
-- **Fase 3:** Payment exacto (prioridad `conversation_id → session_id → cotización+teléfono`,
-  `candidate_count = 1`, siempre `outcome`/`updated_count`).
+- **Fase 3:** 🔵 handoff entregado (28-jul, `Agente-n8n:handoffs/2026-07-28-fase3-payment-exacto.md`,
+  commit `c5ae46b` en la rama del port) — Payment exacto: prioridad
+  `conversation_id → session_id → cotización+teléfono` sin degradación ante contradicción,
+  `candidate_count = 1`, una sola fila física por sentencia (ctid/CTE), siempre
+  `outcome`/`updated_count` (la notificación WA se envía SIEMPRE — el pago ya viene verificado).
+  Los 4 defectos de la spec confirmados por el Arquitecto contra el export congelado de Fase 0
+  (incluye `transaction_id` leído del nivel equivocado → hoy siempre `undefined`). 6→6 nodos,
+  3 mutados esperados.
 - **Fase 4:** Atención Humana dual-safe contra `dashboard_conversation_claims` (gate: paso 2b).
   POST + headerAuth, fencing/epoch, idempotencia durable pre-Meta, historial bajo `session_id`
   canónico, dedupe por `wamid`, retirar GETs mutables.
