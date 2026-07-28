@@ -233,7 +233,7 @@ Staging end-to-end paralelo a prod (gitflow `stg`→`main`) para validar bug fix
 |---|---|
 | Rotar service account key Google Cloud (`ba36b46f377b...`) | ⚠️ Urgente |
 | Regenerar token Meta Business API | ⚠️ Urgente |
-| Corrección Bug #7 en Django — Juan Aguayo (Issue #69 `aguayo-co/HYL-WAI`) | ⏳ Pendiente externo |
+| Bug #7 / Issue #69 `HYL-WAI` — fix es lado n8n (IA emite `[phase:completed]`, se guarda sin pago verificado) | 🔴 **Nuestro** desde 2 jul (renombrado por Juan 27 jul) → Agente n8n |
 | Corrección Bug #8 en Django — Juan Aguayo (Issue #70 `aguayo-co/HYL-WAI`) | ⏳ Pendiente externo |
 | Política de backup automático de workflows n8n | 🔴 Deshabilitado desde 6 jul (401, key vencida). Re-exportado a mano 22 jul (drift había llegado a 107 nodos PROD vs 61 local). Reactivar tras rotar la key. Detalle: `docs/architecture/backup-policy-n8n.md` |
 | Propuesta arquitectura BD — tabla canónica `whatsapp_event` | 💡 Plan de destino, sin decisión de implementar. Detalle: `docs/architecture/whatsapp-event-canonico-propuesta.md` |
