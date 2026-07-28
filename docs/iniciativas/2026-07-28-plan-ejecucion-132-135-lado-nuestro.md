@@ -76,9 +76,13 @@ Sobre el freeze `2ede413`. Orden = fases del issue; lo no-conversacional puede a
   frescos de los 6 workflows vivos, drift check LIMPIO (verificado independientemente por el
   Arquitecto, 6/6), snapshot `docs/2026-07-28-fase0-snapshot-pre-port.md` (commit `b829b53`).
   Main 118 nodos / Payment 6, webhookIds y credenciales registrados.
-- **Fase 1:** 🔵 en curso (handoff `2026-07-28-fase1-port-issue-132.md`, 28-jul) — transform reproducible con precondiciones (aborta si cambió lo que va a tocar);
-  adaptar `RESOLVE_SESSION_QUERY` conservando `human_takeover` y `metepec_derived`;
-  expectativas Main 118→126 nodos, Payment 6→6; usar `75e1de3` y `efcd374` SOLO como referencia.
+- **Fase 1:** 🟡 parcial certificada (28-jul, commit `4db0f02`, 22/22 tests verificados por el
+  Arquitecto): infra completa del transform (fingerprint/precondiciones/allowlist-diff/
+  idempotencia) + garantía verificada de flags en la lógica actual. **Bloqueo:** `75e1de3` y
+  `efcd374` no existen en ninguna ref remota ni clon de esta máquina (solo clones locales de
+  otra máquina) → el port real de `Resolve Session` (118→126) espera la referencia. En paralelo:
+  petición a Juan publicada en #132 (28-jul) + Alberto busca su clon local. Plan C si ambos
+  fallan: derivar los 8 nodos de la spec de Fase 2 del issue.
 - **Fase 2:** Main — identidad/afinidad estrictas, fail-closed, `affinity_updated === 1`,
   folio exacto. Incluye el **guard determinístico de 30 días** (etapa 2 de #66).
 - **Fase 3:** Payment exacto (prioridad `conversation_id → session_id → cotización+teléfono`,
