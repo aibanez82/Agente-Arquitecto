@@ -100,14 +100,17 @@ Sobre el freeze `2ede413`. Orden = fases del issue; lo no-conversacional puede a
   shape del error de negocio del guard es aproximación razonada (nunca se capturó un body real de
   Django). Reporte: `Agente-n8n:docs/2026-07-28-fase2-reporte-guards-y-folio.md`. `#66` sigue
   abierto hasta deploy (Fase 7) + re-test.
-- **Fase 3:** 🔵 handoff entregado (28-jul, `Agente-n8n:handoffs/2026-07-28-fase3-payment-exacto.md`,
-  commit `c5ae46b` en la rama del port) — Payment exacto: prioridad
-  `conversation_id → session_id → cotización+teléfono` sin degradación ante contradicción,
-  `candidate_count = 1`, una sola fila física por sentencia (ctid/CTE), siempre
-  `outcome`/`updated_count` (la notificación WA se envía SIEMPRE — el pago ya viene verificado).
-  Los 4 defectos de la spec confirmados por el Arquitecto contra el export congelado de Fase 0
-  (incluye `transaction_id` leído del nivel equivocado → hoy siempre `undefined`). 6→6 nodos,
-  3 mutados esperados.
+- **Fase 3 ✅ (28-jul, `1b26d79`):** Payment exacto — **111/111 reproducidos por el Arquitecto
+  en ambos flavors** (actual: 108 pass + 3 skip; objetivo: 110 pass + 1 skip) + verificación
+  estructural independiente (6→6, los 3 mutados declarados, 3 byte-idénticos, webhookIds/
+  credenciales/conexiones intactos). SQL: una sola sentencia `WITH…UPDATE…RETURNING` con `ctid`,
+  tiers que estructuralmente no degradan, sin fallback por teléfono solo, 4 outcomes, guard
+  `status IS DISTINCT FROM 'completed'` (aprobado: un retry no pisa `closed_at`), outcome final
+  derivado del `updated_count` real (perdedor de carrera reporta `no_candidate`, nunca `updated`
+  falso). Notificación WA se envía siempre (default acordado; Django no reintenta webhooks de
+  pago en la práctica). Reporte: `Agente-n8n:docs/2026-07-28-fase3-reporte-port-issue-132.md`.
+  **Siguiente en la rama:** correcciones de contrato cruzado C1-C3 (`49049ad`, sin empezar) —
+  C1 bloqueante para Fase 7.
 - **Correcciones de contrato cruzado (28-jul, handoff `2026-07-28-correcciones-contrato-cruzado-django.md`,
   commit `49049ad` — ejecutar tras Fase 3):** auditoría del Arquitecto sobre el Django real de
   `origin/stg` HYL-WAI. **C1 BLOQUEANTE Fase 7:** `m:` del payload v2 es `message_token`
