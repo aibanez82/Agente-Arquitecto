@@ -82,9 +82,10 @@ Sobre el freeze `2ede413`. Orden = fases del issue; lo no-conversacional puede a
   Arquitecto): infra completa del transform (fingerprint/precondiciones/allowlist-diff/
   idempotencia) + garantía verificada de flags en la lógica actual. **Bloqueo:** `75e1de3` y
   `efcd374` no existen en ninguna ref remota ni clon de esta máquina (solo clones locales de
-  otra máquina) → el port real de `Resolve Session` (118→126) espera la referencia. En paralelo:
-  petición a Juan publicada en #132 (28-jul) + Alberto busca su clon local. Plan C si ambos
-  fallan: derivar los 8 nodos de la spec de Fase 2 del issue.
+  otra máquina) → el port real de `Resolve Session` (118→126) espera la referencia. **Plan C activado (28-jul):**
+  búsqueda de clones agotada en todas las máquinas y Juan sin responder → se reconstruye desde
+  la spec (handoff `2026-07-28-fase1c-resolve-session-desde-spec.md`; anunciado en #132 — el
+  material de Juan, si llega, pasa a ser contraste de revisión).
 - **Fase 2:** Main — identidad/afinidad estrictas, fail-closed, `affinity_updated === 1`,
   folio exacto. Incluye el **guard determinístico de 30 días** (etapa 2 de #66).
 - **Fase 3:** Payment exacto (prioridad `conversation_id → session_id → cotización+teléfono`,
