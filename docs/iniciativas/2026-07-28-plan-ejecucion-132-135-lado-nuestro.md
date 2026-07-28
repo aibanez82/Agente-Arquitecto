@@ -86,8 +86,12 @@ Sobre el freeze `2ede413`. Orden = fases del issue; lo no-conversacional puede a
   búsqueda de clones agotada en todas las máquinas y Juan sin responder → se reconstruye desde
   la spec (handoff `2026-07-28-fase1c-resolve-session-desde-spec.md`; anunciado en #132 — el
   material de Juan, si llega, pasa a ser contraste de revisión).
-- **Fase 2:** Main — identidad/afinidad estrictas, fail-closed, `affinity_updated === 1`,
-  folio exacto. Incluye el **guard determinístico de 30 días** (etapa 2 de #66).
+- **Fase 1-C ✅ (28-jul, `82c01c4`):** Resolve Session portado desde la spec — 118→123 nodos
+  (+5 justificados), 62/62 tests en ambos flavors **reproducidos por el Arquitecto**, diff
+  canónico limpio. 5 decisiones de diseño documentadas en #132 para contraste de Juan.
+- **Fase 2:** 🔵 en curso (handoff `2026-07-28-fase2-guards-y-folio.md`) — guard determinístico
+  de 30 días (etapa 2 de #66), Intent Router/rama KB con contexto (#68, capa prompt para Fase 8
+  + capa determinística), folio exacto consumido como selección.
 - **Fase 3:** Payment exacto (prioridad `conversation_id → session_id → cotización+teléfono`,
   `candidate_count = 1`, siempre `outcome`/`updated_count`).
 - **Fase 4:** Atención Humana dual-safe contra `dashboard_conversation_claims` (gate: paso 2b).
