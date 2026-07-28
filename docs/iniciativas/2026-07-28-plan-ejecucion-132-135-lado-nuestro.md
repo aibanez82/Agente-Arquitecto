@@ -89,9 +89,17 @@ Sobre el freeze `2ede413`. Orden = fases del issue; lo no-conversacional puede a
 - **Fase 1-C ✅ (28-jul, `82c01c4`):** Resolve Session portado desde la spec — 118→123 nodos
   (+5 justificados), 62/62 tests en ambos flavors **reproducidos por el Arquitecto**, diff
   canónico limpio. 5 decisiones de diseño documentadas en #132 para contraste de Juan.
-- **Fase 2:** 🔵 en curso (handoff `2026-07-28-fase2-guards-y-folio.md`) — guard determinístico
-  de 30 días (etapa 2 de #66), Intent Router/rama KB con contexto (#68, capa prompt para Fase 8
-  + capa determinística), folio exacto consumido como selección.
+- **Fase 2 ✅ (28-jul, `5d7c685`):** guards y folio — **78/78 reproducidos por el Arquitecto en
+  ambos flavors** (actual: 75 pass + 3 skip; objetivo: 77 pass + 1 skip). Guard 30 días (etapa 2
+  de #66): `Issue Policy` convertido a `toolWorkflow` → sub-workflow `Issue Policy Guard (STG)`
+  (5 nodos, fuera de Main; Main sigue 118→123), "hoy" siempre CDMX en código, el jsCode del nodo
+  es literalmente el `fn.toString()` de las funciones testeadas offline. #68 dos capas: ejemplo
+  GNP en Intent Router (validación conversacional → Fase 8) + contexto de sesión y regla 13 en
+  RAG IA Agent (cero nodos nuevos). Folio: consumido como selección, nunca llega crudo al agente;
+  entrada con pinta de folio pero ajena a este teléfono = terminal. ⚠️ Para contraste de Juan: el
+  shape del error de negocio del guard es aproximación razonada (nunca se capturó un body real de
+  Django). Reporte: `Agente-n8n:docs/2026-07-28-fase2-reporte-guards-y-folio.md`. `#66` sigue
+  abierto hasta deploy (Fase 7) + re-test.
 - **Fase 3:** Payment exacto (prioridad `conversation_id → session_id → cotización+teléfono`,
   `candidate_count = 1`, siempre `outcome`/`updated_count`).
 - **Fase 4:** Atención Humana dual-safe contra `dashboard_conversation_claims` (gate: paso 2b).
