@@ -120,7 +120,11 @@ Sobre el freeze `2ede413`. Orden = fases del issue; lo no-conversacional puede a
   alinea. **C3 menor:** v1 real lleva `l:` y `m:`. Confirmado además el body real de Payment
   (sin `session_id` hoy — la prioridad queda inerte hasta que Juan lo añada; `transaction_id`
   hardcodeado `txn_test_001` lado Juan). Contraste publicado en #132 + propuesta de checkpoint
-  de contrato cruzado pre-Fase 7.
+  de contrato cruzado pre-Fase 7. **✅ C1-C3 aplicadas y certificadas (28-jul, `9a27ef5`;
+  112 tests: actual 109+3 skip, objetivo 111+1 skip, 0 fallos, reproducidos por el Arquitecto;
+  verificado en el output generado: check de igualdad `m:` eliminado → formato 12-hex, shape
+  `status/code/field` en el guard). C3 documentada como no viable sin mutar `Session Context
+  Builder` congelado (v1 no expone `leadId`) — aceptado.**
 - **Fase 4:** 🔵 handoff entregado (28-jul, `Agente-n8n:handoffs/2026-07-28-fase4-atencion-humana-dual-safe.md`,
   commit `d3d27c9`; ejecutar tras C1-C3) — Atención Humana dual-safe contra
   `dashboard_conversation_claims` (gate paso 2b ✅). 3 webhooks GET sin auth → POST+headerAuth
