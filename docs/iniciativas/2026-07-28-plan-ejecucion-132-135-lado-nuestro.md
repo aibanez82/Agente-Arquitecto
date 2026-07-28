@@ -55,7 +55,9 @@ Regla del activador verificada contra PROD: ordinal `1-` + `tipo_movimiento='POL
 `estado='PAGADO'` + `fecha_pago IS NOT NULL` (22/22 pagados cumplen). Caso borde: endosos
 `Adicional` con su propio `1-` (póliza 7620098864) → el reconciliador los reporta como conflicto.
 Cron GH Actions 06:00 CDMX; reconciliador ≥13:00 UTC + gate por `max(verificado_en)`.
-Pendiente nuestro: crear `conciliacion_pagos` + fixture en STG y coordinar rol del GRANT por privado.
+✅ `conciliacion_pagos` creada en STG (28-jul) con fixture sintético de los 4 casos del contrato
+(versionado en `Agente-Conciliacion:fixtures/stg-conciliacion-pagos-fixture.sql`, confirmado a
+Juan en #135). GRANT = no-op en STG mono-rol; real en PROD con credenciales dedicadas.
 
 ### 2b. Evolución de `dashboard_conversation_claims` — ✅ handoff entregado (28-jul)
 Verificado en STG: tabla existe con esquema mínimo (sin control_id/epoch/state, session_id NULL,
