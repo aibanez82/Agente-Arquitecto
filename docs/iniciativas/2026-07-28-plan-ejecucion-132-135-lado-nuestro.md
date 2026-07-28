@@ -62,9 +62,11 @@ Verificado en STG: tabla existe con esquema mínimo (sin control_id/epoch/state,
 6 filas); en PROD no existe. Handoff completo (DDL aditiva, backfill, índices de control activo
 único, grants, endpoints Tomar/Liberar con fencing, doble escritura con `human_takeover`) en
 `~/claude-projects/Dashboard_SeguroAuto/handoffs/2026-07-28-evolucion-dashboard-conversation-claims.md`
-(rama `stg` del repo Dashboard). Falta: ejecutarlo (Agente Dashboard) y verificación en vivo del Arquitecto.
-
-- [ ] Confirmar schema/grants en #132/#135 tras la ejecución — precondición de los tests SQL de la Fase 4.
+(rama `stg` del repo Dashboard). ✅ **Ejecutado y certificado (28-jul):** esquema completo con
+fencing en STG, zombis saneados, endpoints por `control_id`+`epoch`; corrección del Arquitecto
+(released_at en revoked + drop índice legacy). STG es mono-rol → grants = no-op hasta credenciales
+dedicadas (ventana #130). Gate de Fase 4 confirmado a Juan en #132. Hallazgo: `human_takeover` lo
+escribe solo n8n vía GET por teléfono → evidencia en `qualitas-issues#57`, se resuelve en Fase 4.
 
 ## Paso 3 — Port dual-safe (#132) — Agente-n8n, handoff del Arquitecto
 
