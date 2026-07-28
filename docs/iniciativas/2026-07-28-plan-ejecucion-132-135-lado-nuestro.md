@@ -57,14 +57,6 @@ Regla del activador verificada contra PROD: ordinal `1-` + `tipo_movimiento='POL
 Cron GH Actions 06:00 CDMX; reconciliador ≥13:00 UTC + gate por `max(verificado_en)`.
 Pendiente nuestro: crear `conciliacion_pagos` + fixture en STG y coordinar rol del GRANT por privado.
 
-Juan necesita saber cómo identifica la tabla el **recibo inicial/activador** (`numero_recibo`,
-`tipo_movimiento` u otra regla) antes de escribir el reconciliador, y coordinar su ejecución
-después del cron Q360.
-- [ ] Arquitecto revisa esquema real de `conciliacion_pagos` + `docs/architecture/estatus-pago-qualitas.md`
-      y el protocolo del Agente Conciliación; si falta la semántica de recibo, handoff al Agente Conciliación.
-- [ ] Publicar el contrato en #135 (columnas, regla del recibo activador, hora del cron para
-      encadenar el reconciliador).
-
 ### 2b. Evolución de `dashboard_conversation_claims` — ✅ handoff entregado (28-jul)
 Verificado en STG: tabla existe con esquema mínimo (sin control_id/epoch/state, session_id NULL,
 6 filas); en PROD no existe. Handoff completo (DDL aditiva, backfill, índices de control activo
@@ -72,12 +64,7 @@ Verificado en STG: tabla existe con esquema mínimo (sin control_id/epoch/state,
 `~/claude-projects/Dashboard_SeguroAuto/handoffs/2026-07-28-evolucion-dashboard-conversation-claims.md`
 (rama `stg` del repo Dashboard). Falta: ejecutarlo (Agente Dashboard) y verificación en vivo del Arquitecto.
 
-#128/#135 fijan: Dashboard escribe, n8n lee, Django lee (schedulers). Contrato mínimo §10.2:
-`control_id`, `lead_id`, `session_id` exacto, `conversation_id`, cotización, owner, `epoch`
-monotónico, `state`, timestamps. Juan preguntó quién coordina: **nosotros** (Agente Dashboard).
-- [ ] Arquitecto redacta handoff al Agente Dashboard: DDL de evolución del claim + constraints
-      (un control activo por hilo) + `GRANT SELECT` a los roles de n8n y Django (primero STG).
-- [ ] Confirmar schema/grants en #132/#135 — es precondición de los tests SQL de la Fase 4.
+- [ ] Confirmar schema/grants en #132/#135 tras la ejecución — precondición de los tests SQL de la Fase 4.
 
 ## Paso 3 — Port dual-safe (#132) — Agente-n8n, handoff del Arquitecto
 
