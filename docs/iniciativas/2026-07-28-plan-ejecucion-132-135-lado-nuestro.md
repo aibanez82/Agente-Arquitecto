@@ -99,6 +99,10 @@ Sobre el freeze `2ede413`. Orden = fases del issue; lo no-conversacional puede a
   bloqueador físico del multi-sesión (los índices objetivo ya existen en STG); retiro propuesto
   en la ventana Fase 7→8 con Django en `shadow` (comentado en #132). Bug 521/52 confirmado con
   datos. Suites completas cuando existan Fases 2-5.
+  **Fase 6b (28-jul, `fbf02ca`):** dos sabores de schema — `actual/` (DDL real STG) y `objetivo/`
+  (sin el índice único de teléfono; diff verificado por el Arquitecto: es el ÚNICO cambio),
+  fixture "dos sesiones mismo teléfono" ejercitando la desambiguación real (match_count=2),
+  detección de flavor en runtime vía pg_indexes. 34 tests (33 pass + 1 skip por flavor).
 - **Fase 7:** re-descarga inmediata pre-deploy, transform sobre contenido vivo, PUT
   `{name, nodes, connections, settings}`, verificar webhookIds intactos, GET posterior → git.
   Main y Payment coordinados, sin ventana larga de contratos distintos.
