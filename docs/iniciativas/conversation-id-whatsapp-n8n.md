@@ -145,3 +145,12 @@ y rollback probado a `shadow`.
 ⚠️ Este issue NO aparece en el barrido de HYL-WAI (no está asignado a `aibanez82` ni lo
 menciona con `@`) — seguirlo desde aquí. El "luz verde para pedir a Juan el cambio a
 `dual`" de la fase 3 queda supeditado a que #132 se resuelva.
+
+## Actualización 27-28 jul 2026 — HYL-WAI #135: plan de funnel Fase 1 enmarca esta iniciativa
+
+Juan abrió `aguayo-co/HYL-WAI#135` (asignado a `aibanez82`) con el plan actualizado de
+arquitectura de funnel Fase 1. Reafirma: #132 bloqueante de `dual`, rollback siempre
+`dual → shadow` (nunca directo a `legacy`), y define el Track C de rollout
+(STG shadow → E2E → STG dual → ventana de observación → PROD shadow → PROD dual →
+`enforced` como iniciativa separada). Revisión del Arquitecto publicada con 4 puntos
+previos al sign-off. Detalle: `docs/2026-07-27-revision-plan-funnel-fase1-hyl-wai-135.md`.
