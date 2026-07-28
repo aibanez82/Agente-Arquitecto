@@ -25,3 +25,13 @@ Alberto actualiza docs/n8n-workflows/ en Agente-Arquitecto
 **Punto de atención:** como Agente n8n no tiene clonado este repo, el JSON que modifica vive solo en su propio repo hasta que Alberto lo reimporta a producción y lo vuelve a traer aquí. Si se salta el último paso, `docs/n8n-workflows/` en este repo queda desactualizado respecto a lo que corre en producción — mismo riesgo que ya existía con el backup manual (ver `docs/architecture/backup-policy-n8n.md`).
 
 **✅ Nombre de repo confirmado:** `aibanez82/Agente-n8n` (con guion). Clonado en local en `~/claude-projects/Agente-n8n` (8 jul) y con push directo habilitado — mismo `gh auth` (scope `repo`) que el resto de los repos de esta cuenta, sin setup adicional. Esto cierra el gap de "no tengo escritura en ese repo": ahora puedo dejar handoffs directamente en `Agente-n8n/handoffs/` en vez de depender de que Alberto los copie.
+
+
+## Regla de concurrencia en el clon local (28 jul 2026)
+
+El Arquitecto y el Agente n8n comparten `~/claude-projects/Agente-n8n` en la misma máquina.
+Detectado durante la Fase 0 del port de HYL-WAI#132: un checkout del Arquitecto cambió la rama
+del working tree mientras el Agente n8n trabajaba (riesgo real de carrera; esa vez sin pérdida).
+Regla desde entonces: **el Arquitecto no opera directamente sobre ese clon** — usa un
+`git worktree` propio (p. ej. en su scratchpad) para leer/commitear en paralelo, y solo el
+Agente n8n toca el working tree principal.

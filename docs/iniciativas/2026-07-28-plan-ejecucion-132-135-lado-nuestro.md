@@ -70,10 +70,11 @@ Verificado en STG: tabla existe con esquema mínimo (sin control_id/epoch/state,
 
 Sobre el freeze `2ede413`. Orden = fases del issue; lo no-conversacional puede arrancar ya.
 
-- **Fase 0:** export fresco de los 4 workflows vivos STG (Main, Payment, Atención Humana,
-  Metepec), drift check contra git, registrar hashes/IDs/webhookIds/credenciales. Crear rama
-  del port desde el freeze. *(no bloqueada por #67)*
-- **Fase 1:** transform reproducible con precondiciones (aborta si cambió lo que va a tocar);
+- **Fase 0:** ✅ (28-jul) rama `feature/issue-132-port-dual-safe` desde `2ede413`; exports
+  frescos de los 6 workflows vivos, drift check LIMPIO (verificado independientemente por el
+  Arquitecto, 6/6), snapshot `docs/2026-07-28-fase0-snapshot-pre-port.md` (commit `b829b53`).
+  Main 118 nodos / Payment 6, webhookIds y credenciales registrados.
+- **Fase 1:** 🔵 en curso (handoff `2026-07-28-fase1-port-issue-132.md`, 28-jul) — transform reproducible con precondiciones (aborta si cambió lo que va a tocar);
   adaptar `RESOLVE_SESSION_QUERY` conservando `human_takeover` y `metepec_derived`;
   expectativas Main 118→126 nodos, Payment 6→6; usar `75e1de3` y `efcd374` SOLO como referencia.
 - **Fase 2:** Main — identidad/afinidad estrictas, fail-closed, `affinity_updated === 1`,
