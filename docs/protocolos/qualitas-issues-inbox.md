@@ -59,3 +59,29 @@ No reemplaza la función de tracker de bugs técnicos ya documentada en CLAUDE.m
 la complementa. Un issue capturado vía `QUALITAS:` puede terminar siendo, tras
 triangulación, un bug técnico que se queda en este mismo repo con su ciclo normal
 (abrir → agente ejecutor → Arquitecto certifica → cierra).
+
+## Extensión (27 jul 2026) — barrido de issues entrantes de Juan en HYL-WAI
+
+Juan también nos abre trabajo directamente en su repo (`aguayo-co/HYL-WAI`), asignando
+el issue a `aibanez82` (caso real que motivó esto: #126, estados de entrega de Meta,
+abierto y asignado el 27 jul — nos enteramos porque Juan lo mencionó, no por el tracker).
+
+**En el mismo momento del barrido de inbox** (inicio de sesión o "revisa QUALITAS"),
+ejecutar también:
+
+```
+gh issue list --repo aguayo-co/HYL-WAI --assignee aibanez82 --state open
+gh search issues --repo aguayo-co/HYL-WAI --mentions aibanez82 --state open
+```
+
+- El primero trae lo formalmente asignado a Alberto; el segundo, issues donde Juan
+  nos menciona sin asignar.
+- Para cada issue nuevo (no registrado aún en `docs/iniciativas/` ni en CLAUDE.md):
+  leerlo completo, diagnosticar, responder en el issue si procede, y registrar la
+  iniciativa en git — mismo tratamiento que una captura del inbox.
+- Los issues ya conocidos solo se revisan si tienen comentarios nuevos de Juan
+  (`gh issue view <n> --comments` cuando la fecha de actualización sea posterior al
+  último registro nuestro).
+
+Esto NO sustituye la regla de "Verificar PROD cuando Juan ejecuta": Juan puede cerrar
+o avanzar cosas sin comentar — el barrido detecta lo que abre, no lo que despliega.
