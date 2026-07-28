@@ -37,17 +37,26 @@ Estado real: el refuerzo del límite 30 días YA está en `origin/stg` (`8950106
 de Issue Policy; el systemMessage ya lo tenía de #114) y aplicado al workflow vivo de STG.
 HEAD actual de `origin/stg`: `2ede413` (los 2 commits post-fix son solo scripts/docs).
 
-- [ ] Re-test caso +49 días ("15 de septiembre") en STG — **bloqueado por #67**.
-- [ ] Si pasa: comentar en HYL-WAI#132 el **SHA de freeze = `2ede413`** y declarar `stg` congelada
-      (no más push hasta que exista la rama del port).
-- [ ] Cerrar etapa 1 de `qualitas-issues#66` (etapa 2 = guard determinístico, va dentro del port, Fase 2).
-- [ ] Acusar recibo en #132 de la corrección de reparto (todo n8n nuestro).
+- [x] #67 cerrado 28-jul (Alberto subió el límite; verificado API 200 + bot PROD responde).
+- [x] Re-test caso +49 en STG (28-jul): **FALLO** — el guard de prompt volvió a aceptar +49.
+      Etapa 1 declarada insuficiente; etapa 2 (guard determinístico) va en Fase 2 del port.
+      Evidencia en `qualitas-issues#66`. Hallazgo colateral: `qualitas-issues#68` (Intent Router
+      rutea "tengo póliza con GNP" a kb_query → RAG responde sin contexto) — también al port.
+- [x] **Freeze confirmado en HYL-WAI#132: SHA `2ede413`** (28-jul). `stg` congelada — no más push
+      hasta que exista la rama del port. Reparto corregido acusado en el mismo comentario.
+- [ ] `qualitas-issues#66` queda abierto hasta la etapa 2 (dentro del port).
 
 Ejecuta: Arquitecto (comentarios) + Alberto (re-test manual por WhatsApp STG).
 
 ## Paso 2 — Contratos pendientes que Juan espera (no bloqueados, paralelos)
 
-### 2a. Contrato de `conciliacion_pagos` (para #129 / §15.2 de #135)
+### 2a. Contrato de `conciliacion_pagos` — ✅ publicado en #135 (28-jul)
+Regla del activador verificada contra PROD: ordinal `1-` + `tipo_movimiento='POLIZA'` +
+`estado='PAGADO'` + `fecha_pago IS NOT NULL` (22/22 pagados cumplen). Caso borde: endosos
+`Adicional` con su propio `1-` (póliza 7620098864) → el reconciliador los reporta como conflicto.
+Cron GH Actions 06:00 CDMX; reconciliador ≥13:00 UTC + gate por `max(verificado_en)`.
+Pendiente nuestro: crear `conciliacion_pagos` + fixture en STG y coordinar rol del GRANT por privado.
+
 Juan necesita saber cómo identifica la tabla el **recibo inicial/activador** (`numero_recibo`,
 `tipo_movimiento` u otra regla) antes de escribir el reconciliador, y coordinar su ejecución
 después del cron Q360.
@@ -56,7 +65,13 @@ después del cron Q360.
 - [ ] Publicar el contrato en #135 (columnas, regla del recibo activador, hora del cron para
       encadenar el reconciliador).
 
-### 2b. Evolución de `dashboard_conversation_claims` (gate de Fase 4 del port)
+### 2b. Evolución de `dashboard_conversation_claims` — ✅ handoff entregado (28-jul)
+Verificado en STG: tabla existe con esquema mínimo (sin control_id/epoch/state, session_id NULL,
+6 filas); en PROD no existe. Handoff completo (DDL aditiva, backfill, índices de control activo
+único, grants, endpoints Tomar/Liberar con fencing, doble escritura con `human_takeover`) en
+`~/claude-projects/Dashboard_SeguroAuto/handoffs/2026-07-28-evolucion-dashboard-conversation-claims.md`
+(rama `stg` del repo Dashboard). Falta: ejecutarlo (Agente Dashboard) y verificación en vivo del Arquitecto.
+
 #128/#135 fijan: Dashboard escribe, n8n lee, Django lee (schedulers). Contrato mínimo §10.2:
 `control_id`, `lead_id`, `session_id` exacto, `conversation_id`, cotización, owner, `epoch`
 monotónico, `state`, timestamps. Juan preguntó quién coordina: **nosotros** (Agente Dashboard).
