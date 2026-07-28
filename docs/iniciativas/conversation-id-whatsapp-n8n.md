@@ -129,3 +129,19 @@ Alberto preguntó "¿tienes cosas en STG pendientes de migrar a PROD?" y, al ver
 - El salto `shadow → dual` (payload v2 real, click de quick-reply real) sigue sin decidirse/coordinarse — no hay evidencia de que haya ocurrido.
 
 **Por qué el doc no lo reflejaba:** el patrón de trabajo de esta iniciativa fue "Agente n8n reporta a STG, Arquitecto verifica STG" — nadie volvió a verificar contra PROD después del 12-13 jul, y aparentemente Juan desplegó su parte directo sin pasar por un handoff explícito de "ya hice merge a main". **Lección: cuando Juan es el que ejecuta un paso (no un agente Nivel 3 de este ecosistema), no hay garantía de que quede reportado aquí — conviene chequear periódicamente el estado real en PROD de las iniciativas donde Juan tiene una tarea pendiente, no solo confiar en que avise.**
+
+## Actualización 28 jul 2026 — bloqueante formal del paso a `dual`: HYL-WAI #132
+
+Juan abrió `aguayo-co/HYL-WAI#132` ("[STG][Bloqueante][n8n] Integrar hardening dual y
+asegurar Atención Humana/Metepec"), asignado a sí mismo. Tres revisiones independientes
+suyas concluyeron **NO-GO** para `dual`/`enforced` sobre el STG actual de n8n hasta
+integrar un hardening (port viable ya probado por él: 118→126 nodos, 12/12 tests en
+Postgres 17 local). Criterios de aceptación destacables que nos tocan: `metepec_derived`
+y `human_takeover` deben sobrevivir resolución/afinidad/deploy, operaciones mutables de
+Atención Humana/Metepec autenticadas (incluye el webhook `metepec-liberar` sin auth que
+ya teníamos como prerequisito de PROD), idempotencia durable en salientes operator-driven,
+y rollback probado a `shadow`.
+
+⚠️ Este issue NO aparece en el barrido de HYL-WAI (no está asignado a `aibanez82` ni lo
+menciona con `@`) — seguirlo desde aquí. El "luz verde para pedir a Juan el cambio a
+`dual`" de la fase 3 queda supeditado a que #132 se resuelva.
