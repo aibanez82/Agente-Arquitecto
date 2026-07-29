@@ -170,6 +170,8 @@ n8n escribe a Postgres directamente (credencial `"Postgres account"` en el workf
 
 **El estado vigente de todos los bugs vive en `github.com/aibanez82/qualitas-issues` (privado) — NO en este archivo.** Cualquier agente (y Juan) puede abrir/comentar issues; solo el Arquitecto cierra/certifica. Convenciones en el `README.md` de ese repo. Van ahí los defectos técnicos (código, esquema, queries, regex, integraciones); las recomendaciones de copy/tono NO — esas siguen la tubería del Agente Mejoras Conversación (abajo).
 
+**Regla de ruteo entre trackers (29 jul):** el fix decide el repo — fix en nuestros sistemas y sin acción de Juan → `qualitas-issues`; fix en Django de Juan, decisión suya o coordinación entre lados → issues de `aguayo-co/HYL-WAI` (Alberto SÍ puede abrir issues ahí; lo que no puede es pushear código). Transversales: UN issue canónico, el otro lado solo comentario-puntero — nunca dos issues con estado.
+
 Los `docs/bugs/bug-NN-*.md` (aquí y en los repos de agentes) siguen siendo el cuaderno de investigación largo — cronología, SQL, decisiones — enlazado desde cada issue.
 
 **`qualitas-issues` también es inbox de captura rápida (20 jul):** ideas/bugs dictados fuera de casa, prefijo `QUALITAS:`. Al iniciar sesión (o "revisa QUALITAS"): `gh issue list --repo aibanez82/qualitas-issues --state open` **+ barrido de issues que Juan nos abre en HYL-WAI** (`--assignee aibanez82` y menciones), triangular, cerrar con comentario de destino — nunca ejecutar trabajo de otro repo. Detalle: `docs/protocolos/qualitas-issues-inbox.md`.
