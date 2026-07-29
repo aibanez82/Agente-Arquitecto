@@ -290,3 +290,17 @@ mapea, `08981ef`); **hallazgo #69: Phase Guard leía propiedad inexistente — N
 corregido + 3 barreras, Payment único writer de `completed` (cambio observable)**; runbook de
 deploy dry-run `deploy/deploy-port-132-stg.py`. 6 supuestos elevados a Juan para el checkpoint
 (issuecomment-5121457924), incluido el inventario honesto de 4 writers legacy sin lock.
+
+**Fase 6.6 ✅ (29 jul tarde, `f5072f5`, fork ejecutor — 2º intento, el 1º murió por 500 de
+plataforma) y certificada por el Arquitecto** (273 tests: actual 269/4/0, objetivo 272/1/0).
+Los 5 gates de la revisión de Juan sobre `848057e`: trigger con fencing completo (fail-closed
+`RETURN NULL` en sesión inexistente/archivada/reemplazada, test de intercalación real), los 8
+writers legacy con lock+re-validación A4, `leadId` en v1 (mutación de `Session Context Builder`
+autorizada por Juan; `authoritative_lead_id` vía LATERAL con exactamente-1-lead; outcomes
+terminales `payload_v1_contradiccion`/`payload_v1_lead_no_verificable`), schema de ventana
+CONSOLIDADO en `scripts/create-port132-window-schema-stg.py` (supersede a los dos anteriores),
+runbook con verify comparador+abort, sync Git ejecutado y rollback implementado. 6 semánticas
+elevadas a aprobación de Juan (issuecomment-5123328661). **Paquete Django de Juan recibido en
+paralelo (PR draft #139, canónico EXACTO al acordado, preflight por etapas)** — contraste
+formal pendiente (revisión del PR por el Arquitecto). Ambos lados en verde para el checkpoint
+del 30-jul 10:00; único gate restante del GO de staging: preflight STG real de Juan + firmas.
