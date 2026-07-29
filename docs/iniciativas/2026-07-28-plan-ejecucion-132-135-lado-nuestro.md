@@ -138,22 +138,33 @@ Sobre el freeze `2ede413`. Orden = fases del issue; lo no-conversacional puede a
   pospuesto a post-port, y la regla de Juan "no simultanear control humano y Metepec sin
   transferencia explícita" sigue sin implementar — decidir en checkpoint con Juan. Suma a Fase 7:
   credencial httpHeaderAuth real + secreto al Dashboard + schema del ledger en STG.
-  **Certificación del Arquitecto pendiente** (reproducir suites; se hará junto con Fase 5 para
-  no tocar el worktree con la fase en vuelo).
-- **Fase 5:** 🟡 EN EJECUCIÓN (lanzada por Alberto 28-jul noche, worktree
-  `Agente-n8n/.git/tmp-worktrees/port-fase3`). Handoff `Agente-n8n:handoffs/2026-07-28-fase5-metepec-dual-safe.md`
-  (`87ef6eb`) + **adenda del Arquitecto (`b738f5a`)**: incorpora de origen el advisory lock de
-  3-B en todas sus mutaciones (canónico `52`, lock como CTE referenciado, test de concurrencia)
-  y la regla RETURNING/snapshot del hallazgo de Fase 4; su reporte añade la lista de writers con
-  lock para acotar el retro-alcance de 3-B — Metepec dual-safe. Verificado contra exports de
+  **✅ Certificada por el Arquitecto (28-jul ~22:15):** suites reproducidas junto con Fase 5
+  (sus 157 tests van incluidos en los 195 de la suite completa, 0 fallos ambos flavors).
+- **Fase 5:** ✅ ejecutada (28-jul ~21:53, `b610616`, agente n8n en auto mode) y **certificada
+  por el Arquitecto** (suites reproducidas: `actual` 191 pass/4 skip/0 fail, `objetivo` 194
+  pass/1 skip/0 fail, 195 tests). Metepec dual-safe: liberación GET sin auth por teléfono →
+  POST+headerAuth por `session_id` exacto con fencing `metepec_derived_at`; Registrar 7→7 (1
+  mutado), Liberar 2→2 (2 mutados), Main +2 nodos T3 (historial de la rama `metepec_derived`,
+  mismo hueco que T3.6 de Fase 4). Advisory lock (A1) en los 4 writers de la fase, canónico
+  derivado SIEMPRE de la fila real, 4 tests de concurrencia real. Hallazgo propio: `NOW()`
+  estable en transacción → `date_trunc('milliseconds', …)` para que el fencing sobreviva el
+  roundtrip JSON. Credencial headerAuth REUSADA de Fase 4 (un solo secreto). Suma a Fase 7:
+  `ALTER TABLE … ADD COLUMN IF NOT EXISTS metepec_derived_at timestamptz`. Reporte:
+  `Agente-n8n:docs/2026-07-28-fase5-reporte-port-issue-132.md`. Verificado contra exports de
   Fase 0: la derivación ya marca por `session_id`; el infractor es `Metepec Liberar` (GET sin
   auth, limpia por teléfono → todas las sesiones). Liberación POST+headerAuth (credencial
   compartida con Fase 4) por `session_id` exacto con opcionales compatibles y 521/52 como
   verificación secundaria; fencing con columna nueva `metepec_derived_at` (aditiva, dominio
   nuestro); historial de la rama `metepec_derived` de Main bajo `session_id` canónico.
   Suma a la ventana Fase 7: `ALTER TABLE` de la columna.
-- **Fase 3-B:** 🔵 handoff entregado (28-jul noche, `2026-07-28-fase3b-contrato-payment-v1-y-advisory-locks.md`,
-  commit `b4bc3f5`) + **adenda del Arquitecto (`b738f5a`)**: orden definitivo DESPUÉS de Fase 5
+- **Fase 3-B:** 🟡 EN EJECUCIÓN (lanzada por el Arquitecto 28-jul ~22:20 vía fork ejecutor,
+  con autorización nocturna explícita de Alberto). Handoff
+  `2026-07-28-fase3b-contrato-payment-v1-y-advisory-locks.md` (`b4bc3f5`) + **adendas del
+  Arquitecto (`b738f5a` A1-A3, `7d9d7e0` A4)**. A4 (hallazgo del Arquitecto revisando el SQL de
+  Fase 5): el advisory lock serializa pero NO re-valida — EPQ solo re-chequea el WHERE del
+  UPDATE, así que las condiciones de estado/fencing deben repetirse ahí; fix del outcome bajo
+  carrera (leak `'ok'` en liberación Fase 5, mutación extra autorizada a sus 4 writers) y test
+  de concurrencia holder-muta-antes-de-soltar. Adendas A1-A3: orden definitivo DESPUÉS de Fase 5
   (Fase 4 cerró sin locks → retro-alcance de T3 ampliado a sus writers: takeover/liberar/
   historial, dedupe wamid, ledger dispatch); diseño obligatorio del dedupe por `event_id` vía
   `RETURNING` del propio CTE del INSERT (prohibido SELECT hermano contra `n8n_payment_events` —
