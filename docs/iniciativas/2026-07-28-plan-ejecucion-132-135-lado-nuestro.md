@@ -125,17 +125,27 @@ Sobre el freeze `2ede413`. Orden = fases del issue; lo no-conversacional puede a
   verificado en el output generado: check de igualdad `m:` eliminado → formato 12-hex, shape
   `status/code/field` en el guard). C3 documentada como no viable sin mutar `Session Context
   Builder` congelado (v1 no expone `leadId`) — aceptado.**
-- **Fase 4:** 🔵 handoff entregado (28-jul, `Agente-n8n:handoffs/2026-07-28-fase4-atencion-humana-dual-safe.md`,
-  commit `d3d27c9`; ejecutar tras C1-C3) — Atención Humana dual-safe contra
-  `dashboard_conversation_claims` (gate paso 2b ✅). 3 webhooks GET sin auth → POST+headerAuth
-  (mismos webhookIds), mutación solo por `session_id` con claim validado (control_id+epoch),
-  liberar con fencing anti-stale, envío §10.4 (teléfono desde la fila, ledger
-  `dashboard_outbound_dispatch` con reserva pre-Meta, `provider_message_id`, historial canónico
-  con `sent_by=human_agent`), dedupe inbound por `wamid` (única mutación de Main), precedencia
-  humano/Metepec/terminal. Resuelve `qualitas-issues#57`. Ventana Fase 7 necesitará: credencial
-  headerAuth nueva + secreto al Dashboard + tabla en STG.
-- **Fase 5:** 🔵 handoff entregado (28-jul, `Agente-n8n:handoffs/2026-07-28-fase5-metepec-dual-safe.md`,
-  commit `87ef6eb`; ejecutar tras Fase 4) — Metepec dual-safe. Verificado contra exports de
+- **Fase 4:** ✅ ejecutada y reportada verde (28-jul noche, `b33f74c`; reporte
+  `Agente-n8n:docs/2026-07-28-fase4-reporte-port-issue-132.md`). T1-T5 aplicados: 3 webhooks
+  GET→POST+headerAuth (mismos webhookIds), tomar/liberar por claim con fencing, envío §10.4 con
+  ledger `dashboard_outbound_dispatch`, dedupe inbound por `wamid` (única mutación de Main),
+  precedencia caracterizada con tests sin cambio de código. Atención Humana 7→19 nodos, Payment
+  intacto. 157 tests (112+45), 0 fallos ambos flavors, 3× sin flakiness. Resuelve
+  `qualitas-issues#57`. **Hallazgo real:** el ledger de idempotencia en un solo CTE fallaba bajo
+  carrera (un SELECT hermano de un INSERT en el mismo `WITH` usa el snapshot del inicio de la
+  sentencia) → rediseñado a 2 sentencias. **§10.6:** el grafo real ya implementa el orden de Juan
+  (`Phase → Metepec → Human`) como "accidente correcto"; formalizarlo como regla explícita queda
+  pospuesto a post-port, y la regla de Juan "no simultanear control humano y Metepec sin
+  transferencia explícita" sigue sin implementar — decidir en checkpoint con Juan. Suma a Fase 7:
+  credencial httpHeaderAuth real + secreto al Dashboard + schema del ledger en STG.
+  **Certificación del Arquitecto pendiente** (reproducir suites; se hará junto con Fase 5 para
+  no tocar el worktree con la fase en vuelo).
+- **Fase 5:** 🟡 EN EJECUCIÓN (lanzada por Alberto 28-jul noche, worktree
+  `Agente-n8n/.git/tmp-worktrees/port-fase3`). Handoff `Agente-n8n:handoffs/2026-07-28-fase5-metepec-dual-safe.md`
+  (`87ef6eb`) + **adenda del Arquitecto (`b738f5a`)**: incorpora de origen el advisory lock de
+  3-B en todas sus mutaciones (canónico `52`, lock como CTE referenciado, test de concurrencia)
+  y la regla RETURNING/snapshot del hallazgo de Fase 4; su reporte añade la lista de writers con
+  lock para acotar el retro-alcance de 3-B — Metepec dual-safe. Verificado contra exports de
   Fase 0: la derivación ya marca por `session_id`; el infractor es `Metepec Liberar` (GET sin
   auth, limpia por teléfono → todas las sesiones). Liberación POST+headerAuth (credencial
   compartida con Fase 4) por `session_id` exacto con opcionales compatibles y 521/52 como
@@ -143,7 +153,12 @@ Sobre el freeze `2ede413`. Orden = fases del issue; lo no-conversacional puede a
   nuestro); historial de la rama `metepec_derived` de Main bajo `session_id` canónico.
   Suma a la ventana Fase 7: `ALTER TABLE` de la columna.
 - **Fase 3-B:** 🔵 handoff entregado (28-jul noche, `2026-07-28-fase3b-contrato-payment-v1-y-advisory-locks.md`,
-  commit `b4bc3f5`; T3 se incorpora en Fase 4/5 si siguen abiertas, resto tras Fase 5). Origen:
+  commit `b4bc3f5`) + **adenda del Arquitecto (`b738f5a`)**: orden definitivo DESPUÉS de Fase 5
+  (Fase 4 cerró sin locks → retro-alcance de T3 ampliado a sus writers: takeover/liberar/
+  historial, dedupe wamid, ledger dispatch); diseño obligatorio del dedupe por `event_id` vía
+  `RETURNING` del propio CTE del INSERT (prohibido SELECT hermano contra `n8n_payment_events` —
+  patrón que falló en Fase 4; y en ` Mark Session Completed` no existe la salida de 2 sentencias
+  por `queryReplacement`); auditoría del mismo defecto latente en los CTEs de Fase 3/4. Origen:
   **checkpoint Django de Juan en #132 (22:12)** — su hardening terminado (PR oscuro, sin deploy),
   validó su payload contra nuestro código real de `1b26d79` y **confirmó `m:` aleatorio (C1
   correcta) y la secuencia del índice telefónico (nuestra propuesta adoptada)**. Sus 3 gates
