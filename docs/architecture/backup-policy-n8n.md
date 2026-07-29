@@ -109,3 +109,23 @@ media/`doc_chunks`, ninguno reflejado).
 aibanez82/Agente-Arquitecto` con el valor nuevo, (3) `gh workflow enable backup-n8n.yml --repo
 aibanez82/Agente-Arquitecto`, (4) disparar un `workflow_dispatch` manual para refrescar el
 snapshot ya mismo en vez de esperar al cron de las 06:00.
+
+## ⚫ DESCONTINUADO — decisión de Alberto, 29 jul 2026
+
+El backup automático **no se reactiva**: decisión explícita de Alberto ("ya no quiero hacer
+backup automático"). Ejecutado ese mismo día por el Arquitecto:
+
+- `.github/workflows/backup-n8n.yml` eliminado del repo (no solo deshabilitado — no puede
+  reactivarse por accidente).
+- Secret `N8N_API_KEY` de GitHub Actions eliminado (contenía la key vencida; la rotación de la
+  key de n8n sigue pendiente como asunto de seguridad aparte, ver CLAUDE.md).
+- Los scripts `scripts/n8n-backup/*.mjs` SE CONSERVAN: sirven para snapshot manual
+  (`node scripts/n8n-backup/backup.mjs` con una key válida), con el whitelist anti-PII de
+  `toExportFormat()` incluido.
+
+**La política vigente pasa a ser el export manual**: exportar y commitear a
+`docs/n8n-workflows/` tras cada cambio en un workflow de producción (regla ya presente en
+CLAUDE.md, sección "n8n workflow — estructura interna"). Es la única red de seguridad — la
+disciplina de hacerlo deja de ser provisional y pasa a ser permanente. El runbook de deploy del
+port #132 (`deploy-port-132-stg.py`) ya incluye su propio paso de GET posterior + sync a Git,
+que cubre este requisito para los deploys de ventana.
