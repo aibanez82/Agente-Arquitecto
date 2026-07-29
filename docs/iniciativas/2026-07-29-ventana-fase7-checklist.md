@@ -12,11 +12,11 @@
 
 ## Artefactos listos (rama `feature/issue-132-port-dual-safe` de Agente-n8n, HEAD `18a154f`)
 
-1. **Script de schema STG** — `scripts/create-fase3b-payment-events-schema-stg.py`
-   (dry-run por defecto, `--go` para aplicar; idempotente). Crea `n8n_payment_events`
-   (event_id uuid PK, session_id, outcome, processed_at) Y el
-   `ALTER TABLE whatsapp_sessions ADD COLUMN IF NOT EXISTS metepec_derived_at timestamptz`
-   de Fase 5 — una sola corrida cubre ambos. Sin backfill necesario.
+1. **Script de schema STG CONSOLIDADO (Fase 6.6)** — `scripts/create-port132-window-schema-stg.py`
+   (dry-run por defecto, `--go`; idempotente). Crea TODO: claims, `dashboard_outbound_dispatch`,
+   `n8n_payment_events`, `n8n_chat_histories.wamid`+índice, `metepec_derived_at`, paridad
+   archive de ambas columnas, y el trigger de lock/fencing. Supersede a los dos scripts
+   anteriores (fase3b y fase4, que avisan superseded). Sin backfill necesario.
 2. **JSONs transformados** (build del transform, ambos verificados por suites):
    Main (125 nodos), Payment (6), Atención Humana (19), Metepec Liberar (2),
    Metepec Registrar (7). Todos cambian respecto a lo importado hoy en STG.
