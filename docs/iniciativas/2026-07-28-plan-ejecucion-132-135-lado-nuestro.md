@@ -142,6 +142,17 @@ Sobre el freeze `2ede413`. Orden = fases del issue; lo no-conversacional puede a
   verificación secundaria; fencing con columna nueva `metepec_derived_at` (aditiva, dominio
   nuestro); historial de la rama `metepec_derived` de Main bajo `session_id` canónico.
   Suma a la ventana Fase 7: `ALTER TABLE` de la columna.
+- **Fase 3-B:** 🔵 handoff entregado (28-jul noche, `2026-07-28-fase3b-contrato-payment-v1-y-advisory-locks.md`,
+  commit `b4bc3f5`; T3 se incorpora en Fase 4/5 si siguen abiertas, resto tras Fase 5). Origen:
+  **checkpoint Django de Juan en #132 (22:12)** — su hardening terminado (PR oscuro, sin deploy),
+  validó su payload contra nuestro código real de `1b26d79` y **confirmó `m:` aleatorio (C1
+  correcta) y la secuencia del índice telefónico (nuestra propuesta adoptada)**. Sus 3 gates
+  aceptados: dedupe Payment por `event_id` (contrato v1: `session_id`/`event_id`/`identity_status`,
+  `amount` string; replay → `duplicate` sin re-envío WA; legacy compatible), máscara de teléfono
+  en logs, `pg_advisory_xact_lock(hashtext(canonical_phone))` en todos los writers n8n
+  (Chat Memory queda sin lock — flag al checkpoint). ⚠️ Escalado a Alberto: su readiness
+  rechazará el rol compartido de STG para `conciliacion_pagos` → rol read-only dedicado
+  (#129/#130) pasa a prerrequisito real del E2E.
 - **Fase 6:** 🟡 adelanto certificado (28-jul, commit `be4bd50`, 33/33): harness PG17 local con
   DDL real de STG, fixtures, concurrencia determinística y baseline de caracterización.
   **Inventario §9.1 completado:** `idx_whatsapp_sessions_phone_number UNIQUE` es el único
