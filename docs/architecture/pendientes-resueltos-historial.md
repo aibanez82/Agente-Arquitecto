@@ -36,3 +36,11 @@ fallback `doc_chunks` (152 filas). E2E real confirmado para RAG general, M36/M38
 `kb_chunks.id=38` y el fallback de `doc_chunks` (Cláusula 8ª, verificado contra el PDF). Guard
 defensivo de tool-call crudo desplegado en PROD/STG (issue #47, cerrado). Sin pendientes
 urgentes al cierre. Detalle: `docs/iniciativas/2026-07-17-migracion-rag-kb-pgvector-design.md`.
+
+## Cómo saber con certeza si un cliente pagó la póliza
+
+✅ Resuelto (26 jul 2026) — Agente Conciliación operativo: scraping real del portal Q 360
+(Playwright, login simple sin captcha), cron diario en GH Actions, escribe en su tabla propia
+`conciliacion_pagos`. Certificado 26 jul, reporte en `docs/`. Queda como pendiente aparte qué
+hacer con los estatus `VENCIDO`/`CANCELADO` que detecta (sigue en la tabla de Pendientes de
+CLAUDE.md). Detalle: `docs/architecture/estatus-pago-qualitas.md`.
