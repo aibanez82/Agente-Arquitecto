@@ -24,6 +24,23 @@ nuevo `aibanez82/Agente-Conciliacion`, protocolo completo en
 nunca en `qualitas_polizaemitida`. Aún sin lógica real de scraping — falta que Alberto comparta
 acceso al portal.
 
+## 🔍 Nueva vía en exploración — webservices OPL (29 jul 2026)
+
+Alberto consiguió el PDF oficial del webservice de pago **OPL** ("Operadora en Línea"), el hueco que la doc de `qualitas-documentacion-webservices` no cubría. Guardado y resumido en `docs/qualitas-api/opl-servicios-web.md` (+ PDF `OPL-Servicios-Web-v1.3.2.pdf`).
+
+Hallazgos de la exploración (29 jul, contra PROD, solo lectura):
+
+1. **Django ya usa OPL** — credenciales operativas en Heroku (`QUALITAS_WPUID`/`QUALITAS_WPTOKEN`): `derivar_poliza_opl()` instala la cobranza CL y `generar_link_pasarela()` usa el REST `api.php` (`genWebPay`/`fareceipt`).
+2. El WSDL PROD expone operaciones **no documentadas** en el PDF, entre ellas **`oplConciliation`** y `oplListPols` — nombres que apuntan directo a nuestro caso de uso. Pedir doc a Quálitas vía Juan.
+3. `oplListReceipts` (lista recibos pendientes de cobro) **requiere una credencial que no tenemos**: el "Pid de negocio OPL" (`pid`+`token`), distinta del `wpuid`/`wptoken`. Verificado en vivo: rechaza nuestras credenciales con `Negocio Inexsistente o Token Invalido!!`. Pedir a Quálitas vía Juan.
+4. Limitación semántica: `oplListReceipts` no distingue póliza pagada de cancelada (ambas responden vacío) — confirma "sigue debiendo", no "pagó". El scraping de Q360 sí distingue (columna `estado` de `conciliacion_pagos`). Por eso el plan es **cruce**, no sustitución.
+
+**Plan de cruce con el Agente Conciliación:**
+
+- Paso inmediato (sin dependencias): probar `api.php m=fareceipt` (funciona con el `wptoken` que ya tenemos) contra 4 pólizas con estado conocido en `conciliacion_pagos` — script listo en `docs/qualitas-api/scripts/test-fareceipt.js`. Hipótesis: PENDIENTE/VENCIDO devuelven `rid`, PAGADO/CANCELADO no. El intento del agente quedó bloqueado por permisos del entorno; correrlo a mano.
+- Si la semántica se confirma: handoff al Agente Conciliación para añadir una pasada de verificación cruzada API tras cada scraping (discrepancia scraping↔API → alerta), como red de seguridad ante cambios de HTML del portal.
+- En paralelo (vía Juan): pedir a Quálitas el Pid OPL y la doc de `oplConciliation`/`oplListPols`.
+
 ## Fila original de la tabla de pendientes
 
 | Cómo saber con certeza si un cliente pagó la póliza — la doc oficial SOAP de Quálitas (`docs/qualitas-api/`: WsEmision, WsTarifas, WsImpresion, Matriz de Captura) **no documenta ningún endpoint ni campo de consulta de estatus de pago** (verificado 7 jul). Solo cubre `FormaPago` (método/frecuencia) y los recibos generados al emitir — nada sobre si un recibo/link de pago fue efectivamente pagado. Hoy la única señal automatizada es `qualitas_polizaemitida.estatus_pago`, que depende de un webhook externo de Quálitas hacia Django no documentado en su spec (ver Bug #7 y su workaround). Detectado por Alberto al revisar una conversación con póliza emitida y link de pago enviado, sin forma de confirmar el pago desde ahí. **No es dependencia de Juan** — la resolución probable es manual: Laura (Hylant) reporta ventas/pagos confirmados en una hoja Excel al día siguiente. | 💡 Sin investigar — definir si conviene formalizar el reporte de Laura como fuente de verdad (p. ej. cargarlo al Dashboard) en vez de perseguir un mecanismo automático de Quálitas |
