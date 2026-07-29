@@ -135,3 +135,34 @@ Juan publicó su auditoría de `f5072f5` (issuecomment-5123871526). Lo esencial:
   13:00 está en riesgo real** — llevar a la llamada la disyuntiva viernes-vs-lunes 3-ago sin
   forzar; si T1+T2 no están en verde y contrastados antes de la llamada, recomendación del
   Arquitecto: proponer lunes directamente.
+
+---
+
+## ACTUALIZACIÓN 29-jul ~19:00 — Fase 6.7 CERRADA Y CERTIFICADA (supersede el riesgo del bloque anterior)
+
+**El escenario ideal se cumplió con margen: no solo T1+T2 — los 10 puntos (T1-T7) están en
+verde, certificados por el Arquitecto y avisados a Juan** (issuecomment-5124468615, con petición
+de re-auditoría antes de las 10:00 si le da la vida; si no, primer punto de la llamada).
+
+- **Entrega:** commit `1424163` en `feature/issue-132-port-dual-safe` (pusheado). Reporte del
+  ejecutor: `Agente-n8n:docs/2026-07-30-fase6-7-reporte-port-issue-132.md`. 0 nodos nuevos en
+  ningún workflow (Main sigue 118→125) — todo es mutación de contenido.
+- **Verificación independiente del Arquitecto (checkout limpio, worktree propio):** JS 290
+  tests × ambos flavors (286+4 skip / 289+1 skip, 0 fallos — números idénticos a los del
+  reporte); Python 46 tests 0 fallos (T1:11, T7:11, T4:2+6, T7b:16). Las DOS reproducciones de
+  Juan son tests de regresión citables que fallaban contra el código pre-fix.
+- **Decisiones tomadas por el Arquitecto (comunicadas a Juan para sign-off):**
+  1. Matriz de gates: terminal sí/no (no por-fase) + `Mark Session Closed` con gate propio;
+     `human_takeover` fuera del gate. Si Juan quiere granularidad por fase, es fase pequeña
+     post-checkpoint con las fases exactas que él defina.
+  2. T6 acotado a `qc:v1` — el patrón también existe en la rama v2 del nodo CONGELADO; anotado,
+     no tocado (disciplina de freeze, `qualitas-issues#66`).
+  3. Preflight Django 0053 como gate duro del runbook (desactivable por parámetro si Juan
+     prefiere informativo).
+- **Criterio de GO del viernes:** vuelve a estar sobre la mesa — depende solo de (a)
+  re-auditoría de Juan sobre `1424163` y (b) su preflight read-only real en STG. La disyuntiva
+  viernes-vs-lunes sigue siendo el cierre de la llamada, pero ya sin recomendación de proponer
+  lunes de entrada.
+- **Flag operativo menor:** el clon local de `Agente-n8n` tiene la rama `stg` con 1 commit sin
+  pushear (`31306db`, refuerzo CASO A) — pedir al Agente n8n que lo pushee o lo explique
+  (regla multi-máquina: nada vive solo en local).
