@@ -213,7 +213,6 @@ Staging end-to-end paralelo a prod (gitflow `stg`→`main`) para validar bug fix
 | Regenerar token Meta Business API | ⚠️ Urgente |
 | Bug #7 / Issue #69 `HYL-WAI` — fix es lado n8n (IA emite `[phase:completed]`, se guarda sin pago verificado) | 🔴 **Nuestro** desde 2 jul → Agente n8n |
 | Corrección Bug #8 en Django — Juan Aguayo (Issue #70 `aguayo-co/HYL-WAI`) | ⏳ Pendiente externo |
-| Rotar `N8N_API_KEY` de n8n PROD (se pegó en texto plano en chat el 30 jun; la key actual además venció) | ⚠️ Pendiente — seguridad. Actualizar el valor en Vercel al rotar |
 | Propuesta arquitectura BD — tabla canónica `whatsapp_event` | 💡 Plan de destino, sin decisión de implementar. Detalle: `docs/architecture/whatsapp-event-canonico-propuesta.md` |
 | `N8N_TOKEN` hardcodeado como default en `qualitas/views.py:1291` (`enviar_webhook_whatsapp`; el validador `:1041` ya es env-only) | 🔴 **Issue #130 `HYL-WAI`** (27 jul): quitar default, rotar, coordinar con Alberto el cambio simultáneo en credenciales n8n |
 | Qué hacer con pólizas `VENCIDO`/`CANCELADO` que detecta el Agente Conciliación | 💡 Sin decisión. Ver `docs/architecture/estatus-pago-qualitas.md` |

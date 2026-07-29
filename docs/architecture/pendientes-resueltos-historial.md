@@ -44,3 +44,13 @@ urgentes al cierre. Detalle: `docs/iniciativas/2026-07-17-migracion-rag-kb-pgvec
 `conciliacion_pagos`. Certificado 26 jul, reporte en `docs/`. Queda como pendiente aparte qué
 hacer con los estatus `VENCIDO`/`CANCELADO` que detecta (sigue en la tabla de Pendientes de
 CLAUDE.md). Detalle: `docs/architecture/estatus-pago-qualitas.md`.
+
+## Rotar `N8N_API_KEY` de n8n PROD (expuesta en chat el 30 jun + vencida)
+
+✅ Resuelto (29 jul 2026) — Alberto revocó la key vieja en n8n UI y generó una nueva; script
+one-shot del Arquitecto la verificó contra la API (HTTP 200) ANTES de instalarla, la reemplazó
+en Vercel (production+preview, rol de almacén — el Dashboard no la consume en código) y en el
+`.env.local` del Arquitecto, todo vía portapapeles sin que el valor apareciera jamás en chat ni
+en historial. El secret de GitHub Actions ya no existe (backup automático descontinuado ese
+mismo día). Pendiente residual por laptop: los `.env.local` de las otras máquinas se actualizan
+copiando de Vercel cuando toque.
