@@ -35,11 +35,20 @@ Hallazgos de la exploración (29 jul, contra PROD, solo lectura):
 3. `oplListReceipts` (lista recibos pendientes de cobro) **requiere una credencial que no tenemos**: el "Pid de negocio OPL" (`pid`+`token`), distinta del `wpuid`/`wptoken`. Verificado en vivo: rechaza nuestras credenciales con `Negocio Inexsistente o Token Invalido!!`. Pedir a Quálitas vía Juan.
 4. Limitación semántica: `oplListReceipts` no distingue póliza pagada de cancelada (ambas responden vacío) — confirma "sigue debiendo", no "pagó". El scraping de Q360 sí distingue (columna `estado` de `conciliacion_pagos`). Por eso el plan es **cruce**, no sustitución.
 
-**Plan de cruce con el Agente Conciliación:**
+**Cruce validado en vivo (29 jul, Alberto ejecutó `test-fareceipt.cjs` contra PROD):** `api.php m=fareceipt` funciona con el `wptoken` que ya tenemos y devuelve el *siguiente* recibo cobrable de la póliza:
 
-- Paso inmediato (sin dependencias): probar `api.php m=fareceipt` (funciona con el `wptoken` que ya tenemos) contra 4 pólizas con estado conocido en `conciliacion_pagos` — script listo en `docs/qualitas-api/scripts/test-fareceipt.cjs`. Hipótesis: PENDIENTE/VENCIDO devuelven `rid`, PAGADO/CANCELADO no. El intento del agente quedó bloqueado por permisos del entorno; correrlo a mano.
-- Si la semántica se confirma: handoff al Agente Conciliación para añadir una pasada de verificación cruzada API tras cada scraping (discrepancia scraping↔API → alerta), como red de seguridad ante cambios de HTML del portal.
-- En paralelo (vía Juan): pedir a Quálitas el Pid OPL y la doc de `oplConciliation`/`oplListPols`.
+| Estado en `conciliacion_pagos` | Póliza | Respuesta `fareceipt` |
+|---|---|---|
+| PENDIENTE | 7620099716 | recibo `np:1/nps:1`, `fcr`=hoy, monto coincide |
+| VENCIDO | 7620098627 | recibo `np:1/nps:1`, `fcr` rodada a hoy, monto coincide |
+| PAGADO (fraccionada 12 pagos) | 7620099601 | siguiente recibo `np:2/nps:12`, `fcr` 2026-08-26 → cobra el 2 ⇒ el 1 se pagó |
+| CANCELADO | 7620098974 | `"No hay recibos disponibles a cobro"` |
+
+Ambigüedad residual: póliza totalmente pagada (o contado `nps=1` pagada) responde igual que cancelada — el scraping desambigua. Por eso el API **complementa** al scraping como red de seguridad, no lo sustituye.
+
+**Handoff entregado al Agente Conciliación** (29 jul): `Agente-Conciliacion:handoffs/2026-07-29-verificacion-cruzada-api-fareceipt.md` (rama `main`) — reglas de cruce por estado, solo `m=fareceipt`, discrepancias se alertan sin tocar `estado`. Requiere que Alberto añada `QUALITAS_WPTOKEN` como secret de GitHub Actions en ese repo.
+
+**Pendiente vía Juan:** pedir a Quálitas el Pid de negocio OPL (para `oplListReceipts`/`getRefOpl`) y la documentación de `oplConciliation`/`oplListPols`. Borrador: `docs/2026-07-29-mensaje-juan-opl-pid-y-conciliacion.md`.
 
 ## Fila original de la tabla de pendientes
 
