@@ -266,3 +266,16 @@ E2E Meta real en ventana controlada → PROD (aprobación posterior)
 - B5 sigue bloqueado por el deploy del port (#132) → lo desbloquea nuestra ventana de Fase 7.
 - Aviso previo de Juan para su llegada a STG: la migración 0064 reemplaza un constraint del
   ledger — exigirá estrategia de locks/`lock_timeout` y ensayo 0062→0064.
+
+## Fase 6.5 — pre-window hardening (29 jul, tarde)
+
+Origen: checkpoint grande de Juan en #132 (29 jul 15:40 UTC) — acepta jueves 10:00, condiciona
+la ventana del viernes a GO explícito con gates 1-8. Confirmaciones del Arquitecto (OK Alberto)
+en issuecomment-5121020594: reparto aceptado; ventana condicionada (plan B lunes 3-ago AM);
+Chat Memory → trigger BEFORE INSERT con lock; Dashboard lo coordinamos nosotros; ventana 24h
+diferida explícitamente a #135/B4 (followups siguen en dry-run). Hallazgos aceptados: canónico
+unificado (10 dígitos → prefijar 52 — cambia NUESTRO helper también), paridad active/archive en
+nuestros scripts DDL (bug real), lead_id v1, exclusión Humano/Metepec fail-closed, #69 tres
+barreras. 🟡 EN EJECUCIÓN: handoff `2026-07-29-fase6-5-pre-window-hardening.md` (`17ddf39`,
+T1-T9) lanzado vía fork ejecutor. Pendiente del Arquitecto tras el reporte: certificar, mapear
+outcomes nuevos de T6 en la rama del Dashboard, y llevar (c)/(h) al checkpoint de mañana.
