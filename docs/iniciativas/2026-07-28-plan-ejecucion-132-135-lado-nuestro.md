@@ -157,8 +157,21 @@ Sobre el freeze `2ede413`. Orden = fases del issue; lo no-conversacional puede a
   verificación secundaria; fencing con columna nueva `metepec_derived_at` (aditiva, dominio
   nuestro); historial de la rama `metepec_derived` de Main bajo `session_id` canónico.
   Suma a la ventana Fase 7: `ALTER TABLE` de la columna.
-- **Fase 3-B:** 🟡 EN EJECUCIÓN (lanzada por el Arquitecto 28-jul ~22:20 vía fork ejecutor,
-  con autorización nocturna explícita de Alberto). Handoff
+- **Fase 3-B:** ✅ ejecutada (28-jul ~23:00, `18a154f`, fork ejecutor lanzado por el Arquitecto
+  con autorización nocturna de Alberto) y **certificada por el Arquitecto** (suites reproducidas:
+  `actual` 213 pass/4 skip/0 fail, `objetivo` 216 pass/1 skip/0 fail, 217 tests; el fork las
+  corrió 3× por flavor sin flakiness). Contrato Payment v1 + dedupe durable por `event_id`
+  (`n8n_payment_events`, señal vía RETURNING del CTE del INSERT), máscara de teléfono en todos
+  los logs, advisory lock retro en 8 writers (11 en total con los 4 de Fase 5), re-validación
+  EPQ (A4) aplicada incluso a Fase 5 (leak `outcome='ok'` corregido — confirmado real bajo
+  carrera). A3: auditoría de CTEs del port limpia, sin más defectos. Allowlist: Payment 6→6,
+  Main 125→125, AH 19→19, Metepec Liberar 2→2 — 0 nodos nuevos. Canónico hashtext: forma `52`
+  12 dígitos, igualdad SQL/JS verificada con test real (contrastar con helper de Juan en el
+  checkpoint). Sin lock (documentado): `Postgres Chat Memory` (LangChain) y legacy no tocado
+  (`Update Activity`). Desacuerdo suave: lock del ledger `dashboard_outbound_dispatch` aplicado
+  según adenda aunque Django no toca esa tabla — decisión del Arquitecto: se mantiene por
+  uniformidad, revisable en checkpoint. Reporte:
+  `Agente-n8n:docs/2026-07-28-fase3b-reporte-port-issue-132.md`. Handoff
   `2026-07-28-fase3b-contrato-payment-v1-y-advisory-locks.md` (`b4bc3f5`) + **adendas del
   Arquitecto (`b738f5a` A1-A3, `7d9d7e0` A4)**. A4 (hallazgo del Arquitecto revisando el SQL de
   Fase 5): el advisory lock serializa pero NO re-valida — EPQ solo re-chequea el WHERE del
