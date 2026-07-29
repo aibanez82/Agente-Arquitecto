@@ -253,3 +253,16 @@ E2E Meta real en ventana controlada → PROD (aprobación posterior)
 | Evolución `dashboard_conversation_claims` + grants | Agente Dashboard |
 | Semántica recibo activador en `conciliacion_pagos` | Agente Conciliación |
 | Matriz de integración pinneada STG (§19) | Agente QA |
+
+## Track Django de Juan (#135) — estado al 29 jul
+
+- B0-B2 completados por Juan en LOCAL y en oscuro (rama local sin push, 7 commits sobre
+  `stg@a6209ad`, flags apagados, migraciones 0062-0064 sin aplicar; #78 resuelto técnicamente,
+  no cerrado operacionalmente). Su comentario: HYL-WAI#135, 29 jul 04:55 UTC.
+- **B3 autorizado por el Arquitecto (29 jul, OK de Alberto) con rider #119**: al evolucionar
+  `/api/emitir-externo/` (punto 3 de B3), resolver #119 con el shape de error `status/code/field`
+  del contraste cruzado de #132. Comentario:
+  https://github.com/aguayo-co/HYL-WAI/issues/135#issuecomment-5119317570
+- B5 sigue bloqueado por el deploy del port (#132) → lo desbloquea nuestra ventana de Fase 7.
+- Aviso previo de Juan para su llegada a STG: la migración 0064 reemplaza un constraint del
+  ledger — exigirá estrategia de locks/`lock_timeout` y ensayo 0062→0064.
