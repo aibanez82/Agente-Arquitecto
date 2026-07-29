@@ -98,3 +98,8 @@ Desde que se escribió este guion pasó todo esto (todo publicado en #132):
   (su preflight trata ausente como false-PASS).
 - **Criterio de GO actualizado:** nuestros gates ✅ + canónico match ✅ → el GO del viernes
   depende solo de su preflight real en STG + las 3 decisiones (b)/(e)/(f) + firmas.
+- **Punto extra para la llamada (decisión Alberto 29-jul: todo Meta lo ejecuta Juan):** pedirle
+  que someta la **plantilla de re-enganche fuera de ventana 24h** (pendiente desde el 16-jul,
+  bloquea Recordatorios por fecha mencionada y rescates tipo Bug #12). El Arquitecto tiene el
+  borrador listo (nombre `reenganche_cotizacion_pendiente`, categoría Utilidad, cuerpo con
+  {{nombre}}/{{vehículo}}, botones de respuesta rápida) — se le pasa para copy/paste.
