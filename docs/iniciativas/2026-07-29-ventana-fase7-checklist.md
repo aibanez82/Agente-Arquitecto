@@ -1,5 +1,10 @@
 # Ventana Fase 7 — checklist consolidado (port HYL-WAI#132)
 
+> **AGENDADO (29 jul):** checkpoint **jueves 30 jul 10:00 CDMX** (45 min) y ventana de deploy
+> STG **viernes 31 jul 13:00-15:00 CDMX** (plan B: lunes 3-ago AM). Invitaciones de Calendar
+> enviadas a Juan (Meet incluido) y anunciado en #132
+> (issuecomment-5119401920). Pendiente: confirmación de Juan.
+
 > Consolidado por el Arquitecto la noche del 28-29 jul 2026, al cierre de Fases 4/5/3-B
 > (todas ejecutadas y certificadas — ver `2026-07-28-plan-ejecucion-132-135-lado-nuestro.md`).
 > La Fase 7 es la ÚNICA fase que toca sistemas reales. Requiere a Alberto presente y
