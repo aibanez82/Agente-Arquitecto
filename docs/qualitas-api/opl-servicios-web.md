@@ -56,4 +56,4 @@ Encriptación de datos sensibles (tarjetas): tag `<crypto>` + RC4 con llave comp
 En `scripts/` de esta carpeta (leen el token de Heroku en runtime, no contienen secretos):
 
 - `test-opl-list-receipts.sh` — SOAP `oplListReceipts` PROD (hoy devuelve error de auth; sirve para revalidar cuando Quálitas dé el Pid OPL).
-- `test-fareceipt.js` — `api.php m=fareceipt` para 4 pólizas con estado conocido en `conciliacion_pagos` (PAGADO/PENDIENTE/VENCIDO/CANCELADO). Pendiente de ejecutar (bloqueado por permisos del entorno del agente — correrlo a mano).
+- `test-fareceipt.cjs` — `api.php m=fareceipt` para 4 pólizas con estado conocido en `conciliacion_pagos` (PAGADO/PENDIENTE/VENCIDO/CANCELADO). Pendiente de ejecutar (bloqueado por permisos del entorno del agente — correrlo a mano).

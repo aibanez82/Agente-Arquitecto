@@ -37,7 +37,7 @@ Hallazgos de la exploración (29 jul, contra PROD, solo lectura):
 
 **Plan de cruce con el Agente Conciliación:**
 
-- Paso inmediato (sin dependencias): probar `api.php m=fareceipt` (funciona con el `wptoken` que ya tenemos) contra 4 pólizas con estado conocido en `conciliacion_pagos` — script listo en `docs/qualitas-api/scripts/test-fareceipt.js`. Hipótesis: PENDIENTE/VENCIDO devuelven `rid`, PAGADO/CANCELADO no. El intento del agente quedó bloqueado por permisos del entorno; correrlo a mano.
+- Paso inmediato (sin dependencias): probar `api.php m=fareceipt` (funciona con el `wptoken` que ya tenemos) contra 4 pólizas con estado conocido en `conciliacion_pagos` — script listo en `docs/qualitas-api/scripts/test-fareceipt.cjs`. Hipótesis: PENDIENTE/VENCIDO devuelven `rid`, PAGADO/CANCELADO no. El intento del agente quedó bloqueado por permisos del entorno; correrlo a mano.
 - Si la semántica se confirma: handoff al Agente Conciliación para añadir una pasada de verificación cruzada API tras cada scraping (discrepancia scraping↔API → alerta), como red de seguridad ante cambios de HTML del portal.
 - En paralelo (vía Juan): pedir a Quálitas el Pid OPL y la doc de `oplConciliation`/`oplListPols`.
 
