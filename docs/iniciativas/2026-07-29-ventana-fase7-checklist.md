@@ -31,12 +31,24 @@
 6. E2E de humo: tomar/enviar/liberar conversación desde el Dashboard, derivar/liberar Metepec,
    replay de Payment con mismo `event_id` (→ `duplicate`, sin re-envío WA).
 
-## Lado Dashboard (preparado, sin merge)
+## Lado Dashboard (✅ preparado la noche del 28-29 jul, SIN merge)
 
-Los 4 webhooks de operador pasaron a POST+headerAuth; el Dashboard hoy los llama GET sin auth.
-Handoff + rama preparados la noche del 28 jul (ver `Dashboard_seguroautoqualitas/handoffs/` y
-la rama indicada en el resumen de la mañana). Regla: tolerante a ausencia del secreto
-(Preview sin env var no debe romper), NO mergear hasta la ventana.
+Rama **`fix/operator-webhooks-post-headerauth`** (commit `7273605`, base `origin/main`
+`60ec67b`, build en verde), handoff con la tabla de contrato completa en
+`Dashboard:handoffs/2026-07-29-fase7-webhooks-post-headerauth.md`. Clon local:
+`~/claude-projects/Dashboard_SeguroAuto` (ojo: carpeta ≠ nombre del repo).
+
+- **Hallazgo del fork:** en `main` el Dashboard NO llamaba a ningún webhook de atención humana —
+  el claim era solo BD, nadie seteaba `human_takeover` desde el Dashboard, y liberar solo ponía
+  `released_at` sin `state='released'` (n8n valida claims por `state`). Ambos gaps cerrados en
+  la rama.
+- Cliente compartido tolerante a entorno sin configurar (Preview no rompe); `operator-send` con
+  `idempotency_key` + auditoría; `metepec-liberar` como endpoint listo sin UI.
+- **Env vars nuevas en Vercel:** `N8N_OPERATOR_WEBHOOK_BASE_URL` + `N8N_OPERATOR_WEBHOOK_SECRET`.
+- **Supuesto clave:** header `X-Operator-Auth` — la credencial n8n de la ventana debe crearse
+  con ese nombre exacto (o cambiar la constante del cliente).
+- **NO mergear hasta la ventana** (contra el n8n actual rompería los botones de operador);
+  verificar antes que `dashboard_conversation_claims` de PROD tiene `control_id/epoch/state`.
 
 ## Agenda del checkpoint con Juan (previo a la ventana)
 
