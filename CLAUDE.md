@@ -219,7 +219,8 @@ Staging end-to-end paralelo a prod (gitflow `stg`→`main`) para validar bug fix
 | Qué hacer con pólizas `VENCIDO`/`CANCELADO` que detecta el Agente Conciliación | 💡 Sin decisión. Ver `docs/architecture/estatus-pago-qualitas.md` |
 | Plantilla de Meta aprobada para re-enganche fuera de ventana 24h | ⚠️ Bloqueante para "Recordatorios por fecha mencionada" (arriba) y rescates tipo Bug #12. Pedida a Juan 16 jul, no sometida aún |
 | Exponer `fecha_inicio` en emisión — Issue #114 `HYL-WAI` | ✅ Django en PROD 27 jul (PR #125, v331). **E2E n8n STG validado 28 jul** (pólizas reales, +0 y +30 exacto). Falta: fix prompt límite 30d (`qualitas-issues#66`, define SHA de freeze de #132) y promoción n8n a PROD. Desbloquea M47/M48 |
-| `/api/emitir-externo/` no distingue causa del 400 — Issue #119 HYL-WAI (=#9) | ⏳ Pendiente externo — Juan |
+| `/api/emitir-externo/` no distingue causa del 400 — Issue #119 HYL-WAI (=#9) | ⏳ En curso — Juan (rider aceptado en la autorización de B3, 29 jul) |
+| Monitor horario de actividad de Juan (rutina cloud `trig_013gQWu8gqfDh5c8QQWzTAbM`, 6-23h CDMX → issue `JUAN:` en qualitas-issues) | ⚠️ Creado 29 jul pero CIEGO: el entorno cloud no tiene credencial GitHub (corrida de prueba no creó el issue de control "JUAN-monitor activo"). Falta: Alberto añade PAT como `GH_TOKEN` en el environment Default de claude.ai/code |
 
 Ítems resueltos: archivados en `docs/architecture/pendientes-resueltos-historial.md` — ya no son accionables.
 
