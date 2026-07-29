@@ -209,8 +209,8 @@ Staging end-to-end paralelo a prod (gitflow `stg`→`main`) para validar bug fix
 
 | Item | Estado |
 |---|---|
-| Rotar service account key Google Cloud (`ba36b46f377b...`) | ⚠️ Urgente |
-| Regenerar token Meta Business API | ⚠️ Urgente |
+| Rotar service account key Google Cloud (`ba36b46f377b...`) | 🟡 Desprioritizado por Alberto (29 jul) — no lo ve urgente; no volver a proponer salvo señal de exposición |
+| Regenerar token Meta Business API | 🟡 Todo lo de Meta lo ejecuta JUAN (decisión Alberto 29 jul) — coordinar con él, junto con la plantilla de re-enganche |
 | Bug #7 / Issue #69 `HYL-WAI` — fix es lado n8n (IA emite `[phase:completed]`, se guarda sin pago verificado) | 🔴 **Nuestro** desde 2 jul → Agente n8n |
 | Corrección Bug #8 en Django — Juan Aguayo (Issue #70 `aguayo-co/HYL-WAI`) | ⏳ Pendiente externo |
 | Propuesta arquitectura BD — tabla canónica `whatsapp_event` | 💡 Plan de destino, sin decisión de implementar. Detalle: `docs/architecture/whatsapp-event-canonico-propuesta.md` |
