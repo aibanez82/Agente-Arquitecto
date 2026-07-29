@@ -24,11 +24,14 @@
 
 ## Pasos de la ventana (orden propuesto)
 
-1. Crear en n8n STG la credencial `httpHeaderAuth` **"Atencion Humana Header Auth STG"**
-   (UN solo secreto: cubre los 3 webhooks de Atención Humana + `metepec-liberar`).
-   Decisión pendiente del Arquitecto/Alberto: nombre del header (propuesta: `X-Operator-Auth`).
-2. Provisionar el mismo secreto al Dashboard (env var en Vercel, Preview+Production cuando
-   toque PROD; en la ventana STG solo el entorno que corresponda).
+1. ✅ **PRE-PROVISIONADO (29 jul, ejecutado por Alberto):** credencial `httpHeaderAuth`
+   **"Atencion Humana Header Auth STG"** creada en n8n STG vía API — **id `TyxFAIYtKfgHt9cv`**
+   (parámetro del runbook para el remapeo), header `X-Operator-Auth`. Secreto generado con
+   `openssl rand -hex 32`, instalado sin exponerse en ningún momento.
+2. ✅ **PRE-PROVISIONADO (29 jul):** `N8N_OPERATOR_WEBHOOK_SECRET` (mismo secreto) y
+   `N8N_OPERATOR_WEBHOOK_BASE_URL` (`https://n8n-xlqk.srv1810257.hstgr.cloud/webhook`) en
+   Vercel `dashboard-seguroautoqualitas`, targets Production y Preview (verificado con
+   `vercel env ls`). Todo inerte hasta el import (paso 4) y el merge (paso 5).
 3. Correr el script de schema con `--go` contra STG.
 4. Importar los 5 JSONs transformados en n8n STG (export previo de seguridad, como siempre).
 5. Desplegar la rama del Dashboard con las llamadas POST+header (preparada la noche del 28,
