@@ -74,3 +74,27 @@ Ventana 24h: ya acordado diferirla a #135/B4 con followups en dry-run — solo f
 Pásame el resultado (aunque sea en 3 líneas: GO/no-GO, decisión de los 4 writers, supuestos
 aprobados/ajustados) y yo: actualizo docs, lanzo la fase pequeña si Juan pidió los locks
 legacy, y dejo la ventana del viernes lista paso a paso.
+
+---
+
+## ACTUALIZACIÓN 29-jul noche — el checkpoint llega mucho más maduro
+
+Desde que se escribió este guion pasó todo esto (todo publicado en #132):
+
+- **Fase 6.5 y 6.6 cerradas y certificadas** (`f5072f5`, 273 tests, ambos flavors): los 5 gates
+  de la revisión de Juan en verde. **Los 8 writers legacy ya tienen lock** — el punto 3 del
+  guion original queda obsoleto (ya no hay decisión de "4 writers sin lock").
+- **Juan entregó su paquete Django** (PR draft #139) y **el contraste del Arquitecto dio
+  canónico en MATCH EXACTO** — el gate 1 se cierra con su corrida en el PG real de STG.
+- **De las 6 preguntas de aprobación, 3 se cerraron con su propio código** ((a)/(c)/(d)).
+  **Decisiones reales que quedan: (b) RETURN NULL vs RAISE en el trigger, (e)
+  `payload_v1_lead_no_verificable` terminal vs degradar, (f) re-validación por
+  identidad/generación sin gates de fase.** Recomendación del Arquitecto: defender las tres
+  como están (razonadas en issuecomment-5123328661).
+- **4 sincronizaciones menores** ya avisadas a Juan (issuecomment-5123375090): su runbook
+  referencia scripts superseded (usar `create-port132-window-schema-stg.py`), la expectativa
+  errónea de `blocked_human_active` en Dashboard, la asimetría de sus writers single-statement
+  sin lock (confirmar deliberada), y flags de followups seteados EXPLÍCITOS en Heroku STG
+  (su preflight trata ausente como false-PASS).
+- **Criterio de GO actualizado:** nuestros gates ✅ + canónico match ✅ → el GO del viernes
+  depende solo de su preflight real en STG + las 3 decisiones (b)/(e)/(f) + firmas.
