@@ -279,3 +279,14 @@ nuestros scripts DDL (bug real), lead_id v1, exclusión Humano/Metepec fail-clos
 barreras. 🟡 EN EJECUCIÓN: handoff `2026-07-29-fase6-5-pre-window-hardening.md` (`17ddf39`,
 T1-T9) lanzado vía fork ejecutor. Pendiente del Arquitecto tras el reporte: certificar, mapear
 outcomes nuevos de T6 en la rama del Dashboard, y llevar (c)/(h) al checkpoint de mañana.
+
+**Fase 6.5 ✅ (29 jul tarde, `848057e`, fork ejecutor) y certificada por el Arquitecto** (249
+tests: actual 245 pass/4 skip/0 fail, objetivo 248/1/0, reproducidos). T1-T9 completos. Claves:
+canónico unificado 10/52/521 (11 writers re-generados, vectores publicados a Juan); trigger
+BEFORE INSERT en n8n_chat_histories (cubre Chat Memory; carrera archivado-vs-INSERT probada);
+Update Activity lockeado; paridad archive en script de ventana; lead_id validado; exclusión
+Humano/Metepec fail-closed (`blocked_metepec_active`/`blocked_human_active`; Dashboard ya lo
+mapea, `08981ef`); **hallazgo #69: Phase Guard leía propiedad inexistente — NUNCA bloqueó;
+corregido + 3 barreras, Payment único writer de `completed` (cambio observable)**; runbook de
+deploy dry-run `deploy/deploy-port-132-stg.py`. 6 supuestos elevados a Juan para el checkpoint
+(issuecomment-5121457924), incluido el inventario honesto de 4 writers legacy sin lock.
