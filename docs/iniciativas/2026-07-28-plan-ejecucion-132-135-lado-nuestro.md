@@ -134,7 +134,14 @@ Sobre el freeze `2ede413`. Orden = fases del issue; lo no-conversacional puede a
   con `sent_by=human_agent`), dedupe inbound por `wamid` (única mutación de Main), precedencia
   humano/Metepec/terminal. Resuelve `qualitas-issues#57`. Ventana Fase 7 necesitará: credencial
   headerAuth nueva + secreto al Dashboard + tabla en STG.
-- **Fase 5:** Metepec dual-safe (liberación POST autenticada por `session_id` exacto).
+- **Fase 5:** 🔵 handoff entregado (28-jul, `Agente-n8n:handoffs/2026-07-28-fase5-metepec-dual-safe.md`,
+  commit `87ef6eb`; ejecutar tras Fase 4) — Metepec dual-safe. Verificado contra exports de
+  Fase 0: la derivación ya marca por `session_id`; el infractor es `Metepec Liberar` (GET sin
+  auth, limpia por teléfono → todas las sesiones). Liberación POST+headerAuth (credencial
+  compartida con Fase 4) por `session_id` exacto con opcionales compatibles y 521/52 como
+  verificación secundaria; fencing con columna nueva `metepec_derived_at` (aditiva, dominio
+  nuestro); historial de la rama `metepec_derived` de Main bajo `session_id` canónico.
+  Suma a la ventana Fase 7: `ALTER TABLE` de la columna.
 - **Fase 6:** 🟡 adelanto certificado (28-jul, commit `be4bd50`, 33/33): harness PG17 local con
   DDL real de STG, fixtures, concurrencia determinística y baseline de caracterización.
   **Inventario §9.1 completado:** `idx_whatsapp_sessions_phone_number UNIQUE` es el único
