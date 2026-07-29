@@ -103,3 +103,35 @@ Desde que se escribió este guion pasó todo esto (todo publicado en #132):
   bloquea Recordatorios por fecha mencionada y rescates tipo Bug #12). El Arquitecto tiene el
   borrador listo (nombre `reenganche_cotizacion_pendiente`, categoría Utilidad, cuerpo con
   {{nombre}}/{{vehículo}}, botones de respuesta rápida) — se le pasa para copy/paste.
+
+---
+
+## ACTUALIZACIÓN 29-jul 22:30 — dictamen de auditoría de Juan: NO-GO offline (SUPERSEDE lo anterior donde contradiga)
+
+Juan publicó su auditoría de `f5072f5` (issuecomment-5123871526). Lo esencial:
+
+- **Confirma nuestros números** (reprodujo las suites en PG17 aislado: 269+272 pass, 139/139
+  unitarias, dry-run completo) y da por presentes los 5 avances funcionales. **Pero el dictamen
+  es NO-GO offline** para ejecutar el runbook contra STG: 3 P0 en el script de deploy + 5 P1
+  de fencing/identidad + readiness/rollback. Ninguno toca la lógica certificada — todos están
+  en la tubería de deploy o en cobertura que las suites no tenían.
+- **Las 3 decisiones abiertas quedaron resueltas — ya NO son agenda de la llamada:**
+  (b) `RETURN NULL` ✅ aprobado; (e) `lead_no_verificable` terminal ✅ aprobado;
+  (f) ❌ RECHAZADO omitir gates de fase/estado en los 8 writers — lo reprodujo (writer stale
+  mutó una sesión `completed`; `Update Out of Scope` baneó a una identidad nueva). Los gates
+  son ahora trabajo obligatorio, no decisión.
+- **Handoff Fase 6.7 ya entregado al Agente n8n** con los 10 puntos:
+  `~/claude-projects/Agente-n8n/handoffs/2026-07-29-fase6-7-bloqueantes-auditoria-juan.md`
+  (rama `feature/issue-132-port-dual-safe`, commit `095829a`). Orden: P0 runbook → gates
+  writers → resto. Ideal: llegar a la llamada con T1+T2 en verde.
+- **PR #139 ya está en STG:** mergeado a `stg` como `34d7d6b` y desplegado en `hyl-wai-stg`
+  (sin flags nuevos ni migraciones), ANTES del checkpoint. Juan lo declaró y no tocará STG sin
+  autorización. **Abrir la llamada con el punto 1 (preflight read-only)** — confirmar `shadow`,
+  flags y schema efectivos — ya no es "presenta Juan si quiere", es el primer paso conjunto.
+- **Juan sincronizó su runbook** al script consolidado y al outcome real del Dashboard
+  (`HYL-WAI@6499284`).
+- **Criterio de GO re-actualizado:** ya no basta preflight + decisiones. Ahora: Fase 6.7
+  cerrada y certificada + re-revisión de Juan + su preflight verde. **La ventana del viernes
+  13:00 está en riesgo real** — llevar a la llamada la disyuntiva viernes-vs-lunes 3-ago sin
+  forzar; si T1+T2 no están en verde y contrastados antes de la llamada, recomendación del
+  Arquitecto: proponer lunes directamente.
