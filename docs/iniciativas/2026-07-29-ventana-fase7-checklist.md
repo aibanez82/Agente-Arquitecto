@@ -34,8 +34,14 @@
    `vercel env ls`). Todo inerte hasta el import (paso 4) y el merge (paso 5).
 3. Correr el script de schema con `--go` contra STG.
 4. Importar los 5 JSONs transformados en n8n STG (export previo de seguridad, como siempre).
-5. Desplegar la rama del Dashboard con las llamadas POST+header (preparada la noche del 28,
-   ver abajo) — SOLO tras 1-4.
+5. Desplegar el Dashboard — SOLO tras 1-4. Son DOS ramas listas, se mergean a `main` en este
+   orden (no chocan: tocan archivos distintos):
+   a. `fix/conversation-id-whatsapp-n8n-rebased` (`756d794`) — conversation-id v2 re-aplicado
+      post-monorepo (preparado 29-jul; verificado: columnas v2 ya en PROD, build verde,
+      incorpora allowlist #61 y respeta la rama de archive). Decisión de Alberto 29-jul: NO
+      desplegar ad-hoc, va en esta ventana. El `main` local del clon quedó devuelto a
+      `origin/main` — el merge se recrea aquí (merge --no-ff de la rama y push).
+   b. `fix/operator-webhooks-post-headerauth` (`08981ef`) — webhooks de operador POST+auth.
 6. E2E de humo: tomar/enviar/liberar conversación desde el Dashboard, derivar/liberar Metepec,
    replay de Payment con mismo `event_id` (→ `duplicate`, sin re-envío WA).
 
