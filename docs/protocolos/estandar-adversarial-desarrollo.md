@@ -39,6 +39,12 @@ columna de identidad al esquema, hay UN punto del código que actualizar, no och
 **5. Toda llamada externa tiene TRES resultados.** Éxito, fallo, e INCIERTO
 (timeout/4xx-5xx inesperado/respuesta sin el campo esperado). El incierto NUNCA se colapsa a
 éxito ni a "nada que hacer"; se reporta como incierto y requiere verificación explícita.
+Corolario capa-de-herramienta (anomalía del clasificador, reparación 30-jul): aplica también
+a la infraestructura con la que el propio agente ejecuta — una denegación/error de la
+herramienta tras lanzar una ACCIÓN VIVA no prueba que no se ejecutó (la respuesta puede
+perderse DESPUÉS de actuar). Regla operativa: tras cualquier error en acción viva, verificar
+el estado real del sistema antes de afirmar nada; y toda acción viva escribe su propio log a
+fichero desde dentro (no depender de la redirección del invocador).
 
 **6. Verificar por definición, no por nombre.** Que exista un objeto llamado igual
 (trigger, índice, constraint, función) no prueba nada: comparar definición normalizada,
