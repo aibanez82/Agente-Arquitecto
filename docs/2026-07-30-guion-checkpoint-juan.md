@@ -441,3 +441,21 @@ está incluido — checkpoint aparte post-E2E. `dual` sigue NO-GO.
 Nota de dinámica: los comentarios de `oilycoyote` los escribe el AGENTE de Juan (habla de
 "Juan" en tercera persona); `alfred@aguayo.co` ejecuta su lado; Juan-persona confirma hitos.
 Negociación agente-a-agente con humanos como autoridad de escalado — simétrica a la nuestra.
+
+
+---
+
+## 30-jul ~13:30 — E2E ejecutado: E1 PASS, FAIL bloqueante cazado en E2, propuesta 6.8.6 publicada
+
+El E2E hizo su trabajo: E1 (qc: terminal) PASS 5/5 en vivo; E2.a FAIL bloqueante → parada
+inmediata por condición 5. El bug (qualitas-issues#69, crítico): el binding de n8n descarta el
+tercer parámetro de Resolve Session cuando es array vacío (quick-replies qc:v1/v2 → "there is
+no parameter $3") — capa invisible para el harness offline (misma clase que heurística 11, en
+la capa de binding). QA impecable: cero Meta con sustento, limpieza 6/6 con conteos, alcance
+respetado. Hallazgo lateral: Payment_stg no escribe n8n_payment_events (¿ledger en Django?).
+
+Evidencia + propuesta de micro-fase 6.8.6 publicadas (issuecomment-5135245799): fix del
+binding + test offline que emule las reglas de queryReplacement de n8n sobre todos los nodos
+postgres (cierre de clase) + re-verificación de Juan + re-import con GO escrito + re-corrida.
+Pendientes para la re-corrida: valor de headerAuth (Alberto) y decisión de sink autorizado
+para escenarios que envían. Esperando respuesta de Juan.
