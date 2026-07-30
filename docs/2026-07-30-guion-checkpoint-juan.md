@@ -459,3 +459,10 @@ binding + test offline que emule las reglas de queryReplacement de n8n sobre tod
 postgres (cierre de clase) + re-verificación de Juan + re-import con GO escrito + re-corrida.
 Pendientes para la re-corrida: valor de headerAuth (Alberto) y decisión de sink autorizado
 para escenarios que envían. Esperando respuesta de Juan.
+
+**Sinks de prueba propuestos por Alberto (30-jul, para autorización de Juan en la re-corrida):**
+- WhatsApp de prueba: **5551074144** (México → destino efectivo 525551074144)
+- Correo Metepec de prueba: **Insurmind Metepec <insurmindmetepec@gmail.com>**
+Pendiente confirmar: si el número está dado de alta como destinatario permitido en la app de
+Meta que usa STG (si la app no está en modo producción, Meta solo entrega a números
+verificados) — si no lo está, el alta es gestión de Juan (regla: todo Meta lo ejecuta Juan).
