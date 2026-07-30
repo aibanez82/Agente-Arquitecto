@@ -307,3 +307,30 @@ concretar la suite compartida post-ventana como `test/negative-suite/` versionad
 - OJO límite del ciclo autónomo: la 6.8.2 es la iteración 2 de 2. Si la re-verificación de
   Juan sobre los 7 saliera con hallazgos nuevos, el Arquitecto NO itera solo — lo trae a
   Alberto (y a esa altura sería señal de discutir enfoque en la llamada, no de parchear).
+
+---
+
+## ACTUALIZACIÓN 30-jul madrugada — 6.8.2 ENTREGADA, CERTIFICADA Y NOTIFICADA (ciclo completo; pelota en Juan)
+
+El ciclo autónomo cerró su segunda y última vuelta: el ejecutor entregó la 6.8.2 (`19e98c5`),
+el Arquitecto la reprodujo (**JS 394 × ambos flavors, Python 149, 0 fallos** — concurrencia
+con Postgres real incluida) y la pasada adversarial acotada a los 7 dio **los 7 contratos
+CERRADOS**, diff completo (41 archivos) dentro de alcance, diferidos intactos. **Juan
+notificado** (issuecomment-5131822493) con las notas declarables:
+1. Punto 6b: ventana residual sub-sentencia (revocación en tabla de claims mientras la reserva
+   espera el lock — EPQ no aplica cross-tabla). Su reproducción exacta SÍ está cerrada; se le
+   propone decidir si va a diferidos o a E2E.
+2. Punto 5: validación inicial (no continua) para motivos no-renovación — decisión declarada.
+3. `binaryMode` fuera del PUT/rollback — reponer a mano post-ventana si algún flujo necesita
+   media.
+4. Guard de destino validado con conexión read-only a STG (0 escrituras, declarado).
+
+Piezas nuevas reutilizables: helper de alcanzabilidad de grafo (`test/helpers-graph.js`) y
+guard de destino (`port132_target_guard.py`, 2 capas + `--confirm-target-db`, pre-DDL).
+
+**Posición final para la llamada de las 10:00:** TODO nuestro lado está entregado y
+certificado. Falta solo la verificación de Juan de los 7 (su compromiso: verde = GO técnico
+shadow, sin más rondas). La llamada idealmente ARRANCA con su verde (o lo ejecuta en vivo) y
+pasa directo a fechas de la secuencia operativa: contención/preflight → DDL autorizado (con
+`--confirm-target-db`) → import shadow → E2E vivo → dual con GO conjunto. Presupuesto
+autónomo agotado: cualquier hallazgo nuevo de Juan vuelve a Alberto, no al ciclo.
