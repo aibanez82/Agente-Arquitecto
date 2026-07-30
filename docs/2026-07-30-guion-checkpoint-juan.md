@@ -360,3 +360,27 @@ pairing (Alberto + Juan + agentes en vivo) en lugar de otra ronda asíncrona —
 convergencia es real (cada ronda encuentra menos y más fino: 10 → 10 → 7 → 4 → ¿0?) pero el
 método asíncrono tiene coste de ~medio día por ronda. La ventana del viernes ya no es
 defendible; lunes 3-ago es la propuesta honesta.
+
+---
+
+# 🟢 RESULTADO FINAL 30-jul ~11:10 CDMX — GO TÉCNICO DE JUAN (matriz 7/7 PASS)
+
+Tras SEIS pasadas de auditoría (10→10→7→4→3→0 hallazgos), Juan dio el **GO técnico para
+preparar la ventana STG en shadow** sobre **`f33abf8`** (SHA congelado de ventana; cualquier
+commit posterior a la rama = re-apertura que exige su re-verificación). Su verificación final:
+458 JS × ambos flavors + 166 Python + invariante de 6 artefactos/31 IF + carreras con
+conexiones reales — 0 hallazgos nuevos. Quinta y sexta ronda cerradas por el ciclo con
+autorización expresa de Alberto (6.8.5: sub-workflow IF, reserva Metepec INSERT→Gmail con TTL,
+active en rollback final).
+
+**El GO NO autoriza cambios vivos.** Secuencia pactada (cada paso con autorización explícita):
+1. Ambos lados quietos: Django shadow, followups off, dry-run, cero cambios a la rama.
+2. Juan publica preflight read-only sin FAIL. ← ESPERANDO ESTO
+3. Checkpoint/autorización de Alberto con Juan → fechar y ejecutar DDL
+   (`--confirm-target-db`) + import n8n en STG. ← DECISIÓN DE FECHAS DE ALBERTO
+4. E2E en shadow (Agente QA disponible) + evidencia de rollback real.
+5. `dual` solo con GO conjunto posterior + observación + rollback disponible.
+
+Acuse publicado: issuecomment-5133942154. Post-ventana pendiente: concretar la suite negativa
+compartida (`test/negative-suite/`) como criterio de aceptación común. #135 sigue
+offline/draft. Juan no cierra #132 hasta completar la secuencia (correcto: deploy ≠ cierre).
