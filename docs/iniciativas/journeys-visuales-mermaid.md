@@ -9,6 +9,14 @@ Mapear todos los journeys del ecosistema como diagramas Mermaid versionados en e
 (`docs/journeys/`, un archivo por journey + índice), mantenidos por los agentes en el mismo
 commit que documenta cada cambio real — para que el diagrama no pueda mentir.
 
+## Privacidad (aclarado con Alberto, 30 jul)
+
+Mermaid es una LIBRERÍA open source, no un servicio: los diagramas son texto en `.md` dentro
+de este repo privado — nada se sube a ningún tercero nuevo. "Mermaid Chart"
+(mermaidchart.com) es un SaaS comercial aparte que NO se usa ni se necesita. Render: GitHub
+(nativo, repo privado), extensión VS Code "Markdown Preview Mermaid Support" (offline), o
+Artifacts de Claude (privados por defecto). mermaid.live tampoco hace falta.
+
 ## Por qué Mermaid (y no una herramienta de dibujo)
 
 - La fuente de verdad del proyecto vive en git (regla multi-máquina) y la mantienen agentes:
