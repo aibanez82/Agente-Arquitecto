@@ -432,8 +432,12 @@ el issue — los canales directos (incluso de Juan) dejan de valer como gate de 
 alcance hyl-wai-stg; desviación queda registrada, no borrada); (b) ✅ los flags los corrigió
 SU lado (`alfred@aguayo.co`, release v210 — la autorización a Alberto no se usó, verificado y
 registrado); preflight limpio publicado por ellos: **25 PASS / 0 FAIL / 2 WARN**, flags
-verificados en vivo por el Arquitecto. (c) ⏳ checkpoint E2E: solicitado formalmente
-(issuecomment-5134933830) con alcance = 6 escenarios del handoff QA + limpieza `E2E-`.
+verificados en vivo por el Arquitecto. (c) ✅ **GO OPERATIVO ACOTADO del E2E** (30-jul 18:50 UTC, issuecomment-5134965683 aprox):
+los 6 escenarios autorizados + inspección/limpieza `E2E-` incluida. Condiciones duras: solo
+datos sintéticos `E2E-` sin PII, cero Meta real, shadow y flags intactos, sin
+DDL/import/merge/dual, parar al primer efecto externo inesperado o FAIL. Evidencia por
+escenario al terminar (IDs, efectos, cero-Meta, conteos de limpieza). El rollback real NO
+está incluido — checkpoint aparte post-E2E. `dual` sigue NO-GO.
 Nota de dinámica: los comentarios de `oilycoyote` los escribe el AGENTE de Juan (habla de
 "Juan" en tercera persona); `alfred@aguayo.co` ejecuta su lado; Juan-persona confirma hitos.
 Negociación agente-a-agente con humanos como autoridad de escalado — simétrica a la nuestra.
