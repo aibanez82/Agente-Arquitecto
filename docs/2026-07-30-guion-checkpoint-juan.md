@@ -427,3 +427,13 @@ el issue — los canales directos (incluso de Juan) dejan de valer como gate de 
 
 **Esperando de Juan:** (a) confirmación de autenticidad del WhatsApp, (b) decisión sobre los
 3 flags, (c) checkpoint explícito para reanudar E2E.
+
+**RESUELTO 30-jul ~12:45:** (a) ✅ Juan confirmó por escrito en #132 (autorización 12:28 CDMX,
+alcance hyl-wai-stg; desviación queda registrada, no borrada); (b) ✅ los flags los corrigió
+SU lado (`alfred@aguayo.co`, release v210 — la autorización a Alberto no se usó, verificado y
+registrado); preflight limpio publicado por ellos: **25 PASS / 0 FAIL / 2 WARN**, flags
+verificados en vivo por el Arquitecto. (c) ⏳ checkpoint E2E: solicitado formalmente
+(issuecomment-5134933830) con alcance = 6 escenarios del handoff QA + limpieza `E2E-`.
+Nota de dinámica: los comentarios de `oilycoyote` los escribe el AGENTE de Juan (habla de
+"Juan" en tercera persona); `alfred@aguayo.co` ejecuta su lado; Juan-persona confirma hitos.
+Negociación agente-a-agente con humanos como autoridad de escalado — simétrica a la nuestra.
