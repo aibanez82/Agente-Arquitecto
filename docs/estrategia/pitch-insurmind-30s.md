@@ -3,6 +3,8 @@
 > Generado 30 jul 2026 a petición de Alberto. Base: el funnel E2E real
 > (Google Ads → landing → WhatsApp IA → póliza → pago → conciliación).
 > Sin métricas inventadas — donde van números reales, hay un hueco marcado [DATO].
+> Rev. 30 jul: eliminada la línea del takeover humano a petición de Alberto ("esto no lo
+> haremos") — sustituida por el ecosistema de agentes de supervisión.
 
 ## El pitch (30 segundos, ~90 palabras)
 
@@ -13,7 +15,8 @@
 > en segundos, a cualquier hora: cotiza, resuelve dudas, captura los datos, emite la
 > póliza y cobra — todo en la misma conversación.
 >
-> Y cuando hace falta un humano, el equipo toma el control con un clic.
+> Y por detrás, un ecosistema de agentes vigila cada conversación, cada póliza y cada
+> pago — para que nada se pierda.
 >
 > Menos leads perdidos. Más pólizas emitidas. Sin ampliar el equipo.
 >
@@ -40,8 +43,9 @@ Cotiza. <break time="0.3s" /> Resuelve dudas. <break time="0.3s" /> Captura los 
 <break time="0.3s" /> Emite la póliza… <break time="0.3s" /> y cobra. <break time="0.4s" />
 Todo en la misma conversación. <break time="0.7s" />
 
-Y cuando hace falta un humano, <break time="0.2s" /> el equipo toma el control con un
-clic. <break time="0.7s" />
+Y por detrás, <break time="0.2s" /> un ecosistema de agentes vigila cada conversación,
+<break time="0.3s" /> cada póliza <break time="0.3s" /> y cada pago. <break time="0.4s" />
+Para que nada se pierda. <break time="0.7s" />
 
 Menos leads perdidos. <break time="0.4s" /> Más pólizas emitidas. <break time="0.4s" />
 Sin ampliar el equipo. <break time="0.8s" />
@@ -59,7 +63,7 @@ escrito "inteligencia artificial"; generar 2-3 tomas y quedarse con la mejor.
 | 0-5s | Persona rellenando formulario en el móvil de noche; el reloj avanza, nadie contesta | "Cada día, miles de personas… nadie les responde a tiempo" |
 | 5-12s | Notificación de WhatsApp entra AL SEGUNDO; burbuja del bot saludando (capturas reales del bot, datos ficticios) | "Insurmind lo resuelve… a cualquier hora" |
 | 12-20s | Secuencia rápida de burbujas: cotización → PDF → datos → "póliza emitida" → pago confirmado | "Cotiza. Resuelve dudas… en la misma conversación" |
-| 20-25s | Dashboard real (anonimizado): botón "Tomar conversación", agente humano escribe | "Y cuando hace falta un humano…" |
+| 20-25s | Vista del Dashboard con el funnel completo + iconos de agentes vigilando (monitor, QA, conciliación) | "Y por detrás, un ecosistema de agentes vigila…" |
 | 25-30s | Tres contadores subiendo (leads atendidos / pólizas / hora 3:00 AM) | "Menos leads perdidos… sin ampliar el equipo" |
 | 30-35s | Logo Insurmind sobre fondo oscuro, luna → sol | "Insurmind. El vendedor de seguros que nunca duerme." |
 
