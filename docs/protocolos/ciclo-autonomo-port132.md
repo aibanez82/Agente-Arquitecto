@@ -42,8 +42,10 @@ Arquitecto.
 
 ## Cordura anti-bucle
 
-- Máximo 2 iteraciones autónomas Arquitecto↔ejecutor por paquete sin intervención de
-  Alberto; a la tercera, PushNotification y parar (señal de que el enfoque está mal, no
-  de que falten parches).
+- Máximo 3 iteraciones autónomas Arquitecto↔ejecutor por paquete sin intervención de
+  Alberto (ampliado de 2→3 por Alberto, 30 jul, tras agotarse las 2 primeras con las fases
+  6.8.1/6.8.2); a la cuarta, PushNotification y parar (señal de que el enfoque está mal, no
+  de que falten parches). Estado del port #132: iteraciones 1 y 2 consumidas; queda 1
+  disponible para procesar la respuesta de Juan a la 6.8.2 si trae trabajo técnico.
 - El Monitor es de esta sesión — si la sesión muere, el ciclo muere con ella (rearmar al
   reabrir; este doc es la referencia).
