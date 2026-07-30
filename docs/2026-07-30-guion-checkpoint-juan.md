@@ -334,3 +334,29 @@ shadow, sin más rondas). La llamada idealmente ARRANCA con su verde (o lo ejecu
 pasa directo a fechas de la secuencia operativa: contención/preflight → DDL autorizado (con
 `--confirm-target-db`) → import shadow → E2E vivo → dual con GO conjunto. Presupuesto
 autónomo agotado: cualquier hallazgo nuevo de Juan vuelve a Alberto, no al ciclo.
+
+---
+
+## ACTUALIZACIÓN 30-jul ~10:20 — cuarta revisión de Juan (2/4/5/6/7 FAIL) → 6.8.3 entregada y notificada (iteración 3/3, presupuesto AGOTADO)
+
+Secuencia de la mañana, toda por el ciclo autónomo:
+1. Juan verificó `19e98c5`: contratos 1 y 3 PASS; 2/4/5/6/7 FAIL por 4 hallazgos (el crítico:
+   los 5 IF nuevos serializados PLANOS cuando n8n v2.3 exige `fixedCollection` anidada — los
+   tests de alcanzabilidad elegían rama a mano, falso verde de integración). Rechazó como
+   diferidos la decisión del punto 5 y la ventana residual del 6b.
+2. Handoff 6.8.3 (`af388a7`) con sus correcciones exactas; estándar ampliado con heurística
+   11 (validar artefactos contra el schema real del consumidor) y corolario EPQ cross-tabla.
+3. El ejecutor entregó `843ac43`; reproducción Arquitecto: **JS 431 × ambos flavors, Python
+   160, 0 fallos**; adversarial con verificación independiente de H1 (transform in-memory +
+   emulador de condiciones propio): **los 4 hallazgos CERRADOS**, diff dentro de alcance,
+   heredados byte-intactos.
+4. **Juan notificado** (issuecomment-5133067666) con 2 riders menores declarados (invariante
+   H1 de los 3 workflows no-Main corre sobre base, no built; guard InitPlan asimétrico en
+   `session_fence` — ambos fail-closed, no violan contrato).
+
+**PRESUPUESTO AUTÓNOMO AGOTADO (3/3).** Lo que Juan responda va a Alberto, no al ciclo. Si su
+quinta revisión trae hallazgos nuevos, recomendación firme del Arquitecto: sesión síncrona de
+pairing (Alberto + Juan + agentes en vivo) en lugar de otra ronda asíncrona — el patrón de
+convergencia es real (cada ronda encuentra menos y más fino: 10 → 10 → 7 → 4 → ¿0?) pero el
+método asíncrono tiene coste de ~medio día por ronda. La ventana del viernes ya no es
+defendible; lunes 3-ago es la propuesta honesta.
