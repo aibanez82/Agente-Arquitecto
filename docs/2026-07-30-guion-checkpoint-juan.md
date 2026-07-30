@@ -405,3 +405,25 @@ autorización en el issue; (4) E2E en shadow (Agente QA — coordinar escenarios
 takeover, payment, qc:) + evidencia de rollback real; (5) `dual` con GO conjunto.
 También pendiente nuestro: merge Dashboard + env vars Vercel (fase aparte, manos de Alberto)
 y la suite negativa compartida post-ventana.
+
+---
+
+## ⚠️ 30-jul ~12:30 — BLOQUEO DE PROCESO de Juan y resolución en curso
+
+Juan dio **PASS documental/técnico a la ventana** pero **NO-GO operativo** (E2E/merge/dual)
+por proceso: la ejecución saltó su secuencia 1→2→3 (preflight publicado → autorización en el
+issue → ejecutar). La instrucción "ejecuten/suban el DDL+import a STG ya" fue real pero por
+WhatsApp (12:28, tras llamada de 11:57) — no en el issue. Sin rollback (ejecución limpia).
+
+**Respuesta publicada (issuecomment-5134780879):** congelación confirmada (E2E parado — se
+había iniciado antes del dictamen, declarado; datos `E2E-` sin limpiar hasta OK), transcripción
+literal del WhatsApp como evidencia (pantallazo en poder de Alberto), reconocimiento de la
+desviación residual (ejecutar sin preflight previo publicado), y el preflight ACTUAL corrido
+por Alberto: **24 PASS / 3 FAIL / 2 WARN** — los 3 FAIL son los flags de followups que JUAN
+comprometió apagar; su congelación dice "ni flags" → decisión suya (los apaga él o autoriza).
+
+**REGLA PERMANENTE adoptada (y publicada):** ninguna acción viva sin autorización escrita EN
+el issue — los canales directos (incluso de Juan) dejan de valer como gate de ejecución.
+
+**Esperando de Juan:** (a) confirmación de autenticidad del WhatsApp, (b) decisión sobre los
+3 flags, (c) checkpoint explícito para reanudar E2E.
