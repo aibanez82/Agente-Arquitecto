@@ -74,7 +74,12 @@ debería computar NO es un test de integración: hay que emular la evaluación d
 (condición del IF, parser del endpoint) o validar el schema exacto. Casos que motivaron esta
 regla: fingerprint calibrado contra fixtures inventados en vez de los backups de Fase 0
 (6.8.1/A2) y los IF v2.3 serializados planos con tests que elegían `branchIndex` a mano
-(6.8.2→6.8.3/H1).
+(6.8.2→6.8.3/H1). Variante insidiosa (colateral de 6.8.3/H4, detectado por el ejecutor):
+fixtures incompletos (sin `versionId`/`activeVersionId`) que ejercitan silenciosamente el
+camino "sin señal" mientras el test AFIRMA probar el camino confirmado — 10 tests
+preexistentes pasaban en verde probando otra cosa; al endurecer el caso None cayeron todos.
+Señal de detección: si un fix legítimo hace caer tests que "no tienen que ver", sospechar
+primero de los fixtures de esos tests, no del fix.
 
 ## Ámbito
 
