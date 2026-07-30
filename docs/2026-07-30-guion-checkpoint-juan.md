@@ -475,3 +475,12 @@ Alberto quedan archivados por si sirven para un harness inerte). GO SOLO para la
 6.8.6 offline (4 puntos: binding con expresión única, test que emula queryReplacement, 
 invariante de binding sobre los 6 artefactos, contratos intactos). Handoff `1b718ef` pusheado;
 acuse issuecomment-5135294122. Re-import y re-corrida E2E: checkpoints posteriores separados.
+
+**30-jul ~16:05 — REPARACIÓN EJECUTADA + MODO CIERRE.** Serie binding completa (6.8.6→6.8.9,
+4 fases en ~3h por el circuito automático). Reparación Main+Payment aplicada una única vez
+(63bc453, checkout detached, preflight 25/0/2 con JSON crudo, instrucción explícita de
+Alberto), verificada en vivo por el Arquitecto: 3 nodos con el fix servido, sin rollback.
+Evidencia: Agente-n8n docs/2026-07-30-reparacion-stg-evidencia.md + issuecomment-5136716047.
+**MODO CIERRE activado por Alberto (Juan y él quieren terminar):** propuesta publicada = un
+único GO terminal (E2E final → shadow cumplida → inventario único de diferidos → dual aparte).
+Regla para agentes y Arquitecto: cero alcance nuevo; solo bloquea lo que rompa shadow.
