@@ -205,3 +205,40 @@ como tablas para su sign-off.
 - Si la 6.8 no está cerrada → proponer lunes 3-ago directamente, sin forzar.
 - Señal positiva para la relación: Juan respondió en <30 min a las ~18:00 de su noche y propuso
   él mismo la fase corta — está tan invertido como nosotros en que la ventana salga.
+
+---
+
+## ACTUALIZACIÓN 29-jul ~21:30 — Fase 6.8 entregada; el proceso adversarial NUEVO la retuvo antes de Juan (Fase 6.8.1 en curso)
+
+El Agente n8n cerró la 6.8 (`520a805`, 306 JS × ambos flavors + 60 Py, reproducidos en verde
+por el Arquitecto). **Pero estrenamos el proceso anti-ping-pong**
+(`docs/protocolos/estandar-adversarial-desarrollo.md`): 3 revisores adversariales del
+Arquitecto atacaron el paquete ANTES de notificar a Juan. Resultado: **4 críticos y ~8 medios
+que Juan habría cazado en su tercera auditoría — esta vez los encontramos nosotros**:
+
+1. **Writer nº 9 sin gate:** hay 10 writers de `whatsapp_sessions`, no 8 — `Update Phase in DB`
+   quedó fuera del universo y puede regresar la fase de una sesión pagada a `payment_pending`
+   (re-enganche a cliente que ya pagó). `Update Activity` comparte el hueco.
+2. **Auto-rollback determinista del runbook:** el fingerprint del sub-workflow compara el id
+   placeholder del build contra el id que genera el servidor → NINGUNA ventana real podría
+   completarse; el verify nunca se calibró contra la forma real de la API (los backups de
+   Fase 0 estaban en el repo para hacerlo).
+3. **root↔activeVersion contradictorio** (los backups prueban que la API sí expone el campo,
+   pero un comentario vigente de 6.7 dice que viene rezagado post-PUT → rollback en falso).
+4. **Readiness del trigger fail-open cross-schema** (el fake de Juan sobrevive un schema más
+   allá).
+
+**Handoff Fase 6.8.1 entregado** (`Agente-n8n:handoffs/2026-07-29-fase6-8-1-pasada-adversarial-arquitecto.md`,
+commit `0cff96b`). Juan NO ha sido notificado de la 6.8 — solo se le notifica cuando 6.8.1
+cierre y re-verifique.
+
+**Para la llamada (actualiza el árbol de decisión anterior):**
+- Si 6.8.1 cierra esta noche y re-verifica en verde → notificar a Juan a primera hora con 6.8 +
+  6.8.1 juntas y el relato del proceso nuevo ("tu método ya corre de nuestro lado ANTES de
+  entregarte") — es el mejor argumento posible para mantener vivo el GO del viernes.
+- Si no cierra → llevar a la llamada la 6.8 con los hallazgos propios declarados y proponer
+  lunes 3-ago; la transparencia de "nos auto-cazamos el writer nº 9" vale más que llegar
+  "en verde" y que lo cace él.
+- Narrativa clave para Juan: adoptamos su metodología como estándar permanente (checklist de 10
+  heurísticas destilada de sus 2 auditorías) + pasada adversarial obligatoria pre-notificación.
+  Proponerle el paso 3: suite negativa COMPARTIDA como criterio de aceptación común.
