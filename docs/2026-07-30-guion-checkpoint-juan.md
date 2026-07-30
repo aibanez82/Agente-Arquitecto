@@ -267,3 +267,43 @@ depende de: (a) re-auditoría de Juan del rango completo, (b) su preflight read-
 (c) el WHERE de followups si decide activar envío real cerca de la ventana. La disyuntiva
 viernes-vs-lunes se decide en la llamada — llegamos con la mejor posición posible: dos fases en
 una noche, 4 críticos auto-cazados y el método de Juan institucionalizado.
+
+---
+
+## ACTUALIZACIÓN 30-jul ~03:45 UTC — TERCERA auditoría de Juan: CONVERGENCIA CALIBRADA (esto cambia el tono de la llamada a positivo)
+
+Juan re-auditó `b74d9b4` (issuecomment de las 03:42 UTC) y el resultado es el mejor posible sin
+ser GO inmediato:
+
+- **Reprodujo y confirmó toda nuestra certificación** (JS 327/330, Python 118, 16 writers con
+  lock en su escaneo independiente). "Las mejoras de 6.8/6.8.1 son reales."
+- **ACEPTÓ la suite negativa compartida** (nuestra propuesta anti-ping-pong).
+- **CALIBRÓ el cierre — fin del ciclo abierto de perfeccionamiento:** 7 bloqueantes concretos
+  con criterios de aceptación explícitos + lista de riesgos DIFERIDOS que "no abrirán otra
+  ronda bloqueante". Con los 7 verdes → **GO técnico para preparar la ventana STG en shadow**.
+  Su re-verificación será limitada a esos 7 contratos.
+- Los 7 (resumen): (1) rebase sobre `stg` vigente + fix `binaryMode` 400; (2) `qc:` inválido
+  terminal por ALCANZABILIDAD de grafo (su parser-fuzzing resolvió `qc:garbage`); (3) carrera
+  de Payment que consume el pago sin completar sesión (el hallazgo más serio); (4) respuesta
+  IA stale se envía aunque `writer_rows=0`; (5) Metepec inserta lead y manda correo ANTES del
+  gate; (6) TOCTOU de takeover/liberación humana; (7) activeVersion/rollback/guard de destino
+  del DDL.
+- Su lado mientras tanto: Django en shadow, followups APAGADOS/dry-run (recoge nuestra nota de
+  `last_activity`), preflight a repetir, #135 congelado offline.
+
+**Hecho ya (ciclo autónomo, iteración 2 de 2):** handoff 6.8.2 pusheado (`c65c98a`, el loop
+del ejecutor lo recoge solo) con alcance ESTRICTO a los 7 y la advertencia de no tocar
+diferidos; acuse a Juan publicado (issuecomment-5126165367) aceptando el marco y proponiendo
+concretar la suite compartida post-ventana como `test/negative-suite/` versionado.
+
+**Para la llamada de las 10:00 — el guion cambia:**
+- Ya NO es "defender el paquete": es confirmar la secuencia operativa que el propio Juan
+  enumeró (contención/preflight → DDL autorizado → import shadow → E2E vivo → dual con GO
+  conjunto) y ponerle fechas.
+- Si la 6.8.2 está entregada y certificada antes de la llamada → pedir su verificación de los
+  7 en la propia llamada o inmediatamente después, y la ventana del viernes 13:00 es
+  plausible; si no, viernes se convierte en "ventana de preparación" y el import real va al
+  lunes — decisión de Alberto con Juan.
+- OJO límite del ciclo autónomo: la 6.8.2 es la iteración 2 de 2. Si la re-verificación de
+  Juan sobre los 7 saliera con hallazgos nuevos, el Arquitecto NO itera solo — lo trae a
+  Alberto (y a esa altura sería señal de discutir enfoque en la llamada, no de parchear).
