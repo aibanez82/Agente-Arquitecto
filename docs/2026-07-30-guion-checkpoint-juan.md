@@ -165,4 +165,43 @@ de re-auditoría antes de las 10:00 si le da la vida; si no, primer punto de la 
   lunes de entrada.
 - **Flag operativo menor:** el clon local de `Agente-n8n` tiene la rama `stg` con 1 commit sin
   pushear (`31306db`, refuerzo CASO A) — pedir al Agente n8n que lo pushee o lo explique
-  (regla multi-máquina: nada vive solo en local).
+  (regla multi-máquina: nada vive solo en local). [RESUELTO ~18:10 — ya sincronizado]
+
+---
+
+## ACTUALIZACIÓN 29-jul ~18:30 — SEGUNDA re-auditoría de Juan: NO-GO otra vez → Fase 6.8 en curso (SUPERSEDE el bloque anterior)
+
+Juan re-auditó `1424163` en menos de media hora (comentario 30-jul 00:01 UTC). Reprodujo
+nuestros números (los confirma todos) y da por cerrados 6 fixes de 6.7, pero su revisión
+negativa encontró **10 huecos nuevos** y el dictamen sigue **NO-GO offline**. Él mismo propone
+"Fase 6.8 corta". Lo esencial:
+
+- **Writers (los 4 duros):** el gate debe ser ALLOWLIST de estados recuperables (reprodujo
+  mutación con `status='completed'` y `phase='archived'`, que nuestro gate blocklist no cubre);
+  `Mark Session Closed` debe usar el gate estándar (reprodujo a Mark pisando a Payment); falta
+  `conversation_id` en la identidad de los writers; y **rechazó mi decisión de 6.7**: los
+  handoffs `human_takeover`/`metepec` SÍ entran al gate de los writers del agente.
+- **`qc:v2`:** también rechazó mi acotación a v1 — v2 es contrato nuevo, `l:` numérico
+  obligatorio. Acepté ambos criterios suyos (tiene razón en los dos).
+- **Runbook/readiness:** fingerprint ciego a IDs de nodos, sync Git no atómico, doble fuente de
+  URL/credencial STG, rollback que trata timeout como "borrado", readiness por nombre y no por
+  definición (nos cazó con fakes: trigger passthrough homónimo, índice con definición errónea).
+- **Su "Estado de cierre" de #132:** lista explícita de lo que falta aunque el offline quede
+  perfecto (preflight verde, DDL aplicado, import real, E2E shadow, dual observado, rollback
+  real). Coincide con lo ya acordado (deploy ≠ cierre) — no es alcance de 6.8.
+
+**Hecho ya:** handoff Fase 6.8 entregado al Agente n8n
+(`Agente-n8n:handoffs/2026-07-29-fase6-8-segunda-auditoria-juan.md`, commit `53e30a2` en la
+rama) con los 10 puntos como T1-T10 y las dos decisiones revocadas documentadas. Acuse a Juan
+publicado (issuecomment-5124869364) aceptando sus criterios y comprometiendo allowlist + matriz
+como tablas para su sign-off.
+
+**Para la llamada:**
+- Si al arrancar la llamada la 6.8 está cerrada, certificada por el Arquitecto Y re-auditada
+  por Juan en verde → GO viernes sigue vivo (dependiendo solo del preflight).
+- Si la 6.8 está cerrada y certificada pero SIN re-auditoría de Juan → proponer que la
+  re-audite el jueves por la tarde y decidir GO/NO-GO el viernes 9:00 por el issue (ventana
+  13:00 se mantiene tentativa).
+- Si la 6.8 no está cerrada → proponer lunes 3-ago directamente, sin forzar.
+- Señal positiva para la relación: Juan respondió en <30 min a las ~18:00 de su noche y propuso
+  él mismo la fase corta — está tan invertido como nosotros en que la ventana salga.
