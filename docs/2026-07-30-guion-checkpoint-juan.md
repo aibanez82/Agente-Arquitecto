@@ -466,3 +466,12 @@ para escenarios que envían. Esperando respuesta de Juan.
 Pendiente confirmar: si el número está dado de alta como destinatario permitido en la app de
 Meta que usa STG (si la app no está en modo producción, Meta solo entrega a números
 verificados) — si no lo está, el alta es gestión de Juan (regla: todo Meta lo ejecuta Juan).
+
+**30-jul ~13:35 — dictamen de Juan sobre el E2E:** E1 PASS aceptado, FAIL de binding confirmado
+offline, cumplimiento del checkpoint reconocido. Correcciones suyas: el ledger de Payment SÍ
+está en n8n (SQL de Mark Session Completed — trasladar al QA para el E4 futuro); sinks de
+envío = inerte auditado o parada pre-conector (retirada la idea del número real; los sinks de
+Alberto quedan archivados por si sirven para un harness inerte). GO SOLO para la micro-fase
+6.8.6 offline (4 puntos: binding con expresión única, test que emula queryReplacement, 
+invariante de binding sobre los 6 artefactos, contratos intactos). Handoff `1b718ef` pusheado;
+acuse issuecomment-5135294122. Re-import y re-corrida E2E: checkpoints posteriores separados.
