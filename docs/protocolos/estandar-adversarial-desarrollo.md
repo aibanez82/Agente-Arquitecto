@@ -61,6 +61,20 @@ mensaje/razón, no solo el booleano).
 **10. Carreras: la fila viva manda.** En concurrencia con locks, todo predicado se evalúa
 sobre el estado POST-espera (fila viva, EPQ), nunca sobre el snapshot pre-lock; los tests de
 carrera usan dos conexiones reales con el lock tomado en medio, no simulación secuencial.
+Corolario cross-tabla (hallazgo Juan, 6.8.2→6.8.3): EPQ solo re-evalúa filas que la sentencia
+toca — si la autoridad vive en OTRA tabla (claims), el fencing debe forzar el conflicto de
+fila (FOR UPDATE / versión-epoch en la fila que la sentencia sí toca), no confiar en el
+snapshot.
+
+**11. El artefacto construido se valida contra el schema real del consumidor.** Todo artefacto
+generado (JSON de workflow, SQL, payload) se contrasta contra fixtures REALES del sistema que
+lo consumirá (exports de n8n, backups, respuestas de API) — la referencia casi siempre ya está
+en el repo. Un test de integración que selecciona a mano la rama/valor que el consumidor
+debería computar NO es un test de integración: hay que emular la evaluación del consumidor
+(condición del IF, parser del endpoint) o validar el schema exacto. Casos que motivaron esta
+regla: fingerprint calibrado contra fixtures inventados en vez de los backups de Fase 0
+(6.8.1/A2) y los IF v2.3 serializados planos con tests que elegían `branchIndex` a mano
+(6.8.2→6.8.3/H1).
 
 ## Ámbito
 
