@@ -384,3 +384,24 @@ active en rollback final).
 Acuse publicado: issuecomment-5133942154. Post-ventana pendiente: concretar la suite negativa
 compartida (`test/negative-suite/`) como criterio de aceptación común. #135 sigue
 offline/draft. Juan no cierra #132 hasta completar la secuencia (correcto: deploy ≠ cierre).
+
+---
+
+# ✅ VENTANA STG EJECUTADA — 30-jul ~12:15 CDMX (paso 3 de la secuencia COMPLETO)
+
+Juan autorizó por canal directo ("subamos ya"); Alberto instruyó al Agente n8n con el handoff
+de ventana (`ef85e35`). Resultado: **DDL + import n8n con exit 0, sin rollback, PROD
+intocado**. Evidencia: `Agente-n8n:docs/2026-07-30-ventana-stg-evidencia.md` (`ce430c3`),
+sync a `stg` = `acef1a9`, publicado en #132 (issuecomment-5134625523).
+
+- Target guard validó `dei0jssp8kr5kv` pre-commit. Sub creado: `PuogahK4qv9YOiF4`.
+- Única desviación: `--header-auth-cred-id` faltaba en el handoff → el guard del script
+  abortó limpio y Alberto confirmó el ID en sesión (`TyxFAIYtKfgHt9cv`). Bien manejado.
+- **Verificación independiente del Arquitecto contra el STG vivo:** Main → sub correcto,
+  24 IF / 0 planos, 6 tablas, trigger 'O', columnas de fencing desplegadas. Todo verde.
+
+**Quedan de la secuencia:** (2) preflight de Juan publicado sin FAIL + su línea de
+autorización en el issue; (4) E2E en shadow (Agente QA — coordinar escenarios: Metepec,
+takeover, payment, qc:) + evidencia de rollback real; (5) `dual` con GO conjunto.
+También pendiente nuestro: merge Dashboard + env vars Vercel (fase aparte, manos de Alberto)
+y la suite negativa compartida post-ventana.
