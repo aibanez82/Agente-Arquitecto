@@ -242,3 +242,28 @@ cierre y re-verifique.
 - Narrativa clave para Juan: adoptamos su metodología como estándar permanente (checklist de 10
   heurísticas destilada de sus 2 auditorías) + pasada adversarial obligatoria pre-notificación.
   Proponerle el paso 3: suite negativa COMPARTIDA como criterio de aceptación común.
+
+---
+
+## ACTUALIZACIÓN 29-jul ~23:30 — 6.8.1 CERRADA, CERTIFICADA Y NOTIFICADA A JUAN (ciclo autónomo, 1ª vuelta)
+
+El ciclo autónomo completó su primera vuelta sin intervención: el Agente n8n entregó la 6.8.1
+(`b74d9b4`), el Arquitecto la reprodujo (JS 331 × ambos flavors, Python 118, 0 fallos) y el
+re-chequeo adversarial independiente la dio por **cerrada a la clase** (el auditor regeneró los
+workflows built y reprodujo la enumeración de writers por su cuenta). Los 4 críticos + 8 P1 +
+P2 declarados: cerrados. **Juan notificado** (issuecomment-5125749001) con el rango
+`1424163..b74d9b4`, la narrativa del proceso nuevo y la propuesta de suite negativa compartida.
+
+**Hallazgo transversal propio, verificado en ambos repos (nota declarada a Juan):** con el gate
+nuevo, `last_activity` se congela durante takeover humano/Metepec. El followup de estancados
+(`whatsapp_checkpoint_followups.py`, lado Juan) NO filtra `human_takeover` → una conversación
+atendida por humano parecería estancada (riesgo de re-enganche automático; hoy dry-run). Le
+pedimos la exclusión (1 WHERE) antes de activar envío real. Dashboard: impacto solo
+cosmético/métrico (contador abandonados 48h, orden inbox) — pendiente menor nuestro para el
+Agente Dashboard, sin urgencia.
+
+**Estado para la llamada:** todo entregado y en verde de nuestro lado. El GO del viernes
+depende de: (a) re-auditoría de Juan del rango completo, (b) su preflight read-only en STG,
+(c) el WHERE de followups si decide activar envío real cerca de la ventana. La disyuntiva
+viernes-vs-lunes se decide en la llamada — llegamos con la mejor posición posible: dos fases en
+una noche, 4 críticos auto-cazados y el método de Juan institucionalizado.
