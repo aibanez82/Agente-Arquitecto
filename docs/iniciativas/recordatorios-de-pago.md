@@ -1,6 +1,7 @@
 # Iniciativa — Recordatorios de pago por WhatsApp (D-7, D-48h, D-24h, día D)
 
-> Estado: DISEÑO (31 jul 2026). Pedido del negocio: recordar al cliente con póliza emitida y no pagada que le quedan 7 días / 48h / 24h / "hoy vence si no pagas antes de las 12:00", con enlace de pago en cada mensaje.
+> **Issue canónico (estado y discusión): `aguayo-co/HYL-WAI#144`** — decisión de Alberto 31 jul: la iniciativa vive en el repo de Juan porque la implementación propuesta es Django. Este archivo es el cuaderno técnico local; no lleva estado.
+> Pedido del negocio: recordar al cliente con póliza emitida y no pagada que le quedan 7 días / 48h / 24h / "hoy vence si no pagas antes de las 12:00", con enlace de pago en cada mensaje.
 > Base técnica: servicios Quálitas validados en vivo el 31 jul — `docs/qualitas-api/api-rest-link-de-pago.md`.
 
 ## Restricción que gobierna el diseño
