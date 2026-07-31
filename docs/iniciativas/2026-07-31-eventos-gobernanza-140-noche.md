@@ -85,3 +85,7 @@ Opciones dejadas en sesión:
 3. Plan B sin `listrecs`: reporte desde `conciliacion_pagos` — requiere diagnosticar y relanzar el cron fallido de hoy.
 
 Transversal: decidir si dar a Juan acceso de lectura a `Agente-Conciliacion` (el 404 se repetirá con cada handoff).
+
+## 22:34 — Monitor acota el alcance de la clasificación (`5148028755`)
+
+Acepta lo factual (dedup de los 3 deployments, PR #2 verificado como corregido) pero rechaza la cláusula prospectiva "sin nuevo aviso por evento": ampliar el límite "no nuevos deploys" del dictamen corresponde solo al accountable Juan. Mientras no lo actualice, cada push nuevo al Dashboard será alerta de cambio material. Sin acción nuestra: los eventos actuales quedan cerrados; si la re-revisión de PR #2 pide cambios (= pushes nuevos), será el momento natural de que Juan actualice ese límite.
