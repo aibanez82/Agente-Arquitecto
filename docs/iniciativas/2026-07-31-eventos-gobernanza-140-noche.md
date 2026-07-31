@@ -15,10 +15,11 @@ Registro factual del Arquitecto (sesión autónoma, Alberto ausente). Todo verif
 | 21:12 | Juan escribe en #135 (`5147507005`) cerrando el pendiente documental; ese comentario dice expresamente "No autoriza merge". |
 | 21:16 | **Juan mergea PR #142** — NO docs-only: 17 archivos (preflight `dual-core` Django, `qualitas/*.py`, tests, `tests.yml`) — a `stg` sin reviews → deploy automático Heroku STG **v212** (`4f0e741`). |
 | 21:18 | Monitor (`5147553808`) escala a 🚨: merge tras el aviso que dejaba #142 sin autorización y contradiciendo el límite de #135; exige "clasificación accountable inmediata". |
+| 21:26 | Monitor se **auto-corrige** (`5147608218`): vía API de Deployments confirma los **dos despliegues vivos a STG** (`hyl-wai-stg`, deployments `5698232600`/`5698300481` = v211/v212) durante el freeze — el hecho que el Arquitecto ya había verificado por Heroku queda ahora en el registro público. Pide clasificación accountable/incidente + checkpoint explícito; C1 no cerrada, C2–C9 sin GO. |
 
 ## Hechos verificados por el Arquitecto (no observados por el monitor de Juan)
 
-- `stg` **auto-despliega** en Heroku `hyl-wai-stg` vía integración GitHub: v211 (`2d99230`, 21:12) y v212 (`4f0e741`, 21:19, release command en ejecución al verificar). El monitor afirmó "sin paso de deploy observado" porque solo mira GitHub Actions — **el deploy ocurre por fuera de Actions**. Ambos merges SÍ tocaron el entorno STG vivo durante el freeze.
+- `stg` **auto-despliega** en Heroku `hyl-wai-stg` vía integración GitHub: v211 (`2d99230`, 21:12) y v212 (`4f0e741`, 21:19, release command en ejecución al verificar). El monitor afirmó primero "sin paso de deploy observado" porque solo miraba GitHub Actions; a las 21:26 se auto-corrigió y lo confirmó por la API de Deployments — ya no somos los únicos con el dato, y no hizo falta señalarlo nosotros.
 - El barrido `listrecs` **no ha arrancado**: en `Agente-Conciliacion` solo consta el cron diario (14:20 UTC, **falló**; también falló el del 29). `conciliacion_pagos` tiene datos del 30 jul.
 
 ## Evaluación
