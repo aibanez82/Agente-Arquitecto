@@ -51,6 +51,16 @@ Alberto autorizó preparar los handoffs de los PRs C1 (listrecs y cron: aparcado
 
 **21:42 — el monitor de Juan lo detectó antes de la remediación** (`5147718871`): confirma que `e6ee2e9` es docs-only (solo el handoff), que aún no hay PR abierto, y exige reconciliar el head real del PR con una opción autorizada antes de abrirlo ("no declarar `b76a546` si GitHub propone `e6ee2e9`"). Coincide con la remediación ya planificada. Dato operativo nuevo: **el monitor vigila también `aibanez82/Agente-n8n` casi en tiempo real** (detectó el push en ~4 min y leyó el contenido del handoff). Tras la restauración, declarar la excursión en el cuerpo del PR y (si Alberto aprueba el texto) un acuse breve en #140.
 
+## 21:52 — Dictamen NO-GO de C1 offline (`5147782653`) — cambia el alcance de los PRs
+
+Juan reprodujo él mismo las tres entregas y emite **NO-GO con hallazgos accionables**. Mantiene la petición de abrir los 2 PRs, pero ahora **con fixes y nuevos SHA candidatos**:
+
+- **n8n** (5 bloqueantes + 1 P2): ingress sin gate efectivo (10 ingress, 0 gates; allowlist no evaluada en runtime; 2 `executeWorkflowTrigger` sin cubrir); dominancia no validada (ignora `connections` — FAKE saltó el gate en verde); SQL controlable por payload admitido por el checker; alcanzabilidad `ai_*` en dirección equivocada (conector Anthropic real no detectado); sinks sin contrato con su consumidor; P2: persistir cleanup en `run.log`.
+- **Dashboard** (2 P0 + 1 P1): `next@14.2.3` vulnerable a GHSA-f82v-jwr5-mffw (CVSS 9.1, bypass de middleware auth) — decisión Arquitecto: subir a `14.2.35` declarándola como propuesta de npm audit; dispatch proactivo sin verificar claim propio antes del `fetch` (repro de Juan: sin claim → HTTP 200) — fix con SQL exacto provisto + test adversarial 403 `CLAIM_NOT_OWNED`; P1 documental `ALLOWED_ORIGINS` en `.env.example`. No bloqueantes: `revoke` = release exacto existente (sin revoke administrativo); RBAC `isAllowedApiPrefix` se conserva con trazabilidad.
+- Checkpoint operativo C1 bloqueado por el NO-GO; re-revisión verde ≠ GO (decisión humana separada).
+
+**Handoffs v2 (dos fases: corregir → abrir PR) entregados:** `Agente-n8n/handoffs/2026-07-31-pr-c1-contencion-gates-a-stg.md` (commiteado en main, `9a41092`; rama candidata restaurada a `b76a546` por Alberto vía force-push) y `Dashboard_SeguroAuto/handoffs/2026-07-31-pr-c1-gates-api-default-deny-a-stg.md` (redactado; pendiente de commit — el clon local sigue en la rama candidata, falta `checkout main` de Alberto).
+
 ## Decisión pendiente de Alberto (corte mensual HOY)
 
 Opciones dejadas en sesión:
