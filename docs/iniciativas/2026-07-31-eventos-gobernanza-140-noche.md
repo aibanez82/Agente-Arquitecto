@@ -61,6 +61,18 @@ Juan reprodujo él mismo las tres entregas y emite **NO-GO con hallazgos acciona
 
 **Handoffs v2 (dos fases: corregir → abrir PR) entregados:** `Agente-n8n/handoffs/2026-07-31-pr-c1-contencion-gates-a-stg.md` (commiteado en main, `9a41092`; rama candidata restaurada a `b76a546` por Alberto vía force-push) y `Dashboard_SeguroAuto/handoffs/2026-07-31-pr-c1-gates-api-default-deny-a-stg.md` (commiteado en main del Dashboard, `93add42`).
 
+## 22:04–22:09 — PR Dashboard #2 abierto + 🚨 del monitor por deploys Vercel automáticos
+
+El ejecutor Dashboard entregó: SHA candidato `1373d1a` (fixes P0-1/P0-2/P1 conformes a spec) y PR `Dashboard_seguroautoqualitas#2`. **Pasada adversarial del Arquitecto: PASS** — evidencia reproducida independientemente en worktree aislado (89/89, lint, build, fixture 6/6, audit 0 critical, targets stg/prod exit 1).
+
+**22:09 — monitor (`5147884147`):** los pushes a la rama candidata disparan **deploys Vercel Preview automáticos** (`07324f4` a las 06:29 — anterior al dictamen — y `1373d1a` a las 22:03, posterior al NO-GO que prohibía deploys). Contradice la letra de "sin deploy" del PR. Exige corregir trazabilidad + clasificación accountable antes de continuar; prohíbe nuevos pushes mientras tanto. **Espejo exacto del incidente Heroku de Juan** (integración git→deploy automático no considerada al declarar).
+
+**Hallazgo adicional del Arquitecto (el monitor no lo mencionó):** el commit del handoff a `main` (`93add42`, docs-only) disparó un deploy **Production** del Dashboard a las 21:56 (`5698716825`, success) — comportamiento estándar de Vercel en `main`, código idéntico al previo.
+
+**Exposición técnica acotada:** los Preview corren con env vars de Preview (incluye `DATABASE_URL` de PROD — configuración histórica del proyecto), pero tras `DASHBOARD_PASSWORD`, con `GATE_*` sin provisionar (fail-closed 403) y `ALLOWED_ORIGINS` sin provisionar (origin guard deniega los endpoints gateados). Misma exposición que cualquier preview histórico del repo: automatización preexistente de la plataforma, no acción del agente.
+
+**Plan:** clasificación accountable de Alberto en #140 (espejo de la de Juan) + edición del cuerpo del PR #2 corrigiendo la declaración ("sin deploy manual ni acceso del agente; la integración Vercel genera previews automáticos en cada push — automatización preexistente") + decisión futura opcional: desactivar previews de rama vía configuración Vercel.
+
 ## Decisión pendiente de Alberto (corte mensual HOY)
 
 Opciones dejadas en sesión:
