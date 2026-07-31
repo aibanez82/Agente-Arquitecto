@@ -59,7 +59,7 @@ Juan reprodujo él mismo las tres entregas y emite **NO-GO con hallazgos acciona
 - **Dashboard** (2 P0 + 1 P1): `next@14.2.3` vulnerable a GHSA-f82v-jwr5-mffw (CVSS 9.1, bypass de middleware auth) — decisión Arquitecto: subir a `14.2.35` declarándola como propuesta de npm audit; dispatch proactivo sin verificar claim propio antes del `fetch` (repro de Juan: sin claim → HTTP 200) — fix con SQL exacto provisto + test adversarial 403 `CLAIM_NOT_OWNED`; P1 documental `ALLOWED_ORIGINS` en `.env.example`. No bloqueantes: `revoke` = release exacto existente (sin revoke administrativo); RBAC `isAllowedApiPrefix` se conserva con trazabilidad.
 - Checkpoint operativo C1 bloqueado por el NO-GO; re-revisión verde ≠ GO (decisión humana separada).
 
-**Handoffs v2 (dos fases: corregir → abrir PR) entregados:** `Agente-n8n/handoffs/2026-07-31-pr-c1-contencion-gates-a-stg.md` (commiteado en main, `9a41092`; rama candidata restaurada a `b76a546` por Alberto vía force-push) y `Dashboard_SeguroAuto/handoffs/2026-07-31-pr-c1-gates-api-default-deny-a-stg.md` (redactado; pendiente de commit — el clon local sigue en la rama candidata, falta `checkout main` de Alberto).
+**Handoffs v2 (dos fases: corregir → abrir PR) entregados:** `Agente-n8n/handoffs/2026-07-31-pr-c1-contencion-gates-a-stg.md` (commiteado en main, `9a41092`; rama candidata restaurada a `b76a546` por Alberto vía force-push) y `Dashboard_SeguroAuto/handoffs/2026-07-31-pr-c1-gates-api-default-deny-a-stg.md` (commiteado en main del Dashboard, `93add42`).
 
 ## Decisión pendiente de Alberto (corte mensual HOY)
 
