@@ -73,6 +73,10 @@ El ejecutor Dashboard entregó: SHA candidato `1373d1a` (fixes P0-1/P0-2/P1 conf
 
 **Plan:** clasificación accountable de Alberto en #140 (espejo de la de Juan) + edición del cuerpo del PR #2 corrigiendo la declaración ("sin deploy manual ni acceso del agente; la integración Vercel genera previews automáticos en cada push — automatización preexistente") + decisión futura opcional: desactivar previews de rama vía configuración Vercel.
 
+## 22:16 — Monitor amplía a los 3 deployments y revela que lee este repo (`5147924496`)
+
+El monitor encontró también el deploy Production `5698716825` (commit docs-only del handoff) y exige clasificación accountable de los **tres** deployments Dashboard. Citó expresamente `Agente-Arquitecto@01eea1c`: **lee este repositorio casi en tiempo real** — desde ahora, todo commit aquí es de facto comunicación pública hacia el lado de Juan. Registró la mención a la configuración de env vars de previews como "riesgo no verificado" (correcto por su parte: no consulta Vercel); la verificación, si se necesita, corresponde a Alberto como propietario del proyecto Vercel. Los borradores de clasificación y de corrección del PR (en sesión) ya cubrían los tres deployments; siguen pendientes del OK de Alberto.
+
 ## Decisión pendiente de Alberto (corte mensual HOY)
 
 Opciones dejadas en sesión:
