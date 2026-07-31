@@ -75,7 +75,7 @@ El ejecutor Dashboard entregó: SHA candidato `1373d1a` (fixes P0-1/P0-2/P1 conf
 
 ## 22:16 — Monitor amplía a los 3 deployments y revela que lee este repo (`5147924496`)
 
-El monitor encontró también el deploy Production `5698716825` (commit docs-only del handoff) y exige clasificación accountable de los **tres** deployments Dashboard. Citó expresamente `Agente-Arquitecto@01eea1c`: **lee este repositorio casi en tiempo real** — desde ahora, todo commit aquí es de facto comunicación pública hacia el lado de Juan. Registró la mención a la configuración de env vars de previews como "riesgo no verificado" (correcto por su parte: no consulta Vercel); la verificación, si se necesita, corresponde a Alberto como propietario del proyecto Vercel. Los borradores de clasificación y de corrección del PR (en sesión) ya cubrían los tres deployments; siguen pendientes del OK de Alberto.
+El monitor encontró también el deploy Production `5698716825` (commit docs-only del handoff) y exige clasificación accountable de los **tres** deployments Dashboard. Citó expresamente `Agente-Arquitecto@01eea1c`: **lee este repositorio casi en tiempo real** — desde ahora, todo commit aquí es de facto comunicación pública hacia el lado de Juan. Registró la mención a la configuración de env vars de previews como "riesgo no verificado" (correcto por su parte: no consulta Vercel); la verificación, si se necesita, corresponde a Alberto como propietario del proyecto Vercel. Con OK de Alberto ("publica los dos"): clasificación publicada en #140 (`5148002777`) y cuerpo del PR #2 corregido con la trazabilidad de los previews automáticos.
 
 ## Decisión pendiente de Alberto (corte mensual HOY)
 
