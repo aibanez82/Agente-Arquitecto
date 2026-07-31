@@ -47,8 +47,22 @@ El PDF también muestra `status_rec: "rechazado"` con la causa en `referencia` (
 
 **Por qué importa:** es confirmación de pago positiva por API — `status_rec=pagado` + `fpago` + `banco` + `autoriza`. Resuelve la ambigüedad que `fareceipt`/`oplListReceipts` no resuelven (póliza pagada y póliza cancelada responden igual: sin recibos a cobro). Candidato directo a segunda fuente del Agente Conciliación junto al scraping de Q360.
 
-**Pendiente de validar en vivo** (bloqueado por permisos del entorno del agente — Alberto corre a mano):
-`bash docs/qualitas-api/scripts/test-listrecs.sh` (4 pólizas de estado conocido; prueba `listrecs` y `searchlink`). Preguntas abiertas: ¿acepta nuestro `wptoken` (como `fareceipt`) o exige alta adicional? ¿Qué devuelve una póliza CANCELADO? ¿Cubre pagos hechos por la pasarela web además de domiciliación?
+### ✅ Validado en vivo (31 jul 2026, Alberto ejecutó `scripts/test-listrecs.sh` contra PROD)
+
+`listrecs` **acepta nuestro `wptoken` actual** (sin Pid OPL) y cubre pagos hechos por la pasarela web. Estados observados: `pagado`, `por cobrar`, `rechazado`, `cancelado`. Mapeo contra `conciliacion_pagos`:
+
+| Estado en `conciliacion_pagos` | Póliza | Señal en `listrecs` |
+|---|---|---|
+| PAGADO (fraccionada 12) | 7620099601 | recibo 1 `pagado` con `fpago`, `monto`, `banco`, `autoriza`; recibos 2–12 `por cobrar` |
+| PENDIENTE | 7620099716 | `por cobrar` (fcr = hoy), sin `pagado` |
+| VENCIDO | 7620098627 | igual que PENDIENTE — **no distingue vencido de pendiente** (la fecha rueda a hoy); esa distinción sigue viniendo del scraping / de nuestro control del link |
+| CANCELADO | 7620098974 | recibo `cancelado` — **sí distingue cancelada de pagada** 🎯 |
+
+Gotchas para el consumidor:
+- Puede haber **más de una fila por `npago`**: los intentos declinados aparecen como filas `rechazado` (`referencia:"declinada"`, `monto:0.00`) junto al recibo real. Filtrar por `status_rec`, no asumir 1 fila = 1 recibo.
+- Regla de decisión: `pagado` en algún recibo ⇒ pagó (ese recibo); `cancelado` ⇒ póliza cancelada; solo `por cobrar`/`rechazado` ⇒ sigue debiendo.
+
+`searchlink` también validado: devuelve el ciclo de vida del link (`genlink`, `openlink`, `cancellink`, `paylink`, `savelink` con timestamps), email destino y terminación de tarjeta. Observación: los links caducan ~24h después de generarse (aparece `cancellink` al día siguiente en las pólizas no pagadas) — con `paylink` poblado tienes el instante exacto del pago vía link.
 
 ## Respuestas que este doc da a las preguntas de Juan a Laura (23 jul)
 
