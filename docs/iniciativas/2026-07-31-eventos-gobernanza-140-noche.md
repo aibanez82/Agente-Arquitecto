@@ -89,3 +89,9 @@ Transversal: decidir si dar a Juan acceso de lectura a `Agente-Conciliacion` (el
 ## 22:34 — Monitor acota el alcance de la clasificación (`5148028755`)
 
 Acepta lo factual (dedup de los 3 deployments, PR #2 verificado como corregido) pero rechaza la cláusula prospectiva "sin nuevo aviso por evento": ampliar el límite "no nuevos deploys" del dictamen corresponde solo al accountable Juan. Mientras no lo actualice, cada push nuevo al Dashboard será alerta de cambio material. Sin acción nuestra: los eventos actuales quedan cerrados; si la re-revisión de PR #2 pide cambios (= pushes nuevos), será el momento natural de que Juan actualice ese límite.
+
+## 22:40 — Entrega n8n completa: PR #3 con SHA candidato `fe456b0` — PASS del Arquitecto
+
+El ejecutor n8n corrigió los 5 bloqueantes + P2 y abrió `Agente-n8n#3` (base `stg`, merge-base `40fe572` verificado). Suite 71→124 tests. **Pasada adversarial del Arquitecto: PASS** — evidencia reproducida independientemente en worktree aislado: 124/124, runner `RESULTADO: OK — plano contenido`, cleanup persistido en `run.log` (intento/resultado/fin, `restantes=0`, `intentos_sin_resultado=0`), FAKE de dominancia inyecta exactamente la arista del dictamen (`WhatsApp Message Trigger → Update Activity`) y asserta el BYPASS, 10/10 ingress deniegan path de producción, 0 aristas `ai_*` en el aislado (22 en el vivo). Métricas idénticas a las declaradas en el PR. Nota: los valores esperados del handoff (71/71, creados=9) eran los pre-fix; el PR explica cada delta (sinks 24→22, gates 43→54) con causa.
+
+Ambos frentes de la re-revisión C1 (Dashboard #2 y n8n #3) quedan entregados con doble verificación (ejecutor + Arquitecto). Pendiente: aviso a Juan con OK de Alberto.
