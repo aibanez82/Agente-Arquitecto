@@ -9,7 +9,7 @@
 |---|---|
 | Pruebas | `http://pagosqa.qualitas.com.mx/ws/wsCollection.php?WSDL` (⚠️ http, sin TLS — no meter datos reales) |
 | Producción | `https://pagos.qualitas.com.mx/ws/wsCollection.php?WSDL` |
-| REST auxiliar (no está en el PDF) | `https://pagos.qualitas.com.mx/api.php` — lo usa Django (`generar_link_pasarela`) con métodos `m=genWebPay` y `m=fareceipt` |
+| REST auxiliar | `https://pagos.qualitas.com.mx/api.php` — lo usa Django (`generar_link_pasarela`) con métodos `m=genWebPay` y `m=fareceipt`. **Desde el 31 jul tenemos su spec oficial** (8 métodos, incl. `listrecs` = status de recibos): `api-rest-link-de-pago.md` en esta carpeta |
 
 ## Operaciones
 
@@ -28,7 +28,7 @@ Documentadas en el PDF:
 ## Autenticación — dos juegos de credenciales distintos
 
 1. **`wpuid` + `wptoken`** (atributos del XML interno): es lo que Django ya tiene en Heroku (`QUALITAS_WPUID`, `QUALITAS_WPTOKEN`) y funciona para `oplCollection` (tipo CL, con `NoNegocio` = `QUALITAS_NO_NEGOCIO` = negocio SISE `08545`) y para `api.php` (`wptoken` solo).
-2. **`pid` + `token`** (atributos `<ListReceipts pid= token=>`): "Número de Negocio proporcionado por **OPL**" — credencial distinta que **no tenemos**. Verificado en vivo 29 jul 2026: `oplListReceipts` en PROD rechaza tanto `wpuid/wptoken` como `08545/wptoken` con `Negocio Inexsistente o Token Invalido!!`. Hay que pedir el Pid OPL a Quálitas (vía Juan).
+2. **`pid` + `token`** (atributos `<ListReceipts pid= token=>`): "Número de Negocio proporcionado por **OPL**" — credencial distinta que **no tenemos**. Verificado en vivo 29 jul 2026: `oplListReceipts` en PROD rechaza tanto `wpuid/wptoken` como `08545/wptoken` con `Negocio Inexsistente o Token Invalido!!`. Pista (correo alta de negocio, nov 2025): **las llaves OPL de QA y de encriptación se enviaron a `janderson.gomez@aguayo.co`** — preguntar primero a Juan/Janderson antes que a Quálitas. Detalle: `api-rest-link-de-pago.md`.
 
 Encriptación de datos sensibles (tarjetas): tag `<crypto>` + RC4 con llave compartida (⚠️ RC4 = criptografía obsoleta; Django hoy manda `crypto>0` sin cifrar en `derivar_poliza_opl` porque no envía datos de tarjeta). Solo aplica a cobranza, no a los servicios de lectura.
 

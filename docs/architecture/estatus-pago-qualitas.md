@@ -50,6 +50,14 @@ Ambigüedad residual: póliza totalmente pagada (o contado `nps=1` pagada) respo
 
 **Pendiente vía Juan:** pedir a Quálitas el Pid de negocio OPL (para `oplListReceipts`/`getRefOpl`) y la documentación de `oplConciliation`/`oplListPols`. Borrador: `docs/2026-07-29-mensaje-juan-opl-pid-y-conciliacion.md`.
 
+## 🎯 Salto de calidad — API REST v1.4 con `listrecs` (31 jul 2026)
+
+Alberto recuperó el paquete completo del alta del negocio 08545/clave 27614 (correo "27614_ALTA DE NEGOCIO", nov 2025), que incluye la **spec oficial de `api.php`**: `docs/qualitas-api/Api-REST-Link-de-Pago-v1.4.pdf`, resumida en `docs/qualitas-api/api-rest-link-de-pago.md`. Cambia el tablero:
+
+1. **`m=listrecs` (v1.4) devuelve el status de TODOS los recibos de una póliza** — `status_rec` (`pagado`/`rechazado`), `fpago`, `banco`, `autoriza`, `referencia` con causa de rechazo. Es la confirmación positiva de pago que ni `fareceipt` ni `oplListReceipts` dan (ambos solo dicen "sigue debiendo"), y usa el **mismo `wptoken` que ya tenemos**, sin Pid OPL. Si la prueba en vivo lo confirma (`docs/qualitas-api/scripts/test-listrecs.sh`, la corre Alberto a mano), el cruce del Agente Conciliación pasa de "red de seguridad parcial" a **verificación completa por API**, y a futuro podría discutirse invertir los roles (API primaria, scraping de respaldo).
+2. **`searchlink`/`cancellink`/`genlink`** responden por API a lo que Juan pidió a Laura el 23 jul (regenerar link vencido, consultar links) — la respuesta estaba en la doc del alta de nov 2025.
+3. **Las llaves OPL de QA + encriptación se enviaron a `janderson.gomez@aguayo.co` (25 nov 2025)** — el Pid OPL que nos falta probablemente lo tiene el equipo de Juan; preguntar ahí antes que a Quálitas.
+
 ## Fila original de la tabla de pendientes
 
 | Cómo saber con certeza si un cliente pagó la póliza — la doc oficial SOAP de Quálitas (`docs/qualitas-api/`: WsEmision, WsTarifas, WsImpresion, Matriz de Captura) **no documenta ningún endpoint ni campo de consulta de estatus de pago** (verificado 7 jul). Solo cubre `FormaPago` (método/frecuencia) y los recibos generados al emitir — nada sobre si un recibo/link de pago fue efectivamente pagado. Hoy la única señal automatizada es `qualitas_polizaemitida.estatus_pago`, que depende de un webhook externo de Quálitas hacia Django no documentado en su spec (ver Bug #7 y su workaround). Detectado por Alberto al revisar una conversación con póliza emitida y link de pago enviado, sin forma de confirmar el pago desde ahí. **No es dependencia de Juan** — la resolución probable es manual: Laura (Hylant) reporta ventas/pagos confirmados en una hoja Excel al día siguiente. | 💡 Sin investigar — definir si conviene formalizar el reporte de Laura como fuente de verdad (p. ej. cargarlo al Dashboard) en vez de perseguir un mecanismo automático de Quálitas |
