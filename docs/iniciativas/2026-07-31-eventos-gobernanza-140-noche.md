@@ -27,6 +27,22 @@ Registro factual del Arquitecto (sesión autónoma, Alberto ausente). Todo verif
 - **Riesgo técnico para nosotros: bajo.** #141/#142 son runbook + comandos de preflight offline; sin cambios de flags (últimos config vars: v210, 30 jul). Nada toca PROD ni nuestras superficies.
 - **Narrativo: posición reforzada.** Juan ejecutó dos merges y dos deploys a STG durante el freeze, tras un "No autoriza merge" propio y un aviso de su monitor — mientras ese mismo monitor veta nuestro barrido de solo lectura. Si Juan se auto-clasifica como accountable del workstream, usa el mismo mecanismo que reclamamos para pagos/pricing. Precedente directamente citable para la delimitación de superficie (`5146329245`).
 
+## 21:33 — Clasificación ex post de Juan + solicitud de trabajo a Alberto (`5147660691`)
+
+Juan (accountable) clasifica ex post #141/#142 como **intencionales**, sin convalidar la secuencia ("no constituye GO, no cierra C1"). Reconoce que la release phase de Heroku ejecuta `migrate --noinput` y que sin el release log no puede afirmar que no se aplicó migración alguna. **Precedente clave: el accountable ejecutó acción viva en STG durante el freeze y la resolvió con auto-clasificación ex post — exactamente el mecanismo que reclamamos para pagos/pricing.** NO respondió al ⛔ del barrido `listrecs` ni a la delimitación de superficie: el corte mensual sigue bloqueado.
+
+**Solicitud concreta a Alberto (todo offline, "abrir PR no autoriza integrarlos"):**
+
+1. **PR n8n** `feature/c1-contencion-gates-plano-aislado → stg` (merge-base `stg@40fe572` ✓ verificado). Elegir: (a) candidato completo `b76a546` (= `ad85149` funcional + 2 commits de higiene) o (b) rama de revisión solo con `ad85149`. Incluir repro offline `scripts/c1/`: `node --test test/*.test.js` + `node runner/run-c1.js` → esperado 71/71, `RESULTADO: OK — plano contenido`, cleanup `creados=9, restantes=0`, contrato `run.log` (sin resultado = `INCIERTO`).
+2. **PR Dashboard** `c1-gates-api-default-deny → stg` con `07324f4` ✓ verificado. Repro: `npm ci`, tests (88/88), lint, build, `assert-rollout-gates.js --target fixture` (6/6); `--target stg|prod` bloqueados.
+3. Cerrar en el PR Dashboard el **contrato pre-live de `ALLOWED_ORIGINS`** (solo documental): valores literales del Origin de STG, formato lista CSV + `Set.has` exacto, fuente solo `process.env`, fail-closed, responsable humano, tests de rechazo (http/https, puerto, trailing slash). No provisionar nada.
+4. Dos decisiones de alcance Dashboard: (a) ¿`revoke` = `DELETE /api/claim` con `control_id+epoch` existente, o falta capacidad?; (b) fix RBAC `isAllowedApiPrefix` — ¿se queda en C1 o se separa (nuevo SHA + evidencia completa)?
+5. Confirmar en cada PR que las ramas C1 n8n/Dashboard no tuvieron merge/deploy/acceso a STG-PROD (formulación acotada, no global).
+
+**Verificación del Arquitecto:** ramas y SHAs existen y cuadran en ambos repos; Juan tiene acceso de lectura a `Agente-n8n` y `Dashboard` (verificó las entregas él mismo) — el 404 solo aplica a `Agente-Conciliacion`.
+
+**Recomendaciones del Arquitecto:** opción (a) candidato completo para el PR n8n (los 2 commits de higiene son triviales — gitignore + docs — y evita gestionar una rama extra); los PRs los abren los ejecutores (Agente n8n / Dashboard) con handoff del Arquitecto tras OK de Alberto; la evidencia numérica (71/71, 88/88) debe salir de corridas frescas de los ejecutores, no copiarse de Juan.
+
 ## Decisión pendiente de Alberto (corte mensual HOY)
 
 Opciones dejadas en sesión:
