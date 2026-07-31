@@ -43,6 +43,12 @@ Juan (accountable) clasifica ex post #141/#142 como **intencionales**, sin conva
 
 **Recomendaciones del Arquitecto:** opción (a) candidato completo para el PR n8n (los 2 commits de higiene son triviales — gitignore + docs — y evita gestionar una rama extra); los PRs los abren los ejecutores (Agente n8n / Dashboard) con handoff del Arquitecto tras OK de Alberto; la evidencia numérica (71/71, 88/88) debe salir de corridas frescas de los ejecutores, no copiarse de Juan.
 
+## 22:0x — Autorización de Alberto ("2. ok") y preparación de handoffs C1 — INCIDENTE PROPIO
+
+Alberto autorizó preparar los handoffs de los PRs C1 (listrecs y cron: aparcados por decisión suya). El Arquitecto redactó ambos handoffs, pero al commitear el de n8n **el clon local estaba en la rama candidata**: el push movió `feature/c1-contencion-gates-plano-aislado` de `b76a546 → e6ee2e9` (commit docs-only, solo añade `handoffs/2026-07-31-pr-c1-contencion-gates-a-stg.md`). Es la misma clase de incidente que la sonda de descuento de esta tarde: contaminación docs-only de una rama candidata, detectada al instante.
+
+**Remediación pendiente (requiere Alberto, comandos abajo en sesión):** restaurar el remoto a `b76a546` con force-push, mover el handoff a `main`. En el Dashboard el clon también estaba en la rama candidata pero el handoff quedó **solo untracked** — sin daño; basta `checkout main` antes de commitear. Recomendación: declarar la excursión `e6ee2e9` (docs-only, revertida) en el cuerpo del PR n8n, en vez de un comentario aparte en #140.
+
 ## Decisión pendiente de Alberto (corte mensual HOY)
 
 Opciones dejadas en sesión:
