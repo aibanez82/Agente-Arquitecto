@@ -47,7 +47,9 @@ Juan (accountable) clasifica ex post #141/#142 como **intencionales**, sin conva
 
 Alberto autorizó preparar los handoffs de los PRs C1 (listrecs y cron: aparcados por decisión suya). El Arquitecto redactó ambos handoffs, pero al commitear el de n8n **el clon local estaba en la rama candidata**: el push movió `feature/c1-contencion-gates-plano-aislado` de `b76a546 → e6ee2e9` (commit docs-only, solo añade `handoffs/2026-07-31-pr-c1-contencion-gates-a-stg.md`). Es la misma clase de incidente que la sonda de descuento de esta tarde: contaminación docs-only de una rama candidata, detectada al instante.
 
-**Remediación pendiente (requiere Alberto, comandos abajo en sesión):** restaurar el remoto a `b76a546` con force-push, mover el handoff a `main`. En el Dashboard el clon también estaba en la rama candidata pero el handoff quedó **solo untracked** — sin daño; basta `checkout main` antes de commitear. Recomendación: declarar la excursión `e6ee2e9` (docs-only, revertida) en el cuerpo del PR n8n, en vez de un comentario aparte en #140.
+**Remediación pendiente (requiere Alberto, comandos abajo en sesión):** restaurar el remoto a `b76a546` con force-push, mover el handoff a `main`. En el Dashboard el clon también estaba en la rama candidata pero el handoff quedó **solo untracked** — sin daño; basta `checkout main` antes de commitear.
+
+**21:42 — el monitor de Juan lo detectó antes de la remediación** (`5147718871`): confirma que `e6ee2e9` es docs-only (solo el handoff), que aún no hay PR abierto, y exige reconciliar el head real del PR con una opción autorizada antes de abrirlo ("no declarar `b76a546` si GitHub propone `e6ee2e9`"). Coincide con la remediación ya planificada. Dato operativo nuevo: **el monitor vigila también `aibanez82/Agente-n8n` casi en tiempo real** (detectó el push en ~4 min y leyó el contenido del handoff). Tras la restauración, declarar la excursión en el cuerpo del PR y (si Alberto aprueba el texto) un acuse breve en #140.
 
 ## Decisión pendiente de Alberto (corte mensual HOY)
 
