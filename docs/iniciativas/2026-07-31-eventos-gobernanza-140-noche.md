@@ -442,3 +442,7 @@ STG no tiene otros usuarios humanos (solo Alberto+Juan), así que Juan propone n
 ## 23:26 (1 ago) — Juan: sincronización inmediata, sin ventana calendarizada (#140 5153977172 / #132 5153977974)
 
 Superadas la fecha del lunes 3 y la propuesta de 2h. Modelo STG ahora: (1) Alberto confirma listo + sin otra sesión editando n8n STG; (2) Juan emite GO específico del checkpoint; (3) Alberto ejecuta inmediato, ambos sincronizados hasta evidencia/STOP/rollback. Inicio/fin+run-id se registran como evidencia, no aprobación de calendario. Caducidad de la excepción operador único redefinida: termina al completar/abortar la sesión C1 sincronizada, o ante incierto no reconciliado, o nueva corrida. RTO ≤20 min. NO es GO. **Pendiente: confirmación de disponibilidad inmediata de Alberto → Juan emite GO.**
+
+## 23:3x (1 ago) — Alberto confirma "AHORA"; disponibilidad relayada a Juan (`5154060859`)
+
+Alberto listo para C1 inmediata. Verificado: credenciales n8n STG en Agente-n8n/.env (exportar al arrancar); target guard exige origin n8n-xlqk exacto. División operativa por accesos: Juan corre docker inspect del modo publicación (2FA Hostinger, Alberto no lo tiene) + confirma UI cerrada; Alberto ejecuta instalador C1 + Django migrate --check + prueba 403 Vercel; Arquitecto vigila stop conditions en vivo. Esperando GO específico de Juan con checkpoint/comandos/targets exactos. **En el umbral de la ejecución viva.**
