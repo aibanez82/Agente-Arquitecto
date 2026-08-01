@@ -172,3 +172,7 @@ El Arquitecto había verificado el CÓDIGO pero no el doc de entrega (`Agente-n8
 2. **Contradicción de gobernanza real (barrera A):** instalar la contención viva **exige `PUT` sobre los 7 IDs vivos** — justo lo que el handoff/Juan prohibieron ("ni PUT, ni activar, ni borrar"). El ejecutor no puede resolverlo: o el checkpoint **autoriza explícitamente el PUT de contención** sobre los 7 vivos (rollback: reponer el export congelado de git), o **la barrera A se queda sin instalar** y el checkpoint declara que la contención viva no entra en esta ventana. **Decisión de Alberto+Juan, no del Arquitecto.**
 
 El ejecutor entregó además: comandos de solo-lectura (guarda anti-TOCTOU con fingerprints por los 7 vivos, plan de instalación offline, verificación por GET), instalación viva NO expuesta (doble guarda `permitirRed` + `C1_INSTALADOR_VIVO=1`), los 7 destinos (nombre+fingerprint) y rollback mínimo por acción. Lección reforzada: **leer el doc de entrega, no solo verificar el código** — el doc traía lo que el código no dice.
+
+## 04:1x (1 ago) — Aviso publicado en #132 (`5149463414`): SHA 86a9c093c + pregunta de barrera A a Juan
+
+Con OK de Alberto. Nuevo candidato + 6 bloqueantes cubiertos + la decisión de alcance planteada a Juan: opción A (incluir barrera A con PUT autorizado sobre los 7 vivos) vs opción B (diferir, instalar solo barrera B). Bloqueado esperando su decisión antes de rehacer el checkpoint. Sin acción nuestra hasta entonces.
