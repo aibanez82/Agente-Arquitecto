@@ -358,3 +358,7 @@ Juan reprodujo y encontró que 78442a4 NO cierra:
 3. **Mínimos: PASS huellas** (SHA-256+bytes de los 14, NO rehacer); siguen ausentes ventana/roles/suplente + Vercel deployment-id.
 
 **GAP DEL ARQUITECTO (asumido):** reporté "279/279 PASS" pero NO cacé el placeholder — solo inspeccioné las primeras 40 líneas del guion de producers (WhatsApp), no la parte Django. Verificación cierta en mi entorno pero INCOMPLETA. Lección: inspeccionar el artefacto COMPLETO, no un prefijo; y no fiar el "pass" solo de mi entorno cuando hay generación de scripts (probar bash -n).
+
+## 14:1x (1 ago) — Correcciones consolidadas entregadas (4e8acea48) PASS 291/291, verificado COMPLETO
+
+Los 3 bloqueantes de 5151680686 cerrados: rollback acredita activeVersionId incluido null (canario de Juan → incierto/0 PUTs); guion con comando Django real (heroku config:get, sin placeholder) + bash -n propio = 0; falso verde eliminado (reverificación no degrada a dry-run); deactivates journalizados + reconciliación tras corte. Verificación del Arquitecto esta vez COMPLETA (artefacto entero + bash -n propio, aplicando la lección del gap). Re-congelado en 4e8acea48. **Técnico cerrado; el cierre del checkpoint espera SOLO datos humanos: Vercel deployment-id (Alberto) + aceptación de Juan (ventana/roles). ~10 rondas; recomendación de sesión síncrona en pie.**
