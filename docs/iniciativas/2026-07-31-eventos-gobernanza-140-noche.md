@@ -125,3 +125,7 @@ Ejecutor n8n cerró los 5 puntos en un commit (`4e2118c`, redacción por vocabul
 ## 03:xx (1 ago) — Aviso P2 final publicado (`5148961363`, OK de Alberto) — C1 entera en el tejado de Juan
 
 Los tres frentes entregados y verificados: n8n `4e2118c39` (P1+P2 cerrados), Dashboard `1373d1a` (PASS, congelado), Django de Juan en paralelo (wrapper CAS). Próximos pasos, todos de Juan: revisión del delta de redacción → aceptación offline humana de C1 → borrador de checkpoint operativo en #132.
+
+## 03:0x (1 ago) — Estatus coordinado de Juan (`5148997078`), cruzado con nuestro aviso
+
+Su punto 1 (entregar delta n8n) ya estaba cumplido 8 min antes (`5148961363`). Confirma la secuencia a STG: delta n8n → checks Django #145 (nuevo PR suyo: wrapper CAS shadow↔dual, `c373ab1`, 97 PASS offline) → aceptación humana offline de C1 → borrador checkpoint en #132. Convergencia de estándares entre lados (su `migrate --check` bloqueante sale de su incidente Heroku; su journal sanitizado, de nuestro P2). Sin acción nuestra.
