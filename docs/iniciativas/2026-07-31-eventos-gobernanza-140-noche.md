@@ -180,3 +180,12 @@ Con OK de Alberto. Nuevo candidato + 6 bloqueantes cubiertos + la decisión de a
 ## 02:58 (1 ago) — Dirección post-C1 de Juan (`5149471243`) — hoja de ruta, NO respuesta a barrera A
 
 Juan fija que cerrar C1 no cierra #140. Secuencia canónica declarada: C1 (contención viva+aislado) → C2 (integración STG shadow, matriz E2E-, cero red) → C3 (gap pre-dual + readiness PG) → C4 (canary dual→shadow, termina en shadow) → C5 (2º GO + Dual sostenido STG) → C6-C9. Cada fase con aceptación técnica + checkpoint humano separado; NO GO anticipado. Hasta cerrar C1, foco exclusivo, sin trabajo lateral. **La pregunta de barrera A (#132 c.5149463414) sigue sin responder.** Sin acción nuestra; es hoja de ruta.
+
+## 03:1x (1 ago) — El ejecutor verifica 3 riesgos del PUT de barrera A (material para la decisión A/B)
+
+Informe `Agente-n8n@4621d6f` (main), verificado contra el código fuente de n8n. Los 3, relevantes para la opción A que Juan audita:
+1. **`webhookId` se conserva solo por construcción** (`resolveNodeWebhookId`: uuid nuevo solo si el nodo no trae uno). El rollback propuesto es seguro PORQUE el export lleva los 8 nodos completos; un PUT que reduzca campos reintroduce el Bug #12. Guarda de webhookId = 30 min si sale A.
+2. **PUT sobre workflow ACTIVO publica de inmediato** (`publishIfActive:true`; los 7 vivos activos). No hay ensayo; 7 PUT independientes → ventana cortada a mitad = plano MIXTO. Exige orden explícito + rollback por workflow (Main el último). Orden propuesto: Metepec Liberar → Issue Policy Guard → METEPEC Registrar → Retomar → Payment → Atención Humana → Main.
+3. **API sin control de concurrencia** (`forceSave:true`, "skip version conflict check"). Anti-TOCTOU enteramente nuestro, pegado a CADA PUT, no una vez al abrir ventana.
+
+Nada afecta a barrera B (POST nuevos, instalable tal cual). Ejecutor en disciplina correcta: no construyó el PUT (sería trabajo lateral prohibido). **Estos hechos cambian el perfil de riesgo de la opción A — deben llegar a Juan ANTES de que decida.** Suplemento a #132 preparado, pendiente OK de Alberto.
