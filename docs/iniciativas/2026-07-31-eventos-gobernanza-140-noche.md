@@ -227,3 +227,12 @@ Decisión A/B sigue siendo de Juan. Nuestra postura ya está sobre la mesa, veri
 ## 03:56 (1 ago) — Juan acusa la recomendación y VERIFICA la autocorrección — incidente prematuro cerrado limpio
 
 Acuse `5149...` (no decisión): Juan cita "el candidato `86a9c09` y la rama inerte `c1-put-path-preparado@7c64156`" — aceptó el encuadre de cuarentena, sin escalado. La autocorrección proactiva funcionó: cerramos el push prematuro antes de que su monitor lo marcara como violación. Nota de actualización al ejecutor en `main` (`7a1e995`): sincronizar clon (reset a origin), no re-pushear la candidata. Sigue pendiente: decisión A/B (Juan la está revisando).
+
+## 04:03 (1 ago) — DECISIÓN A/B: Juan elige A. FAIL técnico, C1 incompleto (`5149704373`)
+
+Juan reprodujo candidato (190/190) y prototipo (209/209). **Rechaza nuestra recomendación B; decide A:** "B sola no satisface C1; el alcance canónico fija plano vivo contenido Y 7 clones aislados; NO procede diferir A". Tres bloqueantes para cerrar:
+1. **Un único SHA candidato auditable A+B** que exponga el instalador/verificador target-guarded REAL de ambas barreras (el trabajo del PUT en cuarentena entra ahora al candidato, autorizado).
+2. **Cerrar el camino vivo antes del checkpoint** — correcciones al PUT (`7c64156`): rollback puede sobrescribir edición concurrente sin GET/guarda inmediata previa; acredita "repuesto" solo por contenido (falta settings/active/publicación/activeVersion); la verificación de ida no rechaza settings nuevos ajenos. Añadir: reconciliación completa por workflow, journal durable, `incierto` sin retry ciego TAMBIÉN en rollback, fijar versión/config n8n, demostrar orden por dependencias + rollback inverso.
+3. **Publicar el checkpoint completo de los 9 mínimos** (no elección A/B): comandos literales target-guarded, IDs/nombres/fingerprints/bytes+GET post, operador/guardia/suplente/ventana, producers/en-vuelo/destinos, stop/RTO/rollback, identidades/efectos de Dashboard y Django. Dashboard #2 y Django #145 congelados; C2 fuera. Solo offline.
+
+**Consecuencia:** A queda decidida → el ejecutor está desbloqueado para completar la barrera A (ya no es lateral). Plan de cierre: (1) ejecutor completa PUT hardening + candidato unificado A+B; (2) Arquitecto rehace el checkpoint completo de 9 puntos con A. Nuestra recomendación B no ganó — decisión del accountable, sin error nuestro.
