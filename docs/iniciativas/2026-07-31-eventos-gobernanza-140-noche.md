@@ -340,3 +340,8 @@ Juan reprodujo 260/260. Tres bloqueantes:
 3. **Cerrar los mínimos, no pedir que el revisor los complete (Arquitecto + Alberto):** ventana/figura siguen "pendientes de aceptación" (Juan no puede inferir su aceptación — hay que PUBLICARLOS definitivos); `1373d1a` es SHA Git, NO deployment Vercel inmutable (falta ID/URL exacto); los hashes A **excluyen settings** — Juan quiere **SHA-256 + tamaño de cada cuerpo PUT/POST exacto**.
 
 Solo offline. Van ~8 FAILs convergentes; cada uno endurece algo real pero la meta se aleja al auditar más hondo.
+
+## 13:0x (1 ago) — Fix pre-guard/producers/bytes entregado (78442a467) PASS 279/279 + re-congelado
+
+Ejecutor cerró los 3 puntos (279/279): pre-guard del rollback sobre estado completo (settings/active/publicación → incierto sin escritura, era peor de lo que parecía: EMITÍA el PUT); comandos de ventana REALES que pausan el inbound (`/deactivate`, fail-closed, verificado contra fuente 2.28.7); SHA-256+bytes de los 14 cuerpos (A: 464.895 B; B: 444.693 B total). **2 cambios de procedimiento para el checkpoint:** (1) pausar inbound ANTES de barrera A (obligatorio); (2) el rollback NO reactiva → STG queda apagado tras C1 hasta reactivación HUMANA deliberada (debe ir en runbook). Re-congelado en 78442a467.
+**Bloqueante único para el checkpoint completo: deployment-id de Vercel (Alberto) — `1373d1a` es SHA Git, Juan lo rechaza.** + aceptación de Juan (ventana/figura) + decisión Alberto async vs sesión síncrona.
