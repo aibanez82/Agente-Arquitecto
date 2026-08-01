@@ -331,3 +331,12 @@ Ejecutor cerró p1/p2 (260/260): incierto/interrumpido recuperable (intención e
 ## 12:1x (1 ago) — Respuesta única y completa POSTEADA a Juan (`5151470952`) — con OK de Alberto
 
 Juan pidió respuesta única completa (`5151359011`). Alberto autorizó ("postea") y resolvió el suplente: **operador único** (Alberto operador, Arquitecto segundo técnico, Juan guardia) — no hay 2º humano operativo. Posteado sobre `1c30a00b6` (260/260): SHA fijado, producers/destinos cerrados (§5 literal), hashes enviados (§1), guarda release Django v212, Vercel congelado. Las dos cosas que quedan son ACEPTACIÓN de Juan (ventana lunes 3 + figura operador único), no pendientes nuestros. Todo offline. Pendiente: revisión + GO de Juan (y su aceptación de ventana/figura).
+
+## 12:48 (1 ago) — FAIL `5151490235` — rollback pre-guard + prechecks reales + mínimos definitivos
+
+Juan reprodujo 260/260. Tres bloqueantes:
+1. **Rollback pre-guard content-only (ejecutor):** `revertirContencion()` compara solo `fingerprintContenido`; un cambio ajeno en settings/active/publicación pasa y recibe el PUT de preimagen. → acreditar el ESTADO PRETENDIDO COMPLETO antes del rollback; cualquier diferencia → `incierto`, sin escritura.
+2. **Prechecks reales de producers/destinos (ejecutor + Arquitecto):** mi precheck WhatsApp exige credenciales nulas, pero los exports congelados traen `WhatsApp Trigger/Send STG` → falla siempre y NO pausa el inbound; `heroku config|grep` no valida false/dry-run; Dashboard/destinos son comentarios, no gates ejecutables. → comandos fail-closed que PAUSEN/acrediten todos los producers y denieguen/verifiquen conectores antes de los PUT, sin imprimir config sensible.
+3. **Cerrar los mínimos, no pedir que el revisor los complete (Arquitecto + Alberto):** ventana/figura siguen "pendientes de aceptación" (Juan no puede inferir su aceptación — hay que PUBLICARLOS definitivos); `1373d1a` es SHA Git, NO deployment Vercel inmutable (falta ID/URL exacto); los hashes A **excluyen settings** — Juan quiere **SHA-256 + tamaño de cada cuerpo PUT/POST exacto**.
+
+Solo offline. Van ~8 FAILs convergentes; cada uno endurece algo real pero la meta se aleja al auditar más hondo.
