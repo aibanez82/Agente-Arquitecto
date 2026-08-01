@@ -285,3 +285,7 @@ Alberto pasó el About→Copy debug info; el ejecutor lo analizó (nota `619df15
 ## 05:1x (1 ago) — Petición a Juan: obtener N8N_USE_WORKFLOW_PUBLICATION_SERVICE (`5149960007`)
 
 Alberto no tiene el 2FA de Hostinger (lo tiene Juan) → no puede abrir la terminal del VPS. Se pide a Juan que corra la consulta de solo lectura (`docker ps` + `docker inspect ... | grep -i PUBLICATION`) para fijar el modo de publicación (último dato de pre-ejecución del checkpoint). Sin salida → default false → síncrono. Incluida la sinergia: Juan confirma también la exclusión operativa (UI cerrada) en la ventana del lunes 3.
+
+## 05:25 (1 ago) — FAIL `5149976697` — la variable de publicación es preflight de VENTANA, no pre-obtención
+
+Juan: mi petición `5149960007` no cierra el FAIL (no trae SHA, el modo sigue sin fijar, el comando conserva `<ese-nombre>` sin target guard). **Y declina correr Hostinger/SSH/docker offline** — lo trata como preflight vivo de la ventana. Reencuadre: el valor NO se pre-obtiene; el checkpoint debe incorporar el **precheck literal, target-guarded y fail-closed** del modo de publicación, y la **CLI A+B debe consumir/acreditar ese valor antes de cualquier escritura**. Luego nuevo SHA + checkpoint completo sin pendientes. Arreglo de nuestro lado (ejecutor + checkpoint), sin Juan ni Alberto. El `<ese-nombre>` se resuelve identificando el contenedor n8n de forma determinista (p.ej. `--filter ancestor=n8nio/n8n:2.28.7`, fail-closed si no hay exactamente uno), no con un nombre hardcodeado. Mi petición a Juan de consultarlo queda superada.
