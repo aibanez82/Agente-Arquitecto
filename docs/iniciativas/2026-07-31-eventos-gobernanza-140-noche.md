@@ -414,3 +414,7 @@ Verificado: 5fcc0609 hornea el commit 1373d1a (machine-verifica el mapeo del gat
 
 Juan PASÓ el pin del source: `FIJO_COMMIT=1373d1a...` + `FIJO_RAMA=c1-gates-api-default-deny` literales/readonly; otro commit/rama/source ausente → fail-closed; contraste read-only local confirma que 1373d1a ∈ origin/c1-gates-api-default-deny. En su host 313/315 (2 P2 no portables por ruta /Users/AIP hardcodeada — diferidos). **TÉCNICO C1 100% CERRADO Y APROBADO por Juan sobre 5fcc0609.**
 Gate humano (todo de @oilycoyote + inputs de Alberto): fijar ventana + roles/suplente; la evidencia efectiva `403 GATE_DENIED` del Dashboard se acredita EN LA VENTANA (no offline); decidir GO por comentario explícito. La confirmación del panel horneada NO sustituye el comentario de checkpoint humano. Candidato congelado duro en 5fcc0609. Listo para postear la respuesta del gate humano con OK de Alberto.
+
+## 15:2x (1 ago) — Respuesta del gate humano POSTEADA a Juan (`5152108294`, OK de Alberto)
+
+Datos humanos definitivos fijados: (1) deployment dpl_E5yQ...=commit 1373d1a confirmado en panel; (2) ventana lunes 3 ago 09:30 CDMX/15:30 UTC; (3) roles = operador único (Alberto operador, Arquitecto 2º técnico, Juan guardia — sin suplente humano independiente); (4) 403 GATE_DENIED se acredita en la ventana. Pedido a Juan: aceptar ventana+figura y emitir checkpoint/GO humano. **Todo lo que depende de nuestro lado, CERRADO.** Pelota 100% en Juan: aceptar + GO. Nada se ejecuta hasta su comentario explícito.
