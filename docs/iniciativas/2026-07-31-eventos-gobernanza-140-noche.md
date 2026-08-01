@@ -236,3 +236,7 @@ Juan reprodujo candidato (190/190) y prototipo (209/209). **Rechaza nuestra reco
 3. **Publicar el checkpoint completo de los 9 mínimos** (no elección A/B): comandos literales target-guarded, IDs/nombres/fingerprints/bytes+GET post, operador/guardia/suplente/ventana, producers/en-vuelo/destinos, stop/RTO/rollback, identidades/efectos de Dashboard y Django. Dashboard #2 y Django #145 congelados; C2 fuera. Solo offline.
 
 **Consecuencia:** A queda decidida → el ejecutor está desbloqueado para completar la barrera A (ya no es lateral). Plan de cierre: (1) ejecutor completa PUT hardening + candidato unificado A+B; (2) Arquitecto rehace el checkpoint completo de 9 puntos con A. Nuestra recomendación B no ganó — decisión del accountable, sin error nuestro.
+
+## 04:1x (1 ago) — Alberto acepta A. Handoff de barrera A dispatchado (`904402b`)
+
+Decisión de Alberto: adelante con A. Handoff al ejecutor en main (`904402b`): completar camino vivo con las 6 correcciones de Juan + integrar en candidato único A+B, solo offline. En paralelo, el Arquitecto rehará el checkpoint completo de 9 puntos sobre el SHA unificado cuando el ejecutor lo entregue. Ejecutar seguirá requiriendo GO aparte. Ruta a cierre de C1: ejecutor entrega A+B → Arquitecto verifica + rehace checkpoint → Juan revisa → GO → ventana con Alberto.
