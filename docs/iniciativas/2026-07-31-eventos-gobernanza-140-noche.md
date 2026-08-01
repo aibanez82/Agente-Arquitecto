@@ -176,3 +176,7 @@ El ejecutor entregó además: comandos de solo-lectura (guarda anti-TOCTOU con f
 ## 04:1x (1 ago) — Aviso publicado en #132 (`5149463414`): SHA 86a9c093c + pregunta de barrera A a Juan
 
 Con OK de Alberto. Nuevo candidato + 6 bloqueantes cubiertos + la decisión de alcance planteada a Juan: opción A (incluir barrera A con PUT autorizado sobre los 7 vivos) vs opción B (diferir, instalar solo barrera B). Bloqueado esperando su decisión antes de rehacer el checkpoint. Sin acción nuestra hasta entonces.
+
+## 02:58 (1 ago) — Dirección post-C1 de Juan (`5149471243`) — hoja de ruta, NO respuesta a barrera A
+
+Juan fija que cerrar C1 no cierra #140. Secuencia canónica declarada: C1 (contención viva+aislado) → C2 (integración STG shadow, matriz E2E-, cero red) → C3 (gap pre-dual + readiness PG) → C4 (canary dual→shadow, termina en shadow) → C5 (2º GO + Dual sostenido STG) → C6-C9. Cada fase con aceptación técnica + checkpoint humano separado; NO GO anticipado. Hasta cerrar C1, foco exclusivo, sin trabajo lateral. **La pregunta de barrera A (#132 c.5149463414) sigue sin responder.** Sin acción nuestra; es hoja de ruta.
