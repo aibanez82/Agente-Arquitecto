@@ -133,3 +133,7 @@ Su punto 1 (entregar delta n8n) ya estaba cumplido 8 min antes (`5148961363`). C
 ## 03:1x (1 ago) — C1 ACEPTADA offline (`5149044773`) + borrador de checkpoint preparado
 
 Juan aceptó la entrega técnica C1 offline de los 3 frentes (n8n `4e2118c` 147/147, Dashboard `1373d1a`, Django `4f0e741`). Cierra el NO-GO; NO declara C1 operativamente instalada. Django #145 (CAS) queda fuera de la instalación C1, sin merge. Luz verde para preparar (sin ejecutar) el borrador del checkpoint operativo en #132 (9 puntos mínimos). **Borrador redactado:** `docs/iniciativas/c1-checkpoint-operativo-borrador.md` con SHAs/IDs reales del C0 freeze — pendiente del OK de Alberto para publicar en #132. NO es GO; su ejecución exige comentario explícito posterior del accountable.
+
+## 03:2x (1 ago) — Borrador de checkpoint C1 publicado en #132 (`5149097301`, OK de Alberto)
+
+Los 9 puntos en el tejado de Juan para revisión. Pendientes de Alberto para la ventana real: comandos literales de merge/import y designar guardia/suplente. Ejecución bloqueada hasta GO explícito de Juan en #132.
