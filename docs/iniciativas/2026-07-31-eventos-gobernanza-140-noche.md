@@ -249,3 +249,7 @@ Ejecutor integró el camino PUT + hardening (efd3c606 PUT, 28167b6 los 6 puntos 
 - Matiz async de publishIfActive manejado: "versión publicada sigue siendo la anterior → INCIERTO". Excepción PUT ESTRECHA (permite actualizar los 7 para contención, sigue prohibiendo borrar/activar) tras cliente-de-contención explícito + autorización escrita. Dos bugs auto-reportados corregidos (copia profunda; fingerprint sobre lo enviado).
 
 Pendiente: que el ejecutor actualice el PR #3 al nuevo SHA; luego aviso a Juan + rehago el checkpoint de 9 puntos.
+
+## 04:3x (1 ago) — Ejecutor fija n8n 2.28.7 (candidato `601a845`) — PASS; checkpoint actualizado
+
+Alberto observó la versión en la UI (About n8n): 2.28.7. El ejecutor la fijó y **re-verificó los 5 hechos del contrato contra el tag `n8n@2.28.7` (`955be3ef`)** — descubrió que hasta ahora leía master (~5 minors por delante); los 5 se sostienen. Cerró un hueco propio en la guarda de publicación (un `null` la atravesaba). Candidato `28167b6 → 601a845`. Verificación independiente del Arquitecto: 219/219, runner OK, barrera A 56→0, **manifests/fingerprints sin cambios** (tablas del checkpoint siguen válidas). Checkpoint v2 actualizado: SHA `601a845`, punto 6 corregido (versión 2.28.7 fijada + re-verificada; modo de publicación = requisito de pre-ejecución vía `docker inspect ... PUBLICATION`, NO por /rest/settings). Buen trabajo senior: procedencia legítima (Alberto), dato etiquetado, re-verificado contra el tag correcto. Pendiente: confirmar con Alberto la observación de 2.28.7 + OK para postear checkpoint a Juan.

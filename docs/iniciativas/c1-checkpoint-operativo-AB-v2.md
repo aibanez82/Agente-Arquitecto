@@ -1,6 +1,6 @@
 # Checkpoint operativo C1 (A+B) — HYL-WAI#132 · NO ejecutable
 
-> Preparado por el Arquitecto sobre el candidato único A+B `28167b6` (verificado independiente: 216/216, runner OK, los 6 puntos de hardening con test nombrado). Cubre el bloqueante 3 del FAIL de Juan (`5149704373`). **Este documento NO es GO.** Su ejecución exige un comentario posterior y explícito del accountable en #132. **C2 queda fuera.**
+> Preparado por el Arquitecto sobre el candidato único A+B `601a845` (verificado independiente: 219/219, runner OK, los 6 puntos de hardening con test nombrado + pin de n8n 2.28.7). Cubre el bloqueante 3 del FAIL de Juan (`5149704373`). **Este documento NO es GO.** Su ejecución exige un comentario posterior y explícito del accountable en #132. **C2 queda fuera.**
 
 ## 0. Objeto
 Instalar y **verificar** las dos barreras de contención C1 en STG:
@@ -13,7 +13,7 @@ No ejecuta la matriz C2 ni prueba viva Dual. No toca PROD.
 
 | Frente | Artefacto | Target |
 |---|---|---|
-| n8n | PR `aibanez82/Agente-n8n#3@28167b6e7e413cc3c011cb30bcf21bb61c341139` (base `stg@40fe572`) | instancia n8n STG `n8n-xlqk.srv1810257.hstgr.cloud` |
+| n8n | PR `aibanez82/Agente-n8n#3@601a845dc35905153c2ccaa8026e1bc2fa542d55` (base `stg@40fe572`) | instancia n8n STG `n8n-xlqk.srv1810257.hstgr.cloud` |
 | Dashboard | PR #2 `1373d1ab95f2e18f4758ad7d1d571e9dcf5f6fcc` — **congelado, no forma parte de esta instalación** | — |
 | Django | C1 ya efectivo en `stg@4f0e7416` (PASS/CI). PR #145 `c373ab11` = tooling CAS futuro, **fuera**, sin merge | `hyl-wai-stg` |
 
@@ -72,7 +72,9 @@ node runner/run-c1.js   # RESULTADO: OK — plano contenido
 
 ## 6. Gates/origins y efectos automáticos
 - Este frente es **n8n**; no hay auto-deploy Vercel/Heroku asociado a la instalación de las barreras (el `PUT`/`POST` van a la API de n8n, no a git). `GATE_*`/`ALLOWED_ORIGINS` del Dashboard siguen sin provisionar (fail-closed) — **no se tocan en este checkpoint** (Dashboard congelado).
-- ⚠️ **Versión/config de n8n (punto crítico del hardening):** la API pública v1 de n8n **no expone la versión del servidor**. El instalador exige `n8n_esperado` y **falla en cerrado** (`version:null` por defecto). **Alberto debe fijar la versión/config real de la instancia STG por otra vía** (UI, `/rest/settings` con sesión, o el despliegue) antes de exponer el modo vivo — por el `publishIfActive` posiblemente asíncrono.
+- ⚠️ **Versión/config de n8n (punto crítico del hardening):**
+  - **Versión: `2.28.7`** — observada por Alberto en la UI (About n8n) y **re-verificada contra el tag `n8n@2.28.7` (`955be3ef`)**. El pin no protege un número: protege **5 hechos** de los que depende el instalador (id/active readOnly; PUT público con `publishIfActive`+`forceSave`; settings se FUSIONAN en `update()`; `resolveNodeWebhookId` solo asigna si falta; `N8N_USE_WORKFLOW_PUBLICATION_SERVICE` default false), cada uno con fichero:línea y consecuencia-si-cambia en `c1.config.json`. Si n8n sube de versión: re-verificar los 5 contra el tag nuevo y re-pinnear, no cambiar el número.
+  - **Modo de publicación: pendiente, REQUISITO DE PRE-EJECUCIÓN.** Lo determina la env var `N8N_USE_WORKFLOW_PUBLICATION_SERVICE` del contenedor, que **no se puede leer por HTTP** (verificado: no está en `frontend-settings.ts`/`frontend.service.ts` en 2.28.7 → ni `/rest/settings` ni el About lo exponen). Se observa **en la ventana** con `docker inspect <contenedor> | grep -i PUBLICATION`. Si no aparece → default `false` → publicación **síncrona**. El instalador exige `publicacion` declarada y acreditada, y **falla en cerrado** hasta entonces (`modo-de-publicacion-no-declarado`/`no-acreditado`).
 
 ## 7. Stop conditions, `uncertain`, RTO, rollback
 - **Stop:** guarda anti-TOCTOU `1` o `3`; verificación por partes que no cuadre; `settings` ajenos aparecidos; edición concurrente detectada; migración/ejecución en vuelo aparecida; `n8n_esperado` no fijado o distinto.
@@ -91,4 +93,4 @@ node runner/run-c1.js   # RESULTADO: OK — plano contenido
 Instala y verifica C1 (barreras A+B). NO ejecuta M1–M6 (C2), NO E2E vivo, NO `dual`, NO activación de tráfico. C2 requiere su propio GO posterior y separado.
 
 ---
-**Estado:** borrador NO ejecutable. Pendiente de: (a) revisión del accountable; (b) que Alberto fije la versión/config de n8n STG (punto 6); (c) ventana pactada Alberto↔Juan; (d) exponer el modo vivo del instalador (cambio de código con GO escrito); (e) comentario explícito de GO del accountable en #132.
+**Estado:** borrador NO ejecutable. Pendiente de: (a) revisión del accountable; (b) observar el modo de publicación (`docker inspect ... PUBLICATION`) en la ventana — la versión 2.28.7 ya está fijada; (c) ventana pactada Alberto↔Juan; (d) exponer el modo vivo del instalador (cambio de código con GO escrito); (e) comentario explícito de GO del accountable en #132.
