@@ -266,3 +266,12 @@ Juan reprodujo (219/219, runner OK). Tres correcciones:
 3. **Efectos/rollback al alcance:** quitar el backup de BD (A+B no muta BD); fijar identidad/efecto exacto de Dashboard (proyecto/env/deployment Vercel, cero acción al estar congelado) y Django (app/release activo + `migrate --check` target-guarded), manteniendo #2 y #145 congelados. → Arquitecto.
 
 Solo offline; sin PUT/POST/DELETE, docker inspect, backup, STG/PROD, etc. Pendiente de Alberto: pactar ventana con Juan + nombrar suplente.
+
+## 05:0x (1 ago) — Entorno STG observado por Alberto (debug info UI) — NO violación, 4 hallazgos + 1 estratégico
+
+Alberto pasó el About→Copy debug info; el ejecutor lo analizó (nota `619df159b` en main). C1 no tocó STG. Hallazgos:
+1. **Confirma el pin 2.28.7** (n8nVersion en debug) — ya no descansa en una sola lectura.
+2. **DOS bases de datos:** n8n usa SQLite interna (workflows/ejecuciones/credenciales); el bot habla con un POSTGRES aparte (whatsapp_sessions/n8n_chat_histories, cred `5wlLe3gD07CLIM7U`). El checkpoint no debe decir "restaurar la BD" sin apellido → refuerza el quitar el backup (Juan p.3).
+3. **Acota el TOCTOU:** cluster instanceCount 1, un solo main leader, executionMode regular → NO hay segundo proceso n8n que edite en paralelo. El único editor concurrente posible es una PERSONA con la UI abierta u otro cliente API. La exclusión operativa se vuelve concreta: **el garante confirma que nadie tiene la UI de STG abierta al abrir la ventana, y se re-comprueba antes del PUT del Main.**
+4. **`publicacion` sigue null:** el debug info tampoco la expone (última vía sin shell). Requisito de pre-ejecución; el instalador se niega.
+5. **⚠️ FUERA DE C1, muerde después:** STG (2.28.7) y **PROD (2.6.3) están a 22 minors**. STG no es ensayo fiel de PROD; verificado contra el tag `n8n@2.6.3`: **2 de los 5 hechos que sostienen el instalador NO existen en 2.6.3.** Los artefactos no son portables a PROD tal cual. Alberto evalúa subir PROD (el ejecutor le dio el procedimiento; ni lo ejecuta él ni es alcance C1). **Bloqueante futuro real del rollout a PROD.**
