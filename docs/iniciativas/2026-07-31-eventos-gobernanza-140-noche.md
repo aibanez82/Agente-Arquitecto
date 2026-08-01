@@ -450,3 +450,7 @@ Alberto listo para C1 inmediata. Verificado: credenciales n8n STG en Agente-n8n/
 ## 23:53 (1 ago) — Juan: disponibilidad registrada, gate no cambió (`5154066236`) — GO aún pendiente
 
 Juan confirma precondiciones (R presente, accesos repartidos, exclusión a reconfirmar, RTO ≤20). Pero reitera procedimentalmente: la disponibilidad NO sustituye la enmienda RACI (ya en #140 5153952626) ni el GO/checkpoint específico posterior. Punto operativo clave: el modo de publicación es valor a OBSERVAR en ventana ("esperado síncrona" ≠ acreditación); si sale asíncrona/no concluyente → STOP antes de credenciales/mutaciones. Su tarea: (1) enmienda RACI [ya posteada 23:19] → (2) emitir/rechazar GO separado con comandos/target/orden/prueba 403/stop/rollback. **GO aún pendiente de Juan.** No es ask de Alberto.
+
+## 23:57 (1 ago) — Juan corrige estado: RACI YA enmendado, solo falta GO C1 (`5154077026`)
+
+Juan supersede su propio 5154066236: la excepción operador único ya aceptada (#140 5153952626) + sincronización inmediata (#140 5153977172), ambas antes de la disponibilidad de Alberto. **Nada más de código ni coordinación de Alberto.** Único gate: el GO operativo del A en #132. Su tarea: emitir/rechazar GO C1 que autorice primero el preflight Hostinger read-only (docker inspect) y, solo si todas las precondiciones pasan, la ejecución A+B sobre 5fcc06099. Modo publicación = primer precheck; no concluyente/async → STOP antes de mutaciones. **GO INMINENTE.**
