@@ -107,7 +107,7 @@ heroku run --app hyl-wai-stg -- python manage.py migrate --check --noinput
 ## 7. Stop conditions, `uncertain`, RTO, rollback
 - **Stop / exit≠0:** anti-TOCTOU `1`/`3`; verificación que no cuadre; `settings` ajenos; edición concurrente/UI abierta; ejecución en vuelo; `n8n_esperado` incompleto/distinto; publicación `asincrona`; `N8N_BASE_URL` ajeno; **B no limpia → no se toca el vivo**. La CLI cierra no-verde y **sale != 0**; verde solo si todo cuadró.
 - **`uncertain` sin retry ciego** (ida y vuelta): PUT que aplica y pierde respuesta → GET lo acredita; que no aplicó → `fallido`; rollback no acreditable → `incierto`.
-- **RTO:** < 30 min. **Rollback por corrida (`--rollback-from <run-id>`, estado durable que sobrevive un corte):** borra clones (B) y repone preimágenes (A) en orden inverso, con GET/guarda previa; **NO restaura el `versionId`**; NUNCA reimport de los 7 vivos en bloque ni restore de BD (la guarda del cliente prohíbe borrar/activar los 7 IDs vivos).
+- **RTO:** restore n8n **≤20 min** (canónico §11 de #140). **Rollback por corrida (`--rollback-from <run-id>`, estado durable que sobrevive un corte):** borra clones (B) y repone preimágenes (A) en orden inverso, con GET/guarda previa; **NO restaura el `versionId`**; NUNCA reimport de los 7 vivos en bloque ni restore de BD (la guarda del cliente prohíbe borrar/activar los 7 IDs vivos).
 
 ## 8. Evidencia sanitizada y cero DDL/migraciones/flags/secretos
 Evidencia post sanitizada (conteos, fingerprints, resultado; sin PII/secretos/IDs de credencial). NO DDL, NO migraciones, NO flags, NO secretos/origins. Django ya en `stg@4f0e741` (v212; solo `migrate --check`).
