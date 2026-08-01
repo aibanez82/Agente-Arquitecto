@@ -200,3 +200,7 @@ Juan reprodujo `86a9c093` (**190/190 + runner OK, 56→0**) y contrastó los 3 r
 **Si el accountable elige A**, el camino del PUT (sin construir) no entra al checkpoint hasta cubrir, POR workflow: (1) preimagen fresca + guarda exacta de webhookId; (2) exclusión de ediciones concurrentes; (3) journal durable + reconciliación por GET ante timeout, sin retry ciego; (4) verificación posterior de contenido + estado publicado + activeVersion; (5) orden por dependencias + rollback inverso por workflow. Ojo: reponer un export crea/publica OTRA versión (restaura contenido, no el versionId previo) y sufre los mismos riesgos.
 
 **B sola sigue siendo C1 parcial** bajo el alcance de #140 (no cierra "plano vivo contenido + aislado instalado"). NO decide A/B, no es PASS/GO. Dashboard #2 y Django #145 congelados. **Sigue pendiente: la decisión A/B de Juan.**
+
+## 03:2x (1 ago) — Límite de alcance al ejecutor sobre la spec de 5 puntos de Juan
+
+El ejecutor leyó la spec de 5 puntos de Juan como tarea (correcto en parte). El Arquitecto fija el límite (handoff `Agente-n8n@06fff01` en main): ✅ ejecutable ahora = corregir sus 2 afirmaciones de más + análisis del grafo de dependencias como hallazgo offline (aporta a la decisión A/B); 🛑 NO = construir el camino del PUT (5 puntos), que es A-contingente por definición de Juan y trabajo lateral hasta GO de A. Nada pusheado aún por el ejecutor; el candidato 86a9c09 sigue igual. Recordatorio: fijar versión/config STG (por publishIfActive async) es lectura de STG que decide Alberto, no el ejecutor.
