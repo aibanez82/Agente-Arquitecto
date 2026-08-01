@@ -293,3 +293,12 @@ Juan: mi petición `5149960007` no cierra el FAIL (no trae SHA, el modo sigue si
 ## 05:5x (1 ago) — Instalador vivo real entregado (464dbd4) + checkpoint completo POSTEADO a Juan (`5150052424`)
 
 Ejecutor entregó la CLI viva real A+B inerte + preflight de publicación (231/231, inercia verificada: 5 guardas, sin flags→DRY-RUN cero escrituras; preflight con doble target-guard imagen+binario). Verificación independiente del Arquitecto PASS. **Posteado por el Arquitecto directo (delegación de Alberto)**, con las 3 condiciones cumplidas: entregado + verificado + sin placeholders. Correcciones al posteo previo cazadas verificando: quité la columna de fingerprint de artefacto (era mía y de más — la verificación es por partes, no fingerprint único); comandos = salida verbatim de la CLI; SHA 464dbd4; ventana lunes 3 ago 09:30 CDMX. PR #3 actualizado a 464dbd4. Pendiente único: revisión + GO de Juan. Alberto durmiendo; nada irreversible hecho.
+
+## 05:53 (1 ago) — FAIL `5150070342` — rollback/stop/target (2 bugs reales de la CLI + checkpoint incompleto)
+
+Juan reprodujo (231/231, dry-run inerte, simulación verde). Tres bloqueantes:
+1. **Rollback no recuperable entre corridas (bug del ejecutor):** cada invocación borra `build/instalador.log`; `--rollback` re-aplica A e instala B y solo revierte lo de esa invocación; no consume preimágenes/IDs de pasos 3–4 ni recupera tras corte. → estado durable identificable + `--rollback-from`/reconciliación; en rollback NUNCA emitir primero los PUT/POST de ida.
+2. **Stop/target guard sin cerrar (bug del ejecutor):** la CLI ejecuta B aunque A quede parcial; siempre `log.fin(true)`; puede salir 0 con errores/`incierto`. → parar, cerrar no-verde, exit !=0. Y el preflight Docker no está ligado a `N8N_BASE_URL`: **guarda exacta del host/instancia STG antes de cualquier PUT/POST/DELETE** (que las credenciales no puedan apuntar a otro target).
+3. **Checkpoint realmente completo (Arquitecto):** los 6 curls con `…` → literales; placeholders de autorización; ventana "a confirmar"; prechecks sin comandos literales (ejecuciones/producers/schedules/destinos); deployment Vercel inmutable; comando Django `migrate --check` target-guarded; operador/guardia/suplente/ventana definitivos.
+
+Solo offline. Nota: Juan trata la ventana lunes 3 como "a confirmar" — aún no la aceptó; requiere su OK explícito para ser definitiva.
