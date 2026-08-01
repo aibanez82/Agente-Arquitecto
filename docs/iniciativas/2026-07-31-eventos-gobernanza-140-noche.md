@@ -362,3 +362,11 @@ Juan reprodujo y encontró que 78442a4 NO cierra:
 ## 14:1x (1 ago) — Correcciones consolidadas entregadas (4e8acea48) PASS 291/291, verificado COMPLETO
 
 Los 3 bloqueantes de 5151680686 cerrados: rollback acredita activeVersionId incluido null (canario de Juan → incierto/0 PUTs); guion con comando Django real (heroku config:get, sin placeholder) + bash -n propio = 0; falso verde eliminado (reverificación no degrada a dry-run); deactivates journalizados + reconciliación tras corte. Verificación del Arquitecto esta vez COMPLETA (artefacto entero + bash -n propio, aplicando la lección del gap). Re-congelado en 4e8acea48. **Técnico cerrado; el cierre del checkpoint espera SOLO datos humanos: Vercel deployment-id (Alberto) + aceptación de Juan (ventana/roles). ~10 rondas; recomendación de sesión síncrona en pie.**
+
+## 14:20 (1 ago) — FAIL focal `5151822875` sobre 4e8acea4 — PASÓ el delta, quedan 2 P1 (convergencia)
+
+Juan PASÓ el delta: rollback null/publicación-no-correlacionable → incierto/0 PUT; guion pasa bash -n y sh -n; reverificación exige `modo: VIVO` (falso verde cerrado); deactivates con intención durable + GET + stop sin retry + reconciliación read-only. 291/291 + focal 30/30. Huellas intactas. **Convergencia: "no hace falta otra ronda sobre hashes/SQL/sinks/estilo".**
+Dos P1 restantes (ejecutor):
+1. **Acreditar TODOS los producers + Dashboard:** el guion solo mira `WHATSAPP_FOLLOWUPS_ENABLED`; faltan los caminos independientes `WHATSAPP_CHECKPOINT_FOLLOWUPS_ENABLED=false` y `WHATSAPP_CHECKPOINT_FOLLOWUPS_DRY_RUN_DEFAULT=true` (checkpoint followups sigue siendo producer aunque el legacy esté off) + comando que acredite el default-deny del Dashboard. Incumple "todos los producers" + C1.A.3.
+2. **Recuperar la pausa, no solo reconciliarla:** el journal guarda el preestado pero ninguna ruta lo consume para restaurar; `permitirPausaInbound` prohíbe activar, `--reconciliar` solo lee. Un corte deja 4/7 inactivos sin vuelta segura; una corrida verde deja los 7 inactivos indefinidamente. C1.A.2 exige read/release/revoke disponibles. → **restore target-guarded SOLO de lo que esta corrida desactivó, desde el preestado journalizado, con intención/GET/incierto sin retry ciego.**
+Gate humano (ventana/roles/Vercel) tras los 2 P1, en UNA versión final. Bloqueante nuestro sigue: Vercel deployment-id (Alberto).
