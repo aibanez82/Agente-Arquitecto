@@ -147,3 +147,19 @@ Rellenados los dos huecos (decisión Alberto): merge por CLI `--merge` ambos PRs
 Juan revisó el borrador y detectó (correctamente, verificado por el Arquitecto contra el artefacto) que la aceptación offline cubría el **banco de pruebas del plano aislado** (barrera B), no un instalador de contención viva. Bloqueantes: (1) el instalador n8n C1 no existe como script; (2) el borrador proponía importar "sobre los IDs inmutables" cuando el runbook exige 7 clones NUEVOS `active:false`; (3) **falta la barrera A: el plano vivo sigue con `real_connector_calls=24`, gates=0** — los 54 gates solo viven dentro de `aislarWorkflow()`; (4) checkpoint con campos abiertos; (5) rollback (reimport 7 vivos + restore BD) demasiado amplio para la acción; (6) faltan identidades/comandos por frente + validación de head anti-TOCTOU.
 
 **Error del Arquitecto reconocido:** el checkpoint citó `import-stg-workflow.py` (importador del Bug #10) como instalador C1, y conflacionó el harness offline con instalación viva. Handoff de corrección entregado (`Agente-n8n@b5d81be`, en main): construir barrera A + instalador de 7 clones con GET fingerprint/journal/rollback acotado + nuevo SHA + re-revisión adversarial. Checkpoint marcado como superseded hasta que exista el artefacto. Dashboard/Django #145 congelados. **Esto NO es un ajuste menor: es ingeniería nueva — reajusta el plazo a STG.**
+
+## 03:4x (1 ago) — Instalador C1 + barrera A entregados: SHA `86a9c093c` — PASS del Arquitecto
+
+Ejecutor n8n construyó los dos artefactos que faltaban en 3 commits y actualizó el PR #3. **Verificación independiente (190/190 tests, runner OK):**
+- **Barrera A (plano vivo default-deny):** `vivo_alcanzable_sin_gate 56 → 0`, 10/10 ingress con gate, 50 gates que deniegan, `vivo_identidad_conservada:true`. Ya NO es solo el aislado — contiene el plano vivo, que era el bloqueante 3.
+- **Instalador (barrera B):** tests cubren exactamente lo que Juan exigió — FAKE de que borrar/activar un ID vivo lanza antes de tocar red; verificación POR GET; POST que pierde respuesta se acredita por GET sin duplicar; fingerprint no coincide → incierto y NUNCA borra; anti-TOCTOU si el vivo cambió; rollback borra SOLO lo creado por esta corrida (reconcilia por GET antes de cada DELETE, nunca restaura BD, nunca toca los 7 IDs vivos). Rollback acotado exactamente como Juan pidió (bloqueante 5).
+
+Los 6 bloqueantes del NO-GO cubiertos. Pendiente: aviso a Juan (con OK de Alberto) + rehacer el checkpoint con los comandos/IDs del instalador nuevo.
+
+## 03:4x (1 ago) — Instalador C1 + barrera A entregados: SHA `86a9c093c` — PASS del Arquitecto
+
+Ejecutor n8n construyó los dos artefactos que faltaban en 3 commits y actualizó el PR #3. **Verificación independiente (190/190 tests, runner OK):**
+- **Barrera A (plano vivo default-deny):** `vivo_alcanzable_sin_gate 56 → 0`, 10/10 ingress con gate, 50 gates que deniegan, `vivo_identidad_conservada:true`. Contiene el plano vivo (bloqueante 3).
+- **Instalador (barrera B):** tests cubren lo que Juan exigió — borrar/activar un ID vivo lanza antes de red; verificación POR GET; POST que pierde respuesta se acredita por GET sin duplicar; fingerprint no coincide → incierto sin borrar; anti-TOCTOU; rollback borra SOLO lo creado por esta corrida, reconcilia por GET, nunca restaura BD ni toca los 7 IDs vivos (bloqueante 5).
+
+6 bloqueantes del NO-GO cubiertos. Pendiente: aviso a Juan (OK de Alberto) + rehacer checkpoint con comandos/IDs del instalador nuevo.
