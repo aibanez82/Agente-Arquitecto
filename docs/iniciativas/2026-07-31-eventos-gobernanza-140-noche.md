@@ -121,3 +121,7 @@ Los 2 bypasses cerrados y reproducidos por Juan (143/143, runner OK). C1 "técni
 ## 03:xx (1 ago) — P2 final entregado: SHA candidato `4e2118c39` — PASS del Arquitecto
 
 Ejecutor n8n cerró los 5 puntos en un commit (`4e2118c`, redacción por vocabulario cerrado en vez de por clave) y actualizó el PR #3. Verificación independiente: 147/147, runner OK, `credenciales_aisladas_n` solo conteo, `argv:["run-c1.js"]`, grep del canario de Juan sobre `run.log` = 0 coincidencias. Borrador de aviso final a Juan listo — pendiente del "publica" de Alberto (ausente).
+
+## 03:xx (1 ago) — Aviso P2 final publicado (`5148961363`, OK de Alberto) — C1 entera en el tejado de Juan
+
+Los tres frentes entregados y verificados: n8n `4e2118c39` (P1+P2 cerrados), Dashboard `1373d1a` (PASS, congelado), Django de Juan en paralelo (wrapper CAS). Próximos pasos, todos de Juan: revisión del delta de redacción → aceptación offline humana de C1 → borrador de checkpoint operativo en #132.
