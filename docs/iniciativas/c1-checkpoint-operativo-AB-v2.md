@@ -65,7 +65,14 @@ Prechecks target-guarded a correr **al abrir la ventana** (no el inventario C0 h
 
 ## 6. Versión/config de n8n
 - **Versión: `2.28.7`** — observada por Alberto en About n8n de la instancia STG (evidencia + confirmada por el debug info) y re-verificada contra el tag `n8n@2.28.7` (`955be3ef`). El pin protege **5 hechos** (id/active readOnly; PUT con `publishIfActive`+`forceSave`; settings se FUSIONAN; `resolveNodeWebhookId` solo asigna si falta; `N8N_USE_WORKFLOW_PUBLICATION_SERVICE` default false), con fichero:línea en `c1.config.json`.
-- ⏳ **Modo de publicación (`N8N_USE_WORKFLOW_PUBLICATION_SERVICE`): pendiente.** No se expone por HTTP. Pedido a Juan (que tiene el 2FA de Hostinger) correr la consulta de solo lectura (`docker inspect <contenedor> … | grep -i PUBLICATION`) — sin salida → default `false` → publicación **síncrona**. El instalador **falla en cerrado** hasta que `publicacion` esté declarada y acreditada.
+- **Modo de publicación (`N8N_USE_WORKFLOW_PUBLICATION_SERVICE`): preflight de la VENTANA, target-guarded y fail-closed.** No se expone por HTTP (verificado). Se acredita **en la ventana** (no se pre-obtiene), con el contenedor identificado de forma determinista (fail-closed si no hay exactamente uno) ⏳(comando literal del ejecutor):
+  ```bash
+  CID=$(docker ps --filter ancestor=n8nio/n8n:2.28.7 --format '{{.ID}}')   # target guard: exactamente 1
+  [ "$(printf '%s\n' "$CID" | grep -c .)" = 1 ] || { echo FAIL; exit 1; }
+  docker inspect "$CID" --format '{{range .Config.Env}}{{println .}}{{end}}' | grep -i N8N_USE_WORKFLOW_PUBLICATION_SERVICE
+  # sin salida -> ausente -> default false -> publicación SÍNCRONA
+  ```
+  **La CLI A+B consume/acredita ese valor antes de cualquier escritura**; sin `publicacion` acreditada no emite ni un `PUT`/`POST` (`modo-de-publicacion-no-declarado`/`no-acreditado`).
 - Sin auto-deploy Vercel/Heroku asociado a esta instalación (los `PUT`/`POST` van a la API de n8n, no a git).
 
 ## 7. Stop conditions, `uncertain`, RTO, rollback
@@ -82,5 +89,5 @@ Prechecks target-guarded a correr **al abrir la ventana** (no el inventario C0 h
 Instala/verifica C1 (A+B). NO M1–M6 (C2), NO E2E vivo, NO `dual`, NO activación de tráfico. C2 requiere GO posterior y separado.
 
 ---
-**Pendiente de:** ⏳ (a) comandos reales del instalador vivo (ejecutor) — actualiza §1 SHA y §4; ⏳ (b) valor de `N8N_USE_WORKFLOW_PUBLICATION_SERVICE` (Juan) — §6; ⏳ (c) ref del contenedor para el `docker inspect` (ejecutor/Alberto); (d) OK de Alberto para postear; (e) revisión + GO de Juan.
+**Pendiente de:** ⏳ (a) comandos reales del instalador vivo + preflight de publicación literal y CLI que lo consume (ejecutor) — actualiza §1 SHA, §4 y §6; (b) OK de Alberto para postear; (c) revisión + GO de Juan. *(El valor de publicación NO se pre-obtiene: es preflight de ventana — §6.)*
 **Fuera de alcance, apuntado para el rollout a PROD:** PROD corre n8n **2.6.3** (22 minors por debajo de STG); 2 de los 5 hechos del instalador no existen en 2.6.3 → los artefactos no son portables a PROD tal cual (o subir n8n en PROD, o reescribir para 2.6.3). No es C1.
