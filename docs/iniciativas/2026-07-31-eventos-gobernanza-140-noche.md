@@ -109,3 +109,7 @@ Handoff de iteración entregado al Agente n8n (`handoffs/2026-08-01-iteracion-p1
 ## 01:5x (1 ago) — Iteración P1 n8n entregada: nuevo SHA candidato `b2c89ba15` — PASS del Arquitecto
 
 Ejecutor n8n cerró el P1 (2 bypasses SQL) + los 4 P2 en tres commits (`b8b214c` fix, `43836dc` FAKEs e2e, `b2c89ba` P2s) y actualizó el PR #3 con la composición completa (incluye `6242007` docs-only declarado). **Verificación independiente del Arquitecto: 143/143 tests, runner OK, FAKEs e2e reproducen exactamente ambos bypasses del dictamen (gate ejecutado deniega payload malicioso; sujeto acreditado = destino SQL real), `taxonomy.js` clasifica dinámico/no-analizable como mutación fail-closed.** Pendiente: aviso a Juan para la re-revisión focal (con OK de Alberto).
+
+## 02:0x (1 ago) — Aviso de iteración P1 publicado (`5148827114`, OK de Alberto) — TODO en el lado de Juan
+
+Con este aviso, el estado queda: PR n8n #3 (`b2c89ba15`) sometido a re-revisión focal; PR Dashboard #2 (`1373d1a`) PASS y congelado; ningún pendiente operativo del lado nuestro en #132/#135/#140. Próximos hitos, todos de Juan: re-revisión focal n8n → aceptación offline humana de C1 → borrador de checkpoint operativo (en #132, con decisiones futuras de Alberto: ALLOWED_ORIGINS, ventana, guardia).
