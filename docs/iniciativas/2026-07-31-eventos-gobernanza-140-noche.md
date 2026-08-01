@@ -345,3 +345,7 @@ Solo offline. Van ~8 FAILs convergentes; cada uno endurece algo real pero la met
 
 Ejecutor cerró los 3 puntos (279/279): pre-guard del rollback sobre estado completo (settings/active/publicación → incierto sin escritura, era peor de lo que parecía: EMITÍA el PUT); comandos de ventana REALES que pausan el inbound (`/deactivate`, fail-closed, verificado contra fuente 2.28.7); SHA-256+bytes de los 14 cuerpos (A: 464.895 B; B: 444.693 B total). **2 cambios de procedimiento para el checkpoint:** (1) pausar inbound ANTES de barrera A (obligatorio); (2) el rollback NO reactiva → STG queda apagado tras C1 hasta reactivación HUMANA deliberada (debe ir en runbook). Re-congelado en 78442a467.
 **Bloqueante único para el checkpoint completo: deployment-id de Vercel (Alberto) — `1373d1a` es SHA Git, Juan lo rechaza.** + aceptación de Juan (ventana/figura) + decisión Alberto async vs sesión síncrona.
+
+## 13:28 (1 ago) — Addendum de responsabilidad de Juan (`5151628075`) — sin hallazgos nuevos
+
+Formaliza: responsable siguiente @aibanez82; entrega = UNA respuesta única en #132 (SHA exacto + repro offline + checkpoint final completo). 2 de 3 bloqueantes ya cerrados por el ejecutor (78442a467). Instrucción: "no refactors ni mejoras laterales" — corregir exacto los 3 bloqueantes y entregar (valida el freeze del ejecutor). Al publicar, monitor acusa → responsabilidad al revisor; con PASS técnico → a Juan para decisión humana. Bloqueante único nuestro: Vercel deployment-id (Alberto) + aceptación de Juan.
