@@ -13,7 +13,7 @@ No ejecuta C2 ni prueba viva Dual. No toca PROD. **No muta ninguna BD** → sin 
 | Frente | Artefacto | Efecto |
 |---|---|---|
 | n8n | PR `aibanez82/Agente-n8n#3` @ `1c30a00b6` · base `stg@40fe572` · n8n pin **2.28.7** (`955be3ef`) | instala A+B en `n8n-xlqk.srv1810257.hstgr.cloud` |
-| Dashboard | Vercel proyecto **`dashboard-seguroautoqualitas` (org `albers-projects-52295059`)**, env **stg**, congelado en PR #2 `1373d1a` | **CERO acción** |
+| Dashboard | Vercel **`dashboard-seguroautoqualitas`** (`prj_CU5Qqp3BK2B31HVytLeEOBuSlnrU`, scope `albers-projects-52295059`), deployment inmutable **`dpl_E5yQGegYSXZqbNy38TBi4j69U2gK`** (Preview, domain `dashboard-seguroautoqualitas-8xb7zsprm-albers-projects-52295059.vercel.app`) = commit `1373d1a` verificado en panel | **CERO acción** |
 | Django | app **`hyl-wai-stg`**, release activo esperado **v212** (`4f0e7416`). PR #145 fuera, sin merge | **CERO acción** — solo `migrate --check` |
 
 **7 workflows vivos — barrera A por `PUT`; fingerprint anti-TOCTOU (guarda previa a cada PUT):**
