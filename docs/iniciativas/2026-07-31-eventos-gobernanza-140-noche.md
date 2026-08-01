@@ -113,3 +113,7 @@ Ejecutor n8n cerró el P1 (2 bypasses SQL) + los 4 P2 en tres commits (`b8b214c`
 ## 02:0x (1 ago) — Aviso de iteración P1 publicado (`5148827114`, OK de Alberto) — TODO en el lado de Juan
 
 Con este aviso, el estado queda: PR n8n #3 (`b2c89ba15`) sometido a re-revisión focal; PR Dashboard #2 (`1373d1a`) PASS y congelado; ningún pendiente operativo del lado nuestro en #132/#135/#140. Próximos hitos, todos de Juan: re-revisión focal n8n → aceptación offline humana de C1 → borrador de checkpoint operativo (en #132, con decisiones futuras de Alberto: ALLOWED_ORIGINS, ventana, guardia).
+
+## 02:3x (1 ago) — Focal de Juan (`5148866994`): P1 ACEPTADO, queda P2 final de redacción
+
+Los 2 bypasses cerrados y reproducidos por Juan (143/143, runner OK). C1 "técnicamente verde" salvo un P2 de evidencia: `redactar()` no inspecciona el contenido de claves permitidas (canario de Juan: password/URL/SQL/token pasan dentro de `mensaje`/`argv`/`detalle`) y el runner imprime el ID de `credenciales_aisladas`. Luz verde a corrección final acotada (5 puntos, solo delta de redacción). Handoff entregado en `main` de Agente-n8n (`9fa6e14`) **vía worktree temporal — el clon estaba otra vez en la rama candidata y la convención nueva evitó el tercer incidente**. Dato nuevo: Django avanza en paralelo offline con wrapper CAS (`feature/issue-140-django-rollout-cas`).
