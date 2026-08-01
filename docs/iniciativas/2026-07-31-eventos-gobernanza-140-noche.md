@@ -314,3 +314,12 @@ Ejecutor encontró que la instancia simulada de sus tests no persistía entre pr
 ## 06:3x (1 ago) — Ejecutor acusa congelación (c6ebdd287) + recordatorio: validar B→A antes del GO
 
 Ejecutor confirmó freeze en 871221400 (local==remoto==PR head, 248/248, nada crítico) vía main (protocolo correcto). Recordatorio suyo: el orden B→A es desviación pendiente de validación explícita de Juan. Cubierto: B→A + rationale están en el checkpoint que Juan revisa (§0/§2), así que su revisión lo valida. PUNTO A VIGILAR en el dictamen de Juan: que acepte explícitamente B→A; si no lo menciona, confirmarlo con él antes del GO.
+
+## 06:35 (1 ago) — FAIL `5150210658` — uncertain/interrupted + producers/target + datos definitivos
+
+Juan reprodujo 248/248. Tres bloqueantes:
+1. **Recuperar lo incierto/interrumpido (ejecutor):** `revertibleDe()` descarta todo `incierto`; el estado se actualiza SOLO tras terminar cada workflow → un corte entre intento y reconciliación queda en journal pero `--rollback-from` lo ignora. → persistir intención ANTES de cada escritura; reconciliar por GET los intentos abiertos/`incierto` antes de decidir, sin retry/borrado ciego; estado durable de verdad (`fsync`) y privado (`0600`, contiene preimágenes).
+2. **Producers/destinos + target exacto (mixto):** prechecks solo cubren ejecuciones/schedules — faltan comandos para pausar/acreditar TODOS los producers (WhatsApp/Django/webhooks) y denegar/verificar destinos/conectores (Arquitecto). Y `verificarTarget()` debe exigir el **origin HTTPS exacto**; hoy acepta HTTP, puerto/ruta o userinfo con el mismo hostname (ejecutor).
+3. **Datos definitivos del checkpoint (Arquitecto + Alberto/Juan):** ventana sigue "a confirmar"; **falta suplente INDEPENDIENTE** (Juan no puede ser suplente Y guardia); deployment Vercel inmutable real; guarda del release Django esperado; **hashes/bytes exactos de los artefactos enviados** (= fingerprint_contenido del PUT, que yo había quitado — hay que reponerlo).
+
+Solo offline. **BLOQUEANTE DE ALBERTO: suplente independiente** — Alberto es el único humano operativo; o hay un tercero, o se negocia con Juan la realidad de operador único. + confirmar ventana.
