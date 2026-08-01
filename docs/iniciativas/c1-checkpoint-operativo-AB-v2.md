@@ -18,15 +18,17 @@ No ejecuta C2 ni prueba viva Dual. No toca PROD. **No muta ninguna BD** → sin 
 
 **7 workflows vivos — barrera A por `PUT`; fingerprint anti-TOCTOU (guarda previa a cada PUT):**
 
-| # orden PUT (Main 1º, callees 6–7: invariantes) | ID vivo | fingerprint anti-TOCTOU |
-|---|---|---|
-| 1 Bot principal | `dNqtM20ij6ecZYAX` | `9380710bba25bc2df7de4ce1feff2f1732eb087b62c1a7cf519f2b330c9dc4bc` |
-| 2 Atención Humana | `HAMIxqhZd2TEy6NB` | `28249f3883d4e31ef9ff04277fc9f8766b3ec8e9a37aa36385f482d3c790dc64` |
-| 3 Payment Confirmation | `Ob5JYHYbc23SLp0A` | `3ebada900d3ef3c5d79a6619661f85426987c638774a68a33d497714dbeee9c2` |
-| 4 Metepec Liberar | `biWlbwq4NQdZadwg` | `064000c2666461e69296aa6c8981bbbf87bafdf75864ef557c7b18fbb9fb0e9c` |
-| 5 Retomar Conversación | `nYRaRzU83qDLuEWI` | `b671934c0c9776123cdaf2be30106a0db5ab165a59a1f9320f395031f2a76313` |
-| 6 Issue Policy Guard (callee) | `PuogahK4qv9YOiF4` | `fa40ade2a5d24de7cc3483e984bb51a516c10bed429ae9048561ae33fde5aef7` |
-| 7 METEPEC Registrar (callee) | `liBCn3yBegedmYuR` | `5e3dc266bc4090d88af4d23d598906222525f522e0b7a3969de94699706d773a` |
+| # orden PUT | ID vivo | fingerprint anti-TOCTOU (pre-imagen del vivo) | hash del artefacto ENVIADO (contenido del PUT de contención) |
+|---|---|---|---|
+| 1 Bot principal | `dNqtM20ij6ecZYAX` | `9380710bba25bc2df7de4ce1feff2f1732eb087b62c1a7cf519f2b330c9dc4bc` | `8f59f647297a3f1f91729ec96f60c84a1e84300b33a154c41464d9088d90605b` |
+| 2 Atención Humana | `HAMIxqhZd2TEy6NB` | `28249f3883d4e31ef9ff04277fc9f8766b3ec8e9a37aa36385f482d3c790dc64` | `d04386b12828a87a6f8d8e09ef30fe11a5bd990f76fbbd8d9455cdee4ed76e0e` |
+| 3 Payment Confirmation | `Ob5JYHYbc23SLp0A` | `3ebada900d3ef3c5d79a6619661f85426987c638774a68a33d497714dbeee9c2` | `e0671fa632c9832a3c3ea5ea92f83b9aba7c66d1f5c49747f992177cbd942a05` |
+| 4 Metepec Liberar | `biWlbwq4NQdZadwg` | `064000c2666461e69296aa6c8981bbbf87bafdf75864ef557c7b18fbb9fb0e9c` | `3d6c6ab46ea02f6d59b4b2c5d69d0c6c0268b0f5b88d691f4354ea7c2c2c5d61` |
+| 5 Retomar Conversación | `nYRaRzU83qDLuEWI` | `b671934c0c9776123cdaf2be30106a0db5ab165a59a1f9320f395031f2a76313` | `a22e2cb4638b59676387eb575cb624d953b72c0820096d5f0d575e23add4340a` |
+| 6 Issue Policy Guard (callee) | `PuogahK4qv9YOiF4` | `fa40ade2a5d24de7cc3483e984bb51a516c10bed429ae9048561ae33fde5aef7` | `7026992ddbcf78978f79e9a3a3c3256f8963e2480bc2e1858580ed71332f3ed0` |
+| 7 METEPEC Registrar (callee) | `liBCn3yBegedmYuR` | `5e3dc266bc4090d88af4d23d598906222525f522e0b7a3969de94699706d773a` | `4279b82ab271508c0be2448ff02d4dd6279595b0d7e49c8604fb49493d0c8417` |
+
+(El *hash del artefacto enviado* es lo que el `PUT` de contención transmite; la verificación **post**-`PUT` es por partes por la fusión de settings — ver §3.)
 
 Verificación post-`PUT` (A): **por partes** por GET (contenido + settings por fusión + active + publicación + activeVersionId), no fingerprint global.
 
@@ -77,8 +79,8 @@ C1_INSTALADOR_VIVO=1 node scripts/c1/tools/instalar-clones.js \
 ```
 > **Inercia (verificado):** falta cualquiera de las 5 guardas (`--vivo`, `C1_INSTALADOR_VIVO=1`, cliente-de-contención, `{ventana, garante}`, `n8n_esperado` acreditado) → DRY-RUN, cero escrituras. **Target guard:** la CLI exige `N8N_BASE_URL == https://n8n-xlqk.srv1810257.hstgr.cloud`; con un host ajeno **no escribe nada** (`n8n-base-url-apunta-a-otro-host`). **`--autorizacion`** = ID del propio comentario de GO (existe al darlo, no es pendiente del checkpoint).
 
-- **Operador:** Alberto. **Guardia doble:** Arquitecto (stop conditions en vivo) + **Juan** (`@oilycoyote`). **Suplente:** Juan.
-- **Ventana:** **lunes 3 ago 2026, 09:30 CDMX (15:30 UTC)** — propuesta de Alberto; **`@oilycoyote`, confirma para hacerla definitiva.**
+- **Operador:** Alberto. **Guardia:** Arquitecto (stop conditions en vivo vía monitores/API) + **Juan** (`@oilycoyote`, guardia activo desde #132). **Suplente independiente:** ⏳ **pendiente de decisión de Alberto** — no hay un segundo humano operativo en el ecosistema; propuesta a validar con Juan: reconocer **operador único** (Alberto) con el Arquitecto como segundo técnico y Juan como guardia, en vez de un suplente humano ficticio.
+- **Ventana:** **lunes 3 ago 2026, 09:30 CDMX (15:30 UTC)** — propuesta de Alberto; ⏳ **`@oilycoyote`, confirma para hacerla definitiva.**
 
 ## 5. Prechecks ACTUALES en la ventana (literales, no el C0 histórico)
 ```bash
@@ -86,8 +88,15 @@ C1_INSTALADOR_VIVO=1 node scripts/c1/tools/instalar-clones.js \
 test "$(curl -sS -H "X-N8N-API-KEY: $N8N_API_KEY" "$N8N_BASE_URL/api/v1/executions?status=running&limit=250" | jq '.data|length')" = 0 || { echo "STOP: ejecuciones en vuelo"; exit 1; }
 # b) ningún Schedule Trigger activo
 test "$(curl -sS -H "X-N8N-API-KEY: $N8N_API_KEY" "$N8N_BASE_URL/api/v1/workflows?active=true" | jq '[.data[]|select((.nodes[]?.type//"")|test("scheduleTrigger|cron";"i"))]|length')" = 0 || { echo "STOP: schedule activo"; exit 1; }
-# c) exclusión operativa: instancia STG única -> el garante confirma que NADIE tiene la UI de STG abierta al abrir la ventana, y RE-COMPRUEBA antes del PUT del Main.
-# d) Django (target-guarded): sin migración pendiente; release activo esperado v212
+# c) producers Django (followups/checkpoints) apagados en STG
+heroku config --app hyl-wai-stg | grep -E "WHATSAPP_(FOLLOWUPS|CHECKPOINT)_" # todos false/dry-run, o STOP
+# d) producer WhatsApp: los 2 nodos Send del bot vivo sin credencial de prod (no puede emitir)
+curl -sS -H "X-N8N-API-KEY: $N8N_API_KEY" "$N8N_BASE_URL/api/v1/workflows/dNqtM20ij6ecZYAX" | jq -e '[.nodes[]|select(.type|test("whatsApp";"i"))|.credentials]|all(.==null or .=={})' >/dev/null || { echo "STOP: WhatsApp Send con credencial"; exit 1; }
+# e) producer webhook proactivo (Dashboard->n8n): Dashboard congelado, GATE_*/ALLOWED_ORIGINS sin provisionar -> fail-closed (cero acción, §1)
+# f) destinos/conectores externos: los DENIEGA la barrera A (es su objeto); se re-verifica por GET post-PUT (§3)
+# g) exclusión operativa: instancia STG única -> el garante confirma que NADIE tiene la UI de STG abierta al abrir la ventana, y RE-COMPRUEBA antes del PUT del Main.
+# h) Django (target-guarded): release activo == v212 esperado, y sin migración pendiente
+test "$(heroku releases --app hyl-wai-stg -n1 --json | jq -r '.[0].version')" = "v212" || { echo "STOP: release Django != v212"; exit 1; }
 heroku run --app hyl-wai-stg -- python manage.py migrate --check --noinput
 ```
 
