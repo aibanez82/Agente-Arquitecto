@@ -189,3 +189,14 @@ Informe `Agente-n8n@4621d6f` (main), verificado contra el código fuente de n8n.
 3. **API sin control de concurrencia** (`forceSave:true`, "skip version conflict check"). Anti-TOCTOU enteramente nuestro, pegado a CADA PUT, no una vez al abrir ventana.
 
 Nada afecta a barrera B (POST nuevos, instalable tal cual). Ejecutor en disciplina correcta: no construyó el PUT (sería trabajo lateral prohibido). **Estos hechos cambian el perfil de riesgo de la opción A — deben llegar a Juan ANTES de que decida.** Suplemento publicado en #132 (`5149524046`, OK de Alberto) mientras Juan audita A/B.
+
+## 03:22 (1 ago) — Dictamen técnico de Juan sobre el suplemento (`5149565446`) — valida candidato, NO decide A/B
+
+Juan reprodujo `86a9c093` (**190/190 + runner OK, 56→0**) y contrastó los 3 riesgos del PUT contra el código público de n8n (`n8n-io/n8n@10a7422`):
+- **webhookId:** confirmado con condición (rollback seguro respecto de ese id solo si el payload conserva todos los nodos/IDs).
+- **forceSave/sin CAS:** confirmado (GET pegado al PUT reduce, no elimina la carrera).
+- **publishIfActive:** confirmado **con matiz nuevo e importante** — NO está acreditado que en la versión/config concreta de STG el efecto sea siempre "inmediato y sin estado intermedio"; n8n guarda versión nueva antes de publicar y admite publicación **asíncrona por outbox o ruta legacy**. → **Hay que fijar la versión/config efectiva de STG antes del checkpoint.**
+
+**Si el accountable elige A**, el camino del PUT (sin construir) no entra al checkpoint hasta cubrir, POR workflow: (1) preimagen fresca + guarda exacta de webhookId; (2) exclusión de ediciones concurrentes; (3) journal durable + reconciliación por GET ante timeout, sin retry ciego; (4) verificación posterior de contenido + estado publicado + activeVersion; (5) orden por dependencias + rollback inverso por workflow. Ojo: reponer un export crea/publica OTRA versión (restaura contenido, no el versionId previo) y sufre los mismos riesgos.
+
+**B sola sigue siendo C1 parcial** bajo el alcance de #140 (no cierra "plano vivo contenido + aislado instalado"). NO decide A/B, no es PASS/GO. Dashboard #2 y Django #145 congelados. **Sigue pendiente: la decisión A/B de Juan.**
