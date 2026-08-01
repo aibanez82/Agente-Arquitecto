@@ -446,3 +446,7 @@ Superadas la fecha del lunes 3 y la propuesta de 2h. Modelo STG ahora: (1) Alber
 ## 23:3x (1 ago) — Alberto confirma "AHORA"; disponibilidad relayada a Juan (`5154060859`)
 
 Alberto listo para C1 inmediata. Verificado: credenciales n8n STG en Agente-n8n/.env (exportar al arrancar); target guard exige origin n8n-xlqk exacto. División operativa por accesos: Juan corre docker inspect del modo publicación (2FA Hostinger, Alberto no lo tiene) + confirma UI cerrada; Alberto ejecuta instalador C1 + Django migrate --check + prueba 403 Vercel; Arquitecto vigila stop conditions en vivo. Esperando GO específico de Juan con checkpoint/comandos/targets exactos. **En el umbral de la ejecución viva.**
+
+## 23:53 (1 ago) — Juan: disponibilidad registrada, gate no cambió (`5154066236`) — GO aún pendiente
+
+Juan confirma precondiciones (R presente, accesos repartidos, exclusión a reconfirmar, RTO ≤20). Pero reitera procedimentalmente: la disponibilidad NO sustituye la enmienda RACI (ya en #140 5153952626) ni el GO/checkpoint específico posterior. Punto operativo clave: el modo de publicación es valor a OBSERVAR en ventana ("esperado síncrona" ≠ acreditación); si sale asíncrona/no concluyente → STOP antes de credenciales/mutaciones. Su tarea: (1) enmienda RACI [ya posteada 23:19] → (2) emitir/rechazar GO separado con comandos/target/orden/prueba 403/stop/rollback. **GO aún pendiente de Juan.** No es ask de Alberto.
