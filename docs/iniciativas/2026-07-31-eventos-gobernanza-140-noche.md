@@ -275,3 +275,9 @@ Alberto pasó el About→Copy debug info; el ejecutor lo analizó (nota `619df15
 3. **Acota el TOCTOU:** cluster instanceCount 1, un solo main leader, executionMode regular → NO hay segundo proceso n8n que edite en paralelo. El único editor concurrente posible es una PERSONA con la UI abierta u otro cliente API. La exclusión operativa se vuelve concreta: **el garante confirma que nadie tiene la UI de STG abierta al abrir la ventana, y se re-comprueba antes del PUT del Main.**
 4. **`publicacion` sigue null:** el debug info tampoco la expone (última vía sin shell). Requisito de pre-ejecución; el instalador se niega.
 5. **⚠️ FUERA DE C1, muerde después:** STG (2.28.7) y **PROD (2.6.3) están a 22 minors**. STG no es ensayo fiel de PROD; verificado contra el tag `n8n@2.6.3`: **2 de los 5 hechos que sostienen el instalador NO existen en 2.6.3.** Los artefactos no son portables a PROD tal cual. Alberto evalúa subir PROD (el ejecutor le dio el procedimiento; ni lo ejecuta él ni es alcance C1). **Bloqueante futuro real del rollout a PROD.**
+
+## Datos de Alberto para el checkpoint (1 ago) — suplente + ventana
+
+- **Suplente:** Juan (`@oilycoyote`), además de guardia. Operador: Alberto. Guardia doble: Arquitecto + Juan.
+- **Ventana STG:** **lunes 3 ago 2026, 09:30 CDMX = 15:30 UTC** (día laborable; propuesta a confirmar con Juan en el checkpoint).
+- Pendiente para la reescritura sin placeholders: comandos reales del instalador vivo (ejecutor, en curso) + ref del contenedor.
