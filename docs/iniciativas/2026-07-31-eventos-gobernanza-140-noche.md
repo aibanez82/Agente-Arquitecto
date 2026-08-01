@@ -137,3 +137,7 @@ Juan aceptó la entrega técnica C1 offline de los 3 frentes (n8n `4e2118c` 147/
 ## 03:2x (1 ago) — Borrador de checkpoint C1 publicado en #132 (`5149097301`, OK de Alberto)
 
 Los 9 puntos en el tejado de Juan para revisión. Pendientes de Alberto para la ventana real: comandos literales de merge/import y designar guardia/suplente. Ejecución bloqueada hasta GO explícito de Juan en #132.
+
+## 03:3x (1 ago) — Checkpoint #132 completado: comandos + guardia doble
+
+Rellenados los dos huecos (decisión Alberto): merge por CLI `--merge` ambos PRs, import por Agente n8n; guardia doble = Arquitecto (vivo) + Juan activo desde #132. Comentario `5149097301` editado en #132. Borrador ya completo salvo la fecha de ventana. Falta: GO explícito de Juan + pactar ventana.

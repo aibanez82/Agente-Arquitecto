@@ -53,7 +53,7 @@ node scripts/c1/runner/run-c1.js   # esperado: RESULTADO: OK — plano contenido
 `--merge` (no squash/rebase) a propósito: mantiene la trazabilidad SHA-a-SHA que Juan auditó. El import es paso manual **separado** del merge (§2) y **no activa** los workflows.
 
 - **Operador:** Alberto (los merges). **Import:** Agente n8n vía handoff, supervisado por Alberto.
-- **Guardia (propuesta):** el Arquitecto — vigila stop conditions en vivo (fingerprints, runner, ejecuciones en vuelo) vía monitores + API mientras Alberto ejecuta. **Suplente/observador:** Juan (`@oilycoyote`) desde #132. *Sujeto a confirmación de Alberto y validación de Juan — si Juan prefiere ser guardia activo, se ajusta.*
+- **Guardia doble (decisión Alberto 1 ago):** (a) el **Arquitecto** vigila stop conditions en vivo (fingerprints, runner, ejecuciones en vuelo) vía monitores + API mientras Alberto ejecuta; (b) **Juan (`@oilycoyote`) como guardia activo** desde #132 durante la ventana — no solo observador. Cualquiera de los dos puede invocar una stop condition. Requiere que Juan esté presente en la ventana.
 - **Ventana:** a pactar con Juan — propuesta: bloque de ~2h en horario laboral con ambos disponibles.
 
 ## 5. Cero ejecuciones en vuelo, producers pausados, destinos denegados
