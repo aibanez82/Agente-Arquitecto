@@ -426,3 +426,7 @@ Técnico totalmente aceptado (nada más ahí). Deployment→SHA y ventana (lunes
 ## 15:5x (1 ago) — Solicitud de enmienda del RACI (operador único C1) posteada a Juan (`5152822925`, OK de Alberto)
 
 Alberto eligió vía (b): pedir a Juan (A) enmendar el RACI canónico de #140 §10 para C1, aceptando operador único con riesgo ACOTADO por los controles ya construidos (doble vigilancia stop, rollback recuperable tras corte, instalador inerte con 5 guardas, alcance C1 reversible). Delimitado a C1 (C2+ aparte). Pedido: enmendar RACI + emitir GO, o indicar controles adicionales. **Nuestro lado CERRADO; la decisión del operador único + GO es de Juan (A).**
+
+## 18:37 (1 ago) — Juan: solicitud RACI suficiente para decisión del A (`5152829869`) — no es enmienda ni GO
+
+Juan valida la solicitud (atribución R/A correcta, ausencia de suplente declarada, acotada a C1, C2+ aparte). No falta técnico. Dos límites: (1) la excepción SOLO existe si Juan la ESCRIBE en #140 (silencio/dictamen/controles no la crean); (2) la enmienda no rebaja otros gates: **RTO canónico restore n8n ≤20 min (§11 #140)** — corrijo el checkpoint (yo había puesto <30); la IA observa/invoca STOP técnico pero no es A; el GO operativo va posterior y separado en #132. **Decisión EXCLUSIVA del A (Juan):** aceptar+enmendar #140 (alcance C1, controles, RTO canónico, CADUCIDAD) → checkpoint separado; o rechazar → volver a Alberto por suplente. Checkpoint §7 RTO alineado a ≤20 min.
