@@ -240,3 +240,12 @@ Juan reprodujo candidato (190/190) y prototipo (209/209). **Rechaza nuestra reco
 ## 04:1x (1 ago) — Alberto acepta A. Handoff de barrera A dispatchado (`904402b`)
 
 Decisión de Alberto: adelante con A. Handoff al ejecutor en main (`904402b`): completar camino vivo con las 6 correcciones de Juan + integrar en candidato único A+B, solo offline. En paralelo, el Arquitecto rehará el checkpoint completo de 9 puntos sobre el SHA unificado cuando el ejecutor lo entregue. Ejecutar seguirá requiriendo GO aparte. Ruta a cierre de C1: ejecutor entrega A+B → Arquitecto verifica + rehace checkpoint → Juan revisa → GO → ventana con Alberto.
+
+## 04:2x (1 ago) — Candidato unificado A+B entregado: SHA `28167b6e7` — PASS del Arquitecto
+
+Ejecutor integró el camino PUT + hardening (efd3c606 PUT, 28167b6 los 6 puntos de Juan). **Verificación independiente (216/216, runner OK):**
+- Barrera A intacta: vivo 56→0 alcanzable sin gate, 10/10 ingress, identidad conservada; barrera B (instalador de 7 clones) presente → candidato A+B unificado real.
+- **Los 6 puntos de hardening de Juan, cada uno con test nombrado:** (1) rollback no sobrescribe edición concurrente (GET previo); (2) rollback acredita "repuesto" por contenido+settings+active+publicación+activeVersion; (3) verificación de ida rechaza settings ajenos; (4) INCIERTO sin retry ciego también en rollback; (5) fija entorno n8n, fail-closed si no declarado/distinto; (6) orden llamadores-primero (Main index 0, los 2 callees puros últimos — coincide con mi ancla) + rollback inverso.
+- Matiz async de publishIfActive manejado: "versión publicada sigue siendo la anterior → INCIERTO". Excepción PUT ESTRECHA (permite actualizar los 7 para contención, sigue prohibiendo borrar/activar) tras cliente-de-contención explícito + autorización escrita. Dos bugs auto-reportados corregidos (copia profunda; fingerprint sobre lo enviado).
+
+Pendiente: que el ejecutor actualice el PR #3 al nuevo SHA; luego aviso a Juan + rehago el checkpoint de 9 puntos.
