@@ -406,3 +406,6 @@ Responsabilidad → @oilycoyote (gate humano). Tareas del gate: (1) confirmar de
 ## 15:2x (1 ago) — Ejecutor pushea 5fcc0609 (hornea commit) DESPUÉS del PASS de Juan — decisión
 
 Tras el PASS técnico de Juan sobre 944cd963, el ejecutor pusheó `5fcc0609`: hornea el commit confirmado `1373d1a` en la guarda del Dashboard (responde a mi handoff 2dd41c8; probable carrera con el re-freeze c11daeb). Buena intención (verifica el mapeo por código), PERO supera el SHA aprobado y reabre la revisión técnica de Juan — contra su "no tocar lo verde". Juan había enmarcado el mapeo deployment→1373d1a como confirmación HUMANA, no como código. **Decisión pendiente de Alberto (necesita force-push):** (A) restaurar candidato a 944cd963 [el PASSeado] y confirmar el mapeo por el gate humano [evidencia del panel] — recomendado; o (B) quedarse en 5fcc0609 y que Juan re-revise. Recomiendo A.
+
+## 15:2x (corrección) — 5fcc0609 verificado 315/315: recomendación cambia a HOLD (no restaurar)
+Verificado: 5fcc0609 hornea el commit 1373d1a (machine-verifica el mapeo del gate humano #1) + corrige orgId a team_MyB7... 315/315, limpio. Cambio recomendación: NO restaurar a 944cd963 — la mejora atiende justo lo que Juan pidió y no rompe nada; restaurar la tiraría. Juan ya revisa 5fcc0609. Congelación DURA al ejecutor (no más pushes, ni mejoras). Esperar el focal de Juan.
