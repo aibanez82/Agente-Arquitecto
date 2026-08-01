@@ -310,3 +310,7 @@ Ejecutor cerró los 2 bugs (248/248): rollback recuperable (estado durable + `--
 ## 06:2x (1 ago) — Ejecutor autocazó hueco de fixture (871221400) + reconciliación de SHA con Juan + congelación
 
 Ejecutor encontró que la instancia simulada de sus tests no persistía entre procesos → el rollback entre corridas no estaba realmente ejercido; corregido en `871221400` (borra/repone de verdad). Verificado: comandos/fingerprints SIN cambio, 248/248. Pero llegó 2 min tras mi post del checkpoint (`7c877a7`) y del ack de Juan. **Reconciliado:** doc + PR + delta a Juan (`5150193383`) → candidato `871221400`, checkpoint íntegro. **Congelación pedida al ejecutor** (handoff `4f5cea0`): no pushear la candidata durante la revisión de Juan; si algo crítico, reportar a main y coordinar — van 4 SHAs seguidos y cada uno desfasa el SHA bajo revisión del accountable. Pendiente: Juan confirma ventana + revisión/GO.
+
+## 06:3x (1 ago) — Ejecutor acusa congelación (c6ebdd287) + recordatorio: validar B→A antes del GO
+
+Ejecutor confirmó freeze en 871221400 (local==remoto==PR head, 248/248, nada crítico) vía main (protocolo correcto). Recordatorio suyo: el orden B→A es desviación pendiente de validación explícita de Juan. Cubierto: B→A + rationale están en el checkpoint que Juan revisa (§0/§2), así que su revisión lo valida. PUNTO A VIGILAR en el dictamen de Juan: que acepte explícitamente B→A; si no lo menciona, confirmarlo con él antes del GO.
