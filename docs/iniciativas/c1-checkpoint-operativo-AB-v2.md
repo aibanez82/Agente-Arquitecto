@@ -1,6 +1,6 @@
 # Checkpoint operativo C1 (A+B) — HYL-WAI#132 · NO ejecutable
 
-> Sobre el candidato A+B **`871221400`** (verificado independiente: 248/248, runner OK, inercia confirmada; rollback recuperable, STOP con exit≠0, target guard atado a `N8N_BASE_URL`). Comandos = salida verbatim de la CLI. **Este documento NO es GO.** Su ejecución exige comentario explícito posterior del accountable en #132. **C2 fuera.**
+> Sobre el candidato A+B **`1c30a00b6`** (verificado independiente: 248/248, runner OK, inercia confirmada; rollback recuperable, STOP con exit≠0, target guard atado a `N8N_BASE_URL`). Comandos = salida verbatim de la CLI. **Este documento NO es GO.** Su ejecución exige comentario explícito posterior del accountable en #132. **C2 fuera.**
 
 ## 0. Objeto
 Instalar y **verificar** las dos barreras C1 en STG, en **una corrida, orden B→A**:
@@ -12,7 +12,7 @@ No ejecuta C2 ni prueba viva Dual. No toca PROD. **No muta ninguna BD** → sin 
 ## 1. SHAs, targets e IDs
 | Frente | Artefacto | Efecto |
 |---|---|---|
-| n8n | PR `aibanez82/Agente-n8n#3` @ `871221400` · base `stg@40fe572` · n8n pin **2.28.7** (`955be3ef`) | instala A+B en `n8n-xlqk.srv1810257.hstgr.cloud` |
+| n8n | PR `aibanez82/Agente-n8n#3` @ `1c30a00b6` · base `stg@40fe572` · n8n pin **2.28.7** (`955be3ef`) | instala A+B en `n8n-xlqk.srv1810257.hstgr.cloud` |
 | Dashboard | Vercel proyecto **`insurmind-dashboards`**, env **stg**, congelado en PR #2 `1373d1a` | **CERO acción** |
 | Django | app **`hyl-wai-stg`**, release activo esperado **v212** (`4f0e7416`). PR #145 fuera, sin merge | **CERO acción** — solo `migrate --check` |
 
