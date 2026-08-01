@@ -409,3 +409,8 @@ Tras el PASS técnico de Juan sobre 944cd963, el ejecutor pusheó `5fcc0609`: ho
 
 ## 15:2x (corrección) — 5fcc0609 verificado 315/315: recomendación cambia a HOLD (no restaurar)
 Verificado: 5fcc0609 hornea el commit 1373d1a (machine-verifica el mapeo del gate humano #1) + corrige orgId a team_MyB7... 315/315, limpio. Cambio recomendación: NO restaurar a 944cd963 — la mejora atiende justo lo que Juan pidió y no rompe nada; restaurar la tiraría. Juan ya revisa 5fcc0609. Congelación DURA al ejecutor (no más pushes, ni mejoras). Esperar el focal de Juan.
+
+## 15:21 (1 ago) — 🎯 SEGUNDO PASS TÉCNICO de Juan (`5152051722`) sobre 5fcc0609 — TÉCNICO C1 CERRADO Y APROBADO
+
+Juan PASÓ el pin del source: `FIJO_COMMIT=1373d1a...` + `FIJO_RAMA=c1-gates-api-default-deny` literales/readonly; otro commit/rama/source ausente → fail-closed; contraste read-only local confirma que 1373d1a ∈ origin/c1-gates-api-default-deny. En su host 313/315 (2 P2 no portables por ruta /Users/AIP hardcodeada — diferidos). **TÉCNICO C1 100% CERRADO Y APROBADO por Juan sobre 5fcc0609.**
+Gate humano (todo de @oilycoyote + inputs de Alberto): fijar ventana + roles/suplente; la evidencia efectiva `403 GATE_DENIED` del Dashboard se acredita EN LA VENTANA (no offline); decidir GO por comentario explícito. La confirmación del panel horneada NO sustituye el comentario de checkpoint humano. Candidato congelado duro en 5fcc0609. Listo para postear la respuesta del gate humano con OK de Alberto.
