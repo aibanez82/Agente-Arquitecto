@@ -163,3 +163,12 @@ Ejecutor n8n construyó los dos artefactos que faltaban en 3 commits y actualiz�
 - **Instalador (barrera B):** tests cubren lo que Juan exigió — borrar/activar un ID vivo lanza antes de red; verificación POR GET; POST que pierde respuesta se acredita por GET sin duplicar; fingerprint no coincide → incierto sin borrar; anti-TOCTOU; rollback borra SOLO lo creado por esta corrida, reconcilia por GET, nunca restaura BD ni toca los 7 IDs vivos (bloqueante 5).
 
 6 bloqueantes del NO-GO cubiertos. Pendiente: aviso a Juan (OK de Alberto) + rehacer checkpoint con comandos/IDs del instalador nuevo.
+
+## 04:0x (1 ago) — Doc de entrega del ejecutor (main) revela 2 correcciones al checkpoint + 1 decisión de gobernanza
+
+El Arquitecto había verificado el CÓDIGO pero no el doc de entrega (`Agente-n8n:docs/2026-08-01-entrega-arquitecto-c1-barreras-y-comandos-instalador.md`). Al leerlo:
+
+1. **Los 7 IDs NO se pueden fijar a priori** — la API de n8n los asigna en el POST (`id: readOnly`, leído del schema fuente). Lo determinista es **nombre + fingerprint de contenido**; el id se recoge del POST y se confirma por GET. El bloqueante 2 de Juan ("fijar los 7 IDs") es imposible como literal — se satisface con nombre+fingerprint. (Mi checkpoint viejo decía "importar sobre los IDs inmutables": doblemente equivocado.)
+2. **Contradicción de gobernanza real (barrera A):** instalar la contención viva **exige `PUT` sobre los 7 IDs vivos** — justo lo que el handoff/Juan prohibieron ("ni PUT, ni activar, ni borrar"). El ejecutor no puede resolverlo: o el checkpoint **autoriza explícitamente el PUT de contención** sobre los 7 vivos (rollback: reponer el export congelado de git), o **la barrera A se queda sin instalar** y el checkpoint declara que la contención viva no entra en esta ventana. **Decisión de Alberto+Juan, no del Arquitecto.**
+
+El ejecutor entregó además: comandos de solo-lectura (guarda anti-TOCTOU con fingerprints por los 7 vivos, plan de instalación offline, verificación por GET), instalación viva NO expuesta (doble guarda `permitirRed` + `C1_INSTALADOR_VIVO=1`), los 7 destinos (nombre+fingerprint) y rollback mínimo por acción. Lección reforzada: **leer el doc de entrega, no solo verificar el código** — el doc traía lo que el código no dice.
