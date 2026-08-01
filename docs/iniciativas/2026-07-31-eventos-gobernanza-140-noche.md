@@ -117,3 +117,7 @@ Con este aviso, el estado queda: PR n8n #3 (`b2c89ba15`) sometido a re-revisión
 ## 02:3x (1 ago) — Focal de Juan (`5148866994`): P1 ACEPTADO, queda P2 final de redacción
 
 Los 2 bypasses cerrados y reproducidos por Juan (143/143, runner OK). C1 "técnicamente verde" salvo un P2 de evidencia: `redactar()` no inspecciona el contenido de claves permitidas (canario de Juan: password/URL/SQL/token pasan dentro de `mensaje`/`argv`/`detalle`) y el runner imprime el ID de `credenciales_aisladas`. Luz verde a corrección final acotada (5 puntos, solo delta de redacción). Handoff entregado en `main` de Agente-n8n (`9fa6e14`) **vía worktree temporal — el clon estaba otra vez en la rama candidata y la convención nueva evitó el tercer incidente**. Dato nuevo: Django avanza en paralelo offline con wrapper CAS (`feature/issue-140-django-rollout-cas`).
+
+## 03:xx (1 ago) — P2 final entregado: SHA candidato `4e2118c39` — PASS del Arquitecto
+
+Ejecutor n8n cerró los 5 puntos en un commit (`4e2118c`, redacción por vocabulario cerrado en vez de por clave) y actualizó el PR #3. Verificación independiente: 147/147, runner OK, `credenciales_aisladas_n` solo conteo, `argv:["run-c1.js"]`, grep del canario de Juan sobre `run.log` = 0 coincidencias. Borrador de aviso final a Juan listo — pendiente del "publica" de Alberto (ausente).
