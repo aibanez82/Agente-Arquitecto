@@ -257,3 +257,12 @@ Alberto observó la versión en la UI (About n8n): 2.28.7. El ejecutor la fijó 
 ## 04:5x (1 ago) — Checkpoint C1 completo publicado a Juan (`5149876716`) — los 3 bloqueantes cubiertos
 
 Con OK de Alberto y evidencia de la versión (captura About n8n = 2.28.7). Respuesta completa al FAIL `5149704373`: candidato `601a845` (219/219, PASS independiente) + hardening (6 puntos) + checkpoint de 9 puntos íntegro. En el tejado de Juan para revisión. Pendientes de pre-ejecución cuando dé GO: observar modo de publicación (`docker inspect ... PUBLICATION`), ventana Alberto↔Juan, exponer modo vivo del instalador (cambio de código con GO escrito). Cerrar C1 = revisión de Juan → GO → ventana.
+
+## 05:00 (1 ago) — FAIL del checkpoint (`5149896236`) — convergente, a grado ejecutable
+
+Juan reprodujo (219/219, runner OK). Tres correcciones:
+1. **Entregar el instalador/verificador REAL A+B** — hoy ninguna CLI expone `--vivo` ni invoca `aplicarContencion`; el modo vivo quedó como "cambio futuro". Juan lo quiere **construido ya, inerte por defecto y target-guarded**, con comandos reales PUT/POST, GET post y rollback. (Refina el planteamiento anterior: el código debe existir e inerte, no diferirse — el GO es decisión humana + fijar guardas, no escribir código nuevo.) → ejecutor.
+2. **Checkpoint sin placeholders:** sustituir `<ID>`, `<fingerprint-vivo>`, `<contenedor>`, "a pactar", observación futura por los 7 valores completos, hashes/bytes exactos, ventana concreta, operador/guardia/suplente nominales, comandos literales. Prechecks target-guarded ACTUALES (no el C0 histórico) para producers/en-vuelo/destinos/publicación; el runner offline no verifica el plano instalado. → Arquitecto (+ ventana/suplente de Alberto).
+3. **Efectos/rollback al alcance:** quitar el backup de BD (A+B no muta BD); fijar identidad/efecto exacto de Dashboard (proyecto/env/deployment Vercel, cero acción al estar congelado) y Django (app/release activo + `migrate --check` target-guarded), manteniendo #2 y #145 congelados. → Arquitecto.
+
+Solo offline; sin PUT/POST/DELETE, docker inspect, backup, STG/PROD, etc. Pendiente de Alberto: pactar ventana con Juan + nombrar suplente.
