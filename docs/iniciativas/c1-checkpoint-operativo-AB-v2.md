@@ -79,7 +79,7 @@ C1_INSTALADOR_VIVO=1 node scripts/c1/tools/instalar-clones.js \
 ```
 > **Inercia (verificado):** falta cualquiera de las 5 guardas (`--vivo`, `C1_INSTALADOR_VIVO=1`, cliente-de-contención, `{ventana, garante}`, `n8n_esperado` acreditado) → DRY-RUN, cero escrituras. **Target guard:** la CLI exige `N8N_BASE_URL == https://n8n-xlqk.srv1810257.hstgr.cloud`; con un host ajeno **no escribe nada** (`n8n-base-url-apunta-a-otro-host`). **`--autorizacion`** = ID del propio comentario de GO (existe al darlo, no es pendiente del checkpoint).
 
-- **Operador:** Alberto. **Guardia:** Arquitecto (stop conditions en vivo vía monitores/API) + **Juan** (`@oilycoyote`, guardia activo desde #132). **Suplente independiente:** ⏳ **pendiente de decisión de Alberto** — no hay un segundo humano operativo en el ecosistema; propuesta a validar con Juan: reconocer **operador único** (Alberto) con el Arquitecto como segundo técnico y Juan como guardia, en vez de un suplente humano ficticio.
+- **Operador:** Alberto. **Guardia:** Arquitecto (stop conditions en vivo vía monitores/API) + **Juan** (`@oilycoyote`, guardia activo desde #132). **Suplente (decisión de Alberto):** se reconoce **operador único** — no hay un segundo humano operativo en el ecosistema, así que en vez de un suplente ficticio se declara: operador Alberto, **Arquitecto como segundo técnico** (puede invocar stop y ejecutar rollback bajo dirección de Alberto) y Juan como guardia. `@oilycoyote`, indica si aceptas esta figura o requieres otra cosa.
 - **Ventana:** **lunes 3 ago 2026, 09:30 CDMX (15:30 UTC)** — propuesta de Alberto; ⏳ **`@oilycoyote`, confirma para hacerla definitiva.**
 
 ## 5. Prechecks ACTUALES en la ventana (literales, no el C0 histórico)
@@ -116,5 +116,5 @@ Evidencia post sanitizada (conteos, fingerprints, resultado; sin PII/secretos/ID
 Instala/verifica C1 (A+B). NO M1–M6 (C2), NO E2E vivo, NO `dual`, NO activación. C2 requiere GO posterior y separado.
 
 ---
-**Pendiente de:** (a) `@oilycoyote` confirma la ventana; (b) revisión + GO del accountable en #132. *(Publicación se acredita en la ventana por el preflight; `--autorizacion` es el propio GO.)*
+**Pendiente de:** aceptación de `@oilycoyote` a (a) la ventana lunes 3 ago 09:30 CDMX y (b) la figura de operador único; luego su GO. Todo lo demás, definitivo.
 **Fuera de alcance, para PROD:** PROD corre n8n **2.6.3** (22 minors bajo STG); 2 de los 5 hechos del instalador no existen en 2.6.3 → artefactos no portables a PROD tal cual. No es C1.
