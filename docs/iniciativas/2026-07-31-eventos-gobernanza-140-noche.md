@@ -281,3 +281,7 @@ Alberto pasó el About→Copy debug info; el ejecutor lo analizó (nota `619df15
 - **Suplente:** Juan (`@oilycoyote`), además de guardia. Operador: Alberto. Guardia doble: Arquitecto + Juan.
 - **Ventana STG:** **lunes 3 ago 2026, 09:30 CDMX = 15:30 UTC** (día laborable; propuesta a confirmar con Juan en el checkpoint).
 - Pendiente para la reescritura sin placeholders: comandos reales del instalador vivo (ejecutor, en curso) + ref del contenedor.
+
+## 05:1x (1 ago) — Petición a Juan: obtener N8N_USE_WORKFLOW_PUBLICATION_SERVICE (`5149960007`)
+
+Alberto no tiene el 2FA de Hostinger (lo tiene Juan) → no puede abrir la terminal del VPS. Se pide a Juan que corra la consulta de solo lectura (`docker ps` + `docker inspect ... | grep -i PUBLICATION`) para fijar el modo de publicación (último dato de pre-ejecución del checkpoint). Sin salida → default false → síncrono. Incluida la sinergia: Juan confirma también la exclusión operativa (UI cerrada) en la ventana del lunes 3.
