@@ -223,3 +223,7 @@ Secuencia limpia ejecutada (con OK de Alberto):
 3. **Recomendación publicada a Juan** (`5149673985`): (a) corrijo el orden de contención que le di en `5149524046` — "periferia primero" era incorrecto; verificado por el Arquitecto contra el grafo congelado que Issue Policy Guard y METEPEC Registrar son callees puros sin ingress → van los últimos; principio = llamador antes que callee; orden exacto a computar del grafo y re-verificar en checkpoint (NO aserté las 7 posiciones, límite honesto de mi verificación); (b) hallazgo de verificación por partes + binaryMode conservado; (c) **recomendación: opción B ahora, barrera A como checkpoint separado posterior** — los hallazgos del PUT vivo lo hacen operación de riesgo alto que merece su propio checkpoint; (d) estado del artefacto y reconocimiento del prototipo prematuro.
 
 Decisión A/B sigue siendo de Juan. Nuestra postura ya está sobre la mesa, verificada.
+
+## 03:56 (1 ago) — Juan acusa la recomendación y VERIFICA la autocorrección — incidente prematuro cerrado limpio
+
+Acuse `5149...` (no decisión): Juan cita "el candidato `86a9c09` y la rama inerte `c1-put-path-preparado@7c64156`" — aceptó el encuadre de cuarentena, sin escalado. La autocorrección proactiva funcionó: cerramos el push prematuro antes de que su monitor lo marcara como violación. Nota de actualización al ejecutor en `main` (`7a1e995`): sincronizar clon (reset a origin), no re-pushear la candidata. Sigue pendiente: decisión A/B (Juan la está revisando).
