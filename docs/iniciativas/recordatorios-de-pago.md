@@ -40,3 +40,9 @@ Hito D-0: enviar a primera hora de la mañana `America/Mexico_City` (el copy dic
 - **Agente Conciliación:** `listrecs` en el paso 1 es la misma verificación que su cruce API — no duplicar: los resultados del paso 1 pueden registrarse como señal, pero `conciliacion_pagos` sigue siendo suya y de su cron.
 - **Checkpoint followups:** ciclo independiente (inactividad conversacional vs impago de póliza). Un cliente puede estar en ambos; revisar que no se solapen mensajes el mismo día.
 - **Bug #7 / phase completed:** estos recordatorios NO deben depender de `conversation_phase` — solo de `estatus_pago` + verificación `listrecs`.
+
+## Decisión pendiente — canal de envío (1 ago 2026)
+
+Planteada a Alberto: ¿envía Quálitas (`genlinkWSP`, disponible ya, copy/canal suyo), enviamos nosotros (plantilla Meta, bloqueada, hilo propio), o híbrido (Quálitas ya + migrar a canal propio)? Recomendación del Arquitecto: híbrido, previa prueba en QA.
+
+**⚠️ Instrucción de Alberto: NO recordarle esta decisión — la retomará él cuando quiera.** Queda aquí solo para no perderla entre máquinas.
