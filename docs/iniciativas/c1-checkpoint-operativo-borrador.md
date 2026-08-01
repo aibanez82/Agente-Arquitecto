@@ -34,8 +34,27 @@ Secuencia propuesta, un frente a la vez con verificación entre pasos:
 
 ## 4. Comandos exactos, operador/guardia/suplente y ventana
 
-- **Comandos:** a rellenar con Alberto en la sesión de ventana (merge vía UI GitHub o `gh pr merge --merge`; import n8n vía script idempotente `Agente-n8n:scripts/import-stg-workflow.py` con el gotcha de `settings` documentado; verificación vía runner). **Se listan literal antes de ejecutar, no se improvisan.**
-- **Operador:** Alberto. **Guardia/suplente:** a designar (Juan como observador en #132). **Ventana:** a pactar — propuesta: bloque de ~2h en horario laboral con ambos disponibles.
+**Comandos literales (decisión Alberto 1 ago: merge por CLI `--merge`, import por Agente n8n):**
+
+```bash
+# Paso 2 — Dashboard: merge PR #2 a stg (preserva SHAs auditados)
+gh pr merge 2 --repo aibanez82/Dashboard_seguroautoqualitas --merge
+
+# Paso 3a — n8n: merge PR #3 a stg
+gh pr merge 3 --repo aibanez82/Agente-n8n --merge
+
+# Paso 3b — n8n: import a la instancia STG (NO activar) — lo ejecuta el Agente n8n vía handoff
+python3 scripts/import-stg-workflow.py   # idempotente; gotcha de settings ya resuelto
+
+# Verificación (punto 3) — Arquitecto/ejecutor
+node scripts/c1/runner/run-c1.js   # esperado: RESULTADO: OK — plano contenido
+```
+
+`--merge` (no squash/rebase) a propósito: mantiene la trazabilidad SHA-a-SHA que Juan auditó. El import es paso manual **separado** del merge (§2) y **no activa** los workflows.
+
+- **Operador:** Alberto (los merges). **Import:** Agente n8n vía handoff, supervisado por Alberto.
+- **Guardia (propuesta):** el Arquitecto — vigila stop conditions en vivo (fingerprints, runner, ejecuciones en vuelo) vía monitores + API mientras Alberto ejecuta. **Suplente/observador:** Juan (`@oilycoyote`) desde #132. *Sujeto a confirmación de Alberto y validación de Juan — si Juan prefiere ser guardia activo, se ajusta.*
+- **Ventana:** a pactar con Juan — propuesta: bloque de ~2h en horario laboral con ambos disponibles.
 
 ## 5. Cero ejecuciones en vuelo, producers pausados, destinos denegados
 
