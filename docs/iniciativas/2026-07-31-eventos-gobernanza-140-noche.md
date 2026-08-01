@@ -141,3 +141,9 @@ Los 9 puntos en el tejado de Juan para revisión. Pendientes de Alberto para la 
 ## 03:3x (1 ago) — Checkpoint #132 completado: comandos + guardia doble
 
 Rellenados los dos huecos (decisión Alberto): merge por CLI `--merge` ambos PRs, import por Agente n8n; guardia doble = Arquitecto (vivo) + Juan activo desde #132. Comentario `5149097301` editado en #132. Borrador ya completo salvo la fecha de ventana. Falta: GO explícito de Juan + pactar ventana.
+
+## 03:2x (1 ago) — NO-GO OPERATIVO del checkpoint (`5149165789`) — la contención viva no existe aún
+
+Juan revisó el borrador y detectó (correctamente, verificado por el Arquitecto contra el artefacto) que la aceptación offline cubría el **banco de pruebas del plano aislado** (barrera B), no un instalador de contención viva. Bloqueantes: (1) el instalador n8n C1 no existe como script; (2) el borrador proponía importar "sobre los IDs inmutables" cuando el runbook exige 7 clones NUEVOS `active:false`; (3) **falta la barrera A: el plano vivo sigue con `real_connector_calls=24`, gates=0** — los 54 gates solo viven dentro de `aislarWorkflow()`; (4) checkpoint con campos abiertos; (5) rollback (reimport 7 vivos + restore BD) demasiado amplio para la acción; (6) faltan identidades/comandos por frente + validación de head anti-TOCTOU.
+
+**Error del Arquitecto reconocido:** el checkpoint citó `import-stg-workflow.py` (importador del Bug #10) como instalador C1, y conflacionó el harness offline con instalación viva. Handoff de corrección entregado (`Agente-n8n@b5d81be`, en main): construir barrera A + instalador de 7 clones con GET fingerprint/journal/rollback acotado + nuevo SHA + re-revisión adversarial. Checkpoint marcado como superseded hasta que exista el artefacto. Dashboard/Django #145 congelados. **Esto NO es un ajuste menor: es ingeniería nueva — reajusta el plazo a STG.**

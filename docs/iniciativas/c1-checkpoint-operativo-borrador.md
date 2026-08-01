@@ -1,3 +1,5 @@
+> ⚠️ **NO-GO OPERATIVO (Juan, HYL-WAI#132 c.5149165789, 1 ago).** Este borrador atribuía alcance vivo a un artefacto que solo instala la barrera B (plano aislado de prueba). Falta (a) el artefacto default-deny del PLANO VIVO (barrera A), (b) el instalador real de 7 clones (el citado `import-stg-workflow.py` era el del Bug #10 — error del Arquitecto). Rehacer este checkpoint cuando exista el nuevo artefacto n8n. Handoff: `Agente-n8n/handoffs/2026-08-01-c1-instalador-vivo-y-plano-default-deny.md`.
+
 # Borrador de checkpoint operativo C1 (HYL-WAI#132) — NO ejecutable
 
 > Preparado por el Arquitecto bajo la luz verde de Juan (`HYL-WAI#140` c.`5149044773`, 1 ago 2026): "preparar, sin ejecutar". **Este borrador NO es GO.** Su ejecución exige un comentario posterior y explícito del accountable en #132. Cubre los 9 puntos que Juan fijó como mínimo. C2 queda **explícitamente fuera** (punto 9).
