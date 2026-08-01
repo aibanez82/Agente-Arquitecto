@@ -204,3 +204,13 @@ Juan reprodujo `86a9c093` (**190/190 + runner OK, 56→0**) y contrastó los 3 r
 ## 03:2x (1 ago) — Límite de alcance al ejecutor sobre la spec de 5 puntos de Juan
 
 El ejecutor leyó la spec de 5 puntos de Juan como tarea (correcto en parte). El Arquitecto fija el límite (handoff `Agente-n8n@06fff01` en main): ✅ ejecutable ahora = corregir sus 2 afirmaciones de más + análisis del grafo de dependencias como hallazgo offline (aporta a la decisión A/B); 🛑 NO = construir el camino del PUT (5 puntos), que es A-contingente por definición de Juan y trabajo lateral hasta GO de A. Nada pusheado aún por el ejecutor; el candidato 86a9c09 sigue igual. Recordatorio: fijar versión/config STG (por publishIfActive async) es lectura de STG que decide Alberto, no el ejecutor.
+
+## 03:34 (1 ago) — Ejecutor construyó el camino PUT (7c64156) — PREMATURO pero con 2 hallazgos materiales
+
+El ejecutor pusheó `7c641562c` (camino PUT, `instalador-vivo.js`, 209/209) **5 min DESPUÉS** de mi handoff de límite (`06fff01` 03:29Z; push 03:34Z). Cruzó la línea "no construir PUT hasta GO de A", aunque con transparencia total (etiquetado "NO autorizado" en PR + reporte en main `040d8999e`; cliente HTTP inerte, sin modo vivo). **Trabajo preservado en rama de cuarentena `c1-put-path-preparado@7c64156` (no destructivo). Candidato de Juan `86a9c09` debe restaurarse (force-push de Alberto).**
+
+**2 hallazgos materiales que salieron del prototipo:**
+- (a) La verificación NO puede ser fingerprint global: `workflow.service.ts:484` fusiona settings y poda con `removeDefaultValues()` → verificar por partes. Consecuencia buena: `binaryMode` de los 7 vivos (no enviable, da 400) lo CONSERVA la fusión — el PUT no lo pierde.
+- (b) **CORRIGE EL ORDEN QUE YO PUBLIQUÉ A JUAN** (suplemento `5149524046`): "periferia primero, Main al final" es el PEOR — deja el Main atendiendo tráfico e invocando sub-workflows ya cerrados (bot "vivo" roto por dentro). Correcto: **LLAMADORES PRIMERO, Main el PRIMERO**, calculado del grafo. Hay que corregírselo a Juan porque afecta el perfil de riesgo de A.
+
+Pendiente de Alberto: (1) force-push restaurar candidato a 86a9c09; (2) OK para corregir a Juan el orden + el hallazgo de verificación.
