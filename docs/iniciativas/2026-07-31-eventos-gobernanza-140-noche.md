@@ -393,3 +393,7 @@ Juan PASÓ el restore (acredita contenido vs preestado+export, settings, active=
 ## 15:1x (1 ago) — Vercel CONFIRMADO por Alberto (panel): dpl_E5yQ... = commit 1373d1a
 
 Captura del panel: deployment `dpl_E5yQGegYSXZqbNy38TBi4j69U2gK` / domain `...8xb7zsprm...` / Source rama `c1-gates-api-default-deny` commit `1373d1a` / Preview / projectId `prj_CU5Qqp3BK2B31HVytLeEOBuSlnrU`. El deployment que hallé por correlación de hora ERA el correcto. Confirmado al ejecutor (`2dd41c8`) para hornear el target inmutable. Checkpoint §1 Dashboard actualizado con la identidad completa. **Ya no hay dato humano pendiente para la guarda Dashboard; solo falta la entrega del ejecutor del target inmutable → técnico cerrado.**
+
+## 15:1x (1 ago) — Target Vercel inmutable entregado (944cd963) PASS 313/313 — TÉCNICO COMPLETO
+
+Target inmutable: valores literales readonly (sin override), verificados por el Arquitecto que provienen de FUENTES REALES (no inventados): projectId prj_CU5Qqp3... + orgId team_MyB7xWdzJZcEPzeK7rlHMFe8 del .vercel/repo.json del clon Dashboard (corrijo mi error previo: SÍ hay .vercel, es repo.json no project.json); deploymentId dpl_E5yQ... = 1373d1a confirmado en panel de Alberto. 313/313. Re-congelado en 944cd963. **TÉCNICO 100% COMPLETO — todos los P1 de ~13 rondas de Juan resueltos.** Falta solo: gate humano de Juan (aceptar ventana lunes 3 + figura operador único + GO). Listo para montar y postear la respuesta única final en cuanto Juan pase el focal de 944cd963.
