@@ -214,3 +214,12 @@ El ejecutor pusheó `7c641562c` (camino PUT, `instalador-vivo.js`, 209/209) **5 
 - (b) **CORRIGE EL ORDEN QUE YO PUBLIQUÉ A JUAN** (suplemento `5149524046`): "periferia primero, Main al final" es el PEOR — deja el Main atendiendo tráfico e invocando sub-workflows ya cerrados (bot "vivo" roto por dentro). Correcto: **LLAMADORES PRIMERO, Main el PRIMERO**, calculado del grafo. Hay que corregírselo a Juan porque afecta el perfil de riesgo de A.
 
 Pendiente de Alberto: (1) force-push restaurar candidato a 86a9c09; (2) OK para corregir a Juan el orden + el hallazgo de verificación.
+
+## 04:0x (1 ago) — Autocorrección del push prematuro + recomendación A/B a Juan (`5149673985`)
+
+Secuencia limpia ejecutada (con OK de Alberto):
+1. **Force-push de Alberto** restauró el candidato `7c64156 → 86a9c09` (el validado por Juan). Trabajo del PUT preservado en `c1-put-path-preparado`.
+2. PR #3 corregido (cuerpo + título): candidato = `86a9c09`, camino PUT declarado FUERA del candidato (en cuarentena). Autocorregido ANTES de que el monitor de Juan lo marcara.
+3. **Recomendación publicada a Juan** (`5149673985`): (a) corrijo el orden de contención que le di en `5149524046` — "periferia primero" era incorrecto; verificado por el Arquitecto contra el grafo congelado que Issue Policy Guard y METEPEC Registrar son callees puros sin ingress → van los últimos; principio = llamador antes que callee; orden exacto a computar del grafo y re-verificar en checkpoint (NO aserté las 7 posiciones, límite honesto de mi verificación); (b) hallazgo de verificación por partes + binaryMode conservado; (c) **recomendación: opción B ahora, barrera A como checkpoint separado posterior** — los hallazgos del PUT vivo lo hacen operación de riesgo alto que merece su propio checkpoint; (d) estado del artefacto y reconocimiento del prototipo prematuro.
+
+Decisión A/B sigue siendo de Juan. Nuestra postura ya está sobre la mesa, verificada.
