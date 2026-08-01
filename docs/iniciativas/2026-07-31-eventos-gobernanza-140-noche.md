@@ -99,3 +99,9 @@ Ambos frentes de la re-revisión C1 (Dashboard #2 y n8n #3) quedan entregados co
 ## 22:5x — Aviso formal de re-revisión publicado (`5148108549`, OK de Alberto)
 
 Ambos frentes C1 (n8n #3 `fe456b014`, Dashboard #2 `1373d1ab9`) sometidos formalmente a la re-revisión del accountable. La noche cierra con: 2 PRs entregados con doble verificación, 3 clasificaciones ex post cruzadas (sonda descuento, Heroku STG de Juan, Vercel Dashboard), y pendientes aparcados por decisión de Alberto (listrecs/corte mensual, cron Conciliación). La pelota: re-revisión de Juan.
+
+## 01:0x (1 ago) — Re-revisión de Juan (`5148715706`) + iteración P1 n8n lanzada
+
+**Dashboard: PASS técnico offline acotado**, congelado en `1373d1a` (prohibido cualquier push adicional). **n8n: NO-GO acotado por 1 P1** — dos bypasses de clase en el checker SQL (dinámico degradado a `read` sin gate de mutación; spoof de `parameters.table` sobre el destino SQL real) + P2s. Juan da **luz verde expresa a corrección offline inmediata** del PR #3 con nuevo SHA candidato; re-revisión focal e inmediata.
+
+Handoff de iteración entregado al Agente n8n (`handoffs/2026-08-01-iteracion-p1-sql-pr3.md`). **Trazabilidad:** el commit del handoff (`6242007`, docs-only) aterrizó en la propia rama `feature/c1-contencion-gates-plano-aislado` — el clon compartido estaba en esa rama por la iteración activa del ejecutor. A diferencia del 31 jul (rama congelada como candidato), la rama está ahora en desarrollo autorizado por el accountable; se deja en el historial y el PR declarará la composición del nuevo candidato incluyéndolo como docs-only, en vez de reescribir historia sobre la que el ejecutor ya puede estar trabajando.
