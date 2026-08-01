@@ -349,3 +349,12 @@ Ejecutor cerró los 3 puntos (279/279): pre-guard del rollback sobre estado comp
 ## 13:28 (1 ago) — Addendum de responsabilidad de Juan (`5151628075`) — sin hallazgos nuevos
 
 Formaliza: responsable siguiente @aibanez82; entrega = UNA respuesta única en #132 (SHA exacto + repro offline + checkpoint final completo). 2 de 3 bloqueantes ya cerrados por el ejecutor (78442a467). Instrucción: "no refactors ni mejoras laterales" — corregir exacto los 3 bloqueantes y entregar (valida el freeze del ejecutor). Al publicar, monitor acusa → responsabilidad al revisor; con PASS técnico → a Juan para decisión humana. Bloqueante único nuestro: Vercel deployment-id (Alberto) + aceptación de Juan.
+
+## 13:42 (1 ago) — FAIL consolidado `5151680686` sobre 78442a4 + GAP DE VERIFICACIÓN DEL ARQUITECTO
+
+Juan reprodujo y encontró que 78442a4 NO cierra:
+1. **Rollback: FAIL** — la ruta omite `activeVersionId` cuando el esperado es `null` (justo el estado tras el deactivate-antes-de-A). Canario: activeVersionId ajeno → rollback="repuesto", PUTs=1. Debe ser incierto/PUTs=0.
+2. **Prechecks: FAIL** — el guion lleva placeholder literal `<comando-de-lectura-de-la-flag>` (no hay comando real para acreditar la flag Django por valor); en el entorno de Juan `bash -n`=2 y suite 278/279 (en el del Arquitecto 279/279 + bash válido: `$(<...>)` parsea distinto por versión de bash — pero el placeholder es real). Además la "reverificación viva" corre `--barrera ab` SIN `--vivo` → DRY-RUN exit 0 cero-GET pero imprime "OK 3b" (falso verde). Los 7 deactivate quedan fuera del journal/reconciliación.
+3. **Mínimos: PASS huellas** (SHA-256+bytes de los 14, NO rehacer); siguen ausentes ventana/roles/suplente + Vercel deployment-id.
+
+**GAP DEL ARQUITECTO (asumido):** reporté "279/279 PASS" pero NO cacé el placeholder — solo inspeccioné las primeras 40 líneas del guion de producers (WhatsApp), no la parte Django. Verificación cierta en mi entorno pero INCOMPLETA. Lección: inspeccionar el artefacto COMPLETO, no un prefijo; y no fiar el "pass" solo de mi entorno cuando hay generación de scripts (probar bash -n).
