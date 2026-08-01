@@ -302,3 +302,7 @@ Juan reprodujo (231/231, dry-run inerte, simulación verde). Tres bloqueantes:
 3. **Checkpoint realmente completo (Arquitecto):** los 6 curls con `…` → literales; placeholders de autorización; ventana "a confirmar"; prechecks sin comandos literales (ejecuciones/producers/schedules/destinos); deployment Vercel inmutable; comando Django `migrate --check` target-guarded; operador/guardia/suplente/ventana definitivos.
 
 Solo offline. Nota: Juan trata la ventana lunes 3 como "a confirmar" — aún no la aceptó; requiere su OK explícito para ser definitiva.
+
+## 06:0x (1 ago) — Fix rollback/stop/target entregado (7c877a7) + checkpoint v2 completo POSTEADO a Juan (`5150183935`)
+
+Ejecutor cerró los 2 bugs (248/248): rollback recuperable (estado durable + `--rollback-from`, sobrevive corte, nunca re-aplica ida), STOP con exit≠0 en no-verde, target guard atado a `N8N_BASE_URL` (host STG exacto). **Cambio clave verificado: orden ahora B→A** (clones desde el freeze primero; si B no limpia, no se toca el vivo). Verificación independiente del Arquitecto PASS. Checkpoint reescrito completo (comandos verbatim, prechecks literales, Django, Vercel, ventana concreta pidiendo confirmación a Juan) y **posteado por el Arquitecto directo** (delegación de Alberto), 3 condiciones cumplidas. PR #3 → 7c877a7. Pendiente: (a) Juan confirma ventana; (b) revisión + GO de Juan. Alberto durmiendo; nada irreversible.
