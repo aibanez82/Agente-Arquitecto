@@ -30,7 +30,7 @@ Hito D-0: enviar a primera hora de la mañana `America/Mexico_City` (el copy dic
 
 | # | Qué | Estado |
 |---|---|---|
-| 1 | **Plantilla de Meta** para mensaje proactivo fuera de ventana 24h. Una sola plantilla con variables (nombre, días restantes, monto, link) sirve para los 4 hitos — y desbloquea también "Recordatorios por fecha mencionada" | 🔴 Mismo bloqueante conocido desde el 16 jul. Meta la ejecuta Juan |
+| 1 | **Plantilla de Meta** para mensaje proactivo fuera de ventana 24h. Una sola plantilla con variables (nombre, días restantes, monto, link) sirve para los 4 hitos — y desbloquea también "Recordatorios por fecha mencionada" | 🔴 Mismo bloqueante conocido desde el 16 jul. Meta la ejecuta Juan. **⚡ Alternativa detectada 31 jul: `genlinkWSP`/`genlinkSMS` (api.php v1.4.1) — Quálitas genera Y envía el link por SU canal WhatsApp/SMS, sin ventana 24h nuestra ni plantilla Meta. Probable en QA (`pagosqa`). Ver `docs/qualitas-api/api-rest-link-de-pago.md` §v1.4.1** |
 | 2 | **Fuente de la fecha límite D** ("vence tu póliza"). Las APIs no la dan: `fareceipt`/`listrecs` ruedan `fcr`/`fcobro` a hoy mientras el recibo siga cobrable; la cancelación por impago es regla de negocio de Quálitas (¿emisión + N días naturales? ¿varía contado vs fraccionado?). Opciones: confirmar regla con Laura/Quálitas, o tomarla de Q360 si el portal la muestra (preguntar al Agente Conciliación qué campos ve) | 🔴 Sin D fiable no hay cuenta atrás |
 | 3 | Decisión formal Django vs n8n como lanzador | ⏳ Alberto/Juan |
 | 4 | Copy de los 4 mensajes (tono, urgencia creciente) | ⏳ Tubería Agente Mejoras Conversación → Arquitecto → plantilla |

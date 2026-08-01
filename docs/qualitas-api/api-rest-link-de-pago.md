@@ -1,6 +1,7 @@
 # API REST — Link de Pago / Servicios en Línea (Quálitas)
 
 > Fuente: `Api-REST-Link-de-Pago-v1.4.pdf` (en esta carpeta, v1.4, 04 ene 2022). Llegó con el paquete de alta del negocio 08545/clave 27614 (correo "27614_ALTA DE NEGOCIO", nov 2025) que Alberto recuperó el 31 jul 2026.
+> **Actualización v1.4.1** (12 abr 2026, "para OPL controladora"): `Api-REST-Link-de-Pago-v1.4.1-controladora.docx` (en esta carpeta, entregado por Alberto el 31 jul 2026) — añade `genlinkSMS`, `genlinkWSP` y las llaves `mail_user`/`mail_copy`. Ver sección v1.4.1 abajo.
 > Es la **documentación oficial de `pagos.qualitas.com.mx/api.php`** — el endpoint que Django ya usaba sin spec (`generar_link_pasarela`). Complementa a `opl-servicios-web.md` (SOAP OPL).
 
 ## Endpoints y autenticación
@@ -26,6 +27,26 @@
 | `genWebPay` | Genera pasarela de pagos → devuelve `urlwbpy` con redirects `usucces`/`ufail` | `poliza`, `email`, `usucces`, `ufail` | ✅ `generar_link_pasarela()` |
 | `fareceipt` | Primer recibo disponible a cobro (`rid`, `np/nps`, `fcr`, `monto`) | `poliza` | ✅ fallback en `generar_link_pasarela()` + verificación cruzada Conciliación (29 jul) |
 | `listrecs` | **Status de TODOS los recibos de la póliza** | `poliza` | 🔴 No — es la joya, ver abajo |
+| `genlinkSMS` *(v1.4.1)* | Genera link y **Quálitas lo envía por SMS** | `poliza`, `tel`, `mail_user`, `mail_copy` | No |
+| `genlinkWSP` *(v1.4.1)* | Genera link y **Quálitas lo envía por WhatsApp (canal de Quálitas)** | `poliza`, `tel`, `mail_user`, `mail_copy` | 🔴 No — ver v1.4.1 abajo |
+
+## v1.4.1 — `genlinkSMS` / `genlinkWSP` / `mail_user` / `mail_copy` (12 abr 2026)
+
+Tres novedades sobre la familia `genlink`:
+
+- **`genlinkSMS`** (`m=genlinkSMS`, `tel` de 10 dígitos): Quálitas genera el link y lo envía por SMS.
+- **`genlinkWSP`** (`m=genlinkWSP`, `tel`): Quálitas genera el link y **lo envía por WhatsApp desde su propio canal** — no el nuestro.
+- **`mail_user`** (correo de quien genera el link) y **`mail_copy`** (correo en copia) se añaden a los tres `genlink*`. Respuesta igual que `genlink`: `{"result": "Se genero link de pago y se envio a …", "stamp": …}` — string, sin contrato de error estructurado documentado.
+- El docx incluye los `wptoken` de QA (`pagosqa.qualitas.com.mx`) y PROD — **hay ambiente QA completo para probar sin tocar PROD**.
+
+### Por qué importa (oportunidades detectadas — Arquitecto, 31 jul 2026)
+
+1. **`genlinkWSP` puede desbloquear los recordatorios de pago SIN plantilla de Meta.** El bloqueante nº 1 de `docs/iniciativas/recordatorios-de-pago.md` es la plantilla Meta para mensajes fuera de la ventana 24h (pendiente de Juan desde el 16 jul). Con `genlinkWSP` el WhatsApp lo envía **Quálitas desde su canal**, no nosotros desde el nuestro: no hay ventana 24h nuestra ni plantilla Meta que aprobar. Trade-offs a validar: el mensaje llega con remitente Quálitas (¿UX/confianza? — puede incluso ser mejor: es la aseguradora cobrando), no controlamos el copy, y habría que confirmar en QA qué recibe exactamente el cliente. `genlinkSMS` es el mismo desbloqueo por SMS (sin ninguna restricción de ventana).
+2. **`mail_copy` como rastro de auditoría gratis:** poner un buzón nuestro en copia de cada link generado → evidencia independiente de cada envío para la conciliación (casa con el patrón "guardia anti-reclamo" de `listrecs`).
+3. **`mail_user` como atribución:** distinguir links generados por Django (flujo web) vs. recordatorios automáticos vs. manuales.
+4. **Ambiente QA con token propio:** cualquier prueba de esta familia puede hacerse contra `pagosqa` — relevante bajo la gobernanza actual (nada de sondas vivas en PROD sin clasificar).
+
+Sin decisión de implementación: esto es inventario de capacidades. Cuando se retome la iniciativa de recordatorios, evaluar `genlinkWSP`/`genlinkSMS` contra la ruta plantilla-Meta como alternativa o fallback.
 
 ## `m=listrecs` — consulta de status de recibos (añadido en v1.4)
 
