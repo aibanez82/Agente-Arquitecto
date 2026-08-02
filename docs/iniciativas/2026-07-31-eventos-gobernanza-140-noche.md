@@ -532,3 +532,11 @@ El candidato se movió 415ee46→e7f3a78 (runbook generado + fix cross-ref paso 
 Datos de ventana (Alberto tomó autoridad: "jamás os detengáis por unos datos de ventana"): ventana=sync-inmediata-c1-rerun, garante=Alberto-@aibanez82, autorizacion=el comentario "condiciones satisfechas" del monitor v3 (que espero igualmente para ejecutar). El ejecutor confirmó y mantuvo la lectura correcta: "no os paréis esperando ≠ rebajar la guarda" — sin los 3 datos, dry-run por diseño.
 
 **HOLD:** esperando al monitor v3 → PASS de e7f3a78 + aval B→A + "condiciones satisfechas". Cumplido + guardas → el Arquitecto ejecuta la única corrida C1 (pausa→B→A).
+
+## (2 ago ~04:00 UTC) — SHA correctivo 161d6913: FAIL 5154995079 cerrado, verificado hermético; mis 2 partes publicadas
+
+Ejecutor entregó 161d6913 (informe 226e52a47) cerrando los 3 de código: #1 normalize active (fingerprintFuenteNormalizada = fingerprintWorkflow con active fijado al freeze; las 7 huellas VUELVEN a las originales de 5fcc06099 — bot 9380710b); #2 orden runbook (productores expone pre/postinstalacion, verifier solo post-install, canarios de orden y único post-check); #3 suite hermética (enlace Vercel movido a preflight-enlace-vercel.js, hermetismo.test.js guardián). **Verificación independiente del Arquitecto ESTA VEZ BIEN: suite 349/349 desde git archive limpio con .vercel AUSENTE** (corrige mi 340/340 local previo no hermético); asertos y normalize en código; contenido vivo == freeze 7/7 (normalizado).
+
+Mis 2 partes publicadas en checkpoint exacto #132 (5155176112, reemplaza 5154925188): #4 restore 7/7 sanitizado por workflow (contenido==freeze, active=true, activeVersionId nuevos f69215fc…, 0 clones, 0 en vuelo, 7 totales, uncertain=0); #5 checkpoint exacto de 161d6913 (tree b441a311, hashes completos no truncados, secuencia corregida verifier solo post-install, garante HUMANO Alberto, autorizacion=comentario "condiciones satisfechas" del monitor aplicando 5154662330). PR #3 = 161d6913.
+
+**HOLD:** único gate restante = PASS consolidado del monitor v3 sobre 161d6913 + verificación de mi checkpoint/restore → publica "condiciones satisfechas" → el Arquitecto ejecuta la única corrida C1 (pausa→B→A) con las guardas frescas.
