@@ -90,3 +90,29 @@ Un evento Payment sintético para una conversación exacta + **replay del mismo 
 ---
 
 > **Dependencia dura entre fases:** C4-F1 (concurrencia real, cero cruce) hereda el motor de concurrencia PG17 que el FAIL C2 exige. **No arrancar C4 hasta C2 con concurrencia real acreditada + C3 cerrada.** El monitor mantiene este contrato congelado; nuestro entregable real (manifest `c3-schema-gap/1` + DDL núcleo + fixtures C4) va **después** de que C2 cierre formalmente.
+
+---
+
+## C5 — segundo pase → `dual` final (contrato monitor `prep:c5:202608021507`)
+
+**Unidad de autorización:** un **run padre único** + 3 run-id hijos `A/B/C` disjuntos (namespace/fixtures/conversaciones/event IDs/timestamps). Autorización cubre la secuencia **una vez**. Fallo de cualquier hija **consume el padre**: STOP → `dual→shadow` → reconciliación → cleanup. Sin salto ni retry.
+
+**Cada matriz A/B/C recorre el MISMO núcleo completo** (no se reparten criterios), con datos distintos:
+1. identidad v1/v2 + payload terminal + 2 `waq_*` mismo teléfono sin cruce;
+2. afinidad serial + **2 requests realmente sincronizados**; máx. 1 `active`, cada UPDATE ≤1;
+3. Payment exacto + prioridad/contradicción + 1er evento + replay + **carrera** del mismo `event_id`; `updated_count∈{0,1}`, ledger único;
+4. **temporalidad SIMULADA (sin dormir):** filas con timestamps/estados de expiración, evento tardío + replay; reloj/fixture explícito en evidencia;
+5. cero Meta/Payment/Gmail/IA externa/conectores/claims/derivaciones/follow-ups/writers no allowlisted/`completed` por IA;
+6. root/`activeVersion`/fingerprints/modo/target/drift verdes;
+7. cleanup exacto + reconciliado del run-id hijo **antes** de la siguiente.
+
+A/B/C = **mismo manifest y aserciones**, cambia solo el paquete de fixtures versionado. Si cambia código/manifest entre matrices → **STOP** (deja de ser secuencia certificable).
+
+**Secuencia:** C4 cerrado + shadow final → guardas frescas + backup ≤15min + pre-dual verde → CAS shadow→dual → post-dual verde → A→verifier→cleanup→cero restos → B → C → preflight/fingerprints finales → **conservar `dual`** (obligatorio si A/B/C PASS). Sin 24h, sin tráfico orgánico, sin Meta real. Rollback: CAS `dual→shadow` RTO ≤5min, verifica modo antes de retry ambiguo, conserva `waq_*`/historiales/DDL aditivo, restore n8n ≤20min si drift.
+
+**Gate pendiente:** C5 no es checkpoint hasta C4 cerrado + SHA/hashes + PASS sin P0/P1 + comandos CAS/runner/verifier/cleanup + backup + Alberto disponible + 7 condiciones.
+
+---
+
+## Dependencia estratégica entre fases (lo que importa para la planificación)
+**C2 es el cuello de botella fundacional.** El motor de ejecución real (INSERT/POST reales, 2 transacciones PG17 sincronizadas, verifier GET-only real, cleanup atómico) que C2 debe cerrar **es el mismo que reutilizan C4 (canario) y C5 (3 matrices)**. Cada fase viva añade un eje sobre ese motor: C4 añade el eje **modo** (`shadow→dual→shadow`); C5 añade **3 matrices consecutivas + temporalidad simulada**. Por eso C3 (schema/readiness, sin motor) puede adelantarse, pero C4/C5 **no arrancan hasta que C2 acredite el motor real**. Invertir bien en el SHA sucesor de C2 (que `--execute` ejecute de verdad) desbloquea las tres.
