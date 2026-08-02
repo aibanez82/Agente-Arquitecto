@@ -548,3 +548,15 @@ Ejecutor entregó 2b9096a (informe d9d4eace) cerrando el P1 5155205173: pausar-i
 Checkpoint republicado #132 (5155289240, reemplaza 5155176112) para 2b9096a con las 2 correcciones de Juan: --autorizacion 5154662330 (no placeholder) y semántica corregida (rollback NO reactiva; --restaurar SÍ reactiva). Restore evidence 7/7 sigue válida (fingerprints sin cambio). HOLD: espera PASS consolidado del monitor v3 sobre 2b9096a + verificación del checkpoint → "condiciones satisfechas" → 2ª corrida.
 
 Aparte: AI Delivery Audit caso #1 escrito (docs/2026-08-02-ai-delivery-audit-caso-1-c1.md, commit local bd24074 sin push) — pendiente decisión de Alberto sobre push (repo público) y artefacto.
+
+## (2 ago 05:05-05:12 UTC) — ✅✅ C1 EJECUTADO Y ACREDITADO EN STG (corrida única, verde completo)
+
+Ruta al disparo: monitor v3 dio PASS técnico consolidado sobre 416d1987 (5155482965, sin P0/P1: suite 349→356/356 hermético, ruta mínima literal PASS, ciclo-completo exit 0, install/rollback consumen $VENTANA/$GARANTE/$AUTORIZACION). Arquitecto congeló 416d1987 (Agente-n8n@293377f) + midió guardas frescas (target 200, 0 en vuelo, 0 schedule, anti-TOCTOU 7/7) + publicó handoff de ventana (5155509842) con disponibilidad de Alberto + UI cerrada. Monitor aplicó la pre-autorización 5154662330 y transfirió la corrida única ("condiciones de autorización humana satisfechas", 5155529675).
+
+CORRIDA (operador humano Alberto, Arquitecto vigilando): 
+- Pausa run-id c1-20260802T050946-7aa3 → 7 pausa-verificada, verde. Arquitecto verificó: 7 active=false, 0 activos.
+- Barreras B→A run-id c1-20260802T051054-0453 → B: 7 clones C1-AISLADO creados (active:false) + GET OK; A: 7 estado-verificado-workflow-inactivo. RESULTADO verde. **El fix del active normalizado hizo pasar el anti-TOCTOU que paró la 1ª corrida.**
+- Post-check GET-only (verificar-instalacion.js --vivo): 7 clon-acreditado + 7 vivo-contenido-acreditado, verde.
+- Verificación independiente Arquitecto: 14 workflows (7 vivos + 7 clones), 7 clones active=false, 7 vivos active=false contenidos, 0 activos. Cardinalidad 7+7.
+
+**SIN STOP, SIN uncertain, SIN retry.** Plano vivo STG contenido default-deny; 7 clones aislados para C2. Evidencia sanitizada publicada #132 (5155576499). Devuelto a monitor v3 para cierre operativo C1 + prep offline de C2. HOLD: espera confirmación de cierre C1 del monitor.
