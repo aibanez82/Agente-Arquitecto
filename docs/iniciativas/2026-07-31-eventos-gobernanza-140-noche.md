@@ -524,3 +524,11 @@ Enmienda accountable de Juan. Puntos clave:
 - **Nueva directriz operativa (Alberto+Juan): el Arquitecto es único interlocutor hasta C5; las IA de ambos lados convergen y cierran sin preguntar a los humanos. Autoridad del Arquitecto C1→C5, mismas líneas duras (secuencial; una corrida/fase; STOP→humano; sin PROD/Meta/secretos/enforced/C6-C9; guards puestos).**
 - Ejecutor (ccfce002) pidió 4 desbloqueos: #1 scope C2-C5 → handoff C2 emitido (main e28b91d: matriz M1-M6, suite negativa, fixtures, harness offline); #2 traceability + #3 aval B→A → transmitidos a Juan (#132 5154946600); #4 los 4 puntos del runbook humano → anotados al checkpoint.
 - **HOLD:** esperando al monitor v3 (PASS de 415ee46 + aval B→A + traceability). Cumplido eso + guardas → el Arquitecto ejecuta la única corrida C1 (pausa→B→A) bajo la pre-autorización 5154662330.
+
+## (2 ago 03:30 UTC) — SHA drift detectado y estabilizado en e7f3a78; datos de ventana resueltos
+
+El candidato se movió 415ee46→e7f3a78 (runbook generado + fix cross-ref paso 8 + fix test Dashboard-HEAD), y el monitor v3 ya auditaba e7f3a78, no el 415ee46 de mi checkpoint. Verificado por el Arquitecto: delta INOCUO — los 6 artefactos ejecutables byte-idénticos, 7 fingerprints anti-TOCTOU sin cambio (contenido vivo==freeze 7/7 sigue válido), único cambio en plan-instalacion.json es un comentario del restore; suite 340/340; tree 3ccce460. Alineado todo en e7f3a78: handoff de FREEZE al ejecutor (main 2fc1f82: no más pushes al candidato C1, C2 en rama aparte, guardas intactas) + checkpoint de #132 actualizado (5154997235).
+
+Datos de ventana (Alberto tomó autoridad: "jamás os detengáis por unos datos de ventana"): ventana=sync-inmediata-c1-rerun, garante=Alberto-@aibanez82, autorizacion=el comentario "condiciones satisfechas" del monitor v3 (que espero igualmente para ejecutar). El ejecutor confirmó y mantuvo la lectura correcta: "no os paréis esperando ≠ rebajar la guarda" — sin los 3 datos, dry-run por diseño.
+
+**HOLD:** esperando al monitor v3 → PASS de e7f3a78 + aval B→A + "condiciones satisfechas". Cumplido + guardas → el Arquitecto ejecuta la única corrida C1 (pausa→B→A).
