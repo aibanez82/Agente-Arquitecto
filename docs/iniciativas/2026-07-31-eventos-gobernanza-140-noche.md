@@ -540,3 +540,11 @@ Ejecutor entregó 161d6913 (informe 226e52a47) cerrando los 3 de código: #1 nor
 Mis 2 partes publicadas en checkpoint exacto #132 (5155176112, reemplaza 5154925188): #4 restore 7/7 sanitizado por workflow (contenido==freeze, active=true, activeVersionId nuevos f69215fc…, 0 clones, 0 en vuelo, 7 totales, uncertain=0); #5 checkpoint exacto de 161d6913 (tree b441a311, hashes completos no truncados, secuencia corregida verifier solo post-install, garante HUMANO Alberto, autorizacion=comentario "condiciones satisfechas" del monitor aplicando 5154662330). PR #3 = 161d6913.
 
 **HOLD:** único gate restante = PASS consolidado del monitor v3 sobre 161d6913 + verificación de mi checkpoint/restore → publica "condiciones satisfechas" → el Arquitecto ejecuta la única corrida C1 (pausa→B→A) con las guardas frescas.
+
+## (2 ago ~04:22 UTC) — P1 operativo cerrado en 2b9096a; checkpoint republicado
+
+Ejecutor entregó 2b9096a (informe d9d4eace) cerrando el P1 5155205173: pausar-inbound.js con expectativa post-restore explícita "0/7 activos → exit 0" (vía a, conserva la lectura independiente) + nuevo ciclo-completo.test.js (canario que exige exit 0 en los 6 pasos pausa→B→A→verifier→rollback→restore→reconcile); P2 cerrados (--active-congelado en los comandos, comprobar-fingerprint fail-closed, dup tests quitados). Verificación independiente del Arquitecto: suite 351/351 desde git archive limpio (.vercel ausente), ciclo-completo pasa. Hashes cambiados: pausar-inbound 3b5f2923, comprobar-fingerprint a53004f1, plan-instalacion a0eaaf20; fingerprints anti-TOCTOU sin cambio (9380710b originales). tree d91ae27c.
+
+Checkpoint republicado #132 (5155289240, reemplaza 5155176112) para 2b9096a con las 2 correcciones de Juan: --autorizacion 5154662330 (no placeholder) y semántica corregida (rollback NO reactiva; --restaurar SÍ reactiva). Restore evidence 7/7 sigue válida (fingerprints sin cambio). HOLD: espera PASS consolidado del monitor v3 sobre 2b9096a + verificación del checkpoint → "condiciones satisfechas" → 2ª corrida.
+
+Aparte: AI Delivery Audit caso #1 escrito (docs/2026-08-02-ai-delivery-audit-caso-1-c1.md, commit local bd24074 sin push) — pendiente decisión de Alberto sobre push (repo público) y artefacto.
