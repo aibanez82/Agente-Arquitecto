@@ -568,3 +568,15 @@ Monitor v3 (5155631752): núcleo 7+7 verde, pero el reporte salta el tramo oblig
 Aclaración de journal (verificado): los "inciertos" 7/14 son transitorios (deactivate/POST/PUT-emitido-pendiente-de-verificar), cada uno resuelto por GET a verificada/acreditado; 0 incierto SIN resolver; verde:true, errores:0 en ambos run-id. Mi "uncertain=0" era 0-sin-resolver (correcto), lo precisé.
 
 Complemento honesto publicado (5155662487): declaro la omisión sin disfrazarla + evidencia de journal + estado POSTERIOR read-only claramente etiquetado (webhook-404 7/7=404, Django false/false/true, Dashboard opción-A). Conforme a 5155631752 la desviación vuelve a @oilycoyote. Estado real fail-closed y seguro; sin PROD tocado. Lección: en un re-run hay que re-ejecutar (o acreditar explícitamente con OK de Juan) TODO el tramo de precondición, no solo las guardas inmediatas de n8n.
+
+## (2 ago 11:48 UTC) — ✅✅✅ C1 CERRADA OPERATIVAMENTE por Juan (decisión accountable humana, 5157632531)
+
+Juan (humano A) volvió por la mañana (05:34 STOP → 11:48 decisión) y ACEPTÓ la desviación declarada en 5155662487, cerrando C1. Excepción única aceptada porque: (1) los ingress ya estaban desactivados antes de los POST/PUT; (2) mutación principal + post-check GET-only verdes; (3) evidencia posterior fail-closed; (4) repetir/completar/rollback ahora añadiría riesgo sin reconstruir la precondición histórica. La aceptación NO crea precedente ni convierte la comprobación posterior en precondición; la omisión queda registrada — futuros checkpoints deben ejecutar su secuencia EXACTA. Sin rollback/restore/repetición/reactivación. Corrida C1 consumida y aceptada.
+
+Evidencia aceptada por Juan: artefacto 416d1987 (PASS 5155482965, 356/356); pausa 7aa3 (7/7); instalación 0453 (B 7 clones + A 7 vivos, GET-only 7+7); 14 workflows = 7 vivos contenidos + 7 clones, todos active=false; cero retry/uncertain-sin-resolver/rollback; Dashboard opción A; producers Django/webhooks seguros.
+
+**C1 CERRADA. La contención está viva en STG.** Estado final: plano vivo STG contenido default-deny + 7 clones aislados para C2, todos active=false. Sin PROD tocado en toda la operación.
+
+Siguiente: monitor v3 + @aibanez82 completan la prep C2 OFFLINE (manifest allowlisted, fixtures/run-id, runner one-shot, verifier GET-only, cleanup, canarios) → checkpoint C2 consolidado en #132. C2 vivo solo tras PASS técnico + las 7 condiciones de 5154662330. Lección dura registrada: en re-run ejecutar el tramo de precondición COMPLETO, no solo las guardas inmediatas.
+
+--- FIN DE LA MARATÓN C1: ~31h (28 jul #132 → 2 ago 11:48 cierre), ~24 SHAs, 1 STOP en vivo recuperado + 1 desviación aceptada, C1 contención VIVA y CERRADA en STG. ---
