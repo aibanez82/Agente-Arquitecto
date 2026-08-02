@@ -614,3 +614,11 @@ El chequeo multi-agente cazó de nuevo mis errores relayados (el sobre de payloa
 ## (2 ago tarde) — precondición de esquema C2 verificada SATISFECHA en STG
 
 Consulta read-only del Arquitecto a la BD de STG (DATABASE_URL de hyl-wai-stg vía heroku, node/pg del clon Dashboard, SELECT sobre pg_indexes/information_schema): whatsapp_sessions NO tiene índice único sobre phone_number (solo whatsapp_sessions_phone_status_updated_idx y whatsapp_sessions_phone_idx, ambos no-únicos) → esquema OBJETIVO. Columnas objetivo presentes: metepec_derived_at, human_takeover_control_id, metepec_op_lock_id, status, conversation_phase. => C2 vivo NO bloqueado por migración de esquema; S3/S4 pueden compartir teléfono. Un gate menos. Monitor v3 reauditando e5a9c88 (5159402107 ack 16:59).
+
+## (2 ago 18:47) — FAIL P1 C2 #2 (5159817682): el plano sigue DECLARATIVO, no operativo
+
+Monitor v3 FAILó e5a9c88: 6 paths existen, hashes cuadran, 70/70+431/431, PERO run-core-matrix.js hace STOP deliberado (construye payloads + intención global, no siembra/dispara/evalúa M0-M8, cleanup solo imprime SQL, finally solo escribe texto). 4 P1: (1) artefactos 1/3/5 no operables (runner no carga los JSON, dual-core solo describe); (2) fixtures — mi ampliación de allowlist S9-S11 "sin autoridad", M6 reusa event_id en 8/9 (todos duplicate), M4 sin barrera real, falta legacy; (3) cleanup/verifier/target no cierran M8 (verifier 10 checks, no acredita ejecuciones/fingerprints/sinks, target inerte, post espera 8 pero fixture da 11); (4) M5 mi workaround rechazado (spec exige que las 3 colapsen; P1 hasta que Juan enmiende).
+
+Handoff operativo al ejecutor (Agente-n8n@52d31ac): --simular ejecuta la matriz ENTERA (siembra→dispara→evalúa→cleanup), delta aplicable, verifier completo, cleanup ejecutado; M6 event_ids distintos, M4 barrera real, legacy. ESCALADO a Juan (#132 5159834889) los 2 puntos de criterio: M5 (enmendar o fix Main-bot) + allowlist (autorizar extensión o declarar ambiguous/estado_no_recuperable fuera de alcance) — mis decisiones unilaterales fueron rechazadas con razón.
+
+Realidad: C2 es un build iterativo escala-C1, aún declarativo; 2 rondas, más por venir + 2 decisiones de Juan. C1 intacta y cerrada.
