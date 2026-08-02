@@ -560,3 +560,11 @@ CORRIDA (operador humano Alberto, Arquitecto vigilando):
 - Verificación independiente Arquitecto: 14 workflows (7 vivos + 7 clones), 7 clones active=false, 7 vivos active=false contenidos, 0 activos. Cardinalidad 7+7.
 
 **SIN STOP, SIN uncertain, SIN retry.** Plano vivo STG contenido default-deny; 7 clones aislados para C2. Evidencia sanitizada publicada #132 (5155576499). Devuelto a monitor v3 para cierre operativo C1 + prep offline de C2. HOLD: espera confirmación de cierre C1 del monitor.
+
+## (2 ago 05:25 UTC) — HOLD de cierre C1: omití el tramo de productores/prechecks (error del Arquitecto)
+
+Monitor v3 (5155631752): núcleo 7+7 verde, pero el reporte salta el tramo obligatorio del paso 4 (productores/prechecks entre pausa e instalación): OK 1b webhook-404, OK 2 Django, OK 2b Vercel/1373d1a/GATE_*, OK 3a runner 56→0, TODOS LOS PRECHECKS ACREDITADOS. Realidad: di al operador la secuencia pausa→barreras→verifier y OMITÍ comandos-ventana-productores.js. En la 1ª ventana (~01:2x) sí se hicieron los prechecks 3d/3e/3f, pero NO frescos entre pausa e instalación de esta corrida; webhook-404 y runner 56→0 no se corrieron como paso de la corrida.
+
+Aclaración de journal (verificado): los "inciertos" 7/14 son transitorios (deactivate/POST/PUT-emitido-pendiente-de-verificar), cada uno resuelto por GET a verificada/acreditado; 0 incierto SIN resolver; verde:true, errores:0 en ambos run-id. Mi "uncertain=0" era 0-sin-resolver (correcto), lo precisé.
+
+Complemento honesto publicado (5155662487): declaro la omisión sin disfrazarla + evidencia de journal + estado POSTERIOR read-only claramente etiquetado (webhook-404 7/7=404, Django false/false/true, Dashboard opción-A). Conforme a 5155631752 la desviación vuelve a @oilycoyote. Estado real fail-closed y seguro; sin PROD tocado. Lección: en un re-run hay que re-ejecutar (o acreditar explícitamente con OK de Juan) TODO el tramo de precondición, no solo las guardas inmediatas de n8n.
