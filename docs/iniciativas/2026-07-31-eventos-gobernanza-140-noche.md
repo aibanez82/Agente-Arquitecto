@@ -502,3 +502,15 @@ Reconciliación 02fd9ec vs 6 puntos: núcleo (vía a + re-freeze + contra-tests)
 ## (2 ago) — port-132 dual-prep: CERRADO (subagente verificó)
 
 Mapeo read-only: los 10 items P0/P1 del dictamen NO-GO de Juan (29 jul) están RESUELTOS en feature/issue-132-port-dual-safe (commit 1424163 + 6 pases de re-auditoría → GO técnico de Juan 30 jul 17:08, matriz 1..7 PASS). Decisión (f) respetada (gates mantenidos y reforzados). Ninguno abierto; residual declarado/aceptado en item 5 (trigger sin columna dedicada). Nada accionable; la vía viva de dual está gated detrás de C1.
+
+## (2 ago 02:24 UTC) — 🔶 Juan ENMIENDA #140: delega autorización de acciones vivas STG al monitor; C1 re-run PRE-AUTORIZADO (c.5154662330; espejo #132 02:24:44)
+
+Enmienda accountable de Juan. Puntos clave:
+- #140 pasa a issue de decisión/arquitectura/RACI; C0-C5→#132, C7→#128, C6/C8/C9→trackers nuevos. Cerrar #140 = planificación completa, NO implementación ni PROD/enforced.
+- C5 sin espera pasiva 24h: 3 matrices sintéticas independientes (run-id distintos), modo final dual en STG.
+- **Delegación al monitor**: PASS/FAIL técnico, clasificación P0/P1/P2, diferimiento P2, revisión consolidada por SHA, prep offline de la fase siguiente, verificación de condiciones de checkpoint. **NO se exige un nuevo GO humano por cada fase viva C1-C5 en STG.** La enmienda es autorización humana condicional PREVIA cuando se cumplen 7 condiciones objetivas (fase previa cerrada; SHA/tree congelados—push posterior invalida PASS; checkpoint publicado en #132 con target/comandos/stop/RTO/rollback; PASS técnico sin P0/P1; Alberto disponible + target STG acreditado; alcance sintético/allowlisted sin PROD; una sola corrida—STOP/drift/uncertain consume la autorización). Cumplidas, el monitor publica "condiciones de autorización humana satisfechas" y transfiere a Alberto; NO se requiere otra confirmación de Juan.
+- **C1 re-run específico pre-autorizado** cuando: @aibanez82 publique SHA correctivo + evidencia offline; el monitor emita PASS consolidado sobre el defecto pausa→B→A + observabilidad temprana + verifier GET-only; checkpoint/hashes regenerados y publicados; STG restaurado/acreditado + guardas inmediatas pasan. Cumplido → Alberto ejecuta sin otro GO humano. STOP/uncertain en esa corrida → nueva decisión humana.
+- C2 puede prepararse offline mientras C1 termina (no ejecutarse antes del cierre operativo de C1). Una sola revisión consolidada por SHA; SHA congelado tras PASS.
+- Límites sin cambio: no C6-C9, Meta real, secretos/rotación, PROD, enforced, fuera de checkpoint, target distinto, reintento tras STOP.
+
+**Lectura del Arquitecto:** el handoff 2412d7e ya apunta EXACTO a las 3 condiciones nombradas para el PASS del monitor (defecto pausa→B→A + observabilidad temprana + verifier GET-only). AMBIGÜEDAD a aclarar: "el monitor" que publica "condiciones satisfechas" — se lee como el monitor técnico v2 de JUAN (tiene autoridad PASS/FAIL), NO el Arquitecto; el Arquitecto NO asume poder de autorizar acciones vivas (el GO original lo limitó a observar+STOP). La evidencia del restore pasa a ser precondición nombrada del re-run.
