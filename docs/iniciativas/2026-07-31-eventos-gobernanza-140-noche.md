@@ -486,3 +486,7 @@ instalar-clones --barrera ab --vivo (run-id instalación c1-20260802T014148-21a0
 **Recuperación (pre-autorizada, RTO ≤20min):** restore de la pausa run-id c1-20260802T014026-c975 → 7/7 restore-verificado verde; reconcile → 7 ACTIVO, pausados acreditados 0/7. Verificación independiente del Arquitecto: 7 vivos active=true, contenido intacto (node counts iguales), 7 activos en instancia, 0 clones C1-AISLADO. STG restaurado a estado pre-ventana. Sin daño.
 
 **Estado gobernanza:** STOP conforme al GO. Excepción de corrida única consumida (la corrida comenzó y paró en B). Re-intento requiere fix del defecto de orden (lado ejecutor) + nuevo GO. Responsabilidad → @oilycoyote. Pendiente: reporte STOP a #132 + handoff del defecto al Agente n8n.
+
+## (2 ago) — Reporte STOP a Juan + handoff del defecto al ejecutor
+
+Reporte del STOP posteado a HYL-WAI#132 c.`5154508007` (secuencia real, causa raíz, recuperación verde, gobernanza: excepción consumida, re-intento requiere fix+nuevo GO, responsabilidad→@oilycoyote). Handoff del defecto al Agente n8n commiteado a su `main` (`Agente-n8n@c2d6dea`, vía worktree — el checkout de Alberto sigue en la rama feature intacto): `handoffs/2026-08-02-c1-defecto-orden-pausa-B-anti-toctou.md`, con causa raíz y 2 vías de fix (a: cabeza-viva content-only + re-freeze de huellas + nuevo GO; b: reordenar B→pausa→A con bendición de Juan). Offline; nada en vivo hasta nuevo GO.
