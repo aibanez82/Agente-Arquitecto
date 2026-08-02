@@ -23,7 +23,7 @@
 
 ### 3.2 Schema — **el ÚNICO bloqueante duro pre-dual**
 - **Retirar `idx_whatsapp_sessions_phone_number` (UNIQUE)**. Está en `db/schema/actual/01_whatsapp_sessions.sql:41`; **retirado** en `db/schema/objetivo/01_whatsapp_sessions.sql:48-50`. Razón (cabecera objetivo `:1-10`): el upsert de Django usa `ON CONFLICT (session_id)`; con el índice de teléfono puesto, el 2º INSERT del mismo teléfono en `dual` (sesión legacy + v2 concurrentes) **revienta**. Retiro real vía **migración Django 0053** (ref. `scripts/port132_schema_readiness.py:121`), en ventana Fase 7→8.
-- ⚠ **Nota crítica STG (contraste con nuestra verificación previa):** el schema de STG que verifiqué read-only para C2 **ya NO tenía** el índice único de teléfono → STG ya está en schema **objetivo** para `whatsapp_sessions`. Confirmar si 0053 ya corrió en STG o si el índice sigue en PROD; **es el hecho que decide si C3 tiene trabajo de schema pendiente en STG o solo readiness.**
+- ✅ **RESUELTO (contrato monitor `prep:c3-c4:202608021442`):** el schema de STG que verifiqué read-only para C2 **ya NO tenía** el índice único de teléfono, y el monitor trata la retirada como **gate "no recrear unicidad telefónica"** (gate #5), no como tarea pendiente → **la retirada ya está hecha en STG.** C3 en STG **no** tiene el bloqueante de schema duro; se reduce a: columnas v2 en `*_archive` (el WARN vivo), manifest de catálogo exacto y PG17. Queda por confirmar solo el estado en **PROD** (fuera de C3, que es STG).
 - Todo lo demás es **aditivo/idempotente** (`IF NOT EXISTS`), en `scripts/create-port132-window-schema-stg.py`: `n8n_chat_histories.wamid` (`:93-94`); `whatsapp_sessions.metepec_derived_at` (`:96`), `human_takeover_control_id`/`human_takeover_epoch` (`:108-111`), `metepec_op_lock_id`/`metepec_op_locked_at` (`:126-128`); paridad en `*_archive` (`:114-116,131-136`). Migración `0033` introdujo `conversation_id`/`lead_id`/`status` (aditivo).
 
 ### 3.3 Readiness — gates automatizados existentes
@@ -34,12 +34,15 @@
 ### 3.4 Flag de modo — contexto (no es trabajo de C3, es de C5)
 - `WHATSAPP_CONVERSATION_ID_MODE` ∈ `{legacy, shadow, dual, enforced}` (`whatsapp_conversations.py:22,27`). `dual`/`enforced` → `session_id = conversation_id`; `shadow` genera+almacena `conversation_id` pero la clave sigue siendo `phone_number` (`:326`). STG/PROD hoy = `shadow`. El salto a `dual` es C5, no C3.
 
-### Checklist C3 (nuestro, para cruzar contra el manifest del monitor)
-- [ ] Confirmar estado del índice único de teléfono en STG **y** PROD (¿0053 corrida dónde?).
-- [ ] Verificar que el fix de contrato cruzado (`m:` por formato) está en el SHA C3.
+### Checklist C3 (nuestro, alineado con el contrato monitor `c3-schema-gap/1`)
+- [x] Índice único de teléfono: **retirado en STG** (gate #5 del monitor = "no recrear"); confirmar solo PROD.
+- [ ] Producir el manifest **`c3-schema-gap/1`**: por objeto núcleo (`whatsapp_sessions*`, `n8n_chat_histories*`, `n8n_payment_events`) → `schema.table`, owner DDL, readers/writers, columnas actuales/esperadas con **tipo+nullability**, constraints/índices por definición, fingerprint de catálogo, **diferencia exacta**, sentencia DDL + hash.
+- [ ] **Extraer solo el DDL aditivo del núcleo** del histórico `create-port132-window-schema-stg.py@6f1d394` — NO correrlo entero (lleva claims/dispatch/fencing Humano-Metepec/trigger fuera de C3). Alberto (owner n8n) extrae; HYL valida/enumera, no duplica.
 - [ ] Resolver el WARN `missing_v2_archive_columns` (columnas v2 en `*_archive`).
-- [ ] Prueba aislada PG17 del DDL objetivo (aditivo/idempotente, re-ejecutable sin efecto).
+- [ ] Prueba aislada **PG17**: estado anterior → lista roja exacta; 1ª aplicación DDL → verde; 2ª → no-op verde; active/archive preservan columnas/tipos/nullability/datos (incl. writer tardío). Cerrar los **2 skips PG** de `tests/management/test_preflight_issue_132.py` (hoy 8 passed, 2 skipped).
+- [ ] Verificar que el fix de contrato cruzado (`m:` por formato) está en el SHA C3.
 - [ ] Inventario/fingerprints de los nodos de resolución (Session Context Builder `356465ea…`, Resolve Session, Session Resolution, Session Router `36ba4991…`) verdes.
+- [ ] Gate #6: `pre-dual` sintético con **cero FAIL y cero WARN del núcleo** (conciliación excluida solo porque Payment sigue inerte). Rollback C3 lógico: modo permanece `shadow`.
 
 ---
 
@@ -74,10 +77,16 @@ Un evento Payment sintético para una conversación exacta + **replay del mismo 
 - La prueba 1 (concurrencia real, cero cruce, ≤1 `active`) depende del mismo motor de concurrencia real (PG17, 2 requests sincronizadas) que el FAIL C2 exige — **C4 hereda esa pieza de C2**. No arrancar C4 hasta que C2 tenga concurrencia real acreditada.
 - El eje `dual`: requiere `WHATSAPP_CONVERSATION_ID_MODE=dual` en el plano STG del canario (CAS reversible), con retorno garantizado a `shadow`.
 
-### Checklist C4 (nuestro)
-- [ ] Fixtures: 2× `waq_*` mismo teléfono, cotizaciones distintas; 1 evento Payment + su replay.
-- [ ] Asserts prueba 1: ruteo exacto, cero cruce, ≤1 `active`, updates ≤1 fila.
-- [ ] Asserts prueba 2: 1 update / replay `duplicate` / cero Meta real.
-- [ ] CAS `shadow→dual` y drill `dual→shadow` reversible; preflight rollback verde.
-- [ ] STOP taxonomía completa + rollback por run-id + RTO.
-- [ ] Cleanup exacto del run-id sintético; sesiones/historiales preexistentes intactos.
+### Checklist C4 (nuestro, alineado con `c4-dual-shadow-canary/1`)
+- [ ] Fixtures **no-PII**: 2× `waq_*` mismo teléfono sintético, cotizaciones distintas; 1 evento Payment + su replay; un solo run-id nuevo.
+- [ ] Asserts F1: cada hilo exacto, cero cruce, ≤1 `active`, cada UPDATE ≤1 fila (barrera **real**, no serial).
+- [ ] Asserts F2: primer outcome `updated/1`, replay `duplicate/0`, ledger uno, cero Meta/Payment/conector.
+- [ ] Secuencia: precondiciones + **backup ≤15 min** + pre-dual verde en shadow → CAS **target-guarded** shadow→dual → post-dual verde → F1 → F2 → verifier contención/drift → CAS dual→shadow (**también tras PASS**) → preflight rollback → conservación `waq_*`/historiales → cleanup por run-id.
+- [ ] `dual→shadow` en `finally`, pero **ambiguo NO se reintenta**: GET/read-only del modo efectivo + reconciliación primero; STOP consumido.
+- [ ] **RTO:** retorno a shadow ≤5 min, restore n8n verificado ≤20 min. Sin espera de pared.
+- [ ] STOP: cruce, update>1, >1 `active`, output≠0, conector/claim/derivación, drift, preflight rojo, cleanup incompleto o `uncertain`.
+- [ ] Evidencia sanitizada: SHA/tree/tool hash, target, run-id, fixture IDs, timestamps, CAS before/after, outcomes/conteos, fingerprints, cleanup, RTO. **Sin teléfono completo, URLs privadas ni secretos.**
+
+---
+
+> **Dependencia dura entre fases:** C4-F1 (concurrencia real, cero cruce) hereda el motor de concurrencia PG17 que el FAIL C2 exige. **No arrancar C4 hasta C2 con concurrencia real acreditada + C3 cerrada.** El monitor mantiene este contrato congelado; nuestro entregable real (manifest `c3-schema-gap/1` + DDL núcleo + fixtures C4) va **después** de que C2 cierre formalmente.
