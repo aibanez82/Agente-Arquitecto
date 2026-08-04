@@ -1,3 +1,5 @@
+> **SUPERSEDED (4 ago 2026):** el plan C2–C9 fue sustituido por Contract-First S1–S5 (enmienda `#140 c.5174994247`). Este doc queda como registro histórico; el candidato `1161dcf` se conserva solo como insumo. Prep vigente: `docs/iniciativas/s2-prep-offline.md`.
+
 # C2 — Matriz núcleo Dual: borrador de runbook E2E (preparación offline, carril B)
 
 > Preparado por el Arquitecto (31 jul, madrugada+mañana) al amparo del carril offline que la

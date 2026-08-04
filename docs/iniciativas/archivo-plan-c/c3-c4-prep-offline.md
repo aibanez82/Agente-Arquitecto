@@ -1,3 +1,5 @@
+> **SUPERSEDED (4 ago 2026):** el plan C2–C9 fue sustituido por Contract-First S1–S5 (enmienda `#140 c.5174994247`). Este doc queda como registro histórico; el candidato `1161dcf` se conserva solo como insumo. Prep vigente: `docs/iniciativas/s2-prep-offline.md`.
+
 # C3 / C4 — prep offline (lado Arquitecto)
 
 > **Nuestra preparación de ingeniería**, no la spec canónica (esa la fija el monitor v4 + Juan en #132: C3/C4 def `5160112633`, enmienda C4 `5160209145`).
