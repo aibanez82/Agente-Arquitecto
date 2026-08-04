@@ -1,4 +1,7 @@
-# Borrador — Acuse del STOP S1 (Dashboard=AFECTADO) para `#132` · pendiente OK de Alberto
+# Acuse del STOP S1 (Dashboard=AFECTADO) — PUBLICADO en `#132 c.5184087052` (4 ago)
+
+> Decisión de Alberto (4 ago): implementador autorizado del repo Dashboard = **él mismo,
+> `@aibanez82`**. Publicado con su OK; este archivo conserva el texto exacto.
 
 > Contexto: `#132 c.5183932664` (4 ago 19:56Z) — Django PASS offline, Dashboard=AFECTADO,
 > STOP de `S1-DUAL-STG v1.0.0` por §6.4; Juan debe decidir alcance de v1.1 y **quién queda
@@ -21,10 +24,11 @@ Recibido el dictamen `c.5183932664`. Tres cosas de nuestro lado:
 Coincidimos: con identidad v2 son incompatibilidades deterministas y `Dashboard=N/A` no era
 sostenible. El STOP es el resultado correcto del gate.
 
-**2. Dueño Dashboard — propuesta para tu decisión:** el contrato S2 aprobado ya asigna ese
-dominio a "Alberto / `@aibanez82` y su agente Dashboard — `Dashboard_seguroautoqualitas`"
-(§5.2). Proponemos la misma designación para S1 v1.1: implementador = el agente Dashboard de
-Alberto, bajo handoff contractual, igual que operó Agente-n8n en v1.0.0. Ese repo tiene además
+**2. Dueño Dashboard — decisión de Alberto:** queda designado **Alberto / `@aibanez82` en
+persona** como implementador autorizado del repo `Dashboard_seguroautoqualitas` para S1 v1.1,
+bajo handoff contractual y con las mismas reglas con las que operó Agente-n8n en v1.0.0
+(SHA/tree declarados, suite de conformidad, CI, sin redefinir el contrato). Es consistente con
+la asignación de dominio que el contrato S2 aprobado ya hace en su §5.2. Ese repo tiene además
 base acreditada reciente para identidad/fencing (evolución de `dashboard_conversation_claims`
 con `control_id`/`epoch`/índices únicos por sesión, 28 jul, en la rama de STG) que puede servir
 de insumo a la redacción de v1.1.
