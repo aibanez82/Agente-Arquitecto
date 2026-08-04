@@ -46,6 +46,16 @@ monitor `oilycoyote` vigilando nuestros repos por API). El 4 ago el plan C fue s
 Contract-First S1–S5 (`#140 c.5174994247`); la convención sigue igual con la gobernanza vigente:
 stand-down por etapa hasta contrato congelado + handoff.
 
+## Respaldos/housekeeping en rama propia (4 ago)
+
+Nació del incidente "port-132": el ejecutor n8n, con autorización de Alberto de "commit y push
+de todo" (respaldo de exports STG que solo existían en local), commiteó sobre la rama en la que
+estaba parado su clon — `feature/c2-matriz-nucleo-dual`, declarada inmóvil por la enmienda
+Contract-First. Sin daño (commits aditivos, insumo `1161dcf` íntegro, candidatas r2 inmóviles),
+pero obligó a clasificación preventiva en `#132 c.5185668015`. Regla instaurada por handoff en
+ambos ejecutores (`Agente-n8n@5058907`, `Dashboard@0665df7`): destino de commit explícito,
+rama propia para respaldos, y "autorización de contenido no es autorización de destino".
+
 ## Recortes de estado trasladados desde CLAUDE.md (4 ago, verbatim)
 
 Estos párrafos de estado vivían en CLAUDE.md; su hogar es el doc de cada iniciativa y el tablero.

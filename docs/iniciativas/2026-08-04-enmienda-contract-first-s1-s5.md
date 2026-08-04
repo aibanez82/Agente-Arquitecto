@@ -19,7 +19,7 @@
 
 ## Nota de registro (4 ago 23:11Z) — movimiento de `feature/c2-matriz-nucleo-dual`
 
-El ejecutor n8n empujó `ca015e0`+`6a0f93f` ("port-132: versionar exports STG del build") sobre esa rama, bajo autorización de Alberto registrada en el propio commit ("commit y push de todo, 2026-08-04"). Contradice literalmente el punto 2 ("la rama no se mueve"), pero: los commits son solo aditivos (`scripts/port-132/build/` + `.gitignore`), no tocan los artefactos de la matriz C2; el insumo `1161dcf` sigue íntegro como SHA; y la rama candidata r2 `feature/s1-dual-stg@fb98f24` permanece inmóvil. Riesgo técnico: nulo. Riesgo narrativo: el monitor de Juan puede observar movimiento durante la revisión r2 — clasificación preventiva en #132 pendiente de OK de Alberto. NO resetear la rama (un force-push sería más ruidoso que el movimiento mismo).
+El ejecutor n8n empujó `ca015e0`+`6a0f93f` ("port-132: versionar exports STG del build") sobre esa rama, bajo autorización de Alberto registrada en el propio commit ("commit y push de todo, 2026-08-04"). Contradice literalmente el punto 2 ("la rama no se mueve"), pero: los commits son solo aditivos (`scripts/port-132/build/` + `.gitignore`), no tocan los artefactos de la matriz C2; el insumo `1161dcf` sigue íntegro como SHA; y la rama candidata r2 `feature/s1-dual-stg@fb98f24` permanece inmóvil. Riesgo técnico: nulo. Riesgo narrativo: mitigado — clasificación preventiva publicada en `#132 c.5185668015` (OK de Alberto). NO resetear la rama (un force-push sería más ruidoso que el movimiento mismo). Convención preventiva instaurada por handoff en ambos ejecutores (`Agente-n8n@5058907`, `Dashboard@0665df7`): respaldos/housekeeping siempre en rama propia.
 
 ## Contexto temporal (para el registro, sin inferir causalidad)
 
