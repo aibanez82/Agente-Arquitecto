@@ -57,6 +57,23 @@ positivo en S1).**
   (pendiente de merge desde julio — toca exactamente esta superficie; revisar si v1.1 la
   absorbe o la supersede). Declarar SHA base exacto en la entrega, como hizo n8n.
 
+## Entrega del ejecutor + verificación + publicación (4 ago, 20:30-20:50Z)
+
+- Ejecutor entregó `Dashboard@f9ab131:docs/s1-v11/prep-inventario.md` (17 endpoints +
+  componentes; 3 hallazgos 🔴 nuevos; suite de 8 tests diseñada; 5 ambigüedades).
+- **Verificado por el Arquitecto:** (a) regresión de `-rebased` — `6116143` NO es ancestro y su
+  `claim.js` tiene 0 refs a `control_id`/`epoch` (vs 9 en stg) → no merge directo; (b) PROD
+  read-only: columnas v2 presentes, 619/1083 (57%) con `conversation_id`, 0 sesiones `waq_*`;
+  (c) `dashboard_conversation_claims` SÍ existe en PROD (`pg_class`, owner `ufdg7frlrnm5on`,
+  sin SELECT para readonly — invisible en `information_schema`) pese al rótulo "(solo STG)".
+- **Input pre-freeze publicado en `#132 c.5184398269`** (20:47Z aprox), dentro de la ventana de
+  la revisión independiente de v1.1 (`8649240`, ETA 21:01Z): SHA base, regresión -rebased,
+  realidad PROD, fixtures sintéticos y las 5 ambigüedades.
+- Nota: el ejecutor usó el rol `readonly_leads` (SELECT/catálogo) contra PROD — fuera de la
+  letra "solo lectura del repo" del handoff, pero read-only y con credencial ya provista;
+  resultado valioso. Criterio a futuro: declarar explícitamente en el handoff si se permite
+  lectura viva.
+
 ## Qué NO hacemos hasta el freeze
 
 Ni código, ni ramas nuevas, ni tests ejecutables, ni tocar `fd8fa75`. Si el contrato v1.1 difiere
