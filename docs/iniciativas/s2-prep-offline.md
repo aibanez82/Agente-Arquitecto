@@ -43,14 +43,29 @@ Estado actual (a confirmar con el inventario delegado al Agente-n8n, handoff
    (§3.3) — probablemente un nodo/subworkflow nuevo que empaqueta "bloque persistido y validado"
    con `fact_id` UUID estable y referencia sanitizada, contra el conducto físico que Django
    defina en su handoff.
-2. **S2-F2 ya tiene un caso real:** la IA emite `[phase:completed]` y se persiste sin pago
-   verificado (`HYL-WAI#69` / Bug #7). El contrato convierte ese bug en fixture negativo
-   obligatorio — el fix de #69 y la conformidad S2-F2 son el mismo trabajo. Sinergia directa.
-3. **Gate de control (S2-F6):** hoy el Main no consulta ninguna fuente de control antes de que la
-   IA responda (de ahí `qualitas-issues#57`, bot responde con humano al mando). S2 exige tener el
-   gate implementado y fail-closed ante indisponibilidad; su ACTIVACIÓN es de S3/S4. Hay que
-   mapear el punto exacto de inserción en el grafo (post-`Resolve Session`, pre-agente) sin
-   tocarlo aún.
+2. **S2-F2 NO es el fix del #69** (corrección al análisis inicial, aportada por el inventario del
+   ejecutor y **verificada por el Arquitecto contra los JSON el 4 ago**): en el export STG
+   (`origin/stg:workflows/…Bot_stg.json`) el `[phase:completed]` de la IA ya está bloqueado con 3
+   barreras (prompt del `AI Agent` + `VALID_PHASES` sin `completed` en ambos Phase Extractor +
+   exclusión SQL en `Update Phase in DB`); la única escritura de `completed` es Payment
+   Confirmation con `headerAuth`. **PERO en el export PROD (re-export 26 jul, `7b93365`)
+   `VALID_PHASES` AÚN INCLUYE `completed` y no existe la barrera SQL** → #69 sigue abierto con
+   razón: falta promover el fix a PROD (acción viva, requiere autorización/clasificación). S2-F2
+   exige además algo distinto: que `PAGO_CONFIRMADO` no sea *expresable* por el adaptador de
+   hechos (allowlist cerrada de `fact_type`, sin `target_state`), estilo gramática `qc:` de S1.
+3. **Gate de control (S2-F6) — DOS puntos, no uno:** el inventario del ejecutor demostró que
+   colocarlo solo ante el agente deja dos bypasses con efecto externo real: (A) `Phase Guard`
+   →`Completed Session Response`→`Send message` (sesión completed recibe respuesta fija con
+   humano al mando) y (B) toda la rama de entrega de PDF por quick-reply, aguas arriba de
+   `Merge Session Data`. Propuesta G1 (ante `quoteDocumentAction?`) + G2 (`Fallback Flag`→
+   `Merge Session Data`), ambas aristas `main` puras — cadena LangChain (`ai_*`) intacta. Cubre
+   también `qualitas-issues#57`.
+3b. **El único conducto n8n→Django de escritura va SIN credencial** (verificado por el Arquitecto
+   en `Issue Policy Guard_stg.json`: `Call Issue Policy Real` a `POST /api/emitir-externo/` sin
+   `authentication`/`credentials`, mientras los dos GET sí usan `httpHeaderAuth`; la emisión E2E
+   del 28 jul funcionó así). Choca de frente con §3.3 ("Django infiere el productor de la
+   autenticación") y §5.4.6. Implicación de seguridad lado Django pendiente de decisión de
+   Alberto (borrador en `s2-borradores-para-decision.md`).
 4. **Vocabulario conservado:** `greeting…completed` no se renombra; cero migración de fases.
 5. La suite de conformidad S2 puede ser espejo estructural de `scripts/s1/` (sandbox offline,
    134/134 como precedente) con F1/F2/F6.
@@ -104,6 +119,29 @@ actual ya acredita `control_id + epoch`" (§4.3.4). Gaps:
    propiedad exigida se cumple con la primera; pedimos confirmación de que es aceptable como
    "garantía equivalente" también para METEPEC.
 
+**+5 del ejecutor Agente-n8n** (inventario `Agente-n8n@b104b1f:docs/s2/prep-inventario-hechos.md`,
+sin solaparse con las anteriores):
+
+6. **A1 (§4.2/§4.1):** ¿"persistido y validado" exige validación en n8n ANTES de persistir, o
+   basta la fila y Django revalida? Hoy los 4 writers (`Save Group1/2/3 Progress`,
+   `Save Policy Data`) toman valores de `$fromAI(...) || 'N/A'` sin validación — una fila con
+   `nombre='N/A'` es indistinguible de una real.
+7. **A2 (§3.3 vs §1.3) — tensión interna del contrato:** el `fact_id` estable entre retries exige
+   persistirlo (= un outbox mínimo, excluido por §1.3) o derivarlo del contenido (y un cambio de
+   contenido rompe `duplicate=true`). Tal como está redactado, no hay opción limpia.
+8. **A3 (§4.3/§4.4):** ¿"antes de IA/efectos" incluye los efectos deterministas que NO pasan por
+   el agente (PDF quick-reply, respuesta fija de sesión completed)? Decide si el gate va en uno o
+   en dos puntos (ver §3.3).
+9. **A4 (§4.1/§7.2):** ¿qué bloque nuestro es el "primer bloque de emisión" de S2-F1
+   (`grupo1/2/3`, `policy_data`)? Sin ese mapeo el fixture no es comprobable desde n8n.
+10. **A5 (§4.3.1/§5.3) — LA MATERIAL:** el contrato asume que los mirrors (`human_takeover`,
+    `metepec_derived`) son derivados del canónico del Dashboard; en la realidad la dirección está
+    invertida — los escriben los workflows `Atención Humana`/`Metepec` de n8n y el Dashboard no
+    se entera. En cuanto Alberto use la atención humana actual, la contradicción mirror↔canónico
+    es el estado NORMAL, y el fail-closed literal deja al bot mudo permanente. Exige decisión
+    pre-freeze: (a) n8n deja de escribir mirrors (rompe el flujo operativo vivo) o (b) el
+    canónico se deriva de ellos (invierte el contrato).
+
 ## 6. Diseño borrador — suite de conformidad n8n S2 (sin código todavía)
 
 Espejo de `scripts/s1/` (sandbox, sin red, sin BD viva): `scripts/s2/test/*.test.js` con
@@ -115,8 +153,14 @@ degrada a mirrors ni a teléfono. Los comandos exactos se registran en el handof
 
 ## 7. Estado y siguiente paso
 
-- ✅ Contrato verificado por hash; brechas mapeadas; ambigüedades redactadas.
-- ⏳ Inventario detallado del lado n8n: delegado por handoff docs-only al Agente-n8n (ver arriba);
-  reporta con informe en su `main`.
-- ⏳ El freeze S2 + handoffs los emite Juan al cerrar S1; entonces se contrastan estas brechas con
-  el fingerprint congelado y se convierten en implementación.
+- ✅ Contrato verificado por hash; brechas mapeadas; **10 ambigüedades** consolidadas (5 Arquitecto
+  + 5 ejecutor, verificadas las afirmaciones de base contra los JSON).
+- ✅ Inventario n8n entregado (`Agente-n8n@b104b1f`): diseño de suite S2 completo (6 tests F1 +
+  5 F2 + 7 F6, espejo de `scripts/s1/`), mapa de gate en dos puntos, conducto de escritura sin
+  auth. Dependencia declarada: la resolución canónica de control no existe aún en ningún repo —
+  la conformidad F6 se hará contra stub hasta que el dominio Dashboard la sirva.
+- ⏳ **Decisiones de Alberto pendientes** (borradores en
+  `docs/iniciativas/s2-borradores-para-decision.md`): publicar las 10 ambigüedades en `#135`
+  (ahora, para des-riesgar el freeze) o esperar al handoff; y qué hacer con el hallazgo de
+  `emitir-externo` sin credencial.
+- ⏳ El freeze S2 + handoffs los emite Juan al cerrar S1.
