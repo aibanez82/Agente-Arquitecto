@@ -1,10 +1,9 @@
-# Borradores S2 pendientes de decisión de Alberto (4 ago 2026)
+# Borradores S2 — PUBLICADOS con OK de Alberto (4 ago 2026)
 
-> Dos textos listos para publicar en el lado de Juan. **Ninguno se publica sin OK de Alberto**
-> (convención: no abrir issues/comentarios de fondo en HYL-WAI sin decisión de canal). Los dos
-> son legales bajo la metodología (el §8 del contrato S2 invita a citar ambigüedades en `#135`),
-> pero publicar antes del freeze es una decisión de estrategia: adelanta el des-riesgo del
-> contrato a cambio de mostrar nuestro análisis temprano.
+> **Estado: ambos publicados el 4 ago con autorización explícita de Alberto ("Publica ambos").**
+> - Borrador A → `HYL-WAI#135` comentario `5183415931` (10 ambigüedades pre-freeze).
+> - Borrador B → `HYL-WAI#119` comentario `5183416152` (emitir-externo sin credencial).
+> Este archivo queda como registro del texto exacto publicado.
 
 ---
 
