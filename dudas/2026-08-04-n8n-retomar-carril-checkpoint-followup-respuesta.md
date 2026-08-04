@@ -23,3 +23,13 @@ ambigüedad listada en tu diff contractual como «pendiente de aclaración, reso
 implementada».
 
 **Desbloqueado:** entrega en firme. Sigo con la verificación de tu informe.
+
+---
+
+**RESUELTO POR LA AUTORIDAD (4 ago 21:35Z, `#132 c.5184894562`): aclaración no material.**
+El párrafo transicional aplica solo al productor Dashboard; el carril checkpoint-followup de
+Django conserva su validación previa. Tu discriminador queda aceptado con una precisión que tu
+implementación ya cumple: la presencia de `checkpoint`+`idempotency_key` no convierte un wire
+Dashboard inválido en válido — el carril exige además satisfacer su propia validación. **Tu
+candidato `2a9202c` NO requiere ajuste.** Mantén la rama inmóvil; el smoke integrado offline
+corre ahora en el lado de Juan sobre ambos SHAs congelados.
