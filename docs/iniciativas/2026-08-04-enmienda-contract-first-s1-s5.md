@@ -17,6 +17,10 @@
 4. **Docs de este repo parcialmente superseded** por la enmienda: `c3-c4-prep-offline.md` (la parte C4/canario; el inventario de schema sigue siendo insumo válido para el contrato S1), `c2-checkpoint-ventana-DRAFT.md` (la ventana de matriz ya no existe; la precondición de esquema verificada sigue siendo insumo). No se borran: se conservan como insumos ofrecidos en el acuse.
 5. **Qué esperar a continuación:** comentario de freeze del contrato S1/C2 en #132 + handoff con nuestro trabajo exacto (probable: DDL/bootstrap de tablas propiedad n8n, acreditaciones del lado n8n, artefactos de `1161dcf` que el contrato reutilice).
 
+## Nota de registro (4 ago 23:11Z) — movimiento de `feature/c2-matriz-nucleo-dual`
+
+El ejecutor n8n empujó `ca015e0`+`6a0f93f` ("port-132: versionar exports STG del build") sobre esa rama, bajo autorización de Alberto registrada en el propio commit ("commit y push de todo, 2026-08-04"). Contradice literalmente el punto 2 ("la rama no se mueve"), pero: los commits son solo aditivos (`scripts/port-132/build/` + `.gitignore`), no tocan los artefactos de la matriz C2; el insumo `1161dcf` sigue íntegro como SHA; y la rama candidata r2 `feature/s1-dual-stg@fb98f24` permanece inmóvil. Riesgo técnico: nulo. Riesgo narrativo: el monitor de Juan puede observar movimiento durante la revisión r2 — clasificación preventiva en #132 pendiente de OK de Alberto. NO resetear la rama (un force-push sería más ruidoso que el movimiento mismo).
+
 ## Contexto temporal (para el registro, sin inferir causalidad)
 
 La enmienda llegó horas después de que este repo publicara las auditorías forenses SRC-ALBERTO-C1-002 (`docs/auditorias/C1-auditoria-primaria.md`) y SRC-ALBERTO-C1-003 (`docs/auditorias/C1-genesis-economia.md`) y de que el ejecutor publicara su testimonio (`Agente-n8n@ea30bad`). La entrega C2 `1161dcf` (23:02Z) y el ping (01:20Z aprox.) quedaron sin acuse bajo la matriz anterior; la enmienda los resuelve por sustitución.
