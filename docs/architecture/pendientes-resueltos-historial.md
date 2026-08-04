@@ -54,3 +54,12 @@ en Vercel (production+preview, rol de almacén — el Dashboard no la consume en
 en historial. El secret de GitHub Actions ya no existe (backup automático descontinuado ese
 mismo día). Pendiente residual por laptop: los `.env.local` de las otras máquinas se actualizan
 copiando de Vercel cuando toque.
+
+## Monitor horario de actividad de Juan (rutina cloud) — RESUELTO POR DISEÑO (4 ago 2026)
+Rutina `trig_013gQWu8gqfDh5c8QQWzTAbM` **apagada** por decisión de Alberto tras análisis: era
+redundante con el barrido de arranque de sesión del Arquitecto (GitHub es el registro durable;
+la rutina solo copiaba a un buzón que nadie leía antes de abrir sesión, y no podía leer HYL-WAI
+—privado— con un PAT fine-grained scopeado a qualitas-issues; hacerla funcional exigía un token
+clásico `repo` de amplio alcance). Valor residual descartado: notificación móvil (Alberto no la
+usa) y captura forense de comentarios editados in situ. Issues de control #70/#71 cerrados.
+Si algún día se quiere el "avísame al móvil": rearmarla con token clásico sabiendo el trade-off.

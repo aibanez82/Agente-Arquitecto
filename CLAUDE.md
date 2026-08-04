@@ -197,7 +197,6 @@ Roles y protocolos completos: tabla "Mapa de sistemas". Reglas operativas:
 | Plantilla Meta re-enganche fuera de ventana 24h | ⚠️ Bloqueante de "Recordatorios"; pedida a Juan, no sometida |
 | `fecha_inicio` en emisión (`HYL-WAI#114`) | ✅ Django PROD + E2E STG ok. Falta `qualitas-issues#66` y promoción n8n a PROD (desbloquea M47/M48) |
 | `/api/emitir-externo/` — 400 sin causa + acepta POST sin credencial | ⏳ `HYL-WAI#119` — Juan (hallazgo auth: `c.5183416152`) |
-| Monitor horario de actividad de Juan (rutina cloud) | ⚠️ CIEGO — falta que Alberto añada PAT como `GH_TOKEN` en el environment Default de claude.ai/code |
 
 Ítems resueltos: `docs/architecture/pendientes-resueltos-historial.md`.
 
