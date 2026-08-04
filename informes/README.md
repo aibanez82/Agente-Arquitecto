@@ -1,6 +1,12 @@
-# Informes de ejecutores → Arquitecto
+# Canales de coordinación ejecutor ↔ Arquitecto — tabla canónica de ruteo
 
-Canal para informes que NO deben ir al `main` del repo del ejecutor (caso: repo Dashboard bajo
-auditoría de Juan — nota del dictamen `#132 c.5185027837`). El ejecutor commitea aquí su informe
-(`AAAA-MM-DD-<agente>-<tema>-informe.md`) y pushea a `main` de este repo. La detección del
-trabajo terminado sigue siendo el push de su rama candidata (monitor del Arquitecto).
+| Flujo | Canal | Detección |
+|---|---|---|
+| Handoff (Arquitecto → ejecutor) | `<repo-del-ejecutor>:handoffs/` en `main` | monitor del ejecutor sobre `handoffs/` |
+| Informe del **Agente-n8n** | su propio `main` (`handoffs/<handoff>-informe.md`) | monitor del Arquitecto sobre su `main` |
+| Informe del **Agente Dashboard** | `Agente-Arquitecto:informes/` (su `main` está bajo auditoría de Juan — dictamen `#132 c.5185027837`) | push de su rama candidata (monitor del Arquitecto) |
+| Duda de cualquier ejecutor | `Agente-Arquitecto:dudas/` (respuesta en `<mismo>-respuesta.md`) | monitor del Arquitecto sobre `dudas/` |
+
+Reglas: la instrucción explícita del handoff vigente manda sobre esta tabla si difieren (y
+entonces esta tabla se actualiza); los ejecutores nunca se coordinan entre sí; nada en trackers
+de Juan; sin PII/secretos. Nombres de fichero: `AAAA-MM-DD-<agente>-<tema>[-informe|-respuesta].md`.
