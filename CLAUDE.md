@@ -1,7 +1,7 @@
 # CLAUDE.md — Ecosistema IA Quálitas/Insurmind
 
 > Fuente de verdad del Arquitecto-IA-Qualitas.
-> Actualizado: 28 julio 2026 (revisión de eficiencia — contradicciones corregidas, duplicados fusionados).
+> Actualizado: 4 agosto 2026 (optimización de tamaño: estado → docs/tablero; historias → `docs/architecture/convenciones-origen.md`).
 
 ---
 
@@ -30,10 +30,7 @@ Google Ads → Landing (Wagtail/Django · Heroku)
 → cliente da datos → póliza emitida → pago confirmado
 ```
 
-**Tres canales de cierre:**
-- Full web (Landing → pago online)
-- Full WhatsApp (n8n → datos → póliza → pago)
-- Mixto (web → WhatsApp → web)
+**Tres canales de cierre:** full web (Landing → pago online) · full WhatsApp (n8n → datos → póliza → pago) · mixto (web → WhatsApp → web).
 
 **Colaborador clave:** Juan Aguayo (`juan.aguayo@aguayo.co`), co-fundador de aguayo-co, propietario del repo Django `aguayo-co/HYL-WAI`.
 
@@ -64,19 +61,15 @@ Observabilidad:
 ├── GA4 → visitas landing
 ├── Meta Business API → métricas WhatsApp (enviados/leídos/respondidos)
 ├── Dashboard → funnel completo
-└── n8n PROD "Monitor Qualitas SIO PROD" (18 jul) → chequeo cada 10 min contra el SOAP real de
+└── n8n PROD "Monitor Qualitas SIO PROD" → chequeo cada 10 min contra el SOAP real de
     Quálitas, alerta por Telegram si cae (repetida mientras siga caído) y al recuperarse
 ```
 
 **Reglas críticas de arquitectura:**
-- Django y n8n comparten la misma BD Postgres.
-- Django **NO** dispara webhook a n8n al crear el lead: genera el PDF de cotización, manda el primer WhatsApp **directo vía Meta Graph API** (sin n8n) y hace `INSERT INTO whatsapp_sessions` por SQL crudo (cronología: `docs/bugs/bug-02-prefijo-57.md`).
+- Django y n8n comparten la misma BD Postgres. Wagtail no es otro sistema: es una app Django más del mismo proceso Heroku y mismo repo; Django lleva la lógica de negocio.
+- Django **NO** dispara webhook a n8n al crear el lead: genera el PDF, manda el primer WhatsApp **directo vía Meta Graph API** y hace `INSERT INTO whatsapp_sessions` por SQL crudo (cronología: `docs/bugs/bug-02-prefijo-57.md`).
 - El **único webhook real** Django→n8n es **al confirmar el pago**: n8n pone `conversation_phase = 'completed'` y envía WA al cliente (`enviar_webhook_whatsapp` en `qualitas/views.py` → workflow "Payment Confirmation").
 - El Dashboard solo escribe indirectamente vía el webhook proactivo de n8n. Los bugs en `whatsapp_sessions` y `n8n_chat_histories` son responsabilidad de n8n — Django no controla esas tablas (salvo el INSERT inicial de `whatsapp_sessions`).
-
----
-
-**Wagtail + Django:** no son dos sistemas — Wagtail (CMS de la landing) es una app Django más dentro del mismo proceso en Heroku, misma BD Postgres (tablas Wagtail + `qualitas_*`), mismo repo `aguayo-co/HYL-WAI`. Django lleva la lógica de negocio (leads, cotizaciones, pólizas, webhook de pago).
 
 ---
 
@@ -88,18 +81,14 @@ Observabilidad:
 | WhatsApp bot | n8n (Hostinger) | n8n workflows | 3 nodos Claude (ver estructura abajo) |
 | Base de datos | Heroku Postgres (addon) | PostgreSQL | Compartida entre Django y n8n |
 | Dashboard | `aibanez82/Dashboard_seguroautoqualitas` | Next.js 14, Vercel | UI de leads en tiempo real. Ejecutor Nivel 3 de código dashboard |
-| Agente QA | `aibanez82/Agente_QATest_Qualitas` | Claude Code | Tests E2E; desde 8 jul lidera pruebas E2E en STG sin pasar por la landing y valida cambios de `systemMessage` |
-| Agente Mejoras Conv. | `aibanez82/Agente-MejorasConversacion` | Claude Code | Analiza abandono (Postgres) y tono/trato (capturas WA), propone copy — nunca modifica nada él mismo. Protocolo: `docs/protocolos/agente-mejoras-conversacion.md` |
-| Agente n8n | `aibanez82/Agente-n8n` | Claude Code | Entiende workflows n8n, propone mejoras, modifica los JSON y sube a git — Alberto importa manualmente en n8n. Protocolo: `docs/protocolos/agente-n8n.md` |
-| Agente Conciliación | `aibanez82/Agente-Conciliacion` | Playwright + Postgres, cron GH Actions | ✅ Operativo (26 jul): scraping real del portal Q 360, cron diario. Verifica estatus de pago real por póliza — escribe solo en su tabla `conciliacion_pagos`, nunca en `qualitas_polizaemitida`. Protocolo: `docs/protocolos/agente-conciliacion.md` |
+| Agente QA | `aibanez82/Agente_QATest_Qualitas` | Claude Code | Tests E2E en STG sin pasar por la landing; valida cambios de `systemMessage` |
+| Agente Mejoras Conv. | `aibanez82/Agente-MejorasConversacion` | Claude Code | Analiza abandono (Postgres) y tono/trato (capturas WA), propone copy — nunca modifica nada. Protocolo: `docs/protocolos/agente-mejoras-conversacion.md` |
+| Agente n8n | `aibanez82/Agente-n8n` | Claude Code | Modifica los JSON de workflows y sube a git — Alberto importa manualmente en n8n. Protocolo: `docs/protocolos/agente-n8n.md` |
+| Agente Conciliación | `aibanez82/Agente-Conciliacion` | Playwright + Postgres, cron GH Actions | ✅ Operativo: scraping del portal Q 360, cron diario. Verifica pago real por póliza — escribe solo en `conciliacion_pagos`, nunca en `qualitas_polizaemitida`. Protocolo: `docs/protocolos/agente-conciliacion.md` |
 | Agente Conversión | — | ⏳ Futuro | Reintentos + seguimiento |
 | Arquitecto | `aibanez82/Agente-Arquitecto` | Este repo | Documentación transversal, workflows n8n, spec SOAP Quálitas |
 
-**Accesos de Alberto:**
-- Heroku: member en `hyl-wai-production`
-- GitHub: colaborador externo en `aguayo-co/HYL-WAI` (`gh auth` con scope `repo` basta)
-- WhatsApp Business: acceso directo
-- n8n: API key en Vercel como `N8N_API_KEY`
+**Accesos de Alberto:** Heroku member en `hyl-wai-production` · GitHub colaborador externo en `aguayo-co/HYL-WAI` (`gh auth` con scope `repo` basta) · WhatsApp Business directo · n8n API key en Vercel como `N8N_API_KEY`.
 
 ---
 
@@ -112,7 +101,6 @@ Observabilidad:
 | `qualitas_polizaemitida` | Django | Número de póliza, `estatus_pago`, precio |
 | `whatsapp_sessions` | n8n (directo a Postgres) | `conversation_phase`, `last_activity`, `captured_data` — **tiene bug activo** |
 | `n8n_chat_histories` | n8n (Postgres Chat Memory) | Historial mensajes WA — **fuente fiable de hitos** |
-| ~~`NumeroPruebaWhatsapp`~~ | — | No existe en producción y ya no importa: `normalize_whatsapp_phone` cae siempre a `52`. Bug #2 cerrado (`docs/bugs/bug-02-prefijo-57.md`) |
 
 **JOIN correcto entre tablas:**
 - `qualitas_cotizacion` → `qualitas_lead` con `l.cotizacion_id = c.id` (NO `c.lead_id`)
@@ -132,20 +120,13 @@ Observabilidad:
 | Confirmación de pago | `docs/n8n-workflows/WhatsApp Insurance Quotation Bot - Payment Confirmation.json` |
 | Mensajes proactivos (Retomar conversación) | `docs/n8n-workflows/Retomar Conversacion.json` |
 
-> Exportar y hacer commit aquí cada vez que se modifique un workflow en producción — es la única red de seguridad y la política permanente (el backup automático se descontinuó por decisión de Alberto el 29 jul; detalle: `docs/architecture/backup-policy-n8n.md`).
+> Exportar y hacer commit aquí cada vez que se modifique un workflow en producción — única red de seguridad; el backup automático está descontinuado (política: `docs/architecture/backup-policy-n8n.md`).
 
-El bot tiene 3 nodos que llaman a Claude:
-1. **Jailbreak detection** — Claude Haiku
-2. **Intent Router classifier** — Claude Haiku
-3. **Agente conversacional principal** — Claude Sonnet
+El bot tiene 3 nodos que llaman a Claude: **Jailbreak detection** (Haiku) · **Intent Router** (Haiku) · **Agente conversacional principal** (Sonnet).
 
-n8n escribe a Postgres directamente (credencial `"Postgres account"` en el workflow):
-- `Check Session Exists` → SELECT en `whatsapp_sessions`
-- `Load Session` → SELECT completo de la sesión
-- `Update Activity` → UPDATE `whatsapp_sessions.last_activity`
-- `Postgres Chat Memory` → lee/escribe `n8n_chat_histories`
+n8n escribe a Postgres directamente (credencial `"Postgres account"`): `Check Session Exists`/`Load Session` (SELECT `whatsapp_sessions`) · `Update Activity` (UPDATE `last_activity`) · `Postgres Chat Memory` (lee/escribe `n8n_chat_histories`).
 
-**Workflow proactivo (Dashboard → WhatsApp):** segundo workflow que recibe `POST /webhook/proactive-wa-message` del Dashboard, hace INSERT en `n8n_chat_histories` y envía el WhatsApp. Detalle completo (payload, reglas): `docs/protocolos/workflow-proactivo-dashboard.md`.
+**Workflow proactivo (Dashboard → WhatsApp):** recibe `POST /webhook/proactive-wa-message` del Dashboard, INSERT en `n8n_chat_histories` y envía el WhatsApp. Detalle: `docs/protocolos/workflow-proactivo-dashboard.md`.
 
 ---
 
@@ -168,42 +149,37 @@ n8n escribe a Postgres directamente (credencial `"Postgres account"` en el workf
 
 ## Bugs — fuente única
 
-**El estado vigente de todos los bugs vive en `github.com/aibanez82/qualitas-issues` (privado) — NO en este archivo.** Cualquier agente (y Juan) puede abrir/comentar issues; solo el Arquitecto cierra/certifica. Convenciones en el `README.md` de ese repo. Van ahí los defectos técnicos (código, esquema, queries, regex, integraciones); las recomendaciones de copy/tono NO — esas siguen la tubería del Agente Mejoras Conversación (abajo).
+**El estado vigente de todos los bugs vive en `github.com/aibanez82/qualitas-issues` (privado) — NO en este archivo.** Cualquier agente (y Juan) puede abrir/comentar; solo el Arquitecto cierra/certifica. Convenciones en el README de ese repo. Van ahí los defectos técnicos; las recomendaciones de copy/tono siguen la tubería del Agente Mejoras Conversación (abajo).
 
-**Regla de ruteo entre trackers (29 jul):** el fix decide el repo — fix en nuestros sistemas y sin acción de Juan → `qualitas-issues`; fix en Django de Juan, decisión suya o coordinación entre lados → issues de `aguayo-co/HYL-WAI` (Alberto SÍ puede abrir issues ahí; lo que no puede es pushear código). Transversales: UN issue canónico, el otro lado solo comentario-puntero — nunca dos issues con estado.
+**Ruteo entre trackers: el fix decide el repo** — fix en nuestros sistemas sin acción de Juan → `qualitas-issues`; fix en Django, decisión de Juan o coordinación → issues de `aguayo-co/HYL-WAI` (Alberto puede abrir issues ahí; no pushear código). Transversales: UN issue canónico, el otro lado solo comentario-puntero.
 
-Los `docs/bugs/bug-NN-*.md` (aquí y en los repos de agentes) siguen siendo el cuaderno de investigación largo — cronología, SQL, decisiones — enlazado desde cada issue.
+Los `docs/bugs/bug-NN-*.md` son el cuaderno de investigación largo, enlazado desde cada issue.
 
-**`qualitas-issues` también es inbox de captura rápida (20 jul):** ideas/bugs dictados fuera de casa, prefijo `QUALITAS:`. Al iniciar sesión (o "revisa QUALITAS"): `gh issue list --repo aibanez82/qualitas-issues --state open` **+ barrido de issues que Juan nos abre en HYL-WAI** (`--assignee aibanez82` y menciones), triangular, cerrar con comentario de destino — nunca ejecutar trabajo de otro repo. Detalle: `docs/protocolos/qualitas-issues-inbox.md`.
+**`qualitas-issues` es también inbox de captura rápida** (prefijo `QUALITAS:`). Al iniciar sesión (o "revisa QUALITAS"): `gh issue list --repo aibanez82/qualitas-issues --state open` + barrido de issues que Juan nos abre en HYL-WAI (`--assignee aibanez82` y menciones), triangular, cerrar con comentario de destino — nunca ejecutar trabajo de otro repo. Detalle: `docs/protocolos/qualitas-issues-inbox.md`.
 
-**Workaround activo para Bug #7 en Dashboard** (documentado en detalle en `docs/bugs/bug-07-estatus-pago.md` y en el issue correspondiente):
-```js
-// Condición correcta para detectar póliza pagada
-d.estatus_pago === 'PAGADO' ||
-(d.conversation_phase === 'completed' && d.numero_poliza != null)
-```
-`conversation_phase = 'completed'` lo setea n8n al recibir confirmación verificada de la pasarela de pago — no es auto-declaración del usuario. El guard `numero_poliza != null` evita falsos positivos.
+**Workaround Bug #7 (Dashboard) — póliza pagada:** `d.estatus_pago === 'PAGADO' || (d.conversation_phase === 'completed' && d.numero_poliza != null)`. `completed` lo setea n8n con confirmación verificada de la pasarela; el guard evita falsos positivos. Detalle: `docs/bugs/bug-07-estatus-pago.md`.
 
 ---
 
 ## Protocolos de ejecutores
 
-Roles y enlaces a protocolos completos: ver tabla "Mapa de sistemas". Reglas operativas que sí viven aquí:
+Roles y protocolos completos: tabla "Mapa de sistemas". Reglas operativas:
 
-- **Tubería de copy (Mejoras y n8n NO se hablan entre sí):** Agente Mejoras Conversación propone el cambio de copy → **Arquitecto** valida, traduce a cambio EXACTO (qué frase, qué nodo) y chequea impacto transversal → **Agente n8n** aplica el cambio en el JSON y hace commit/push → Alberto lo importa en n8n.
-- **Agente n8n nunca decide qué tocar de forma autónoma** — el Arquitecto diagnostica el bug/nodo, el Agente n8n ejecuta el cambio en el JSON.
+- **Tubería de copy (Mejoras y n8n NO se hablan):** Mejoras propone → **Arquitecto** valida, traduce a cambio EXACTO (frase, nodo) y chequea impacto transversal → **Agente n8n** aplica en el JSON y commit/push → Alberto importa en n8n.
+- **El Agente n8n nunca decide qué tocar de forma autónoma** — el Arquitecto diagnostica, el Agente n8n ejecuta.
 
 ---
 
-## Entorno de pruebas / staging (iniciativa activa)
+## Staging y gobernanza con Juan
 
-Staging end-to-end paralelo a prod (gitflow `stg`→`main`) para validar bug fixes antes de desplegar. Instancia n8n STG: `https://n8n-xlqk.srv1810257.hstgr.cloud`. **Principio rector:** cada componente de staging apunta SOLO a gemelos de staging, nunca a prod. Mapa completo prod→staging, credenciales, gotchas de import: `docs/iniciativas/entorno-pruebas-staging.md`.
+**Staging end-to-end** paralelo a prod (gitflow `stg`→`main`). Instancia n8n STG: `https://n8n-xlqk.srv1810257.hstgr.cloud`. **Principio rector: cada componente de staging apunta SOLO a gemelos de staging, nunca a prod.** Mapa, credenciales, gotchas: `docs/iniciativas/entorno-pruebas-staging.md`.
 
-**Seguimiento automático de leads estancados:** 7 checkpoints, hasta 3 reintentos. ✅ **ENVIANDO EN REAL en PROD desde el 20 jul** (171 envíos al 30 jul; verificado en `n8n_chat_histories`, `metadata.source='django_checkpoint_followup'`). El filtro de horario 9am-8pm sigue SIN construir; **decisión de Alberto (30 jul): se acepta el envío sin filtro** (residuo fuera de horario ~1-3/día en los bordes) — el filtro pasa de bloqueante a mejora deseable. En STG están apagados/dry-run por la contención del port #132. Detalle: `docs/iniciativas/seguimiento-leads-estancados.md`.
+**Gobernanza vigente (4 ago): plan Contract-First S1–S5** — S1 Dual STG (`#132`) → S2 estados/control (`#135`) → S3 Atención Humana (`#128`) → S4 Metepec (`#143`) → S5 limpieza (`#146`). Contrato congelado con fingerprint ANTES de implementar; stand-down por etapa hasta freeze + handoff; el monitor de Juan emite GO. Estado del día: tablero artifact + `docs/iniciativas/s2-prep-offline.md`. Metodología: `HYL-WAI:docs/metodologia-contract-first-integracion.md`.
 
-**Conversation ID (Issue #21):** identidad conversacional de n8n movida de `phone_number` a `conversation_id`. **Ya desplegado en PROD** en modo `shadow` (Django `WHATSAPP_CONVERSATION_ID_MODE=shadow`, nodos `Resolve Session`/`Session Router` en n8n PROD). Pendiente: mergear a `main` la rama del Dashboard (`fix/conversation-id-whatsapp-n8n`) y decidir con Juan el paso a `dual`. Detalle: `docs/iniciativas/conversation-id-whatsapp-n8n.md`.
-
-**Recordatorios por fecha mencionada (handoff a Juan 16 jul):** cliente da fecha para no contratar todavía → Haiku extrae, Python calcula, se envía vía el webhook proactivo existente. **Bloqueante:** plantilla de Meta para re-enganche fuera de ventana 24h (ver Pendientes). Detalle: `docs/iniciativas/2026-07-10-recordatorios-seguimiento-por-fecha-mencionada-design.md`, handoff: `docs/2026-07-16-handoff-juan-recordatorios-fecha-mencionada.md`.
+**Iniciativas (estado en su doc, no aquí):**
+- **Seguimiento leads estancados:** ✅ en PROD (sin filtro de horario — aceptado; mejora deseable). En STG apagado/dry-run. `docs/iniciativas/seguimiento-leads-estancados.md`.
+- **Conversation ID:** en PROD modo `shadow`. Pendiente: merge rama Dashboard `fix/conversation-id-whatsapp-n8n` y paso a `dual` con Juan. `docs/iniciativas/conversation-id-whatsapp-n8n.md`.
+- **Recordatorios por fecha mencionada:** diseño entregado a Juan; bloqueado por plantilla Meta re-enganche 24h. `docs/iniciativas/2026-07-10-recordatorios-seguimiento-por-fecha-mencionada-design.md`.
 
 ---
 
@@ -211,33 +187,29 @@ Staging end-to-end paralelo a prod (gitflow `stg`→`main`) para validar bug fix
 
 | Item | Estado |
 |---|---|
-| Rotar service account key Google Cloud (`ba36b46f377b...`) | 🟡 Desprioritizado por Alberto (29 jul) — no lo ve urgente; no volver a proponer salvo señal de exposición |
-| Regenerar token Meta Business API | 🟡 Todo lo de Meta lo ejecuta JUAN (decisión Alberto 29 jul) — coordinar con él, junto con la plantilla de re-enganche |
-| Bug #7 / Issue #69 `HYL-WAI` — fix es lado n8n (IA emite `[phase:completed]`, se guarda sin pago verificado) | 🔴 **Nuestro** desde 2 jul → Agente n8n |
-| Corrección Bug #8 en Django — Juan Aguayo (Issue #70 `aguayo-co/HYL-WAI`) | ⏳ Pendiente externo |
-| Propuesta arquitectura BD — tabla canónica `whatsapp_event` | 💡 Plan de destino, sin decisión de implementar. Detalle: `docs/architecture/whatsapp-event-canonico-propuesta.md` |
-| `N8N_TOKEN` hardcodeado como default en `qualitas/views.py:1291` (`enviar_webhook_whatsapp`; el validador `:1041` ya es env-only) | 🔴 **Issue #130 `HYL-WAI`** (27 jul): quitar default, rotar, coordinar con Alberto el cambio simultáneo en credenciales n8n |
-| Qué hacer con pólizas `VENCIDO`/`CANCELADO` que detecta el Agente Conciliación | 💡 Sin decisión. Ver `docs/architecture/estatus-pago-qualitas.md` |
-| Plantilla de Meta aprobada para re-enganche fuera de ventana 24h | ⚠️ Bloqueante para "Recordatorios por fecha mencionada" (arriba) y rescates tipo Bug #12. Pedida a Juan 16 jul, no sometida aún |
-| Exponer `fecha_inicio` en emisión — Issue #114 `HYL-WAI` | ✅ Django en PROD 27 jul (PR #125, v331). **E2E n8n STG validado 28 jul** (pólizas reales, +0 y +30 exacto). Falta: fix prompt límite 30d (`qualitas-issues#66`, define SHA de freeze de #132) y promoción n8n a PROD. Desbloquea M47/M48 |
-| `/api/emitir-externo/` no distingue causa del 400 — Issue #119 HYL-WAI (=#9) | ⏳ En curso — Juan (rider aceptado en la autorización de B3, 29 jul) |
-| Monitor horario de actividad de Juan (rutina cloud `trig_013gQWu8gqfDh5c8QQWzTAbM`, 6-23h CDMX → issue `JUAN:` en qualitas-issues) | ⚠️ Creado 29 jul pero CIEGO: el entorno cloud no tiene credencial GitHub (corrida de prueba no creó el issue de control "JUAN-monitor activo"). Falta: Alberto añade PAT como `GH_TOKEN` en el environment Default de claude.ai/code |
+| Rotar service account key Google Cloud | 🟡 Desprioritizado por Alberto — no proponer salvo señal de exposición |
+| Regenerar token Meta Business API | 🟡 Lo ejecuta JUAN — coordinar junto con la plantilla de re-enganche |
+| Bug #7 / `HYL-WAI#69` — `[phase:completed]` sin pago verificado | 🔴 Fix (3 barreras) ya en STG; **PROD aún lo acepta** — falta promover (acción viva, requiere autorización) |
+| Bug #8 en Django (`HYL-WAI#70`) | ⏳ Pendiente externo — Juan |
+| Tabla canónica `whatsapp_event` | 💡 Sin decisión. `docs/architecture/whatsapp-event-canonico-propuesta.md` |
+| `N8N_TOKEN` hardcodeado como default (`qualitas/views.py:1291`) | 🔴 `HYL-WAI#130`: quitar default + rotar, coordinado con credenciales n8n |
+| Pólizas `VENCIDO`/`CANCELADO` del Agente Conciliación | 💡 Sin decisión. `docs/architecture/estatus-pago-qualitas.md` |
+| Plantilla Meta re-enganche fuera de ventana 24h | ⚠️ Bloqueante de "Recordatorios"; pedida a Juan, no sometida |
+| `fecha_inicio` en emisión (`HYL-WAI#114`) | ✅ Django PROD + E2E STG ok. Falta `qualitas-issues#66` y promoción n8n a PROD (desbloquea M47/M48) |
+| `/api/emitir-externo/` — 400 sin causa + acepta POST sin credencial | ⏳ `HYL-WAI#119` — Juan (hallazgo auth: `c.5183416152`) |
+| Monitor horario de actividad de Juan (rutina cloud) | ⚠️ CIEGO — falta que Alberto añada PAT como `GH_TOKEN` en el environment Default de claude.ai/code |
 
-Ítems resueltos: archivados en `docs/architecture/pendientes-resueltos-historial.md` — ya no son accionables.
+Ítems resueltos: `docs/architecture/pendientes-resueltos-historial.md`.
 
 ---
 
 ## Flujo de trabajo y arquitectura de agentes
 
-Alberto trabaja desde **Claude Code** sobre repos clonados en `~/claude-projects/` (acceso Git directo, arranque: `cd ~/claude-projects/<repo> && claude`):
+Alberto trabaja desde **Claude Code** sobre repos clonados en `~/claude-projects/` (arranque: `cd ~/claude-projects/<repo> && claude`): `Agente-Arquitecto` (este repo, fuente de verdad) · `Dashboard_seguroautoqualitas` · `Agente-MejorasConversacion` · `HYL-WAI` · `Agente-n8n` · `Agente_QATest_Qualitas` · `Agente-Conciliacion` (push directo habilitado desde el Arquitecto en los tres últimos).
 
-- `Agente-Arquitecto` ← este repo, fuente de verdad
-- `Dashboard_seguroautoqualitas` · `Agente-MejorasConversacion` · `HYL-WAI`
-- `Agente-n8n` · `Agente_QATest_Qualitas` · `Agente-Conciliacion` — push directo habilitado desde el Arquitecto
+**Arquitectura de 3 niveles (regla de oro — diagnóstico arriba, ejecución abajo):** Nivel 1 = lectura (código, APIs); Nivel 2 = Arquitecto (razona, orquesta, NO ejecuta); Nivel 3 = ejecutores, que **nunca se coordinan lateralmente**. Diagrama: `docs/diagrama-agentes.svg`.
 
-**Arquitectura de 3 niveles (regla de oro — diagnóstico arriba, ejecución abajo):** Nivel 1 = lectura (código, APIs); Nivel 2 = Arquitecto (razona, orquesta, NO ejecuta); Nivel 3 = ejecutores (QA, Mejoras Conv., n8n, Conciliación, Dashboard — ver Mapa de sistemas), que **nunca se coordinan lateralmente**. Diagrama: `docs/diagrama-agentes.svg`.
-
-**Documentación Quálitas:** fuente autoritativa en `aguayo-co/HYL-WAI:docs/qualitas-documentacion-webservices/` (PDFs + markdown + CSV catálogos, empezar por `AI_GUIDE.md`). Cubre cotización/emisión/tarifas/impresión — **no** el webservice de pago (OPL). `docs/qualitas-api/` local queda superseded.
+**Documentación Quálitas:** fuente autoritativa en `aguayo-co/HYL-WAI:docs/qualitas-documentacion-webservices/` (empezar por `AI_GUIDE.md`). Cubre cotización/emisión/tarifas/impresión — **no** el webservice de pago (OPL). `docs/qualitas-api/` local superseded.
 
 ---
 
@@ -251,17 +223,19 @@ Alberto trabaja desde **Claude Code** sobre repos clonados en `~/claude-projects
 
 ## Convenciones
 
-- **Persistencia entre máquinas — NUNCA usar memoria local:** Alberto trabaja desde al menos 3 laptops. La carpeta de memoria del agente (`.claude/…/memory/`) es **local a cada máquina y no se sincroniza** → se pierde al cambiar de equipo. Por tanto, TODA iniciativa, plan, backlog o cualquier cosa que deba conservarse se guarda **en git** (en `docs/iniciativas/` para iniciativas/backlog, o el `docs/` que corresponda) y se hace commit+push. Nunca en memoria.
-- **Git:** siempre `user.email = a.ibanez@gmail.com` / `user.name = aibanez82`
-- **Timezone (estándar de consistencia):** almacenar SIEMPRE el instante absoluto en `timestamptz` (UTC interno); convertir a `America/Mexico_City` SOLO en presentación (dashboard), nunca en la BD ni antes. Nunca usar `timestamp without time zone` ni comparar tz-naive con tz-aware. Hallazgo completo (auditoría `information_schema`, tablas afectadas, DDL de migración, query de auditoría reutilizable): `docs/architecture/timezone.md`.
-- **GitHub Issues:** labels con caracteres exactos incluyendo acentos (e.g. `crítico`)
-- **DB:** usar siempre `lib/db.js` del Dashboard — nunca conexiones directas ad-hoc
-- **n8n API:** `https://n8n.srv1325340.hstgr.cloud/api/v1/` con header `X-N8N-API-KEY`
-- **Convención de handoffs (aprendida 6 jul; endurecida 1 ago):** todo handoff a un ejecutor se deja en el repo de ESE ejecutor (`<repo>/handoffs/`) y se comunica con la **ruta absoluta completa** + ubicación git. Nunca solo en el repo del Arquitecto. **SIEMPRE commiteado en `main` del repo del ejecutor — verificar la rama con `git status -sb` ANTES de commitear** (los clones son compartidos con los ejecutores y pueden estar en ramas candidatas bajo auditoría; incidente doble 31 jul–1 ago: dos handoffs contaminaron la rama candidata C1). **Contrato de detección (1 ago):** el ejecutor detecta handoffs pendientes por **fichero sin informe de respuesta**, NO por rango/HEAD de commits — un `git pull` para su propio push arrastraba handoffs por delante del marcador y los marcaba "vistos" sin leerlos (bug de loop, cerrado `Agente-n8n@5470933b`). Dropear un handoff debe ser idempotente a pulls. El **Agente-n8n detecta handoffs solo** (monitor sobre `handoffs/` de `origin/main`, confirmado 4 ago) — basta el push a `main`, sin mensaje manual a Alberto.
-- **Alertar conflictos con el plan Juan (31 jul):** antes de ejecutar cualquier petición de Alberto, evaluar si roza la gobernanza activa con el lado de Juan (`HYL-WAI#140`/`#132`: freeze Dual, fases C con GO, monitor que vigila nuestros repos por API). Si roza — superficie Dual o acción viva STG/PROD observable — alertar a Alberto con el riesgo (técnico vs narrativo) y opciones antes de proceder. Mitigación estándar: autorización suya registrada en git (handoff en repo del ejecutor) + clasificación preventiva en #140.
-- **Revisión periódica del tracker (desde 11 jul):** el Arquitecto revisa `github.com/aibanez82/qualitas-issues` periódicamente para (a) detectar issues duplicados entre agentes, (b) verificar en vivo contra el sistema real cualquier issue que alguien marque como resuelto antes de cerrarlo, y (c) reabrir si un cierre resulta ser falso. No es solo del Arquitecto detectar bugs — es mantener el tracker mismo honesto.
-- **Verificar contra la fuente antes de publicar (reforzada 1 ago, raíz de los fallos por iteración):** NO producir ningún artefacto de salida —checkpoint, afirmación/cifra/orden a Juan, spec, handoff— sin leer la fuente autoritativa y verificar esa afirmación concreta contra ella: el **doc de entrega** del ejecutor (no solo su código), el runbook, el grafo real, el código fuente. Nunca inferir de memoria ni relayar de segunda mano una afirmación técnica a Juan (fallos reales: checkpoint citó instalador inexistente; orden de PUT publicado a Juan estaba invertido). Verificar el código sin leer el doc de entrega deja fuera contratos de API y contradicciones de gobernanza.
-- **Tablero vivo (Alberto 4 ago):** al cerrar cada tarea material, actualizar el artifact "Dual Rollout — STG" pasando `url: https://claude.ai/code/artifact/737115a2-251b-476a-98f1-613f9e2d6002` (sin `url` se crea otra URL — error). Conservar estructura, favicon 🚦 y sello CDMX.
-- **Cambiar una convención = actualizar su herramienta en el acto (1 ago):** si cambio dónde entregan los ejecutores (p.ej. handoffs→`main`), actualizo de inmediato el monitor/tooling que lo vigila. Un canal nuevo sin monitor es un punto ciego (fallo real: entregas a `main` invisibles al monitor de solo-ramas).
+> El PORQUÉ (incidentes, historias de origen) de cada convención vive en `docs/architecture/convenciones-origen.md` — aquí solo la regla.
 
-> **Disciplina de CLAUDE.md:** este archivo se carga completo en cada turno — tamaño máximo **23 KB**. Aquí solo viven hechos estables y reglas operativas: sin cronologías, sin historia de decisiones ("como decía antes…"), sin ítems resueltos. El estado de bugs vive en `qualitas-issues`; cronologías, evidencia e investigaciones van a `docs/` (crear el archivo si no existe); lo resuelto se archiva en `docs/architecture/pendientes-resueltos-historial.md`. Verificar `wc -c CLAUDE.md` tras cada edición.
+- **Persistencia entre máquinas — NUNCA memoria local:** Alberto usa ≥3 laptops y la memoria del agente no se sincroniza. TODO lo que deba conservarse (iniciativas, planes, backlog) va **en git** (`docs/iniciativas/` o el `docs/` que corresponda) con commit+push.
+- **Git:** siempre `user.email = a.ibanez@gmail.com` / `user.name = aibanez82`.
+- **Timezone:** almacenar SIEMPRE `timestamptz` (UTC interno); convertir a `America/Mexico_City` SOLO en presentación. Nunca `timestamp without time zone` ni comparar tz-naive con tz-aware. Auditoría y DDL: `docs/architecture/timezone.md`.
+- **GitHub Issues:** labels con caracteres exactos incluyendo acentos (e.g. `crítico`).
+- **DB:** usar siempre `lib/db.js` del Dashboard — nunca conexiones ad-hoc.
+- **n8n API:** `https://n8n.srv1325340.hstgr.cloud/api/v1/` con header `X-N8N-API-KEY`.
+- **Handoffs:** siempre en `<repo-del-ejecutor>/handoffs/`, commiteado en **`main`** (verificar la rama con `git status -sb` ANTES — los clones compartidos pueden estar en ramas candidatas). Comunicar con ruta absoluta + ubicación git. **Detección: por fichero sin informe de respuesta** (idempotente a pulls), nunca por rango/HEAD de commits. El Agente-n8n detecta handoffs solo (monitor sobre `handoffs/` de `origin/main`) — basta el push.
+- **Alertar conflictos con el plan de Juan:** antes de ejecutar peticiones de Alberto, evaluar si rozan la gobernanza activa (Contract-First `#132`/`#135`: stand-down por etapa, SHAs congelados inmóviles, monitor `oilycoyote` vigila nuestros repos por API). Si roza superficie contractual o acción viva STG/PROD observable → alertar con riesgo (técnico vs narrativo) y opciones. Mitigación: autorización de Alberto registrada en git + clasificación preventiva en el tracker.
+- **Revisión periódica del tracker:** detectar duplicados entre agentes, verificar en vivo todo issue marcado resuelto antes de cerrarlo, reabrir cierres falsos. Mantener el tracker honesto.
+- **Verificar contra la fuente antes de publicar:** NINGÚN artefacto de salida (checkpoint, cifra/orden a Juan, spec, handoff) sin verificar esa afirmación concreta contra la fuente autoritativa — el **doc de entrega** del ejecutor (no solo su código), el runbook, el grafo real. Nunca de memoria ni de segunda mano.
+- **Tablero vivo (Alberto 4 ago):** al cerrar cada tarea material, actualizar el artifact "Dual Rollout — STG" pasando `url: https://claude.ai/code/artifact/737115a2-251b-476a-98f1-613f9e2d6002` (sin `url` se crea otra URL — error). Conservar estructura, favicon 🚦 y sello CDMX.
+- **Cambiar una convención = actualizar su herramienta en el acto:** si cambia dónde/cómo entregan los ejecutores, actualizar de inmediato el monitor/tooling que lo vigila. Un canal nuevo sin monitor es un punto ciego.
+
+> **Disciplina de CLAUDE.md:** este archivo se carga completo en cada turno — tamaño máximo **23 KB**. Aquí solo hechos estables y reglas operativas: sin cronologías ni ítems resueltos. Estado de bugs → `qualitas-issues`; estado de iniciativas → su doc + tablero artifact (aquí solo puntero); convención nueva entra SIN narrativa (la historia va a `docs/architecture/convenciones-origen.md`); lo resuelto → `docs/architecture/pendientes-resueltos-historial.md`. Verificar `wc -c CLAUDE.md` tras cada edición.
