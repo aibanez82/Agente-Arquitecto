@@ -1,6 +1,6 @@
 # S3 (Atención Humana básica) — preparación offline del Arquitecto
 
-> **5 ago 2026, ~06:50 CDMX.** DOCS-ONLY, en stand-down, autorizada por el patrón §9 de la
+> **5 ago 2026, ~08:10 CDMX.** DOCS-ONLY, en stand-down, autorizada por el patrón §9 de la
 > enmienda (prep que no distrae el camino crítico). S3 depende de S1 cerrada (`#132`) y S2
 > cerrada (`#135`); el contrato S3 lo redacta y congela Juan (enmienda en `#128`,
 > `plan140:amendment:s3-human-basic`). Este doc = inventario + brechas + input pre-freeze
