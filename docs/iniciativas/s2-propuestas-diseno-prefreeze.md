@@ -80,5 +80,6 @@ contradicción sería el estado permanente y el bot quedaría mudo.
 Listo: brechas mapeadas por dominio (`s2-prep-offline.md`) · inventario n8n (`b104b1f`) · diseño
 de suite (18 tests F1/F2/F6) · 10 ambigüedades publicadas (`#135 c.5183415931`) · estas 3
 propuestas de diseño. Pendiente de Juan: cierre S1 → reconciliación → freeze → handoffs.
-Pendiente nuestro: publicar este doc en `#135` (con OK de Alberto) cuando S1 cierre — antes solo
-si la autoridad abre la reconciliación.
+**PUBLICADO en `#135 c.5187242434` (5 ago 03:4xZ, orden directa de Alberto)** — antes del cierre
+de S1 (aún en reauditoría r6), encuadrado como insumo DOCS-ONLY para la reconciliación §6.1, sin
+pedir acción y con constancia de stand-down intacto.
