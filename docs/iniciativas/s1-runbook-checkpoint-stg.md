@@ -1,6 +1,6 @@
 # Runbook — acreditación y checkpoint STG de S1 (lado Alberto)
 
-> **5 ago 2026, ~00:20 CDMX.** Preparado en stand-down (DOCS-ONLY) para ejecutar en minutos
+> **5 ago 2026, ~06:30 CDMX.** Preparado en stand-down (DOCS-ONLY) para ejecutar en minutos
 > cuando el liderazgo dé el gate en `#140`. Fuente: contrato congelado
 > `aef501f:docs/contracts/s1-dual-stg-v1.1.md` §9 (transición/rollback), §10.2 (procedimiento
 > STG, 13 pasos), §10.3 (fixtures), §10.4 (consultas) — citado, no sustituido: **ante cualquier
