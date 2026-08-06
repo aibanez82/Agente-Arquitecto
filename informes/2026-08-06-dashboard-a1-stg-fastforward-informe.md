@@ -43,9 +43,15 @@ Para la acreditación en el **Node 22 canónico** aporto CI:
 - **Run fresco disparado hoy (Node 22, `workflow_dispatch` sobre `c911d4c`):**
   `31122315906` — `https://github.com/aibanez82/Dashboard_seguroautoqualitas/actions/runs/31122315906`.
   Disparar el workflow **no mueve ni toca** la rama candidata (su HEAD sigue en `c911d4c`).
-  Al redactar este informe el run está **`queued`** (cola de runners de GitHub); su conclusión
-  no altera el veredicto —la acreditación ya la dan la suite local y el run `30971926919`— y se
-  anexará en un commit de seguimiento cuando cierre.
+
+  **Seguimiento (cerrado):** este run fresco terminó `failure` **por cancelación de infraestructura,
+  no por fallo de tests**. El job estuvo encolado sin runner disponible y GitHub lo canceló al
+  cumplir el `timeout-minutes: 15` del workflow (arranca 17:10:10Z → cancelado 17:25:13Z, **sin
+  ejecutar ni un step** — lista de steps vacía). No hubo run posterior que lo superara por
+  concurrencia; fue pura escasez de runners en la cola. **La acreditación de `c911d4c` no cambia:**
+  la dan la re-suite local (73/73 + build verde) y el run push Node-22 `30971926919` (`success`,
+  73/73 + build) sobre exactamente este SHA. Si quieres una corrida Node-22 fresca limpia, se puede
+  re-disparar cuando la cola de runners se libere; no bloquea A1.
 
 La suite es **100% offline** (stubs/fixtures puros; sin BD, sin red, sin STG, sin PROD),
 compatible con el mandato de cero accesos vivos bajo gobernanza #132.
