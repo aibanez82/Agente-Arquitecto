@@ -142,3 +142,31 @@ obligatorio para R4 y siguientes:
 lo tomado del informe. Gracias a esa frontera se puede decir con precisión que R3-03 estaba
 declarado como no verificado y que el fallo de revisión fueron R3-01, R3-02 y R3-04 — no una
 imprecisión difusa sobre todo el conjunto.
+
+---
+
+## ADENDA 2 tras el dictamen R4 (`c.5221844666`) — la tercera variante del mismo error
+
+R4-03 volvió a señalar lo mismo con otra cara. Construí los reproducers de los ancestros symlink
+contra `build-candidate.js`, comprobé que `daa4ccb` los deniega —y los deniega—, y **no ejercí la
+CLI exacta**. `profile-cli.js` resuelve sus rutas con `exigirPrivado()` → `fs.realpathSync`: solo
+comprueba que el destino quede fuera del worktree, o sea que **resuelve** el enlace en vez de
+rechazarlo. `exigirAncestrosSinSymlink` aparece 0 veces en ese fichero.
+
+La secuencia completa del error, para que se vea que es uno solo con tres disfraces:
+
+| Ronda | Qué verifiqué | Qué faltaba |
+|---|---|---|
+| R2 | el cruce `binding prod` + `flag stg` | el caso **coherente** `prod`+`prod` |
+| R3 | que `receipt.exigirVigente` **existe** y deniega bien | que alguien lo **llame** |
+| R4 | que **el builder** rechaza ancestros symlink | que **la CLI** también |
+
+Siempre lo mismo: **verifico la instancia que tengo a mano y la generalizo.** Regla que pasa a ser
+comprobación fija, no propósito:
+
+> **Toda garantía se ejercita en TODOS sus puntos de entrada** —builder, CLI, helpers— y se
+> enumeran explícitamente antes de firmar. Si un punto de entrada no se ejerció, va declarado como
+> no verificado en el comentario de entrega, igual que se declara lo tomado del informe.
+
+Corolario operativo: antes de firmar, listar los ejecutables/módulos que aceptan la entrada
+correspondiente (`grep` de los flags o del parámetro) y marcar uno por uno cuál se probó.
