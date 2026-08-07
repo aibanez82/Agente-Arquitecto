@@ -170,3 +170,38 @@ comprobación fija, no propósito:
 
 Corolario operativo: antes de firmar, listar los ejecutables/módulos que aceptan la entrada
 correspondiente (`grep` de los flags o del parámetro) y marcar uno por uno cuál se probó.
+
+---
+
+## ADENDA 3 tras el dictamen R5 (`c.5222678799`) — variante nueva: identidad del contrato ≠ conformidad
+
+R5-01 no era una guarda floja: **el mecanismo de `1.0.2` no estaba cableado**. El contrato movió la
+identidad del target de «headers vivos» a «metadata comprometida contra `C1_STG_TARGET_SHA256`», y
+el código conservó el camino de `1.0.1`. Verificado: esa variable **no aparece en `profile-cli.js`**
+(sí en el contrato vendorizado, el fixture y `gate-a.js`), y `acreditarIdentidadViva()` seguía
+exigiendo `instance_id`/`n8n_version` vivos que `clienteReal` devuelve `null` por diseño → el carril
+vivo denegaba siempre.
+
+Yo verifiqué que los tres artefactos coincidían byte a byte con el freeze y que las tres copias del
+fingerprint concordaban. Todo cierto. **Y no comprobé que el comportamiento hubiera cambiado.**
+Vendorizar es barato precisamente porque no obliga a nada.
+
+La serie completa, que es un solo error con cuatro caras:
+
+| Ronda | Verifiqué | Faltaba |
+|---|---|---|
+| R2 | el cruce `prod`+`stg` | el caso coherente `prod`+`prod` |
+| R3 | que el mecanismo existe | que alguien lo llame |
+| R4 | que el builder lo rechaza | que la CLI también |
+| **R5** | **que el contrato nuevo está vendorizado** | **que el contrato nuevo está implementado** |
+
+Regla que se añade a las anteriores:
+
+> **Ante un contrato nuevo, listar QUÉ CAMBIÓ respecto del anterior y verificar el comportamiento de
+> cada cambio.** La identidad del artefacto (hashes, `const`, vendorizado byte a byte) no acredita
+> conformidad. Y las variables o parámetros que el contrato nombra se buscan **en los puntos donde
+> el contrato dice que se usan**, no solo en el repositorio.
+
+Corolario que también salió de esta ronda: una comparación puede degradar a no-comprobar igual que
+un `if` — `null === null` satisface una igualdad de commitments. Al auditar guardas, mirar también
+las **comparaciones cuyo caso ausente es simétrico**.
