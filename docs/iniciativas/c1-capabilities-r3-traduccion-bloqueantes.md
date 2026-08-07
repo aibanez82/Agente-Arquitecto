@@ -8,6 +8,12 @@
 >
 > Todos los anclajes de fichero:línea están verificados por lectura directa del árbol `ac90bc4`
 > (`tree cf64995e`), no tomados del dictamen.
+>
+> **Estatus de este documento, fijado por liderazgo** (`c.5219659877`): *«la matriz DOCS-ONLY puede
+> conservarse como análisis preparatorio fuera del candidato/PR #4, pero **no es GO de
+> implementación, no congela decisiones y queda subordinada al patch contractual**»*. Es decir:
+> cuando se publique el addendum del freeze menor, **este documento se revisa contra él** — no se
+> da por bueno. Lo que aquí se afirme y el patch contradiga, lo gana el patch.
 
 ## Estado y dependencias del freeze menor
 
@@ -42,8 +48,20 @@ es **riesgo de confusión de target**. Trátalo con esa severidad.
 
 **Cambio:** ambos a dominio reservado `.invalid`. Hay precedente interno en el propio candidato
 (`lib/contrato.js` y el fixture ya usan `.invalid`). Después, **barrido del diff completo** por
-hosts, instance IDs y destinos antes de publicar el sucesor — el dictamen lo pide explícitamente y
-es lo que evita repetir el hallazgo.
+hosts, instance IDs y destinos antes de publicar el sucesor.
+
+**Elevado por liderazgo** (`c.5219659877`), con tres precisiones que cambian cómo se cierra:
+
+1. Se **acepta** el agravamiento: dos destinos reales versionados, uno de PROD. No se reproducen.
+2. **El barrido de redacción pasa a ser GATE**, no una comprobación de cortesía: sin él no hay
+   sucesor válido. Conviene implementarlo como test que falle solo, no como paso manual de checklist
+   — un gate que depende de que alguien se acuerde no es un gate.
+3. **NO se autoriza reescritura de historia.** Las dos líneas se corrigen **hacia delante** en el
+   sucesor; los commits existentes se quedan como están. Nada de `filter-branch`, `rebase` de
+   limpieza ni force-push para «borrar» los hostnames del historial.
+
+Liderazgo hace constar además que **no se observó exposición de credenciales** — el hallazgo es de
+destino, no de secreto.
 
 ---
 
