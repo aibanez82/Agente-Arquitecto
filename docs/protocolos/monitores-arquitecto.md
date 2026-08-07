@@ -36,6 +36,9 @@ Dos refinamientos que valen (v2, 7 ago):
   REESCRITA**. Un force-push sobre una candidata o una congelada destruye el árbol acreditado, y es
   el evento que no se puede detectar tarde. Sin esto, un movimiento de rama y una reescritura se ven
   exactamente igual.
+- **Saltar el ref pelado `origin`.** `refs/remotes/origin/HEAD` se lista como `origin` a secas y
+  sigue a la rama por defecto, así que emitía un evento duplicado por cada push a `main`. Es un
+  alias, no una rama.
 - **El head de un PR solo se emite si DIVERGE de su rama.** Que coincida es lo normal y duplicaba
   cada push (2 eventos por commit); registrarlo en silencio. Cuando NO coincide —PR reapuntado,
   rama borrada, head ajeno— sí es señal.
