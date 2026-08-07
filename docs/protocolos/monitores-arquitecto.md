@@ -48,11 +48,24 @@ Dos refinamientos que valen (v2, 7 ago):
 Poll cada 60s de `git ls-tree origin/main -- dudas/` del repo Agente-Arquitecto: fichero sin su
 `-respuesta.md` = duda pendiente → emitir una línea. (Responder SIEMPRE por fichero.)
 
+## 5. Informes de ejecutores en `informes/` de este repo
+
+Poll cada 60s de `git ls-tree origin/main informes/`; fichero nuevo → una línea con su fecha y el
+asunto del commit que lo trajo. Excluir `README.md`, `-respuesta.md` y `-acuse.md`: esos los escribo
+yo y avisarme de ellos es eco.
+
+**Por qué existe (7 ago):** la nota de abajo decía que la señal de fin del Dashboard era el push de
+su rama candidata (monitor 3). Eso vale para una entrega de CÓDIGO; **no vale para un trabajo
+DOCS-ONLY**, que no mueve ninguna rama suya. Le encargué el inventario S3, entregó su informe por
+este canal y **ningún monitor avisó**: lo detectó Alberto preguntando. Corolario general: cuando se
+encarga trabajo cuya entrega no mueve la superficie que vigilan los monitores existentes, el canal
+de entrega necesita el suyo **antes** de mandar el encargo.
+
 ## Notas
 
 - Emitir solo líneas accionables (los monitores ruidosos se auto-detienen).
 - `seen` en memoria del script para no repetir.
-- El informe del Dashboard llega por `informes/` de este repo; su señal de terminado es el push
-  de su rama candidata (monitor 3) — no requiere monitor propio.
+- ~~El informe del Dashboard llega por `informes/`; su señal de terminado es el push de su rama
+  candidata (monitor 3) — no requiere monitor propio.~~ **FALSO para trabajo docs-only** → monitor 5.
 - Tabla de canales: `informes/README.md`. Si cambia un canal, actualizar monitor y esta spec en
   el acto (convención "canal nuevo sin monitor = punto ciego").
