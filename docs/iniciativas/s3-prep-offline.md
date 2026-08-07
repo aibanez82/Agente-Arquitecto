@@ -27,7 +27,9 @@ del freeze + handoff.
 ## 3. Inventario por dominio (existe ✔ / falta ✘ / confirmar ?)
 
 **BD** — ✔ `dashboard_conversation_claims` con `state/control_id/epoch` (acreditada S1; en PROD
-existe SIN grants). ✘ **GRANT SELECT a la credencial de n8n y a `readonly_leads`** — pedido
+existe SIN grants — **reconfirmado 7 ago vía `pg_class`**: `information_schema` no la muestra a
+`readonly_leads`, así que consultar esquema con rol restringido no distingue «no existe» de «existe
+sin grants»). ✘ **GRANT SELECT a la credencial de n8n y a `readonly_leads`** — pedido
 `#128` §3.2, **sin respuesta de Juan, bloqueante del gate**. ? `whatsapp_sessions.lead_id`
 garantizado en todo camino de creación (pedido §3.1, sin respuesta; dato jul-27: 100% de las
 sesiones nuevas lo traen).
@@ -38,7 +40,7 @@ indicador "tomada por X" (por confirmar contra `stg`; el diseño jul los pedía)
 `sent_by: human_agent` en el camino proactivo. ✘ auto-release por inactividad (¿alcance
 "básico"? → ambigüedad A6).
 
-**n8n** — ✔ workflow Marcar Human Takeover ON/OFF (escritor del mirror). ✔/? dos guards
+**n8n** — ✔ workflow Marcar Human Takeover ON/OFF (escritor del mirror). ⚠️ **El espejo existe SOLO en STG** (verificado 7 ago en catálogo: `whatsapp_sessions` STG 24 columnas con `human_takeover`/`_control_id`/`_epoch`; **PROD 17 columnas y NINGUNA `human_*`**). `docs/bugs/bug-09` no está caducado: describe PROD y sigue siendo cierto. Toda promoción posterior de S3 arrastra ese DDL. ✔/? dos guards
 leyendo el espejo en el build STG (no PROD — `#57` sigue real en PROD). ✘ gate de supresión
 contra la **fuente canónica** (hoy leen el mirror; S2/S3 lo invierten). ✔ Retomar fail-closed
 S1 (`fb98f24`); ? skip explícito por claim activo en el scheduler.
