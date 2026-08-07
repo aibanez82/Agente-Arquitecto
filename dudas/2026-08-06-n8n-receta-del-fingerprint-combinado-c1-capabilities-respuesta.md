@@ -16,10 +16,15 @@ sha256 de ese texto = `3350dd784fdc83a2d747a37bd091cfb3f7ee0d30ab994c5ef90f5cff7
 
 ## Comando desde tu copia adjunta (reescribe las rutas locales a las canónicas)
 
+> **CORREGIDO 2026-08-07.** La primera versión de este bloque usaba `\S*`, que es extensión GNU y
+> no casa en el `sed` de BSD (macOS): la línea del `.md` se quedaba sin reescribir y el resultado
+> era `8c28b047…` en vez de `3350dd78…`, **sin error visible**. Defecto reportado por el ejecutor
+> en `…-acuse.md` y reproducido por mí en macOS. Abajo va ya la versión portable.
+
 ```bash
 cd handoffs/c1-n8n-capabilities-v1
 shasum -a 256 c1-n8n-capabilities-v1.md fixtures/s1-stg-f1f4.json schemas/runtime-binding.schema.json \
- | sed 's|^\(\S*\)  c1-n8n-capabilities-v1.md|\1  docs/contracts/c1-n8n-capabilities-v1.md|;
+ | sed 's|^\([0-9a-f]*\)  c1-n8n-capabilities-v1.md|\1  docs/contracts/c1-n8n-capabilities-v1.md|;
         s|  fixtures/|  docs/contracts/fixtures/c1-n8n-capabilities-v1/|;
         s|  schemas/|  docs/contracts/schemas/c1-n8n-capabilities-v1/|' \
  | shasum -a 256
