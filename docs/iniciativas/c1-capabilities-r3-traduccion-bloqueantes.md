@@ -15,7 +15,32 @@
 > cuando se publique el addendum del freeze menor, **este documento se revisa contra él** — no se
 > da por bueno. Lo que aquí se afirme y el patch contradiga, lo gana el patch.
 
-## Estado y dependencias del freeze menor
+## ✅ ACTUALIZACIÓN 7 ago 17:15Z — el freeze menor llegó: `C1-N8N-CAPABILITIES@1.0.1`
+
+Freeze + handoff R3 en #132 `c.5219991756`. **Stand-down levantado; implementación offline
+autorizada.** Handoff nuestro al ejecutor: `Agente-n8n@e0513c5`.
+
+Identidad verificada por mí desde `HYL-WAI@cc712b30` (**4/4 fingerprints coinciden**; tree
+`3dd2ef8f`). **Aviso: el PR contractual #152 sigue OPEN — `1.0.1` no está en `stg`, hay que
+vendorizar por SHA desde la rama `docs/s1-c1-n8n-capabilities-v1-0-1`.**
+
+**Qué sobrevive de este documento y qué no** (diff 1.0.0→1.0.1 hecho por mí):
+
+- **El schema es estructuralmente IDÉNTICO**: solo cambian `$id`, `title`, el `const` de `contract`
+  y dos textos aclaratorios. → **todo el análisis de R2-01 de abajo sigue válido tal cual**; la lista
+  de constructos a implementar no cambia.
+- **La tabla de dependencias de abajo queda obsoleta**: ya no hay nada condicionado al freeze.
+- **El «orden de ataque propuesto» del final queda SUPERSEDIDO** por las Fases 1→6 del contrato,
+  que son normativas — igual que los nombres de fichero de la matriz R2→test.
+- **Scope nuevo que este documento no cubre:** §6.4.1 completa — **Gate A**, preflight read-only
+  vivo con doble ordinal, receipt `initial-state.json` y fail-closed en builder/plan/apply. Es la
+  Fase 2 y es trabajo nuevo, no una corrección de R2. Detalle en el handoff.
+- **Requisito nuevo sobre R2-01:** el schema/builder debe rechazar **cualquier claim `initial_state`**
+  en el binding — «el binding no gana autoridad por llevar un claim».
+
+---
+
+## Estado y dependencias del freeze menor *(obsoleto — resuelto por 1.0.1)*
 
 | Bloqueante | Severidad | ¿Depende del freeze menor? |
 |---|---|---|
