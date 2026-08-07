@@ -205,3 +205,33 @@ Regla que se añade a las anteriores:
 Corolario que también salió de esta ronda: una comparación puede degradar a no-comprobar igual que
 un `if` — `null === null` satisface una igualdad de commitments. Al auditar guardas, mirar también
 las **comparaciones cuyo caso ausente es simétrico**.
+
+---
+
+## ADENDA 4 tras el dictamen R6 (`c.5223134798`) — quinta cara: el guard tiene más llamadores que los que probé
+
+`acreditarTargetVivo()` se invoca **solo** desde `preflight` y `apply`; los otros seis subcomandos
+—`verify`, `reconcile`, `rollback`, `pin-verify`, `execution-verify`, `close`— hacen requests vivos
+sin acreditar. Yo verifiqué que el guard funcionaba (control positivo + siete negativos) y que
+`preflight` lo usaba. La matriz de puntos de entrada que sí ejecuté cubría los guards de **ruta**
+(cuatro entradas × builder/CLI) — el guard de **target** no tenía su matriz por subcomando.
+
+| Ronda | Verifiqué | Faltaba |
+|---|---|---|
+| R2 | el cruce | el caso coherente |
+| R3 | que el mecanismo existe | que alguien lo llame |
+| R4 | que el builder lo rechaza | que la CLI también |
+| R5 | que el contrato está vendorizado | que está implementado |
+| **R6** | que el guard funciona y un llamador lo usa | **todos los demás llamadores** |
+
+Regla que sustituye a la de R4 (que se quedaba corta):
+
+> **Por cada garantía, enumerar la lista COMPLETA de sus llamadores y ejercitar cada uno.** No basta
+> con «los puntos de entrada» entendidos como binarios o interfaces: son *todas las funciones que
+> deberían invocarla*. Se obtiene con un `grep` del símbolo y contrastando contra la lista de
+> funciones públicas del módulo — si una función pública hace un request y no aparece entre los
+> llamadores, eso es el hallazgo.
+
+Y un caso concreto que ni el ejecutor ni yo habíamos probado, para no perderlo: **mutar un nodo del
+baseline que NO esté entre los fingerprints acreditados**. Los 19 son un subconjunto; el resto del
+workflow quedaba sin cubrir.
