@@ -109,3 +109,36 @@ Los nombres de fichero **ya no son normativos** (enmienda `c.5220188803`). Lo ex
 En el comentario de entrega, la frontera entre "reproducido por mí" y "declarado por el ejecutor"
 va explícita. En r2 esa frontera estaba difusa y por eso mi hueco de `--environment` viajó a #132
 como si fuera verificación.
+
+---
+
+## ADENDA tras el dictamen R3 (`c.5221329253`) — cuatro lecciones pagadas
+
+Este plan **no bastó**. Firmé `READY_R3` sobre `c013954` y liderazgo encontró cuatro bloqueantes,
+dos de ellos comprobables con una línea de shell. Lo que faltaba, y queda incorporado como
+obligatorio para R4 y siguientes:
+
+1. **Verificar la INVOCACIÓN, no la existencia.** Comprobé que `receipt.exigirVigente()` denegaba
+   bien con `ordinalMinimo: 2`, y no comprobé que alguien lo llamara. No lo llamaba:
+   `grep -c exigirVigente lib/operativa.js` = **0**. Es el mismo patrón que yo bauticé en R2-04
+   («parámetros opcionales que degradan a no-comprobar») aplicado un nivel más arriba.
+   → Por cada guard nuevo: barrido de llamadas **y** ejecución del comando real sin el artefacto
+   exigido, esperando deny observado.
+2. **Contrastar `require()` contra el manifiesto de paquetes.** `fuentes-vivas.js:66` requiere `pg`
+   y `package.json` solo declara `ajv`/`ajv-formats`. Verifiqué el *scoping* de la dependencia que
+   sí estaba y no que estuvieran todas. El carril vivo no lo ejercen los tests, así que la suite
+   verde no lo revela.
+   → Barrido de `require(` no relativos contra `dependencies`.
+3. **Ejecutar lo que el plan dice, no una parte.** «Symlinks en fichero, padre y ancestro» estaba
+   escrito en la §4 de este documento. Ejecuté el del fichero (probado ya en r2) y di por buenos los
+   otros dos desde el informe. El defecto estaba en el ancestro.
+   → Un ítem del plan no ejecutado se marca como **no verificado**, nunca se hereda de una ronda
+   anterior ni del informe.
+4. **`SIGKILL` real o nada.** Los tests simulaban el journal en el mismo proceso; yo no forcé la
+   muerte de un subproceso con journal en disco.
+   → La recuperación solo se acredita matando un proceso de verdad.
+
+**Lo que sí funcionó y se conserva:** separar en el comentario de entrega lo reproducido por mí de
+lo tomado del informe. Gracias a esa frontera se puede decir con precisión que R3-03 estaba
+declarado como no verificado y que el fallo de revisión fueron R3-01, R3-02 y R3-04 — no una
+imprecisión difusa sobre todo el conjunto.
