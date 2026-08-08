@@ -235,3 +235,26 @@ Regla que sustituye a la de R4 (que se quedaba corta):
 Y un caso concreto que ni el ejecutor ni yo habíamos probado, para no perderlo: **mutar un nodo del
 baseline que NO esté entre los fingerprints acreditados**. Los 19 son un subconjunto; el resto del
 workflow quedaba sin cubrir.
+
+---
+
+## ADENDA 5 — dos fallos de HANDOFF (no de verificación), con la misma causa
+
+En R7 y R8 mandé handoffs defectuosos y hubo que corregirlos en caliente:
+
+- **R7**: dije «los ocho subcomandos». Eran **diez**, y dos tenían regla propia.
+- **R8**: di como corrección de R7-01 «que acepte baseline **o** `blocked`». El plan revisado decía
+  **solo `(blocked,blocked)`, con baseline DENY** — mi versión dejaba el guard *más laxo* de lo que
+  el contrato admite. Y **me salté R7-08 entero**.
+
+**Causa común: escribí el handoff desde una lectura PARCIAL del dictamen.** R7-08 estaba en la línea
+121 de 152; el paso del plan que contradecía mi arreglo, en la 133. En ambos casos leí las primeras
+secciones, me pareció que ya tenía el cuadro y me puse a redactar.
+
+> **Regla: leer el dictamen ENTERO antes de escribir el handoff — incluida la sección de plan.**
+> El «Plan de Sugerencia» no es un resumen de los bloqueantes: puede **corregir o endurecer** la
+> lectura obvia de un bloqueante, y cuando lo hace, manda el plan. Contar los `### R7-NN` y
+> contrastarlos con el número que cita el estado canónico antes de dar el handoff por completo.
+
+Es un fallo distinto del de verificación —allí generalizaba desde una instancia; aquí redacto desde
+un fragmento— pero comparte la forma: **actuar con una muestra creyendo que es el todo.**
