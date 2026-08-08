@@ -115,7 +115,12 @@ cd "$CHECKOUT"
   || { echo "STOP: HEAD no es el acreditado"; exit 1; }
 [ "$(git rev-parse HEAD^{tree})" = "ff966940ee79577a5bb28240b21449282b26fd4a" ] \
   || { echo "STOP: tree no es el acreditado"; exit 1; }
-[ -z "$(git status --porcelain)" ] \
+# El fallo del comando y el resultado limpio se separan: un `git status` que muere sin escribir
+# stdout daba sustitución vacía y `[ -z "" ]` éxito, o sea "limpio". `set -e` no rescata ese caso
+# porque el estado que ve el shell es el de la prueba exterior.
+GIT_STATUS="$(git status --porcelain=v1 --untracked-files=all)" \
+  || { echo "STOP: no se pudo acreditar limpieza"; exit 1; }
+[ -z "$GIT_STATUS" ] \
   || { echo "STOP: worktree sucio"; exit 1; }
 
 sha256sum --check --strict <<'SUMS'
@@ -161,6 +166,23 @@ Propiedades **fail-closed** ya acreditadas de estos comandos:
 
 **No hay ningún comando Heroku en este checkpoint.** Django permanece `shadow` y no se toca. Si un
 GO posterior introdujera alguno, deberá llevar literalmente `--app hyl-wai-stg`.
+
+### Canarios del guard (ejecutados offline, sobre un `git` sintético)
+
+El guard se acredita como se acredita cualquier otra garantía de este carril: comprobando que
+**falla cuando debe**, no que pasa cuando todo está bien.
+
+| Canario | Resultado exigido | Observado |
+|---|---|---|
+| `git status` **falla sin escribir stdout** | STOP antes de `preflight` | STOP, exit 1 ✔ |
+| Uno de los cuatro hashes alterado | STOP antes de `preflight` | STOP ✔ |
+| `HEAD` distinto del acreditado | STOP | STOP ✔ |
+| Todo correcto (control positivo) | continúa hasta `preflight` | continúa ✔ |
+
+El primero es el que motivó esta revisión: en la versión `96aa1fff…` el bloque **llegaba a
+`preflight` con exit 0** ante un `git status` muerto, porque la sustitución vacía y el worktree
+limpio se veían igual. Reproducido con un `git` sintético que devuelve los valores acreditados en
+`rev-parse` y sale 128 sin stdout en `status`.
 
 ## 9. Alcance de la mutación
 
