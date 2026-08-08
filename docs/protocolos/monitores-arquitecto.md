@@ -69,3 +69,12 @@ de entrega necesita el suyo **antes** de mandar el encargo.
   candidata (monitor 3) — no requiere monitor propio.~~ **FALSO para trabajo docs-only** → monitor 5.
 - Tabla de canales: `informes/README.md`. Si cambia un canal, actualizar monitor y esta spec en
   el acto (convención "canal nuevo sin monitor = punto ciego").
+- **Un monitor vivo queda CONGELADO en la versión del script con la que se armó.** El proceso lee
+  el fichero **una sola vez, al arrancar**: arreglar el script no arregla un monitor ya corriendo.
+  Tras editar un monitor hay que **rearmarlo**, si no seguirá emitiendo con la lógica vieja.
+  Al Agente-n8n le costó un rato de diagnóstico el 8 ago: su monitor de handoffs llevaba vivo desde
+  antes del arreglo del filtro, así que un `…-informe-r2.md` perfectamente válido disparaba aviso —
+  se leyó como fallo de nombre y era un proceso desfasado.
+  **Cómo distinguirlo:** comparar `ps -o lstart= -p <pid>` con el `mtime` del script. Si el proceso
+  es anterior, es desfase y no un fallo de contenido. Comprobado el 8 ago sobre los cinco procesos
+  de aquí: los cinco arrancaron después de su última edición, así que estaban en sync.
