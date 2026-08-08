@@ -39,7 +39,9 @@ GIT_STATUS="$(git status --porcelain=v1 --untracked-files=all)" \
 [ -z "$GIT_STATUS" ] \
   || { echo "STOP: worktree sucio"; exit 1; }
 
-# macOS/BSD: `sha256sum --check --strict` es GNU y NO existe aquí. Equivalente sin `--strict`:
+# macOS/BSD: NO usar `sha256sum`. En Darwin existe un binario homónimo `sha256sum (Darwin) 1.0`
+# que devuelve exit 1 INCLUSO CON EL HASH CORRECTO: no puede acreditar nunca y mata el bloque.
+# Verificado con control positivo y negativo (ver §2 bis). El único válido aquí es `shasum`:
 shasum -a 256 --check <<'SUMS'
 d530168045d31bc6c689b3129d0828cded437af49eb4373e05d411467292ea89  build/s1-c1/blocked/main.json
 688c4aed6b96a0159a5d99e755748ae76155fff1d0d2ede1eaeba14981d5d8b5  build/s1-c1/blocked/payment.json
@@ -56,6 +58,22 @@ node scripts/s1-c1/profile-cli.js preflight \
 
 Antes de fiarse del guard de hashes: alterar un hash a mano y comprobar que el comando **falla**.
 Un guard que no se ha visto fallar no es un guard.
+
+## 2 bis. Por qué `sha256sum` no vale en Darwin — con control positivo
+
+Esto ya costó un `BLOCKED` (c.5226381120, diagnosticado en c.5226393460). En Darwin existe un
+binario **llamado igual** que el de GNU pero incompatible, y su modo de fallo es el peor posible:
+no rechaza el comando, simplemente **nunca acredita**.
+
+| Verificador | hash correcto | hash alterado | fichero ausente |
+|---|---|---|---|
+| `sha256sum --check` (Darwin 1.0) | **exit 1** ❌ | exit 1 | exit 1 |
+| `sha256sum --check --strict` (Darwin 1.0) | usage, **exit 1** ❌ | — | — |
+| `shasum -a 256 --check` | **exit 0** ✅ | exit 1 ✅ | exit 1 ✅ |
+
+Solo `shasum -a 256 --check` tiene el control positivo en verde. Los cuatro artefactos, por su
+parte, están presentes en `10920d7d…` y sus hashes leídos de los objetos git dan **4/4** contra el
+checkpoint: cuando este guard falla en Darwin, **no** es un problema de material.
 
 ## 3. ⚠️ Trampa 2 — el compromiso del target NO es `sha256sum` del fichero
 
