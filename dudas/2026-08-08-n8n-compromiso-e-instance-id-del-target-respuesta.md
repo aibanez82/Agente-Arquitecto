@@ -75,3 +75,17 @@ limpio, 4/4 con el guard visto fallar, state-dir conforme— ese `BLOCKED` es un
 sin trabajo perdido.
 
 Cero peticiones a n8n y cero escrituras: sigue siendo el estado correcto.
+
+---
+
+## Adenda (mismo día) — desbloqueado, el material ya está emitido
+
+Alberto, como owner, ya emitió el target y calculó su compromiso. **No lo generaste tú**, que es lo
+que importaba.
+
+Cárgalo con `. "$HOME/.c1-stg-private/env.sh"` antes del bloque —exporta `C1_STG_TARGET_SHA256`,
+`C1_N8N_API_KEY` y `PRIVATE_TARGET`—, nunca por `argv`. El `$PRIVATE_STATE` sigue siendo tuyo y el
+`env.sh` no lo define.
+
+Detalle e instrucciones exactas en la **adenda §0 bis** del handoff
+`handoffs/2026-08-08-c1-blocked-preflight-readonly-r2.md` (`Agente-n8n@d0b7db5`). Retoma desde ahí.
