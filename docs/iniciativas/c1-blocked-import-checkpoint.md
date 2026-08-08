@@ -76,9 +76,14 @@ la preimagen de §6.
   fuera del worktree.
 - La intención y la preimagen se persisten **con `fsync` antes** del primer PUT: es lo que hace
   recuperable un proceso muerto entre la escritura y la inspección.
-- **Backup adicional de la instancia:** el repositorio ya conserva un export completo previo
-  (`backup/2026-08-06-stg-pre-a2-import`). Un backup vivo nuevo **no está autorizado** por este
-  checkpoint; si el GO posterior lo exige, se declara ahí.
+- **Backup histórico adicional — no requerido.** Existe un export completo previo de la instancia,
+  fijado por **ref `origin/backup/2026-08-06-stg-pre-a2-import`, commit
+  `204d067cb0dc76f244dd8444723dbc7c63af1f48`, bajo `backups/2026-08-06-stg-pre-a2-import/`**. En la
+  versión anterior de este documento lo cité como si fuera un path de `stg@10920d7`, y **no lo es**:
+  es una ref aparte y el directorio se llama `backups/`, en plural.
+  **No sustituye a las preimágenes**: la reversibilidad normativa de este import depende
+  exclusivamente de §11. Se declara como respaldo adicional y **no se ha recuperado ni validado su
+  contenido**. Un backup vivo nuevo **no está autorizado** por este checkpoint.
 
 ## 7. Estado previo exigido
 
@@ -98,6 +103,28 @@ Ninguno de estos comandos se ejecuta aquí. Los `$…` son **placeholders**; sus
 operador en la ventana autorizada.
 
 ```bash
+set -euo pipefail
+
+# ── 0) GUARD DE PROCEDENCIA — fail-closed. Si algo no cuadra, el bloque muere aquí ─────────────
+#      `plan` sella el hash de los bytes que ENCUENTRE; eso evita drift posterior, pero no prueba
+#      que esos bytes sean los congelados. Esto sí lo prueba, y antes de llegar a `preflight`.
+CHECKOUT="${CHECKOUT:?ruta del checkout de Agente-n8n}"
+cd "$CHECKOUT"
+
+[ "$(git rev-parse HEAD)" = "10920d7d55c0b49464ccccc6383b1d6537be21fe" ] \
+  || { echo "STOP: HEAD no es el acreditado"; exit 1; }
+[ "$(git rev-parse HEAD^{tree})" = "ff966940ee79577a5bb28240b21449282b26fd4a" ] \
+  || { echo "STOP: tree no es el acreditado"; exit 1; }
+[ -z "$(git status --porcelain)" ] \
+  || { echo "STOP: worktree sucio"; exit 1; }
+
+sha256sum --check --strict <<'SUMS'
+d530168045d31bc6c689b3129d0828cded437af49eb4373e05d411467292ea89  build/s1-c1/blocked/main.json
+688c4aed6b96a0159a5d99e755748ae76155fff1d0d2ede1eaeba14981d5d8b5  build/s1-c1/blocked/payment.json
+2c63db43a290fc1e0a41f4a973cd3ed2295c8356a9c5ca57e5bee2e62c22ed53  build/s1-c1/blocked/manifest.json
+ad49eec0b0f02e0fc5d17c10cb9e175bd9772e5067e4e3ac65d79badfab73a43  scripts/s1-c1/manifests/s1-stg-f1f4.redacted.json
+SUMS
+
 # 1) preflight — acredita target y estado antes de tocar nada
 node scripts/s1-c1/profile-cli.js preflight \
   --target-file "$PRIVATE_TARGET" --state-dir "$PRIVATE_STATE"
@@ -111,7 +138,18 @@ node scripts/s1-c1/profile-cli.js plan \
 node scripts/s1-c1/profile-cli.js apply \
   --target-file "$PRIVATE_TARGET" --state-dir "$PRIVATE_STATE" \
   --plan "$PRIVATE_STATE/plan.json"
+
+# 4) verify — POSTLECTURA EFECTIVA. `apply` hace los PUT y no acredita: es `verify` quien relee y
+#    comprueba proyección writable, IDs, `active=false` y cero pins. Sin esta orden, §10 sería
+#    una promesa narrada y no una postcondición ejecutada.
+node scripts/s1-c1/profile-cli.js verify \
+  --target-file "$PRIVATE_TARGET" --state-dir "$PRIVATE_STATE"
 ```
+
+> **Portabilidad del guard.** `sha256sum --check --strict` es GNU. En macOS el equivalente es
+> `shasum -a 256 --check` (y **no** admite `--strict`). Se señala porque hoy mismo un comando GNU
+> dado por portable falló en silencio en BSD y costó una ronda: el operador debe usar el de su
+> plataforma y comprobar que el comando **falla** ante un hash alterado antes de fiarse de él.
 
 Propiedades **fail-closed** ya acreditadas de estos comandos:
 
@@ -136,6 +174,7 @@ GO posterior introdujera alguno, deberá llevar literalmente `--app hyl-wai-stg`
 
 ## 10. Postlecturas
 
+**Las ejecuta el subcomando `verify` del §8**, no `apply`: `apply` emite los PUT y no acredita nada.
 Tras el apply, por GET público:
 
 1. **Byte/fingerprint**: la proyección writable viva coincide **exactamente** con la del artefacto
