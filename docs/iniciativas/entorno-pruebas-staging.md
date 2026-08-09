@@ -3,6 +3,13 @@
 > Estado: **⛔ PAUSADA 7 jul 2026 — Bug #15: el número de WhatsApp de test comparte `phone_number_id` con producción.** Toda ejecución de prueba en staging se está duplicando en producción (escritura real en `n8n_chat_histories`/`whatsapp_sessions` de prod, aunque sin llegar a emisión). NO correr más pruebas hasta que Juan aísle de verdad el número de test en su propia WABA. Detalle: fila Bug #15 en `CLAUDE.md`.
 > Guardado en git (no en memoria local) para persistir entre las 3 laptops de Alberto.
 
+> **Antes de planificar otra migración a STG, leer primero**
+> [`docs/architecture/manual-migracion-stg-aprendizajes.md`](../architecture/manual-migracion-stg-aprendizajes.md).
+> Recoge lo aprendido en S1 (ago 2026): la tabla de reconocimiento de entorno que hay que
+> responder **en vivo antes de congelar el contrato**, los errores de método que más caros
+> salieron y el catálogo de trampas técnicas. La mayor parte de las 12 jornadas de S1 se fue
+> en descubrir hechos del entorno durante la ejecución.
+
 ## Objetivo
 
 Staging end-to-end para replicar bug fixes antes de subir a prod (gitflow: rama `stg` → `main`). El staging del 2 jul era parcial (ejecución manual con datos "pineados", no conversación WhatsApp real). Se busca cubrir **landing → conversación WhatsApp real → captura → emisión sandbox**.
