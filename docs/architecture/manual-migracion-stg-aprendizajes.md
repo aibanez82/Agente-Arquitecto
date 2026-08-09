@@ -99,6 +99,16 @@ plantilla del GO en vez de leyendo la base. El real era `0`.
 **Antídoto:** las plantillas de salida se rellenan **desde la observación**, campo a campo. Nunca se
 copia el ejemplo del GO.
 
+**Y el caso más caro de esta familia no fue un número, fue una frase de procedimiento.** Se escribió
+«retransmitido por el owner» como **fórmula** en la cabecera de ocho handoffs, al redactarlos y antes
+de que la retransmisión existiera. El ejecutor no tiene otra forma de saberlo, así que se apoyaba en
+ella para decidir **si podía ejecutar**: durante ocho entregas, el control de arranque no controlaba
+nada y nadie lo notó.
+
+**Regla:** un campo que otro va a usar para decidir si actúa **no se rellena al redactar**. Se deja en
+`PENDIENTE` y se cambia, en un cambio propio y fechado, cuando el hecho ocurre. Si al escribir un campo
+no puedes señalar la observación que lo respalda, ese campo miente aunque acabe siendo cierto.
+
 ### 2.5 Guardas que fallan abiertas
 
 `[ -z "$(git status --porcelain)" ]` da éxito si el comando muere sin escribir nada: un fallo se lee
