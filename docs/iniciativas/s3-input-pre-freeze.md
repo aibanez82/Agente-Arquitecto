@@ -27,6 +27,17 @@ El caso que fuerza la definición es justo el que S1 materializa: **A/B con el m
 por lead debe resolver **LA** sesión exacta. Falta definir qué ocurre si un lead tiene **dos sesiones
 vivas** — proponemos el mismo tratamiento de cardinalidad que S1 (`400`/`409`), no elegir una.
 
+**Actualización (9 ago) — esto ya no es hipotético, hay evidencia en vivo.** S1 materializó el par A/B
+**compartiendo teléfono** y el Dashboard lo acreditó por comportamiento en `#132 c.5228667583`:
+cada registro aparece **una sola vez**, con lead, cotización, `session_id` y `conversation_id`
+**distintos**, `identity_mode=v2`, el `conversation_id` embebiendo la cotización de **su propia** fila
+y **sin fallback telefónico**; `conversation?lead_id=<A|B>` abre **su sesión exacta** sin cruce, e
+`inbox` devuelve una entrada por cada uno.
+
+O sea: **la resolución por identidad ya funciona con teléfono compartido**, que era el supuesto de
+riesgo. Lo que S3 tiene que fijar no es si se puede, sino **qué responde cuando hay dos sesiones vivas
+para el mismo lead** — el único caso que la evidencia todavía no cubre.
+
 ### A2 — Fuente del gate
 ¿Consulta canónica de S2 o `EXISTS` ad-hoc?
 
