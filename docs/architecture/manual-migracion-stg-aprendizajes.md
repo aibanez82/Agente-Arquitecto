@@ -182,6 +182,27 @@ como «limpio». Hay que separar **el fallo del comando** del **resultado limpio
 Y en la misma familia: `mkdirSync` sin modo hereda el umask, y `mkdirSync` **con** modo **no corrige
 un directorio ya existente** — el arreglo obvio tampoco basta.
 
+### 2.7 Una suite verde no es cobertura: hay clases de defecto que no puede ver
+
+La conformidad de la etapa salió `success` y la **primera corrida real** murió a los tres minutos, en
+un nodo de base de datos, por un parámetro que llegaba con el tipo equivocado.
+
+Al mirar por qué, lo interesante no fue el hueco sino su forma. La suite **mencionaba** la rama que
+falló, en tres tests — pero para afirmar que **nunca se llegara** a ella (`assert.notEqual`), no que
+funcionara al llegar. Y de fondo: **ningún test offline ligaba parámetros SQL contra su consulta**.
+Ejercitaban lógica sobre objetos. Por construcción, **ninguna cantidad de esos tests podía cazar un
+desajuste de tipo en un parámetro** — y de hecho el mismo nodo ya había tenido otro bug de parámetro
+un mes antes, por otra causa, sin que la suite lo viera tampoco.
+
+**Regla:** antes de fiarte de un `PASS`, pregunta **qué clases de fallo puede detectar esa suite**, no
+cuántos casos cubre. Una rama de respaldo —la que se usa cuando falta el dato bueno— es justo la que
+los tests tienden a declarar indeseable en vez de ejercitar, y justo la que el tráfico real pisa el
+primer día.
+
+**Y el corolario operativo:** cuando aparezca un defecto así, la línea a arreglar es lo barato. Lo que
+hay que decidir es si la suite puede ver esa clase de defecto; si no puede, arreglar la línea solo
+compra tiempo hasta el siguiente.
+
 ---
 
 ## 3. Trazabilidad: el fallo silencioso más caro
