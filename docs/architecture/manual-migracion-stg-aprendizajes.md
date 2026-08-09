@@ -1,8 +1,14 @@
 # Manual de migración a STG — lo aprendido en S1, para que la próxima cueste días y no semanas
 
 Escrito el 8-9 ago 2026, al final del primer carril Contract-First con acciones vivas en staging.
-**No es una crónica: es lo que hay que hacer primero la próxima vez.** La crónica está en el tablero
-y en `HYL-WAI#132`.
+**No es una crónica: es lo que hay que hacer primero la próxima vez.**
+
+> **Documento vivo.** Por decisión de Alberto (8 ago 2026) se alimenta con cada aprendizaje
+> útil **hasta que S1 cierre en STG**. Si aparece una trampa, un error de método o una
+> práctica que evitó daño, entra aquí en el momento — no al final, cuando ya se olvidó el
+> detalle que la hacía útil.
+
+La crónica está en el tablero y en `HYL-WAI#132`.
 
 ## 0. La tesis, en una frase
 
@@ -133,6 +139,30 @@ No todo fue fricción. Estas prácticas evitaron daño real:
   positivo (workflow tocado) y negativo (workflow intacto).
 
 ---
+
+## 4 bis. Leer el GO buscando si es **ejecutable**, no solo si es correcto
+
+Tres GO de la jornada eran impecables de alcance y **materialmente imposibles** tal como estaban
+escritos. Ninguno lo era por descuido: describían el trabajo bien, pero nadie había comprobado que se
+pudiera hacer.
+
+| Lo que pedía el GO | Por qué no era ejecutable |
+|---|---|
+| fijar el pin **«mediante UI»** | ese paso **rompe los fingerprints** que el paso siguiente exige intactos: el método se invalida a sí mismo |
+| que **el owner** enviara un mensaje desde el teléfono de prueba | ese teléfono **no lo tiene el owner**, y el número de destino tampoco era conocido de este lado |
+| que el operador ejecutara la porción PostgreSQL | primero se le retiró la autorización y minutos después se le devolvió; entre medias, el paso era imposible |
+
+**Antídoto — al recibir un GO, antes de aceptarlo, comprobar tres cosas:**
+
+1. **¿Quién tiene físicamente lo que hace falta?** Un teléfono, una credencial, una consola, un
+   navegador. La capacidad no se delega por escrito.
+2. **¿Algún paso del método destruye una precondición de otro paso?** En S1, pinchar por UI rompía lo
+   que `pin-verify` exigía. Se detectó **con el operador delante del teclado**.
+3. **¿La herramienta expone la operación que el GO nombra?** «Execute workflow» existe en la UI y
+   **no** en la API pública. El plan asumió que sí.
+
+Cuesta cinco minutos y ahorra una ventana operativa entera. Y decirlo **antes** es barato: decirlo
+después de un paso irreversible no arregla nada.
 
 ## 5. Catálogo de trampas técnicas concretas
 
