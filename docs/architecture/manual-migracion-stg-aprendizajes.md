@@ -109,6 +109,54 @@ nada y nadie lo notó.
 `PENDIENTE` y se cambia, en un cambio propio y fechado, cuando el hecho ocurre. Si al escribir un campo
 no puedes señalar la observación que lo respalda, ese campo miente aunque acabe siendo cierto.
 
+### 2.5 bis Una precondición **asumida** no es una precondición verificada
+
+Aprobé un reparto de trabajo cuyo paso final era **una interacción real de WhatsApp**, dando por hecho
+que la haría el owner. Nadie comprobó de qué número tenía que salir el mensaje. El transporte del par
+de pruebas **pertenecía a un tercero**, así que el owner no podía ejecutarlo: el reparto era inviable
+desde que lo escribí.
+
+Se cazó porque alguien preguntó **antes** del paso irreversible, no porque el método lo previera. Un
+paso más tarde habríamos descubierto con el sistema ya publicado que hacía falta un teléfono al que no
+teníamos acceso.
+
+**Regla:** antes de asignar a alguien un paso, enumera **qué tiene que poseer** para ejecutarlo
+—credencial, teléfono, consola, permiso— y verifica **cada** cosa. La pregunta no es «¿quién lo hace?»
+sino «¿qué hace falta tener, y quién lo tiene?». Un reparto es una afirmación sobre capacidades, y las
+afirmaciones se verifican.
+
+Corolario del canal: cuando el dato que decide es privado, el que lo tiene responde **solo el hecho**
+—«sí» o «no»— por el canal de coordinación, y **el dato** por el privado. Así se decide sin que el
+material circule.
+
+### 2.5 ter La señal de arranque no se acredita sobre un traslado
+
+El día que estrenamos la línea `Orden de arranque` (§2.4), el owner la dio de viva voz **al ejecutor**,
+que la trasladó pidiendo que se marcara. El ejecutor se negó a escribírsela él mismo, y con razón:
+escrita por el operador solo acredita que **él dice** que se la dieron.
+
+Lo que faltó ver es que **el arquitecto marcándola sobre ese traslado tiene el mismo defecto con un
+salto más**: acredita «el ejecutor dice que el owner dijo». La cadena degrada igual.
+
+**Regla:** la señal la escribe **quien observó el hecho**. Si el owner te la dio a ti, la marcas tú; si
+se la dio a otro, la confirmas con el owner antes de marcarla. Cuesta un mensaje. Es exactamente el
+coste que evita reintroducir por la puerta de al lado el defecto que acabas de retirar por la principal.
+
+### 2.6 El comportamiento del sistema se lee en el artefacto publicado, no de memoria
+
+Un guion de instrucciones para un tercero advertía que cierta palabra «deja la sesión bloqueada con una
+respuesta fija hasta liberarla a mano». Contrastado contra el workflow recién publicado, **el nodo de
+enrutado manda esa intención a la misma salida que la ruta normal**: no hay bloqueo. El efecto real era
+otro —y peor—: el flujo acaba **registrando un lead**.
+
+El consejo práctico era correcto; el mecanismo, inventado de memoria. Y a un tercero se le publica el
+mecanismo, no solo el consejo.
+
+**Regla:** toda afirmación sobre **cómo se comporta** el sistema se comprueba en el JSON del workflow o
+en el código desplegado, no en el recuerdo del prompt. Son treinta segundos. Y aplica igual —o más—
+cuando la afirmación viene de quien más domina ese sistema: la seguridad con la que se dice una frase
+no es evidencia de nada.
+
 ### 2.5 Guardas que fallan abiertas
 
 `[ -z "$(git status --porcelain)" ]` da éxito si el comando muere sin escribir nada: un fallo se lee
