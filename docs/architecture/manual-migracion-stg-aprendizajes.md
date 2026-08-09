@@ -157,6 +157,23 @@ en el código desplegado, no en el recuerdo del prompt. Son treinta segundos. Y 
 cuando la afirmación viene de quien más domina ese sistema: la seguridad con la que se dice una frase
 no es evidencia de nada.
 
+**Coda, y es la mitad más importante: esa corrección mía también estaba mal.** Verifiqué **un solo
+nodo** —el de enrutado—, vi que la intención iba a la ruta normal, y concluí «no hay rama de bloqueo».
+La había: un `IF` posterior, alimentado por otro guard, cortocircuitaba el flujo entero con una
+respuesta fija a partir de que el lead quedaba registrado. El aviso original acertaba en la
+consecuencia y erraba en la ruta; **el mío arregló la ruta y borró la consecuencia**, que era la parte
+útil. De los dos errores, el mío era el peligroso: el otro erraba hacia el lado seguro.
+
+**Regla:** **una verificación puntual no acredita una conclusión general.** Comprobar un nodo autoriza
+a afirmar algo sobre ese nodo, no sobre el camino. Si la afirmación es «no ocurre X», hay que recorrer
+el flujo hasta el final, porque *no haberlo visto* y *no estar* se parecen mucho desde un solo punto.
+
+Y el corolario de conducta: **quien corrige carga con el estándar que exige**. Una corrección publicada
+pesa más que la frase que corrige —llega con autoridad y desactiva el aviso original—, así que merece
+más verificación, no menos. Lo salvó que el ejecutor contrastó mi corrección contra la fuente en lugar
+de acusar recibo. Un equipo donde el de arriba no se contrasta acumula errores con presentación de
+certeza.
+
 ### 2.5 Guardas que fallan abiertas
 
 `[ -z "$(git status --porcelain)" ]` da éxito si el comando muere sin escribir nada: un fallo se lee
