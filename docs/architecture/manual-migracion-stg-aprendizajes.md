@@ -58,6 +58,14 @@ romperlo cuesta una enmienda, no un commit.
 - Se verificó que **mi cliente** conectaba con el DSN, pasando `ssl` como opción de cliente, en vez de
   probar **el DSN solo**, que es como lo consume el código. El DSN entregado no habría conectado.
 
+- **Se razonó sobre el mecanismo en vez de observar el sistema**, dos veces en la misma noche:
+  (i) se designó como «baseline operativo» la preimagen de un state-dir creado **después** del import
+  —contenía el perfil de gates, no el estado normal—, y seguirlo habría dejado **staging activado y
+  roto con apariencia de correcto**; (ii) se afirmó que un gate de solo lectura denegado «no escribe
+  `uncertain`», leyendo rutas de código en lugar del **journal**, que es el estado real.
+  **Cuando exista un registro del estado, leerlo. El código dice lo que debería pasar; el registro
+  dice lo que pasó.**
+
 **Antídoto operativo:** todo control positivo debe ejercitarse **por la misma ruta de código que lo
 va a consumir**, y todo negativo debe fallar **por el motivo esperado** —si deniega por otra razón,
 no ha probado nada—. Y ante una garantía, enumerar **todos** sus puntos de entrada: en S1, seis
@@ -164,10 +172,41 @@ pudiera hacer.
 Cuesta cinco minutos y ahorra una ventana operativa entera. Y decirlo **antes** es barato: decirlo
 después de un paso irreversible no arregla nada.
 
+## 4 ter. Una cadena de acreditación necesita un camino de reparación
+
+En S1 la ventana operativa quedó **atrapada sin que nadie hiciera nada malo**: en cuanto el contenido
+vivo se desvió del artefacto acreditado, **las dos salidas se cerraron a la vez** —`rollback` y
+`close` acreditan el contenido vivo antes de actuar— y **lo único que repararía el contenido estaba
+prohibido** en el estado al que ese mismo desvío había llevado la ventana.
+
+No fue un fallo de implementación: cada guarda hacía exactamente lo que debía. El agujero está en el
+**diseño del conjunto**.
+
+**Preguntas que hay que hacerle a cualquier máquina de estados con acreditación, antes de congelarla:**
+
+1. **¿Existe al menos un camino desde cada estado hasta un final seguro?** Si un estado solo admite
+   acciones que a su vez exigen una precondición que ese estado impide, es una trampa.
+2. **¿La reversión exige que lo vivo esté acreditado?** Revertir es justamente lo que se hace cuando
+   *no* lo está. Una preimagen debería poder aplicarse **sin** exigir que el presente case.
+3. **¿Un control que para a tiempo cuesta lo mismo que un fallo a medias?** En S1 un gate de solo
+   lectura denegó **antes de escribir nada** y aun así dejó la ventana en `recovery-only`. El criterio
+   conservador es defendible, pero conviene que sea una **decisión** y no un efecto colateral.
+
+**Y el criterio que sí funcionó para desempatar fuentes:** cuando hay varios candidatos y ninguno es
+inequívoco, **lo que acredita no es la procedencia: es la coincidencia independiente**. El baseline se
+resolvió porque una preimagen registrada por la herramienta y un fichero versionado **decían lo mismo
+por fingerprint**. Ninguno de los dos bastaba por separado; si no hubieran coincidido, la respuesta
+correcta era STOP.
+
 ## 5. Catálogo de trampas técnicas concretas
 
 Para consultar en frío, sin contexto:
 
+- **Un editor visual no es un canal utilizable sobre artefactos acreditados.** El de n8n
+  **re-serializa al guardar y omite los parámetros cuyo valor coincide con el defecto**: mueve
+  fingerprints de nodos que nadie tocó. Y *«Execute workflow»* **guarda** —con autoguardado activo, en
+  silencio—, así que no hay «ejecutar sin guardar». Cualquier procedimiento que diga «hazlo por la UI»
+  sobre algo con fingerprints congelados **nace roto**.
 - **`sha256sum` no es portable.** En macOS existe un binario homónimo que **devuelve error incluso
   con el checksum correcto**: nunca acredita. Usar `shasum -a 256 --check`.
 - **JSON canónico ≠ fichero.** Un compromiso calculado como `sha256(canonical_json(x))` no coincide
