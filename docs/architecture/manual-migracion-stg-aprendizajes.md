@@ -71,10 +71,21 @@ PROD subió de n8n 2.6.3 a **2.28.7** (misma versión que STG). Ventana 1 min 48
 SHA-256 en los cinco. El motor solo reescribe **al guardar**, y nadie guardó. Es decir, el miedo era
 correcto como riesgo y falso como hecho: **la re-normalización la dispara guardar, no arrancar.**
 
-**El punto 1 sobrevive, por otra razón.** Paridad de versión ≠ paridad de instancia: PROD es licencia
-**enterprise** y STG **community**. Un verde en STG sigue sin ser predicción completa sobre PROD
-mientras alguna ruta dependa de una feature que STG no puede reproducir. Sustituir un riesgo por otro
-más pequeño está bien; darlo por cerrado, no.
+**El punto 1 sobrevive, pero mucho más débil de lo que se escribió primero.** El informe del upgrade
+declaraba PROD como licencia **enterprise** frente a STG **community**, y sobre eso monté una
+asimetría de features que llegué a publicar en `#132`. **Era falso:** Alberto abrió *Usage and plan*
+en las dos instancias y las dos dicen **«You're on the Community Edition (Registered)»**. Explicación
+probable del error, no verificada: el `environment: production` del certificado de licencia designa
+el **servidor de licencias** al que habla n8n, no un plan de pago.
+
+Lo que queda de asimetría real es de **plataforma**, no de features: plantilla de Hostinger (app n8n)
+contra Docker genérico, y la BD interna de n8n (SQLite en PROD, sin verificar en STG).
+
+**La lección de método es la cara, y es mía:** el dato estaba a diez segundos de la UI, y en su lugar
+lo tomé del cuadro de reconocimiento del ejecutor y lo publiqué en el tracker de Juan. Verificar
+contra el doc de entrega **no es** verificar contra la fuente cuando el doc de entrega es quien pudo
+equivocarse. Corolario: **un dato observable en la UI del propio sistema se comprueba en la UI**, no
+en el informe de quien la miró.
 
 **Yo planifiqué ese upgrade sin responder esta tabla, y tres supuestos míos eran falsos:**
 
