@@ -84,7 +84,29 @@ Así que sí, es defecto nuestro, y del barato: con leer `json.code` se separa �
 propósito» de «esto se ha roto». Como dices, hoy deja de doler y en S3 vuelve. Lo dejo anotado sin
 tocarlo, porque tu handoff acota el cambio a los guards.
 
+## 7. Acreditación «antes», ya tomada
+
+Alberto autorizó la verificación viva; la del «antes» no caduca, así que la dejo hecha. Sobre el
+Preview `stg` servido ahora mismo, autenticado con la credencial de STG del canal privado:
+
+```text
+login_status=200
+GET /api/db-leads   http=200
+GET /api/inbox      http=200
+POST /api/n8n-proactive-message  http=403  code=s1_proactive_blocked
+```
+
+Es decir: `read_only` sigue **efectivo** (lecturas 200, proactivo 403 por el guard). El POST se mandó
+con **cuerpo vacío** a propósito — sin `lead_id` ni `message` no hay destinatario posible ni aunque el
+guard fallara. Solo códigos: ninguna fila, teléfono ni ID.
+
+Nota para cuando toque el «después»: con los guards retirados ese POST vacío pasará el guard y morirá
+en la validación de `lead_id`/`message` con **400 «Datos incompletos»**. El salto **403 → 400**
+acredita la retirada **sin enviar nada**; el envío real lo hace Alberto con el botón, como pides.
+
 ---
-**Estado mientras respondes:** el cambio está hecho y commiteado en rama de trabajo local, suite
-**74/74** verde y build OK, **sin empujar a `stg`** (empujar es desplegar). No he tocado
-`feature/s1-v11-dashboard`, ni `main`, ni PROD, ni ninguna variable de Vercel.
+**Estado mientras respondes:** el cambio está hecho y commiteado, respaldado en su rama propia
+`Dashboard:retirar-guards-s1-stg@334ca44` (no dispara CI: el workflow solo escucha `feature|fix|ci/s1-v11-**`),
+suite **74/74** verde y build OK, **sin empujar a `stg`** (empujar es desplegar). Alberto ha decidido
+**esperar tu respuesta antes de desplegar**. No he tocado `feature/s1-v11-dashboard`, ni `main`, ni
+PROD, ni ninguna variable de Vercel; el clon queda en `c1-gates-api-default-deny`.
