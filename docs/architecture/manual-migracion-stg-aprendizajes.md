@@ -44,6 +44,22 @@ romperlo cuesta una enmienda, no un commit.
 
 ---
 
+**Pregunta que faltaba en esta tabla y que descubrimos tarde:** *¿corren staging y producción la misma
+versión del motor?* En nuestro caso la respuesta era **no, y por 3 599 commits** — cinco meses de
+diferencia entre las dos instancias de n8n. Nadie lo había mirado nunca.
+
+Importa por dos motivos distintos, y el segundo no es obvio:
+
+1. **Un verde en staging no es una predicción sobre producción** mientras las versiones difieran. Es
+   el supuesto sobre el que descansa tener staging, y estaba sin comprobar.
+2. **Versiones distintas normalizan el JSON de forma distinta al guardarlo.** Si tu método acredita
+   comparando artefactos byte a byte entre entornos —el nuestro lo hace—, la diferencia de versión es
+   **una fuente de drift que no viene de que nadie haya cambiado nada**. Días de investigación
+   buscando un culpable que no existe.
+
+Cuesta una pregunta. La respuesta, si es «no», no obliga a actualizar nada de inmediato: obliga a
+**saber qué compra y qué no compra cada validación**.
+
 ## 2. Los errores de método que más caros salieron
 
 ### 2.1 Verificar la propiedad que se puede observar en vez de la que importa
