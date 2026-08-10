@@ -235,6 +235,28 @@ error, respuestas guardadas, logs, volcados— y busca ahí. Solo después se de
 declara diciendo **dónde se buscó**, para que el siguiente no repita la búsqueda ni herede la
 conclusión sin la evidencia.
 
+### 2.9 Un bug conocido que encaja con tus síntomas es la respuesta equivocada más cómoda
+
+Un nodo se colgaba hasta agotar el timeout de 300 s. Buscando, apareció **un issue abierto del propio
+motor** que describía el síntoma y cuya precondición **se cumplía en nuestro workflow**. Encajaba
+perfectamente.
+
+**No era.** La causa real era aburrida y nuestra: ese nodo era **el único de 23** que construía en
+caliente el argumento de un acceso a otro nodo, en vez de pasarlo literal — y con literal el motor
+puede resolver estáticamente qué datos enviar. Un detalle sin misterio.
+
+Lo que hace peligroso a un issue que encaja es que **ofrece una salida honorable**: «coincide con un
+bug conocido, no es nuestro, a esperar el fix». Nadie te discute esa conclusión, y el defecto sigue
+vivo.
+
+**Regla:** un bug externo que explica tus síntomas es **una hipótesis más**, no un veredicto — y
+compite en igualdad con «lo nuestro es distinto al resto». Antes de adoptarlo, busca **en qué se
+diferencia el elemento que falla de los que funcionan**; si es el único de veintitrés que hace algo,
+esa es la pista, encaje o no encaje el issue.
+
+Y cuando ambas hipótesis sigan vivas, **diseña el cambio para que discrimine**: elige el que, salga
+como salga, te diga cuál era. Así ninguna ronda se gasta solo en descartar.
+
 ---
 
 ## 3. Trazabilidad: el fallo silencioso más caro
