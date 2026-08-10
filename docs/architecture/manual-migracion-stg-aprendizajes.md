@@ -203,6 +203,22 @@ primer día.
 hay que decidir es si la suite puede ver esa clase de defecto; si no puede, arreglar la línea solo
 compra tiempo hasta el siguiente.
 
+### 2.8 «No observable» es una conclusión, y hay que ganársela
+
+Nos hizo falta la versión del motor desplegado. El endpoint obvio no la traía, así que la declaramos
+**brecha no observable** y seguimos. Estaba en `n8nDetails.n8nVersion`, **dentro del payload de error
+de la ejecución que ya estábamos investigando** — en la mano, desde el día anterior.
+
+El fallo no fue de conocimiento sino de reflejo: de *«el sitio obvio no lo trae»* saltamos a *«no se
+puede saber»* sin repasar qué objetos ya teníamos delante. Y esa declaración hizo daño activo: **una
+brecha declarada cierra la búsqueda con aspecto de rigor**, mientras que una pregunta abierta la
+mantiene viva. Además nos llevó a fabricar una explicación dependiente de versión que resultó falsa.
+
+**Regla:** antes de declarar algo no observable, enumera **los artefactos que ya posees** —payloads de
+error, respuestas guardadas, logs, volcados— y busca ahí. Solo después se declara la brecha, y se
+declara diciendo **dónde se buscó**, para que el siguiente no repita la búsqueda ni herede la
+conclusión sin la evidencia.
+
 ---
 
 ## 3. Trazabilidad: el fallo silencioso más caro
