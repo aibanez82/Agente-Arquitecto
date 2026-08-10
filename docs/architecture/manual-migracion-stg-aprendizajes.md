@@ -60,6 +60,67 @@ Importa por dos motivos distintos, y el segundo no es obvio:
 Cuesta una pregunta. La respuesta, si es «no», no obliga a actualizar nada de inmediato: obliga a
 **saber qué compra y qué no compra cada validación**.
 
+### 1 bis. Resuelto el 10 ago — y lo que enseñó hacerlo
+
+PROD subió de n8n 2.6.3 a **2.28.7** (misma versión que STG). Ventana 1 min 48 s, ~70 migraciones en
+13 s, los 5 workflows idénticos antes/después, los 3 `webhookId` sin cambio. Informe:
+`Agente-n8n:handoffs/2026-08-10-upgrade-n8n-2287-prod-informe.md`.
+
+**El punto 2 de arriba queda contestado con evidencia, y a nuestro favor:** los workflows almacenados
+**no se re-normalizaron** al saltar 3 599 commits — `nodes`+`connections` byte a byte idénticos, mismo
+SHA-256 en los cinco. El motor solo reescribe **al guardar**, y nadie guardó. Es decir, el miedo era
+correcto como riesgo y falso como hecho: **la re-normalización la dispara guardar, no arrancar.**
+
+**El punto 1 sobrevive, por otra razón.** Paridad de versión ≠ paridad de instancia: PROD es licencia
+**enterprise** y STG **community**. Un verde en STG sigue sin ser predicción completa sobre PROD
+mientras alguna ruta dependa de una feature que STG no puede reproducir. Sustituir un riesgo por otro
+más pequeño está bien; darlo por cerrado, no.
+
+**Yo planifiqué ese upgrade sin responder esta tabla, y tres supuestos míos eran falsos:**
+
+| Supuesto del plan (9 ago) | Realidad |
+|---|---|
+| Hace falta Juan para saber el escenario de despliegue | Es **Docker**, y se lee del propio panel + *Copy debug information*. Cero dependencia externa |
+| Backup con `pg_dump` | La BD interna de n8n es **SQLite**. El Postgres es la de aplicación y el upgrade no la toca |
+| `N8N_ENCRYPTION_KEY` es variable de entorno; comprobar que «se conserva» | Vive **autogenerada en un fichero** de 56 bytes dentro del volumen. La comprobación real es no perder el volumen |
+
+Es exactamente el fallo que este documento existe para evitar, cometido por quien lo escribe: **el
+plan se redactó antes del reconocimiento**. Filas nuevas para la tabla del §1, todas de una tarde:
+*¿escenario de despliegue?* · *¿qué motor tiene la BD interna del propio sistema, no la de la
+aplicación?* · *¿la clave de cifrado es variable o fichero?* · *¿las imágenes del compose llevan tag?*
+
+**Trampas técnicas que salieron y son reutilizables** (van también al §5):
+
+- **SQLite no vuelca el WAL al apagarse.** Copiar solo `database.sqlite` habría perdido **2 h 30 min**
+  de escrituras en silencio. Se copian los tres ficheros (`.sqlite`, `-wal`, `-shm`) juntos.
+- **Imágenes de compose sin tag** (`image: docker.n8n.io/n8nio/n8n`): un `docker compose pull` salta a
+  `latest` y **arrastra lo que comparta el compose** — aquí, Traefik con sus certificados y 6 meses de
+  uptime. Fijar tag antes de tocar nada, y levantar con `--no-deps`.
+- **Ensayar la migración sobre una copia con el sistema en marcha**, en contenedor `--network none` y
+  con un comando de CLI en vez de arrancar el producto, para que no se active ningún workflow ni
+  dispare ningún cron. Y la prueba diferencial: **segunda pasada → 0 migraciones**, que es prueba de
+  que se persistieron y no una inferencia de que no dio error.
+
+### 1 ter. Una herramienta de seguridad sin hogar canónico deja de ser una red
+
+El upgrade cambió la **forma del objeto que devuelve la API** (`nodeGroups` aparece, `description`
+desaparece). El detector de drift compara el objeto entero descartando una lista fija de claves
+volátiles, así que **reportará drift falso en todo PROD sin que nadie haya tocado nada**, y con `--go`
+sobrescribiría los baselines. `qualitas-issues#74`.
+
+Lo que enseña no es la lista de claves. Es que **el script no vive en `main`**: existe en veinte ramas
+y su tabla de destinos **ya se ha bifurcado en dos versiones distintas**. Cuál se ejecuta depende de
+qué rama esté pagada en ese clon. Una red de seguridad que depende de eso no es una red.
+
+**Regla:** la herramienta que vigila un entorno vivo tiene **una** copia canónica, en la rama que
+todos comparten, y se actualiza ahí. Si está en una rama de trabajo, lo primero es sacarla.
+
+Y el corolario que casi nos muerde: el arreglo obvio —añadir `description` a la lista de claves
+volátiles— **habría sido peor que el bug**, porque el filtro es **recursivo** y `description` es
+también el campo por el que un agente LLM decide qué herramienta llamar. Habríamos quedado ciegos
+justo en el campo que gobierna el comportamiento del bot. **Cuando un filtro es recursivo, una clave
+del envoltorio y una clave de contenido con el mismo nombre son indistinguibles.**
+
 ## 2. Los errores de método que más caros salieron
 
 ### 2.1 Verificar la propiedad que se puede observar en vez de la que importa
