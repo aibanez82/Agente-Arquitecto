@@ -85,3 +85,31 @@ Se conservan aquí tal cual estaban por si el doc de iniciativa no los tuviera a
   GitHub (la corrida de prueba no creó el issue de control 'JUAN-monitor activo')."
 - **Issue #119 (contexto):** "rider aceptado en la autorización de B3, 29 jul." — y 4 ago:
   hallazgo nuestro publicado en #119 `c.5183416152` (endpoint acepta POST sin credencial).
+
+## Cambio de rol del Arquitecto (Alberto, 10 ago 2026) — de emisor de handoffs a definidor de requerimientos
+
+**Qué cambia:** Alberto pasa a instruir **directamente** a los ejecutores (n8n, Dashboard). El
+Arquitecto deja de publicar handoffs en sus repos y de responder `dudas/*.md`. Su entregable es el
+**paquete de instrucciones para Alberto** — requerimiento, alcance, qué tocar, criterios de
+aceptación y pruebas — y él decide qué pasa, cómo y cuándo.
+
+**Qué NO cambia:**
+
+- El Arquitecto sigue **leyendo** los repos de los ejecutores (informes, commits, artefactos). Es de
+  donde sale el conocimiento E2E y la verificación contra la fuente; leer no es comunicar.
+- El conocimiento E2E incluye explícitamente **la parte de Juan** (`aguayo-co/HYL-WAI`), no solo
+  nuestros sistemas.
+- La comunicación con **Juan y sus issues** sigue siendo del Arquitecto salvo orden en contra.
+- El principio de la «orden de arranque» (contenido ≠ orden; ordena Alberto; la orden se registra
+  aparte del contenido) sigue vigente aunque su mecanismo concreto en el fichero de handoff no se use.
+
+**Por qué importa dejarlo escrito:** durante los 12 días de S1 el Arquitecto era el emisor de
+handoffs y el que resolvía dudas en vivo, y buena parte de las convenciones de este documento
+(orden de arranque, respaldos en rama propia, detección por fichero sin respuesta) nacieron de ese
+modo de trabajo. Al cambiar el emisor, esas convenciones no se borran: quedan **suspendidas** y con
+su formato documentado, porque el histórico de S1 se lee con ellas y porque Alberto puede reutilizar
+el mismo formato al instruir.
+
+**Ampliación del rol:** definición de requerimientos con más profundidad. Alberto detalla el
+requerimiento de negocio y el Arquitecto devuelve las instrucciones para el ejecutor que toque.
+Primer caso: recordatorios de pago (`docs/iniciativas/recordatorios-de-pago.md`, `HYL-WAI#144`).
