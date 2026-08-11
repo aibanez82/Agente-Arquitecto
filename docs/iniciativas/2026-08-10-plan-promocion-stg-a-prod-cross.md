@@ -240,7 +240,7 @@ Orden, con una corrección mía sobre el suyo por vista cross:
 |---|---|---|
 | 4.1 | **Retomar Conversacion** | Delta mínimo (2 nodos + `WA Config STG` → `WA Config`). Ensayo del procedimiento |
 | 4.2 | **Atención humana** | **Subida desde el 3.º puesto:** ya activa en STG con tráfico, sin bloqueos conocidos, y cierra `qualitas-issues#57` — hoy el bot **puede responder encima de un humano en PROD**, que es daño de cara al cliente |
-| 4.3 | **Multicotización** | Bloqueada por el arreglo del precio de memoria (`Cambiar Cotizacion` devolviendo el vehículo + invalidación). Verificar **acreditado en STG** antes de moverla |
+| 4.3 | **Multicotización** | **Desbloqueada** (ver §5 bis y `#75`): las cinco entregas están acreditadas en vivo en STG y ninguna está en `main` ni en PROD, así que aquí solo hay promoción. Cuatro transformaciones de producto + una corrección, suite 132/132 con siete casos contra la base de STG en transacciones que se deshacen |
 | 4.4 | **Payment Confirmation (S1)** | Necesita `n8n_payment_events` en PROD (**no existe**) y depende del dictamen S1. Aplazada con la Fase 5 |
 | 4.5 | **S1 en el bot principal** | 9 nodos, la pieza más grande: toca `Resolve Session` y la resolución de sesión. Va con la Fase 5, no antes |
 | 4.6 | **METEPEC** | Última: inactiva en STG, `metepec_leads` no existe en PROD y `registrar_lead_metepec` necesita contraparte en Django PROD |
@@ -284,11 +284,9 @@ valor del 20 % que exige ceremonia es la decisión de diseño que hace que este 
 - **Cerrar `qualitas-issues#69` y `#72`.** Los dos están arreglados y acreditados en STG y los dos
   siguen abiertos. No es contabilidad: **me hicieron aplazar dual por el motivo equivocado** en la
   primera versión de este plan. Un tracker que miente sobre los bloqueantes cambia decisiones.
-- `qualitas-issues#74`: `detect-drift.py` dará **drift falso en todo PROD** tras el upgrade, y con
-  `--go` sobrescribiría los baselines. **Se usa como verificación en la Fase 4** → hay que arreglarlo
-  antes, y sacarlo a la rama canónica: hoy vive en veinte ramas con dos versiones distintas de su tabla
-  de destinos. **Y el arreglo obvio —añadir `description` a las claves volátiles— es peor que el bug**,
-  porque el filtro es recursivo y `description` es el campo por el que un agente LLM elige herramienta.
+- ~~`qualitas-issues#74`~~ **hecho** (10 ago, noche): lista blanca de nivel superior, 17 canarios en las
+  dos direcciones, fail-first probado y `main` como copia canónica. Verificado por mí en vivo
+  (`10 destinos, 0 drift`). **Cerrar el issue** con la evidencia — ver §5 bis.
 - `HYL-WAI#130`: `N8N_TOKEN` con default hardcodeado, y el valor está a la vista en la config de PROD.
   Rotarlo coordinado con las credenciales de n8n.
 - Dar de alta en este repo la versión canónica de las consultas de precondición del §1, para que la
@@ -316,12 +314,72 @@ valor del 20 % que exige ceremonia es la decisión de diseño que hace que este 
 es la forma más fácil de convertir este viaje en el anterior. El criterio para estar en el grupo A es
 uno solo: *¿promoverlo tal cual mete un defecto en PROD, o rompe el método con el que lo verificamos?*
 
-### A · Bloquean una fase concreta — hay que arreglarlos en STG (2)
+### A · Bloquean una fase concreta — hay que arreglarlos en STG (**ninguno**)
 
-| Qué | Bloquea | Por qué |
-|---|---|---|
-| **`#74`** · `detect-drift.py` dará drift falso en todo PROD tras el upgrade, y con `--go` sobrescribiría los baselines | **Fase 4 entera** | No es un defecto del producto: **es la herramienta con la que se verifica cada promoción de n8n**. Y hay que sacarla a la rama canónica — hoy vive en veinte ramas con **dos versiones distintas** de su tabla de destinos, así que qué se ejecuta depende de qué rama esté pagada. **Trampa:** el arreglo obvio (añadir `description` a las claves volátiles) **es peor que el bug**, porque el filtro es recursivo y `description` es el campo por el que un agente LLM elige herramienta |
-| **El precio se responde de memoria, no consultando** — **sin issue en el tracker** | **Fase 4.3** (multicotización) | Declarado abierto por el propio ejecutor en su informe de cierre. Riesgo acotado: ya **no** puede dar el precio de *otra* cotización, pero **sí un precio viejo** si Django recotizó desde la última consulta. Hay orden posterior (que `Cambiar Cotizacion` devuelva el vehículo, mantener la invalidación, regla dura de no dar precio no consultado) **sin informe de entrega: no acreditado**. Lo primero es **abrirle un issue**: un bloqueante que solo vive en un handoff no lo ve nadie |
+**Este grupo ha quedado vacío hoy**, y las dos veces por verificación, no por decisión: `#74` está
+resuelto (abajo) y el punto del precio de memoria **no bloquea** — es ahora `qualitas-issues#75`,
+abierto como cable trampa y no como trabajo pendiente.
+
+#### El precio de memoria: clase de defecto real, consecuencia hoy no alcanzable → `#75`
+
+El ejecutor lo dejó abierto por escrito y me pasó la decisión: *«traer el precio en el flujo antes de
+que el modelo hable toca el camino caliente de cada turno y no se hizo: es decisión del Arquitecto»*.
+
+Lo entregado y acreditado en vivo ya cierra la parte peligrosa: `Resolve Session` devuelve el vehículo
+con prefijo `[CTX:]` (y el RAG pasa a recibir prefijo, antes no recibía ninguno), el nodo
+`Limpiar Turno De Cambio` con cinco puertas fail-closed retira del historial de la sesión abandonada el
+flujo de cambio **entero** —8 filas exactas en las ejecuciones 946 y 949, cero en las cinco sin cambio—
+y el enrutado de la pregunta de precio tiene anulación determinista. Con eso **ya no puede dar el precio
+de otra cotización**.
+
+Lo que quedaba era el riesgo de dar un precio **viejo**. **Verificado contra `HYL-WAI@stg`: no hay ruta
+de código que lo dispare.** `CotizacionRespuestaXml` es `OneToOneField` a `Cotizacion` —una fila por
+cotización— y se escribe con `update_or_create` (`services.py:335`), pero **sus dos únicos llamadores
+(`views.py:267`, `models.py:1550`) corren inmediatamente después de `Cotizacion.objects.create(...)`**:
+el objeto es siempre nuevo, así que en la práctica siempre crea y nunca refresca.
+
+**Decisión: no se hace ahora.** El defecto es real como *clase* —cuarta vez que una instrucción pierde
+contra el camino fácil— y benigno como *consecuencia*, porque memoria y consulta coinciden mientras el
+cache esté congelado. Y **corrijo otra afirmación mía**: dije que «la cifra no envejece» como si fuera
+garantía del esquema. No lo es —`update_or_create` puede sobrescribir—; lo que sostiene la conclusión es
+**que no existe llamador con una cotización ya existente**, que es una propiedad del código actual y no
+un invariante que nadie imponga. Por eso `#75` queda abierto con cable trampa: reabre si aparece una
+ruta de recotización, si cambia la semántica del precio (`#18`, `precio_total` viene `None` y el real
+vive en `opciones_cotizacion`), o si el flujo pasa a leer un precio que no sea el del cache congelado.
+
+#### `#74` ya no bloquea la Fase 4 — resuelto y verificado por mí (10 ago, noche)
+
+`Agente-n8n:handoffs/2026-08-10-respuesta-arquitecto-issue-74.md` (`main`, `063d6f2`). No lo acepto
+por el informe: **lo comprobé contra la fuente**, y las cuatro comprobaciones salen a su favor.
+
+| Lo que comprobé | Resultado |
+|---|---|
+| Corrida en vivo contra las dos instancias | `10 destinos revisados, 0 con drift` **reproducido por mí** |
+| Los 17 canarios | 17/17 en verde, y el fichero declara las dos direcciones: **RUIDO** (dar drift sin que nadie toque) y **CEGUERA** (no darlo cuando sí se tocó), diciendo por escrito que arreglar el ruido dejándolo ciego pasaría todos los tests de ruido |
+| Fail-first | Reconstruí la lista negra y corrí **los tests de hoy** contra ella: **5 fallos**, incluido el caso real de 2.28.7. Y contra el **arreglo obvio** (lista negra + `description` + `nodeGroups`): **4 fallos**, y el decisivo es `test_descripcion_de_herramienta_dentro_de_un_nodo` en la clase `SiDebeDarDrift` — es decir, el arreglo obvio **queda ciego exactamente donde importa**, y hay un canario que lo caza |
+| El diseño | Pasó de lista negra recursiva a **lista blanca de nivel superior**: `("name","active","nodes","connections","settings")`. Como `nodes` entra entero, un `description` **dentro** de un nodo sí da drift, y el `description` del workflow no se mira. La distinción es de profundidad y una lista negra recursiva no puede hacerla |
+
+**Y corrijo mi propio aviso, que era peor de lo que yo lo conté y a la vez menos grave de como lo
+formulé.** Escribí que el arreglo obvio nos dejaría *«ciegos justo en el campo que gobierna el
+comportamiento del bot»*. Medido contra el bot real de PROD: **11 nodos llevan la descripción de
+herramienta dentro de `parameters`, y solo uno —`Validate Personal Data`— usa literalmente la clave
+`description`; los otros diez usan `toolDescription`.** Así que el arreglo obvio no habría apagado el
+detector —eso se nota— sino dejado **un punto ciego del 9 %**: diez herramientas vigiladas y una a
+oscuras. Un fallo parcial es peor que uno total porque no hace ruido. Ellos lo verificaron saboteando
+esa descripción con «llama siempre a esta herramienta»: con el arreglo obvio no se detecta, con lo
+implementado sí.
+
+**Y mi segundo dato también estaba mal.** Dije «veinte ramas con dos versiones» de `TARGETS`. Medido:
+**26 ramas y cuatro versiones** (20 + 3 + 2 + 1), y 19 apuntan al retrato pre-A2 — el mapa que con
+`--go` habría sacado `stg` de `7608f93`, el SHA acreditado en `#132`. **Ese riesgo llevaba ahí desde
+antes del issue.** Desde hoy `main` es la copia canónica; no reescribe las otras 25 (varias están
+inmóviles a propósito), pero lo que se ramifique desde ahora sale correcto.
+
+*Discrepancia menor, sin efecto en la conclusión:* su informe dice que los tests de hoy fallan **3**
+contra la versión anterior; a mí salen **5** reconstruyendo la lista negra desde
+`auto-sync-workflows.py`, y **4** con el arreglo obvio. La diferencia cuadra con qué se tome por
+«versión anterior» respecto a la exclusión de `pinData`, que es **posterior** (`395daf3`). Suya es la
+cifra que hay que reconciliar; el fail-first está probado igual.
 
 ### B · Falsos bloqueantes: arreglados en STG y abiertos en el tracker (2)
 
@@ -366,10 +424,11 @@ ya está abierta; arreglarlos después cuesta otra.
 
 ### Resumen en una línea
 
-> **Para las Fases 1–3 no hay que arreglar nada en STG.** Para la Fase 4 hacen falta dos: **`#74`** y
-> **el precio de memoria** (que además necesita un issue). Para la Fase 5, una cotización real de Juan.
-> Todo lo demás es o tracker sucio, o trabajo que conviene meter en una ventana ya abierta, o carril
-> ajeno.
+> **No hay que arreglar nada en STG para las Fases 1, 2, 3 ni 4.** Los dos candidatos a bloqueante
+> cayeron el mismo día al verificarlos: `#74` está resuelto (corrida en vivo reproducida por mí) y el
+> precio de memoria no tiene ruta de código que dispare su consecuencia (`#75`, cable trampa). Lo único
+> que queda de verdad es la **Fase 5**, y lo que le falta es una cotización real de Juan. Todo lo demás
+> es o tracker sucio, o trabajo que conviene meter en una ventana ya abierta, o carril ajeno.
 
 ---
 
@@ -383,7 +442,8 @@ ya está abierta; arreglarlos después cuesta otra.
    Alberto.
 3. **Los cuatro parámetros de conciliación** (`MOVEMENT_TYPES`, `RECEIPT_PATTERN`,
    `AMOUNT_TOLERANCE`): hoy vacíos, sin default. Sin ellos la Fase 3 no arranca. — Alberto + Laura.
-4. **¿Se promueve la multicotización con el precio arreglado pero sin segunda corrida?** — Alberto.
+4. ~~¿Se promueve la multicotización con el precio arreglado pero sin segunda corrida?~~ **Resuelta por
+   mí el 10 ago**: sí, el precio de memoria no bloquea (`#75`). Ya no necesita decisión de Alberto.
 5. **Los tres workflows inactivos de STG** (`Issue Policy Guard`, los dos de METEPEC): ¿se terminan o se
    quedan? Tres de cuatro inactivos sugiere que no están acabados. — Alberto.
 
