@@ -132,6 +132,36 @@ también el campo por el que un agente LLM decide qué herramienta llamar. Habr�
 justo en el campo que gobierna el comportamiento del bot. **Cuando un filtro es recursivo, una clave
 del envoltorio y una clave de contenido con el mismo nombre son indistinguibles.**
 
+### Resuelto el 10 ago por la noche — y la lección es de una palabra: **parcial**
+
+Arreglado, y con la solución estructural en vez de la cómoda: **de lista negra recursiva a lista blanca
+de nivel superior** (`name`, `active`, `nodes`, `connections`, `settings`). Como `nodes` entra entero, un
+`description` **dentro** de un nodo da drift y el del workflow no se mira. **La distinción que hacía
+falta era de profundidad, y una lista negra recursiva no puede hacerla** — por eso afinar la lista nunca
+iba a bastar. 17 canarios en las dos direcciones, `main` como copia canónica, y verificado en vivo:
+`10 destinos, 0 drift`.
+
+**Mi aviso era correcto y estaba mal formulado, y el matiz es el aprendizaje.** Escribí que el arreglo
+obvio nos dejaría «ciegos en el campo que gobierna el comportamiento del bot». Medido contra el bot real:
+**11 nodos llevan la descripción de herramienta dentro de `parameters` y solo uno usa literalmente la
+clave `description`; los otros diez usan `toolDescription`.** Así que no habría apagado el detector
+—apagarlo se nota— sino dejado **un punto ciego del 9 %**: diez herramientas vigiladas y una a oscuras.
+
+> **Un fallo parcial es peor que uno total, porque el total hace ruido y el parcial no.** Al evaluar un
+> arreglo, la pregunta no es «¿rompe algo?» sino «¿qué fracción deja de vigilar, y se notaría?». Y la
+> forma de contestarla no es leer el filtro: es **contar los casos reales en el artefacto** — aquí,
+> cuántos nodos usan cada nombre de clave.
+
+Dos cosas más que dejó, ambas de método:
+
+- **La cifra que publiqué del alcance también estaba mal, y por debajo.** Dije «veinte ramas con dos
+  versiones» de la tabla de destinos; eran **26 y cuatro**, con 19 apuntando al retrato pre-A2. Un
+  «vive en varias ramas» sin contarlas es una estimación disfrazada de dato.
+- **Un fail-first se puede verificar sin fiarse de quien lo reporta:** reconstruir la implementación
+  anterior y correr los tests de hoy contra ella. Lo hice, y de paso salió una discrepancia numérica
+  (5 y 4 fallos frente a los 3 declarados) que se explica por qué se tome como «versión anterior».
+  Cuesta diez minutos y convierte «dice que falla antes» en «he visto fallar antes».
+
 ## 2. Los errores de método que más caros salieron
 
 ### 2.1 Verificar la propiedad que se puede observar en vez de la que importa
