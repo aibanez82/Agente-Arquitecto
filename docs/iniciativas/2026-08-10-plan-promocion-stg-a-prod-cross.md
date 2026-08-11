@@ -1,0 +1,344 @@
+# Plan de promoción STG → PRODUCCIÓN — vista cross de los cuatro sistemas
+
+**Autor:** Arquitecto-IA-Qualitas, como arquitecto del proyecto (no de un lado).
+**Fecha:** 10 ago 2026. **Estado:** plan. Nada de aquí se ejecuta sin autorización explícita.
+**Medido contra:** `origin/main` y `origin/stg` de los tres repos y la **BD de PROD en vivo** (rol
+`readonly_leads`), el mismo día. Las cifras de este documento son observadas, no supuestas.
+
+---
+
+## 0. La tesis: por qué esto no puede costar lo que costó STG
+
+S1 tardó 12 días y el manual de aprendizajes ya dictaminó por qué: *«la mayor parte del retraso no fue
+implementar, fue descubrir hechos del entorno en mitad de la ejecución»*. Ir a PROD es un problema de
+**otra forma**, y hay cuatro razones estructurales por las que puede ser mucho más barato. No son
+optimismo: cada una descansa en un hecho verificado hoy.
+
+**1. El reconocimiento ya está hecho, y está en el §1 de este documento.** Es la tabla que el manual
+exige responder *antes* de escribir el plan. En S1 se respondió durante la ejecución, con GO emitidos y
+pasos irreversibles delante. Aquí está respondida en frío, sin permiso de nadie y sin tocar nada.
+
+**2. En PROD ya no se está construyendo una interfaz: se está moviendo una que existe y funciona.** El
+aparato Contract-First —contrato congelado, fingerprints byte a byte, stand-down por etapa, ocho
+handoffs— existía porque tres equipos construían a la vez contra algo que no estaba construido. Ese
+problema **ya se resolvió**. Lo que queda para PROD no es un contrato: es **un invariante de
+compatibilidad** (una frase) y **un rollback por sistema** (tres comandos). Sustituir lo primero por lo
+segundo es el 80 % del ahorro.
+
+**3. Desplegar y activar son dos cosas distintas, y en Django casi todo el delta viaja inerte.** Las
+seis funcionalidades nuevas de pago y funnel v2 están detrás de variables de entorno con **default
+`False`** (`PAYMENT_CONFIRMATION_WRITES_ENABLED`, `PAYMENT_RECONCILIATION_APPLY_ENABLED`,
+`PAYMENT_OUTBOX_DELIVERY_ENABLED`, `PAYMENT_INTERNAL_FULFILMENT_READY`, `LEAD_FUNNEL_V2_WRITE_ENABLED`)
+y el modo de identidad sigue gobernado por `WHATSAPP_CONVERSATION_ID_MODE`, que en PROD vale `shadow`.
+Un despliegue así **no cambia comportamiento**; lo cambia después un `heroku config:set` que se revierte
+en 30 segundos. Un evento grande e irreversible se convierte en dos pequeños y reversibles.
+**Con una excepción real, que está en el §3 y es el riesgo de negocio de todo el viaje.**
+
+**4. Se promueve por sistema y por iniciativa, nunca en bloque.** El Agente n8n ya llegó a esta
+conclusión midiendo su lado (20 nodos nuevos = cinco iniciativas independientes con dueños y estados
+distintos). Vale igual arriba: **una autorización = un sistema = una ventana = un E2E**. Si algo se
+tuerce, se sabe qué fue. Un bloque pide una firma para cinco decisiones y hace el fallo inatribuible.
+
+Y la regla que mantiene todo esto simple, que es la que se rompió en S1:
+
+> **Lo que no esté verde en STG no se promueve. No se arregla en el camino.**
+> Cada vez que en S1 se metió una corrección dentro de una ventana abierta, la ventana se alargó un día.
+
+---
+
+## 1. Reconocimiento de PROD — la tabla del manual §1, respondida en vivo hoy
+
+| Pregunta | Respuesta observada en PROD |
+|---|---|
+| ¿Cómo se despliega Django? | Heroku `hyl-wai-production`, stack **container**. Despliegues `Deploy <sha>` por `alfred@aguayo.co`. **PROD corre `43bfaf2` = `origin/main` HEAD, desplegado el 27 jul.** Última release v339, pero v332–v339 son solo `config:set` |
+| ¿Cuánto código separa PROD de STG? | **89 commits**, 79 ficheros, +18 950 líneas, **9 migraciones** (0053→0061). Ventana 27 jul → 6 ago |
+| ¿PROD tiene ya el bootstrap de tablas externas? | **Parcialmente.** `whatsapp_sessions_archive` (113 filas) y `n8n_chat_histories_archive` (1105) **existen**. **`n8n_payment_events` NO existe** |
+| ¿Se cumplen las precondiciones de la migración 0053? | **Las tres verdes.** `session_id` nulo/vacío = 0 · `session_id` duplicado = 0 · `conversation_id` duplicado = 0. La migración **no abortaría** hoy |
+| ¿Qué identidad tiene PROD hoy? | **`session_id = phone_number` en las 1083 filas (100 %).** PK sobre `session_id`. 619 filas ya tienen `conversation_id` y `lead_id` poblados por `shadow` |
+| ¿Qué se destruye en 0053? | El índice `idx_whatsapp_sessions_phone_number` (UNIQUE). **Es redundante hoy:** con `session_id = phone_number` y PK en `session_id`, la unicidad de teléfono la sigue imponiendo la PK. El drop es inerte hasta que existan filas con `session_id ≠ phone_number` |
+| ¿Qué tamaño tienen las tablas del DDL? | `whatsapp_sessions` **1083** filas · `n8n_chat_histories` **5427**. El `CREATE INDEX` no concurrente y el `SET NOT NULL` son **instantáneos**; la ventana de lock es irrelevante |
+| ¿`n8n_chat_histories` tiene las columnas que pide 0056? | Tiene `created_at`, **le falta `updated_at`**. 0056 la añade `NULL` → aditivo, seguro para el nodo de n8n que inserta por columnas |
+| ¿Cuál es la ventana de menos tráfico? | 7 días: **36 mensajes**, solo en horas UTC 0, 1, 16 y 22 (= 18:00–19:00 y 10:00–16:00 MX). **Sin tráfico observado entre 02:00 y 15:00 UTC** → ventana recomendada **13:00–15:00 UTC (07:00–09:00 MX)** |
+| ¿Dónde está PROD del Dashboard? | Rama **`main`** (`MAPA-DE-RAMAS.md` es autoritativo). `stg` es lo desplegado en STG y **va por delante en código** |
+| ¿El delta del Dashboard es grande? | **No: 40 ficheros, 12 de aplicación**, todos bajo `apps/operacion/`. El monorepo **ya está en `main`**: no viaja en este delta |
+| ¿El Dashboard promovido depende de tablas que PROD no tenga? | **No.** `dashboard_conversation_claims`, `comisiones_facturas`, `comisiones_recibos`, `dashboard_message_audit` existen en PROD. `lead_id`/`status`/`closed_at`/`conversation_id` de `whatsapp_sessions` existen |
+| ¿Qué versión de n8n corre cada instancia? | **Las dos en 2.28.7** desde hoy. Ya no hay diferencia de motor que confunda una comparación, y está probado que los workflows **no se re-normalizan** al arrancar (solo al guardar) |
+| ¿Cuánto vale el pago para el negocio hoy? | 57 pólizas emitidas: **51 `PENDIENTE`, 6 `PAGADO`**. Django no sabe qué se pagó de verdad (lo sabe Laura en Excel). Ese hueco es lo que cierra la Fase 3 |
+| ¿Hay daño vivo por leads duplicados? | **12 pares** de leads con el mismo teléfono en el mismo minuto en 30 días (`qualitas-issues#20`) |
+| Permisos de lectura para verificar | `readonly_leads` **no puede leer** `django_migrations` ni `dashboard_conversation_claims`. Dos huecos de verificación a cubrir con otro rol o desde Heroku |
+
+**Lo que esta tabla compra:** las tres cosas que en S1 costaron una vuelta cada una —precondiciones de
+datos, tamaño real del bloqueo y qué es efectivamente destructivo— aquí ya están contestadas, y las tres
+salen a favor. El DDL de PROD no es el problema de este viaje.
+
+---
+
+## 2. Inventario: qué hay en STG que no está en PROD
+
+### 2.1 Django · `aguayo-co/HYL-WAI` — 89 commits, 9 migraciones
+
+| Bloque | Qué es | ¿Viaja inerte? |
+|---|---|---|
+| **A. Hardening dual de sesión** (0053, 0056) | DDL sobre `whatsapp_sessions` y las tablas de archivo. Convergente e idempotente: no repite lo que ya exista | Sí — el comportamiento lo gobierna `WHATSAPP_CONVERSATION_ID_MODE`, que sigue en `shadow` |
+| **B. Fencing del envío inicial** (0054, 0055) | Claim durable + idempotencia por cotización en el **primer WhatsApp**, y `delivery_unknown` visible en el admin | **NO. Sin flag.** Ver §3 |
+| **C. Verdad del pago** (0057→0061) | `PaymentEvidence` append-only + business outbox + trigger de identidad + `reconciliar_pagos` con dry-run. Tablas **nuevas**, no toca las existentes | Sí — cinco flags `PAYMENT_*` en `False` |
+| **D. Preflights** | `preflight_issue_132`, `preflight_conversation_rollout`, `checks.py`: solo lectura, no se ejecutan solos | Sí |
+| **E. Admin Wagtail** | Entrega desconocida, domicilio en cotización, listado de leads | Sí (superficie interna) |
+
+### 2.2 n8n — medido por el Agente n8n contra las dos instancias vivas
+
+| Workflow | PROD | STG | Nodos nuevos | Nodos con parámetros distintos |
+|---|---|---|---|---|
+| WhatsApp Insurance Quotation Bot | 113 | **132** | +20 | **39** |
+| Payment Confirmation | 5 | **9** | +4 | 4 |
+| Retomar Conversacion | 12 | 12 | +1 (`WA Config STG`) | 2 |
+
+Los 20 nodos nuevos son **cinco iniciativas independientes**: multicotización (3), S1 observabilidad
+dual (9), atención humana (2), METEPEC (5), infraestructura STG (1). Más **cuatro workflows que en PROD
+no existen**: `Atencion Humana` (19 nodos, **activo** en STG), `Issue Policy Guard` (7, inactivo),
+`METEPEC - Registrar Lead` (19, inactivo), `Metepec Liberar` (4, inactivo).
+Fuente: `Agente-n8n:docs/2026-08-10-plan-promocion-stg-a-prod.md`.
+
+### 2.3 Dashboard · `aibanez82/Dashboard_seguroautoqualitas` — 12 ficheros de aplicación
+
+Read model S1 v1.1 (`lib/s1/*`), **fix del `42P08` en `/api/claim`**, `isEligible` aceptando
+`('open','active')`, pin de `InboxTab` al liberar, y la retirada de los guards S1 (`334ca44`).
+
+> **Hay un fallo vivo en PROD cuyo arreglo está en STG:** «Tomar conversación» **no funciona en
+> producción desde el 28 jul** por el `42P08` (`$2` deducido como `text` y `varchar` en la misma
+> consulta). Falla siempre y para todos. `30e2fb4` lo arregla y está solo en `stg`.
+
+### 2.4 Agente Conciliación — ya en PROD
+
+Cron operativo escribiendo `conciliacion_pagos`. **No necesita promoción**: es el *proveedor* de la
+Fase 3. Su dato ya está en PROD; lo que falta es que Django lo consuma.
+
+---
+
+## 3. Lo irreversible, y qué lo precede (manual §6)
+
+La pregunta que ahorra más tiempo, respondida antes de escribir las fases. **Son tres cosas, y no son
+las que parecían.**
+
+**① El primer WhatsApp pasa por un claim durable nuevo, y no tiene flag.** Es el riesgo real de todo
+el viaje. `_claim_and_reserve_initial_whatsapp` decide si se envía; ante `RuntimeError` **devuelve
+`False` sin enviar** («frontera durable no disponible») y ante un claim no adquirido devuelve
+`replayed_sent`. Si esa capa se equivoca en PROD, **los leads dejan de recibir su primer WhatsApp, en
+silencio**, y eso es el inicio del funnel entero. Es también lo que probablemente cierra los 12 pares
+duplicados de `#20` — el beneficio y el riesgo viven en la misma línea de código.
+→ **Punto de parada:** un lead canario con observación de la fila en `WhatsappMessage` **antes** de
+dejar entrar tráfico, y un segundo envío con la misma cotización para ver el claim denegar (un guard
+que nadie ha visto denegar no es un guard).
+→ **Rollback:** `heroku releases:rollback` a `43bfaf2`. Minutos.
+
+**② El drop del índice único de `phone_number`** (0053). Único DDL destructivo, y `noop_reverse` lo dice
+por escrito: no se restaura, la vuelta atrás es de modo, no de esquema. **Pero en PROD es inerte hoy**:
+`session_id = phone_number` en el 100 % de las filas y `session_id` es PK, así que la unicidad de
+teléfono sigue impuesta. Solo empieza a importar cuando `dual` escriba filas con
+`session_id ≠ phone_number` — es decir, **en una fase que este plan aplaza**.
+→ **Punto de parada:** repetir las tres consultas de precondición inmediatamente antes de la ventana
+(están en `scratchpad/recon-prod.js`, y su versión canónica debe vivir en este repo).
+
+**③ Los inbound de WhatsApp que entren durante una ventana de n8n se pierden.** Meta no reintenta de
+forma que nos salve. Es el coste de cada promoción de n8n, y por eso la ventana va en la franja del §1.
+
+Todo lo demás del viaje es **aditivo** (tablas nuevas, columnas `NULL`, índices) o **gobernado por
+flag**. Ninguna otra pieza necesita ceremonia.
+
+---
+
+## 4. Las fases
+
+Cinco fases y una de higiene. Cada una es **un sistema, una autorización, una ventana, un E2E**. El
+orden no es de comodidad: es de riesgo creciente y de dependencia, y las dos primeras entregan valor
+sin depender de nada pendiente.
+
+### Fase 1 — Dashboard (`stg` → `main`)
+
+**Por qué primero.** Es el delta más pequeño (12 ficheros), **no toca DDL compartido**, escribe en la
+BD solo por el webhook proactivo, tiene **rollback instantáneo** (promover el deployment anterior en
+Vercel) y **arregla un fallo que hoy está roto en producción**. Además sirve de ensayo del
+procedimiento con el riesgo más bajo del viaje.
+
+- **Precondiciones:** ① build verde en un Preview de Vercel sobre la punta de `stg`; ② suite offline
+  89/89 sobre el commit que se promueve; ③ **acreditar por comportamiento** qué camino toma el
+  proactivo en PROD con `S1_DASHBOARD_MODE` **ausente** — la expectativa es el camino legacy
+  (`phone_number = session_id`, coherente con el 100 % de PROD), pero es una expectativa y hay que
+  observarla, no razonarla (manual §2.1); ④ dar `SELECT` sobre `dashboard_conversation_claims` al rol
+  de verificación, o el `409` del segundo clic no se puede comprobar desde fuera.
+- **Criterio de éxito, observable:** `POST /api/claim` → **201** y fila real en
+  `dashboard_conversation_claims`; segundo clic → **409** (nunca se ha ejecutado, ni antes ni después
+  del arreglo: es la prueba que falta); `/api/inbox` y `/api/db-leads` → 200 con los mismos conteos que
+  antes; un mensaje proactivo real entregado a un teléfono de pruebas.
+- **Rollback:** promover el deployment anterior. Segundos, sin BD implicada.
+- **Duración:** una ventana de 30 min. No requiere franja de bajo tráfico (el Dashboard no atiende al
+  cliente).
+
+### Fase 2 — Django, despliegue inerte (`stg` → `main` + release Heroku)
+
+**Qué entra:** los 89 commits y las 9 migraciones. **Qué NO cambia:** ninguna variable de entorno.
+`WHATSAPP_CONVERSATION_ID_MODE` se queda en `shadow`; los cinco `PAYMENT_*` y `LEAD_FUNNEL_V2` se
+quedan **ausentes** (= `False`).
+
+- **Ejecuta:** Juan / `alfred@aguayo.co`, que es quien despliega. Nosotros verificamos. **Dos criterios,
+  no uno** (manual §4): quien despliega no acredita.
+- **Precondiciones:** ① las tres consultas de precondición de 0053 en verde **en el momento**;
+  ② `heroku releases` con el SHA actual anotado para el rollback; ③ franja **13:00–15:00 UTC**;
+  ④ acuerdo explícito sobre quién aplica el DDL de las tablas externas — el contrato S1 §8.2 se lo
+  atribuye al **Agente n8n**, pero las migraciones Django lo hacen de forma convergente si llegan
+  primero. **Las dos rutas existen y no deben correr a la vez.** Decisión, no descubrimiento.
+- **Criterio de éxito, observable, en este orden:**
+  1. las 9 migraciones aplicadas y **una segunda pasada = 0 migraciones** (prueba de persistencia, no
+     inferencia de que no dio error);
+  2. **lead canario:** formulario real → fila en `qualitas_lead` + `qualitas_cotizacion` + **primer
+     WhatsApp recibido** + fila en `WhatsappMessage` con `status='sent'`;
+  3. **el claim denegando:** segundo intento sobre la misma cotización → no se reenvía;
+  4. el bot responde a un mensaje entrante (n8n sigue leyendo `whatsapp_sessions` sin cambios);
+  5. redirect de pago (`usucces`) sigue llevando a `pago_exitoso`;
+  6. `conversation_id` sigue escribiéndose en las sesiones nuevas (shadow intacto).
+- **Rollback:** `heroku releases:rollback`. El DDL aditivo se queda (no molesta) y el índice único
+  dropeado no se restaura — inerte mientras la identidad siga siendo legacy (§3②).
+- **Duración:** una ventana de 45 min, la mayoría de verificación.
+
+### Fase 3 — La verdad del pago, encendida (solo flags de Django)
+
+Aquí está el valor de negocio de todo el viaje: **51 pólizas de 57 en `PENDIENTE`** mientras Laura sabe
+en Excel cuáles se pagaron. Cierra `qualitas-issues#7` / `HYL-WAI#69` y el workaround del Bug #7 en el
+Dashboard. **No depende de n8n**: las tablas de evidencia son de Django y `n8n_payment_events` (que
+falta en PROD) solo hace falta para los nodos S1 del Payment, que este plan aplaza.
+
+Escalera de un flag por vez, cada uno con su observación y su vuelta atrás de 30 segundos:
+
+| Paso | Flag | Qué se observa antes de seguir |
+|---|---|---|
+| 3.1 | `PAYMENT_CONFIRMATION_WRITES_ENABLED=True` | Aparecen filas en `PaymentEvidence` con el pago observado; `estatus_pago` **no** cambia todavía |
+| 3.2 | `PAYMENT_RECONCILIATION_APPLY_ENABLED` — primero **dry-run** | El comando `reconciliar_pagos` en seco lista los candidatos y **cuadran con lo de Laura**. Si no cuadran, se para aquí y no se ha escrito nada |
+| 3.3 | aplicar la conciliación | `estatus_pago='PAGADO'` en las pólizas que Laura confirma, y en **ninguna** que no |
+| 3.4 | `PAYMENT_OUTBOX_DELIVERY_ENABLED` | El outbox entrega; el trigger append-only impide reescrituras |
+
+- **Precondiciones:** `conciliacion_pagos` fresco (el cron del Agente Conciliación con corrida reciente
+  y exitosa), y los valores de `PAYMENT_ACTIVATING_MOVEMENT_TYPES` / `..._RECEIPT_PATTERN` /
+  `..._AMOUNT_TOLERANCE` **decididos** — hoy están vacíos y no hay default.
+- **Rollback:** poner el flag en `False`. Los datos escritos se quedan (son append-only por diseño) y
+  eso es correcto: son evidencia.
+- **Duración:** un paso por día, no los cuatro seguidos. Cada paso vale por sí mismo.
+
+### Fase 4 — n8n, una iniciativa por ventana
+
+Se ejecuta la mecánica del Agente n8n (`docs/2026-08-10-plan-promocion-stg-a-prod.md` §7): retrato del
+antes por API, cambio **por API con script dedicado y nunca por import del fichero ni por UI**,
+verificación de `webhookId` sin cambiar + `Phone Number ID Guard` presente + cero `WA Config STG` +
+`detect-drift.py` en 0, E2E real, y el `PUT` de reversión escrito antes de empezar.
+
+**Su Fase 0 —clasificar los 39 nodos con parámetros distintos en «promover / diferencia de entorno /
+deuda»— no se salta.** Es la parte peligrosa porque no se ve: un nodo con el mismo nombre y otra
+consulta SQL no aparece en ningún recuento. Es la única parte de este plan que son días, no horas.
+
+Orden, con una corrección mía sobre el suyo por vista cross:
+
+| # | Iniciativa | Estado y por qué ahí |
+|---|---|---|
+| 4.1 | **Retomar Conversacion** | Delta mínimo (2 nodos + `WA Config STG` → `WA Config`). Ensayo del procedimiento |
+| 4.2 | **Atención humana** | **Subida desde el 3.º puesto:** ya activa en STG con tráfico, sin bloqueos conocidos, y cierra `qualitas-issues#57` — hoy el bot **puede responder encima de un humano en PROD**, que es daño de cara al cliente |
+| 4.3 | **Multicotización** | Bloqueada por el arreglo del precio de memoria (`Cambiar Cotizacion` devolviendo el vehículo + invalidación). Verificar **acreditado en STG** antes de moverla |
+| 4.4 | **Payment Confirmation (S1)** | Necesita `n8n_payment_events` en PROD (**no existe**) y depende del dictamen S1. Aplazada con la Fase 5 |
+| 4.5 | **S1 en el bot principal** | **Bloqueada por hecho, no por gobernanza.** Ver Fase 5 |
+| 4.6 | **METEPEC** | Última: inactiva en STG, `metepec_leads` no existe en PROD y `registrar_lead_metepec` necesita contraparte en Django PROD |
+
+### Fase 5 — `shadow` → `dual`: **aplazada, y a propósito**
+
+Es la única fase que merecería el aparato de S1, y la recomendación es **no meterla en este viaje**.
+El motivo no es prudencia, es un hecho: **dual no está verde en STG**. `qualitas-issues#69` sigue
+abierto — todo clic de quick-reply (`qc:v1`/`qc:v2`) muere en `Resolve Session` con *«there is no
+parameter $3»*, y la última tabla de ejecuciones lo confirma: la 882 en `payload_v2` recorre **21
+nodos** y no llega ni al observable, mientras las de texto libre recorren 46 y responden. El camino de
+texto libre está cerrado y probado (`#72`, de 300 006 ms a 12 ms); **el del botón, no** — y el botón es
+justo el de la plantilla inicial de Django, que en PROD está activada.
+
+**Puerta de entrada a esta fase, y son todas:** `#69` cerrado y reverificado en vivo · una corrida S1
+completa en STG con los cuatro fixtures en PASS · los 9 nodos S1 del bot y los 4 del Payment en PROD ·
+`n8n_payment_events` creado en PROD por su dueño · el read model v2 del Dashboard acreditado en PROD ·
+y el drop del índice único ya aplicado (Fase 2). Solo entonces el `config:set` de `dual`, con la vuelta
+a `shadow` acreditada **antes** de activarlo.
+
+**Lo importante de esta fase es que las cuatro anteriores no la necesitan.** Desacoplar el 80 % del
+valor del 20 % que exige ceremonia es la decisión de diseño que hace que este viaje no sea el anterior.
+
+### Fase 6 — Higiene, en el momento y no al final
+
+- Cerrar `qualitas-issues#72` (arreglado y acreditado en STG, sigue abierto → el tracker miente).
+- `qualitas-issues#74`: `detect-drift.py` dará **drift falso en todo PROD** tras el upgrade, y con
+  `--go` sobrescribiría los baselines. **Se usa como verificación en la Fase 4** → hay que arreglarlo
+  antes, y sacarlo a la rama canónica: hoy vive en veinte ramas con dos versiones distintas de su tabla
+  de destinos. **Y el arreglo obvio —añadir `description` a las claves volátiles— es peor que el bug**,
+  porque el filtro es recursivo y `description` es el campo por el que un agente LLM elige herramienta.
+- `HYL-WAI#130`: `N8N_TOKEN` con default hardcodeado, y el valor está a la vista en la config de PROD.
+  Rotarlo coordinado con las credenciales de n8n.
+- Dar de alta en este repo la versión canónica de las consultas de precondición del §1, para que la
+  próxima promoción no las reescriba.
+
+---
+
+## 5. Lo que NO viaja en este plan, y por qué
+
+| No viaja | Motivo |
+|---|---|
+| `shadow` → `dual` | `#69` abierto: el camino del quick-reply no está verde en STG |
+| `WA Config STG` | Es la configuración de staging. Si llega a PROD el bot responde por el número de STG: **es el Bug #15 otra vez** |
+| Borrar `Phone Number ID Guard` | Existe **solo en PROD**, es la defensa que quedó de ese bug, y un import del fichero entero lo borraría. Por eso se promueve por API y por nodos |
+| METEPEC | Inactivo en STG, sin `metepec_leads` ni endpoint en PROD |
+| Multicotización | Hasta que el arreglo del precio esté acreditado en STG |
+| `enforced` de cualquier cosa | Ninguna transición de este plan lo autoriza |
+| Cualquier cosa «de paso» | Si no está en el inventario del §2, no entra en la ventana |
+
+---
+
+## 6. Lo que hay que decidir antes de arrancar (ninguna es técnica)
+
+1. **¿Se autoriza el viaje sin cerrar S1?** Las Fases 1–4.3 no dependen de S1; el contrato S1 dice
+   *«ninguna transición S1 autoriza PROD»*, así que PROD necesita su propia autorización de todos
+   modos. **Mi recomendación: sí, y por eso el plan aplaza dual.** — Alberto, con visto de Juan.
+2. **¿Quién aplica el DDL de las tablas externas en PROD?** El contrato lo atribuye al Agente n8n; las
+   migraciones Django lo hacen igual si llegan primero. Elegir una ruta y desactivar la otra. — Juan +
+   Alberto.
+3. **Los cuatro parámetros de conciliación** (`MOVEMENT_TYPES`, `RECEIPT_PATTERN`,
+   `AMOUNT_TOLERANCE`): hoy vacíos, sin default. Sin ellos la Fase 3 no arranca. — Alberto + Laura.
+4. **¿Se promueve la multicotización con el precio arreglado pero sin segunda corrida?** — Alberto.
+5. **Los tres workflows inactivos de STG** (`Issue Policy Guard`, los dos de METEPEC): ¿se terminan o se
+   quedan? Tres de cuatro inactivos sugiere que no están acabados. — Alberto.
+
+---
+
+## 7. Reglas de ventana — una página, y sustituye al aparato de S1
+
+1. **Un sistema por ventana.** Una autorización, un rollback escrito **antes**, un E2E.
+2. **Franja 13:00–15:00 UTC** (07:00–09:00 MX) para lo que atienda al cliente. Fuera de esa franja solo
+   Dashboard y flags.
+3. **Retrato del antes, siempre**, y del estado que se va a cambiar. Sin lectura previa, un `PASS` no
+   distingue haber cambiado algo de haberlo encontrado ya así.
+4. **Quien ejecuta no acredita.** Dos personas o dos roles, nunca el mismo criterio dos veces.
+5. **Se rellena desde la observación**, campo a campo. Nunca se copia el valor esperado de la plantilla.
+6. **Cero cambios por UI** sobre workflows de n8n: el editor re-serializa al guardar y *Execute* guarda.
+7. **Si aparece algo inesperado, se para y se cierra la ventana.** No se arregla dentro. Reabrir cuesta
+   una ventana; arreglar dentro costó, en S1, un día por vez.
+8. **Toda desviación se declara en el momento**, incluidas las propias y las incómodas.
+
+---
+
+## 8. Estimación honesta
+
+| Fase | Trabajo real | Ventana |
+|---|---|---|
+| 1 · Dashboard | preparar y verificar: medio día | 30 min |
+| 2 · Django inerte | coordinación con Juan + verificación: 1 día | 45 min |
+| 3 · Verdad del pago | 4 pasos, uno por día, con contraste contra Laura | 15 min cada uno |
+| 4 · n8n | **Fase 0 de clasificación: varios días** + 3 promociones cortas | 30–45 min cada una |
+| 5 · dual | no estimable hasta cerrar `#69` | — |
+
+**Lo honesto:** las Fases 1, 2 y 3 son **una semana** de trabajo tranquilo y entregan casi todo el
+valor —el botón de Tomar conversación arreglado, el fencing del primer WhatsApp, y Django sabiendo por
+fin qué se ha pagado—. La Fase 4 la marca la clasificación de los 39 nodos, que es de su dueño y no se
+acelera. Y la Fase 5 no tiene fecha porque no depende de nosotros: depende de que el quick-reply
+funcione en STG.
+
+Quien prometa «pasamos STG a PROD esta semana» está hablando de las Fases 1–3. Y eso ya es mucho.
