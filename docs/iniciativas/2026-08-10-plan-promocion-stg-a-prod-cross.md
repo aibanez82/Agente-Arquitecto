@@ -242,31 +242,48 @@ Orden, con una corrección mía sobre el suyo por vista cross:
 | 4.2 | **Atención humana** | **Subida desde el 3.º puesto:** ya activa en STG con tráfico, sin bloqueos conocidos, y cierra `qualitas-issues#57` — hoy el bot **puede responder encima de un humano en PROD**, que es daño de cara al cliente |
 | 4.3 | **Multicotización** | Bloqueada por el arreglo del precio de memoria (`Cambiar Cotizacion` devolviendo el vehículo + invalidación). Verificar **acreditado en STG** antes de moverla |
 | 4.4 | **Payment Confirmation (S1)** | Necesita `n8n_payment_events` en PROD (**no existe**) y depende del dictamen S1. Aplazada con la Fase 5 |
-| 4.5 | **S1 en el bot principal** | **Bloqueada por hecho, no por gobernanza.** Ver Fase 5 |
+| 4.5 | **S1 en el bot principal** | 9 nodos, la pieza más grande: toca `Resolve Session` y la resolución de sesión. Va con la Fase 5, no antes |
 | 4.6 | **METEPEC** | Última: inactiva en STG, `metepec_leads` no existe en PROD y `registrar_lead_metepec` necesita contraparte en Django PROD |
 
 ### Fase 5 — `shadow` → `dual`: **aplazada, y a propósito**
 
 Es la única fase que merecería el aparato de S1, y la recomendación es **no meterla en este viaje**.
-El motivo no es prudencia, es un hecho: **dual no está verde en STG**. `qualitas-issues#69` sigue
-abierto — todo clic de quick-reply (`qc:v1`/`qc:v2`) muere en `Resolve Session` con *«there is no
-parameter $3»*, y la última tabla de ejecuciones lo confirma: la 882 en `payload_v2` recorre **21
-nodos** y no llega ni al observable, mientras las de texto libre recorren 46 y responden. El camino de
-texto libre está cerrado y probado (`#72`, de 300 006 ms a 12 ms); **el del botón, no** — y el botón es
-justo el de la plantilla inicial de Django, que en PROD está activada.
 
-**Puerta de entrada a esta fase, y son todas:** `#69` cerrado y reverificado en vivo · una corrida S1
-completa en STG con los cuatro fixtures en PASS · los 9 nodos S1 del bot y los 4 del Payment en PROD ·
-`n8n_payment_events` creado en PROD por su dueño · el read model v2 del Dashboard acreditado en PROD ·
-y el drop del índice único ya aplicado (Fase 2). Solo entonces el `config:set` de `dual`, con la vuelta
-a `shadow` acreditada **antes** de activarlo.
+**Corrección a una versión anterior de este documento (misma fecha):** escribí que dual no estaba verde
+en STG porque `qualitas-issues#69` seguía abierto. **Es falso y el error era mío:** los dos defectos de
+`Resolve Session` están arreglados y acreditados en STG —el bind JSON del camino por teléfono (`#72`,
+ejecuciones 879–887, de 300 006 ms a 12 ms) y el `$3` del modo payload (`#69`, relectura del workflow
+vivo: *«Resolve Session $3: ARREGLADO»*)—, y el camino del quick-reply está probado de punta a punta en
+la **ejecución 891 `success`** con `lookupMode = payload_v2`: selecciona B pese a haber otra sesión
+`active`, A conserva su snapshot campo a campo, las otras seis sesiones del teléfono intactas y nunca
+dos activas. **Los dos issues siguen abiertos en el tracker, y eso es lo que me hizo concluir mal**:
+inferí el estado del sistema del estado del tracker en vez de del artefacto (manual §2.1).
+
+**Lo que de verdad falta, que es más estrecho:**
+
+1. **Una pata de acreditación**, no un defecto: el fixture `S1-F2` pide `outbound_count = 1` con un
+   envío normal y no pudo cerrarlo porque la cotización del fixture (990011) es **sintética** y
+   `Fetch Quotation Document` falló al no existir en Django. Cerrarlo exige **una cotización real**, y
+   eso es del carril de Juan. No es un fallo del producto: es un fixture que no puede tener documento.
+2. **Un hueco funcional declarado:** el bot **no ofrece** el quick-reply cuando el cliente pide cambiar
+   de cotización por escrito. La selección por folio exige que el mensaje sean solo dígitos.
+3. **El peso de coordinación**, que es el motivo principal del aplazamiento: dual no es un
+   `config:set`, son cinco piezas en tres sistemas a la vez.
+
+**Puerta de entrada a esta fase, y son todas:** la pata de `outbound` cerrada con cotización real ·
+`#69` y `#72` cerrados en el tracker tras reverificar · los 9 nodos S1 del bot y los 4 del Payment en
+PROD · `n8n_payment_events` creado en PROD por su dueño · el read model v2 del Dashboard acreditado en
+PROD · y el drop del índice único ya aplicado (Fase 2). Solo entonces el `config:set` de `dual`, con la
+vuelta a `shadow` acreditada **antes** de activarlo.
 
 **Lo importante de esta fase es que las cuatro anteriores no la necesitan.** Desacoplar el 80 % del
 valor del 20 % que exige ceremonia es la decisión de diseño que hace que este viaje no sea el anterior.
 
 ### Fase 6 — Higiene, en el momento y no al final
 
-- Cerrar `qualitas-issues#72` (arreglado y acreditado en STG, sigue abierto → el tracker miente).
+- **Cerrar `qualitas-issues#69` y `#72`.** Los dos están arreglados y acreditados en STG y los dos
+  siguen abiertos. No es contabilidad: **me hicieron aplazar dual por el motivo equivocado** en la
+  primera versión de este plan. Un tracker que miente sobre los bloqueantes cambia decisiones.
 - `qualitas-issues#74`: `detect-drift.py` dará **drift falso en todo PROD** tras el upgrade, y con
   `--go` sobrescribiría los baselines. **Se usa como verificación en la Fase 4** → hay que arreglarlo
   antes, y sacarlo a la rama canónica: hoy vive en veinte ramas con dos versiones distintas de su tabla
@@ -283,13 +300,76 @@ valor del 20 % que exige ceremonia es la decisión de diseño que hace que este 
 
 | No viaja | Motivo |
 |---|---|
-| `shadow` → `dual` | `#69` abierto: el camino del quick-reply no está verde en STG |
+| `shadow` → `dual` | Funciona en STG; falta la pata de `outbound` con cotización real (carril de Juan) y son cinco piezas en tres sistemas — ver Fase 5 |
 | `WA Config STG` | Es la configuración de staging. Si llega a PROD el bot responde por el número de STG: **es el Bug #15 otra vez** |
 | Borrar `Phone Number ID Guard` | Existe **solo en PROD**, es la defensa que quedó de ese bug, y un import del fichero entero lo borraría. Por eso se promueve por API y por nodos |
 | METEPEC | Inactivo en STG, sin `metepec_leads` ni endpoint en PROD |
 | Multicotización | Hasta que el arreglo del precio esté acreditado en STG |
 | `enforced` de cualquier cosa | Ninguna transición de este plan lo autoriza |
 | Cualquier cosa «de paso» | Si no está en el inventario del §2, no entra en la ventana |
+
+---
+
+## 5 bis. Qué hay que arreglar en STG antes de ir a PROD
+
+35 issues abiertos en `qualitas-issues`. **La mayoría no bloquea nada**, y confundirlos con bloqueantes
+es la forma más fácil de convertir este viaje en el anterior. El criterio para estar en el grupo A es
+uno solo: *¿promoverlo tal cual mete un defecto en PROD, o rompe el método con el que lo verificamos?*
+
+### A · Bloquean una fase concreta — hay que arreglarlos en STG (2)
+
+| Qué | Bloquea | Por qué |
+|---|---|---|
+| **`#74`** · `detect-drift.py` dará drift falso en todo PROD tras el upgrade, y con `--go` sobrescribiría los baselines | **Fase 4 entera** | No es un defecto del producto: **es la herramienta con la que se verifica cada promoción de n8n**. Y hay que sacarla a la rama canónica — hoy vive en veinte ramas con **dos versiones distintas** de su tabla de destinos, así que qué se ejecuta depende de qué rama esté pagada. **Trampa:** el arreglo obvio (añadir `description` a las claves volátiles) **es peor que el bug**, porque el filtro es recursivo y `description` es el campo por el que un agente LLM elige herramienta |
+| **El precio se responde de memoria, no consultando** — **sin issue en el tracker** | **Fase 4.3** (multicotización) | Declarado abierto por el propio ejecutor en su informe de cierre. Riesgo acotado: ya **no** puede dar el precio de *otra* cotización, pero **sí un precio viejo** si Django recotizó desde la última consulta. Hay orden posterior (que `Cambiar Cotizacion` devuelva el vehículo, mantener la invalidación, regla dura de no dar precio no consultado) **sin informe de entrega: no acreditado**. Lo primero es **abrirle un issue**: un bloqueante que solo vive en un handoff no lo ve nadie |
+
+### B · Falsos bloqueantes: arreglados en STG y abiertos en el tracker (2)
+
+`#69` (`$3` en modo payload) y `#72` (bind JSON por teléfono). **Los dos están cerrados en STG con
+evidencia** (ejecuciones 879–887 y 891). **No hay que arreglarlos: hay que cerrarlos** tras reverificar.
+Van en el grupo B y no en el A porque el coste ya se pagó: son la razón por la que la primera versión de
+este plan aplazó dual por un motivo falso.
+
+### C · No es un defecto, es una acreditación que falta (1)
+
+El fixture `S1-F2` pide `outbound_count = 1` con un envío normal y quedó sin cerrar porque su cotización
+es **sintética** (990011) y `Fetch Quotation Document` no puede encontrar un documento que no existe.
+Exige **una cotización real** → **carril de Juan**. Bloquea la Fase 5, no las cuatro primeras.
+
+### D · Están vivos en STG y en PROD: no bloquean, pero deberían viajar arreglados (7)
+
+Todos caen en superficies que se promueven, así que arreglarlos en STG **ahora** cuesta una ventana que
+ya está abierta; arreglarlos después cuesta otra.
+
+| Issue | Crit. | Por qué merece el mismo viaje |
+|---|---|---|
+| **`#64`** PDF no se regenera al cambiar de cobertura | **crítico** | **Venta perdida confirmada** (lead 1767): el bot dio los precios de Limitada en texto y reenvió tres veces el PDF de Amplia. Misma superficie que 4.3/4.5 y el mejor candidato a entrar en el viaje |
+| **`#39`** el AI Agent alucina el vehículo en el resumen | alto | **Misma familia que el precio de memoria:** el modelo responde del contexto en vez de consultar. Un arreglo estructural cierra los dos |
+| **`#45`** AI Agent y RAG comparten `session_id` de memoria | alto | Puede dejar al usuario **sin respuesta, en silencio** |
+| **`#56`** `conversation_phase` no se persiste | alto | Es el bug que obliga a leer los hitos por `LIKE` sobre el copy del bot — frágil por diseño, y cualquier cambio de copy lo rompe |
+| **`#33`** `chatInput` vacío rompe Detect Jailbreak/PII | medio | Cualquier inbound sin `text.body` (audio, imagen, ubicación) |
+| **`#68`** Intent Router manda a `kb_query` lo que no lo es | medio | **Verificar primero:** el enrutado se tocó al arreglar el precio (anulación determinista en `Parse Router Output`); puede estar ya cerrado |
+| **`#21`** no soporta recotizar un modelo distinto | medio | **Probablemente cerrado** por la multicotización. Verificar y cerrar |
+
+### E · No son de STG — no se arreglan aquí, y varios los cierra este plan (el resto)
+
+| Issue | Qué hacer |
+|---|---|
+| **`#7`** Django no escribe `estatus_pago='PAGADO'` | **Lo cierra la Fase 3.** Es el valor de negocio del viaje |
+| **`#20`** leads duplicados (~11 %, 12 pares en 30 días) | **Lo cierra probablemente la Fase 2** (fencing del envío inicial). Verificar después, no antes |
+| **`#4`** leads sin `whatsapp_session` | Misma familia. Verificar tras la Fase 2 |
+| **`#57`** el bot responde encima del agente humano | **Lo cierra la Fase 4.2.** En STG los tres triggers de Atención Humana estaban muertos en un gate de ingreso y quedaron operativos; la promoción es la que arregla PROD |
+| **`#29`** deployments Preview del Dashboard sin purgar | Higiene de Vercel, tocarlo en la ventana de la Fase 1 |
+| `#9` `#49` `#40` `#48` `#13` `#18` `#28` `#37` | **Carril de Juan.** No bloquean ninguna fase |
+| `#25` `#26` `#27` + `HYL-WAI#130` | Secretos y buckets compartidos STG↔PROD. **La promoción no los agrava, pero siguen vivos** y el `N8N_TOKEN` está a la vista en la config de PROD |
+| `#3` `#23` `#24` `#41` `#43` `#60` `#66` | Cola menor, fuera de este viaje |
+
+### Resumen en una línea
+
+> **Para las Fases 1–3 no hay que arreglar nada en STG.** Para la Fase 4 hacen falta dos: **`#74`** y
+> **el precio de memoria** (que además necesita un issue). Para la Fase 5, una cotización real de Juan.
+> Todo lo demás es o tracker sucio, o trabajo que conviene meter en una ventana ya abierta, o carril
+> ajeno.
 
 ---
 
@@ -338,7 +418,7 @@ valor del 20 % que exige ceremonia es la decisión de diseño que hace que este 
 **Lo honesto:** las Fases 1, 2 y 3 son **una semana** de trabajo tranquilo y entregan casi todo el
 valor —el botón de Tomar conversación arreglado, el fencing del primer WhatsApp, y Django sabiendo por
 fin qué se ha pagado—. La Fase 4 la marca la clasificación de los 39 nodos, que es de su dueño y no se
-acelera. Y la Fase 5 no tiene fecha porque no depende de nosotros: depende de que el quick-reply
-funcione en STG.
+acelera. Y la Fase 5 depende de una pata de acreditación que está en el carril de Juan (un envío real
+sobre una cotización real) más la coordinación de cinco piezas en tres sistemas.
 
 Quien prometa «pasamos STG a PROD esta semana» está hablando de las Fases 1–3. Y eso ya es mucho.
