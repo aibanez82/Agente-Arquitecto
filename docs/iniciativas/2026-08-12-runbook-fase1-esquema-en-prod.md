@@ -10,6 +10,38 @@
 
 ---
 
+## 0 bis. Quién aplica y quién acredita — **decidir antes de abrir**
+
+Lo levantó el Agente Dashboard y al primer borrador de este runbook le faltaba. La regla de ventana es:
+
+> **Quien despliega no acredita. Dos criterios, no uno.**
+
+Y hay un hecho que la condiciona: **el Agente Dashboard no puede aplicar nada** — trabaja bajo cero
+accesos vivos y en producción ni siquiera puede leer `dashboard_conversation_claims`. El Arquitecto sí
+tiene lectura de PROD; Alberto tiene Heroku.
+
+Dos repartos válidos, y hay que elegir uno **antes** de abrir:
+
+| | Aplica | Acredita |
+|---|---|---|
+| **A** | Alberto, desde TablePlus con este runbook | El Arquitecto, leyendo el catálogo por su cuenta |
+| **B** | El Arquitecto | Alberto, con las consultas de este documento |
+
+**Recomiendo A.** El que escribe las consultas de verificación no debería ser el mismo que ejecuta el
+cambio, y así el segundo par de ojos mira de verdad y no repite su propio trabajo.
+
+## 0 ter. ¿Y si la migración de n8n no está lista?
+
+**Las dos tablas son independientes: no hay dependencia técnica entre las dos migraciones.** Así que
+esta ventana *puede* aplicar solo la de claims.
+
+Pero es una decisión, no un automatismo. Aplicar solo claims desbloquea la **Fase 2** (Dashboard a
+producción) y deja la **Fase 3.2** (Atención Humana) esperando otra ventana. Si la de n8n va a estar en
+horas, esperar y hacer una sola ventana cuesta menos que hacer dos. **Lo decide Alberto en el momento**,
+y se anota cuál de los dos caminos se tomó.
+
+---
+
 ## 0. Antes de abrir la ventana
 
 | # | Comprobación | Estado |
