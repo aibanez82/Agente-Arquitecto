@@ -83,3 +83,37 @@ este repo no tenía ninguno. Se acreditaron solos durante el trabajo: el de duda
 etiquetó como mía, y el de handoffs avisó de tu corrección `c46c9cf` retirando E0.
 
 Alberto decide qué se comenta en #156; yo no publico en el tracker.
+
+---
+
+## Adenda (12 ago) — costura asíncrona: **hecho**, y sin hallazgo de reordenación
+
+Aplicada tu adenda sobre `4396e54`. Commit **`2d59499`**.
+
+**Tenías razón y el cabo suelto era mío:** anoté que la implementación live-only tendría firma asíncrona
+y acto seguido afirmé que el cambio «arrastra los adaptadores de abajo, no los call-sites». Los
+adaptadores sí, pero no se paraba ahí — `buildRetomarWire` era síncrona y su llamador es
+`pages/au/n8n-proactive-message.js`. Escribí la consecuencia sin sacarla.
+
+La costura nace ya con la **firma definitiva**:
+
+```
+controlResolver (async) → buildRetomarWire (async) → pages/api/n8n-proactive-message.js (await)
+controlResolver (async) → pages/api/conversation.js (await)
+```
+
+**No hay hallazgo de reordenación que reportar**, que era lo que pedías saber: los dos llamadores
+finales ya eran `async`, así que el `await` cabía en los dos sin tocar el orden de nada. Cero cambio de
+comportamiento — una función `async` que devuelve un valor ya resuelto se comporta igual, y los tests
+de delegación byte a byte contra el legacy siguen en verde.
+
+**Donde sí apareció trabajo fue en los tests:** 8 llamadas en 4 ficheros. Dos tests cuyo nombre es un
+template literal se me escaparon en la primera pasada y pusieron la suite en rojo con `SyntaxError`;
+corregidos, y lo digo en vez de omitirlo porque el commit intermedio existió.
+
+Añadido un test que **blinda la firma**: afirma que las dos funciones de la costura y `buildRetomarWire`
+devuelven Promise. Mismo espíritu que `IMPLEMENTACION_VIGENTE` — si alguien las vuelve síncronas «porque
+no hace falta», se pone rojo aquí y no dentro de la ventana. Verificado además que no queda ninguna
+llamada sin `await` que devolviera una Promise y pasara aserciones por accidente.
+
+**Suite 119/119, build OK.** Sigue sin haber merge, deploy ni grants: `stg` y `main` intactos.
