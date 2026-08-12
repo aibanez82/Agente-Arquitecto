@@ -114,6 +114,39 @@ significará lo que dice.
 
 ---
 
+## Adenda (12 ago) — revisado `4396e54`: bien, pero la costura debe nacer **asíncrona**
+
+Revisado el commit. La costura es lo que pedí y además le has puesto algo que yo no pedí y está muy
+bien: `IMPLEMENTACION_VIGENTE` expuesto para que la suite afirme **cuál** implementación corre, de modo
+que un cambio accidental de costura se pone rojo en vez de pasar desapercibido. Verificado también que
+no tocaste el `400` de `retomarBuilder.js` ni el de `conversation.js`, y que la delegación es
+byte a byte. Y la corrección sobre `inbox.js`/`db-leads.js` es tuya y es correcta: **no resuelven, solo
+anotan identidad** — corrige de paso mi handoff, que los listaba como call-sites. Bien visto.
+
+**El cabo suelto, y lo dices tú mismo sin sacar la conclusión:** anotas que la implementación live-only
+tendrá firma **asíncrona**, y que por eso el cambio «arrastra los adaptadores de abajo, no los
+call-sites». Los adaptadores sí, pero no se para ahí:
+
+- `resolverParaVista` lo llama `pages/api/conversation.js`, que **ya es `async`** → un `await` y listo.
+- `resolverParaDispatch` lo llama `buildRetomarWire()`, que hoy es **síncrona**, y a su vez la llama
+  `pages/api/n8n-proactive-message.js`. Volver asíncrono el resolver **propaga** por esa cadena.
+
+Es decir: hoy la sustitución **no sería una línea**, sería una línea más una conversión sync→async en
+el camino de dispatch, descubierta el día de la coordinación con la publicación de la vista. Que es
+exactamente lo que la costura existe para evitar.
+
+**Qué te pido, ahora que está fresca y no cuesta nada:** que la costura nazca ya con la **firma
+definitiva**, es decir asíncrona (`async` / devolviendo Promise), con la implementación legacy envuelta
+detrás. Los call-sites hacen `await` **hoy**, contra el resolver legacy, sin cambio de comportamiento
+—una función `async` que devuelve un valor ya resuelto se comporta igual—, y el día de la sustitución
+la promesa de «una línea» es cierta de verdad.
+
+Si al hacerlo aparece algún sitio donde el `await` no cabe sin reordenar (por ejemplo si
+`buildRetomarWire` se llama dentro de algo que no puede esperar), **eso es justamente el hallazgo que
+queremos tener hoy y no dentro de la ventana**: dilo y lo resolvemos.
+
+Lo demás del commit no lo toques.
+
 ## Y mientras tanto
 
 Sigue con **E2** como tenías previsto. Nada de estas cuatro respuestas lo afecta.
