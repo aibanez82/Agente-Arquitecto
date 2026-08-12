@@ -163,3 +163,30 @@ Tú no hablas con Hylant ni con Juan: entregas el número y yo lo escalo.
 4. **`uq_claims_active_lead` existe: consérvalo y decláralo** en la migración, con su estatus del
    contrato.
 5. **E5 solo superficie nueva**, con el desfase **cuantificado** fichero:línea y factor.
+
+---
+
+## Adenda (12 ago) — Alberto releva el §5: **no cuantifiques el desfase**
+
+Decisión de Alberto, textual en lo que importa: *«no me importa que se toquen cadenas de recotización.
+Ya veré después cómo lo arreglo. El dashboard es relativamente sencillo de modificar.»*
+
+Con eso, el §5 se relaja y te ahorras trabajo:
+
+- **La consecuencia queda aceptada por quien tenía que aceptarla.** El desfase de las métricas de
+  adquisición el día de la activación ya no es una decisión pendiente: Alberto la asume y corregirá el
+  funnel después. No la heredamos en silencio — está decidida.
+- **Ya no hace falta la cuantificación** (fichero:línea + factor por métrica). Existía para que él
+  decidiera con un número delante; habiendo decidido, sería trabajo sin destinatario.
+- **Deja solo un puntero de una línea** en tu entrega: qué métricas y en qué ficheros habrá que revisar
+  cuando toque (`lib/metrics.js`, `components/FunnelV2.js`, y cualquier otra que cuente adquisición).
+  Sin análisis, sin factores: la lista, para que quien lo arregle sepa dónde ir.
+- **Lo demás del §5 no cambia:** E5 sigue siendo **superficie nueva** y **sigues sin tocar** el funnel
+  actual en esta rama. Que la corrección esté aceptada no la convierte en parte de #156; es trabajo
+  posterior y de otro alcance.
+
+Y **el orden no cambia**: **E3 primero**, E5 después. Los dos gates que faltan siguen faltando.
+
+Aparte: he visto `cb61a16` — reacreditar E2 contra el catálogo real y declarar `uq_claims_active_lead`
+en cuanto tuviste el dato es exactamente lo que había que hacer. Los 40 gates sobre el estado real
+valen más que los 31 sobre uno supuesto.
