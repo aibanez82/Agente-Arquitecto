@@ -117,3 +117,69 @@ no hace falta», se pone rojo aquí y no dentro de la ventana. Verificado ademá
 llamada sin `await` que devolviera una Promise y pasara aserciones por accidente.
 
 **Suite 119/119, build OK.** Sigue sin haber merge, deploy ni grants: `stg` y `main` intactos.
+
+---
+
+## Adenda 2 (12 ago) — **E3, E5 y el stub corrupto: hechos**. Los cinco entregables cerrados
+
+```text
+DASHBOARD_156_COMPLETO
+commits=9efb74a (E3) · d4cd007 (stub corrupto) · a1bd1f5 (E5)
+suite_offline=162/162          (partia de 89; 73 nuevos)
+postgres_efimero=47/47 gates   (migracion + release A<->take B + politica de producto)
+stub_corrupto=19/19 gates
+build=OK · merge=NO · deploy=NO · grants=NO
+```
+
+### E3 — cable
+
+`command_id` **derivado** de `operation + session_id + control_id + epoch`, no aleatorio: el reintento
+exacto lo reproduce solo, sin que el cliente tenga que conservarlo. El `request_hash` va aparte y cubre
+el payload entero, y son los dos juntos los que separan replay exacto (mismo id + mismo hash → eco
+persistido, sin repetir el CAS) de reutilización del id (mismo id + hash distinto → rechazo). **Si el id
+fuera hash del payload completo, el segundo caso sería irrepresentable** y tu regla no tendría a qué
+aplicarse; por eso son dos valores.
+
+Idempotencia de take/release en módulo puro. El owner se comprueba **también en el replay**, para que no
+se puedan sondear tokens ajenos.
+
+**`release A ↔ take B` acreditado contra base real**: A toma, A libera, B toma, B recibe epoch nuevo, y
+el CAS tardío con el epoch viejo de A afecta a **cero filas** sin tocar la toma de B. El ataque ABA
+demostrado, no argumentado.
+
+### Stub corrupto — construido del contrato
+
+Relación PostgreSQL real con las 26 columnas **transcritas del §Columnas v1**, nunca del SQL de n8n, y el
+resolver real conectado por `pg`. 19 gates, incluidas **columna faltante** y **relación desaparecida**.
+
+Lo que acredita es la distinción que importa: ante una fila corrupta el resolver **no se hace el listo**
+—entrega la fila y deja que la autorización la rechace, porque validar enums sería duplicar la autoridad
+de la vista— y ante una relación rota devuelve `dependency_unavailable` en vez de reventar. El trío
+`applied_*` incompleto se bloquea **con el reason de la vista** (`applied_token_partial`), no con uno
+inventado.
+
+**Se vuelve a correr contra la vista real cuando exista.** El stub acredita mi lado, la vista real la
+integración; ninguno sustituye al otro.
+
+### E5 — y el desfase con su cifra
+
+Superficie nueva, sin tocar `lib/metrics.js` ni `FunnelV2.js`. Medido contra `F6-dashboard-chain`, que
+se carga con `git show` del repo de contratos en vez de replicarse: **3 leads, 1 adquisición, factor 3
+exacto** — el tope de descuentos por cadena.
+
+Puntero del desfase, ya que Alberto relevó la cuantificación completa: **`lib/metrics.js:84` y `:92`**
+(`total = leads.length`) y **`FunnelV2.js:144`** (`fmt(leads.length)`) cuentan un lead = una adquisición.
+
+`continued` se **lee** del overlay, no se infiere de `parent_quote_id` — hay test de que el leaf tiene
+padre y aun así no se bloquea. El timeline pone lo heredado primero **sin intercalar por fecha**: sus
+marcas son anteriores al cutover y mezclarlas por hora produciría un hilo que parece uno cuando son dos.
+
+### Lo que sigue sin estar
+
+- **`claim ↔ reserva`**: las reservas de dispatch son ownership de n8n; necesita su lado.
+- **Cableado a los endpoints** de E1 y E3: las piezas están probadas pero `pages/api/claim.js` y los
+  resolvedores siguen con su lógica actual. Cablear `take` cambia su wire (hoy el reintento del propio
+  agente da 409; el contrato pide 201 con los mismos tokens), y eso es superficie acreditada.
+- **Lista de columnas de `dashboard_lead_continuation_v1` incompleta**: el §9 describe el overlay por
+  concepto pero no publica todos los nombres. Consumo las seis que el fixture acredita, con un test que
+  exige que ambas listas coincidan. **No es el SELECT definitivo** y lo digo antes de que lo parezca.
