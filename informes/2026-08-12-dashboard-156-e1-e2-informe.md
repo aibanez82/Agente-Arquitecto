@@ -93,7 +93,7 @@ Aplicada tu adenda sobre `4396e54`. Commit **`2d59499`**.
 **Tenías razón y el cabo suelto era mío:** anoté que la implementación live-only tendría firma asíncrona
 y acto seguido afirmé que el cambio «arrastra los adaptadores de abajo, no los call-sites». Los
 adaptadores sí, pero no se paraba ahí — `buildRetomarWire` era síncrona y su llamador es
-`pages/au/n8n-proactive-message.js`. Escribí la consecuencia sin sacarla.
+`pages/api/n8n-proactive-message.js`. Escribí la consecuencia sin sacarla.
 
 La costura nace ya con la **firma definitiva**:
 
