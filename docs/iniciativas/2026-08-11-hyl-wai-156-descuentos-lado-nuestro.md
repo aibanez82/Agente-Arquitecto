@@ -167,6 +167,8 @@ Suite 120/120 (partía de 89). Entrega en `docs/156/entrega-dashboard.md`.
 | 4 | Llevar a #156 la **divergencia de wire** 400 vs 404 | Alberto decide canal |
 | 5 | **Brecha de roles Postgres** (mono-rol) — gate de rollout declarado por los dos ejecutores | pendiente de decisión |
 | 6 | Autorizar el **merge a `stg`**: no es nuestro, lo da el checkpoint de #156 tras PR-ready | Juan |
+| 7 | **Métricas de adquisición**: el funnel actual contará cada recotización como lead nuevo (hasta 3×) el día que Discounts se active. E5 se construye como superficie nueva **sin tocar** `lib/metrics.js` ni `FunnelV2.js`; el Dashboard entrega el desfase cuantificado (fichero:línea + factor) y hay que **decidirlo con Hylant**, no heredarlo | Alberto / Hylant |
+| 8 | **Estado de `dashboard_conversation_claims` en PROD sin verificar**: `readonly_leads` no puede leerla (10 ago). En STG ya está acreditado (ver §8) | pendiente de otro rol |
 
 ---
 
@@ -184,3 +186,36 @@ Suite 120/120 (partía de 89). Entrega en `docs/156/entrega-dashboard.md`.
   justo cuando el cliente decide. Ordenado cerrar el 10 ago; verificar que quedó cerrado.
 - **La adquisición se cuenta por `root`**: si Dashboard o GA4 cuentan cada recotización como lead
   nuevo, los números se inflan hasta 3×.
+
+---
+
+## 8. Estado acreditado de `dashboard_conversation_claims` en STG (12 ago)
+
+Leído por el Arquitecto vía `pg_catalog` en `hyl-wai-stg` (solo catálogo, cero filas de datos). Se usa
+`pg_catalog` y no `information_schema` a propósito: con rol readonly, `information_schema` filtra por
+privilegios y «no existe» se confunde con «existe sin grants».
+
+Columnas: `id` int PK · `lead_id` **integer** NOT NULL · `session_id` varchar(255) NOT NULL ·
+`agent_id` int NOT NULL FK→`dashboard_users(id)` · `claimed_at` timestamptz NOT NULL · `released_at`
+timestamptz · `control_id` uuid NOT NULL · `conversation_id` **varchar(64)** · `quotation_id`
+**integer** · `epoch` integer NOT NULL · `state` text NOT NULL · `lease_expires_at` timestamptz.
+
+Constraints: `ck_claims_state` CHECK ∈ {active, released, revoked, expired} · PK(`id`) ·
+`uq_claims_control_id` UNIQUE(`control_id`).
+Índices: PK · `uq_claims_active_lead` UNIQUE(`lead_id`) WHERE active · `uq_claims_active_session`
+UNIQUE(`session_id`) WHERE active · `uq_claims_control_id`.
+
+**Cinco gaps contra el contrato:** `conversation_id` 64 < 80 · `lead_id` integer ≠ bigint ·
+`quotation_id` integer ≠ bigint · **falta `CHECK(epoch>0)`** · **falta `UNIQUE(session_id, epoch)`**.
+
+> El que más lejos llega es `UNIQUE(session_id, epoch)`: no es solo el invariante anti-ABA, es **el
+> índice del que depende la vista de n8n** para resolver `authority_epoch` por backward scan sin
+> `GROUP BY` global. Sin él, la cláusula de eficiencia del contrato no se cumple aunque la vista esté
+> bien escrita.
+
+**`uq_claims_active_lead` EXISTE** → se conserva, declarado en la migración como política de
+producto/UI y nunca autoridad conversacional (cláusula del contrato).
+
+**PROD no está verificado** y puede diferir: `readonly_leads` no puede leer esta tabla. Por eso la
+migración del Dashboard se mantiene **aditiva e idempotente**, acreditada partiendo de una tabla
+deliberadamente deficiente — decisión correcta que este hallazgo confirma.
