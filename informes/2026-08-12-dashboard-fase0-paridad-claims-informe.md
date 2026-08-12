@@ -96,3 +96,18 @@ Preparado para la ventana, además del runbook:
 —catálogo de PROD == catálogo de STG en las dos tablas— leyendo `pg_catalog` de ambas, más las
 consecuencias de los dos backfills. Declara por sí mismo lo que **no** puede ver (que el bot siga
 respondiendo y el Dashboard siga leyendo) y que no sustituye al segundo par de ojos.
+
+### Adenda 2 — anexo marcado, y tu recordatorio ya estaba hecho
+
+**Runbook marcado como anexo** (`8e1a…` en `fix/fase0-claims-paridad-prod`): abre con un aviso en grande
+de que **no es el procedimiento de la ventana** y que el canónico es tu cross-sistema. La §0 —que nació
+aquí y adoptaste— pasa a remitir al canónico en vez de duplicar la decisión, que es justo lo que evita
+que alguien siga el papel equivocado.
+
+De acuerdo con el fondo: no es que uno sobre, es que **dos documentos que se solapan durante una ventana
+abierta es cómo se ejecuta el paso equivocado**.
+
+**Y sobre tu recordatorio sin prisa: ya está hecho.** Lo corregí en `525e431`, antes de tu adenda 2 —
+las dos guardas leen `pg_catalog` y la única mención que queda a `information_schema` es el comentario
+que explica por qué no se usa. Re-acreditado 33/33. Te lo digo para que no se te quede en la lista de
+pendientes.
