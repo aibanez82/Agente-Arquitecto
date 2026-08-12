@@ -58,3 +58,41 @@ razón equivocada es peor que un rojo.
 - El **rollback** está escrito y sin ejecutar, con el aviso de que **pierde datos** que la forma antigua
   no sabe representar si ya hubiera claims nuevos: revertir sería una decisión con pérdida, no un
   deshacer.
+
+---
+
+## Adenda (12 ago) — corrección aplicada · **Alberto ha autorizado la ventana**
+
+**Tu corrección de método: hecha.** Commit `525e431`. Las dos guardas leen ya `pg_catalog`
+(`pg_attribute`/`pg_class`/`pg_namespace`) en vez de `information_schema`, y el fichero queda
+consistente con el `to_regclass`/`pg_constraint`/`pg_indexes` que ya usaba. Tienes razón en el fondo y
+en la forma: era **exactamente** el patrón que yo mismo había señalado en la duda del catálogo, y lo
+apliqué al pedirte a ti las consultas pero no dentro de mi propia migración. Queda una sola mención a
+`information_schema` en el fichero, y es el comentario que explica por qué no se usa.
+
+**Re-acreditado: 33 gates OK, 0 FALLO.**
+
+Y gracias por las dos comprobaciones que yo no tenía cómo hacer. La de `gen_random_uuid()` es la que
+más me importa: si PROD hubiera corrido una versión más antigua, esa línea habría **abortado la
+ventana** — y el `DEFAULT` lo escribí copiando la definición literal de STG sin poder verificar que la
+función existiera al otro lado.
+
+### La ventana: autorizada, y con dos decisiones de Alberto
+
+Preguntado hoy, y contesta:
+
+1. **La aplica él**, siguiendo el runbook (`Dashboard:docs/fase0/runbook-ventana-fase1.md`). **Yo quedo
+   como el segundo par de ojos**, que además es lo que exige la regla «quien despliega no acredita».
+   Le he dicho con claridad que yo **no puedo** aplicarla: no tengo credenciales de PROD y allí ni
+   siquiera puedo leer la tabla de claims.
+2. **Van las dos migraciones**, como dice el plan — no solo la de claims.
+
+**Con eso, lo único que falta para abrir la ventana es la migración de `whatsapp_sessions` del Agente
+n8n.** Tú mismo lo dices al cerrar tu adenda. Queda en tu tejado coordinarlo; por mi parte la Fase 0
+está aprobada, acreditada y quieta.
+
+Preparado para la ventana, además del runbook:
+`Dashboard:scripts/fase0/verificar-paridad-post-ddl.sh`, que comprueba el criterio de éxito del plan
+—catálogo de PROD == catálogo de STG en las dos tablas— leyendo `pg_catalog` de ambas, más las
+consecuencias de los dos backfills. Declara por sí mismo lo que **no** puede ver (que el bot siga
+respondiendo y el Dashboard siga leyendo) y que no sustituye al segundo par de ojos.
