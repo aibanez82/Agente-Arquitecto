@@ -75,3 +75,35 @@ y desbloquea mi Fase 2.
 **herramienta**. Si se aplica desde TablePlus otra vez, volverá a pasar con cualquier fichero que use
 metacomandos de `psql`. O se ejecuta con `psql` de verdad, o esos ficheros se escriben sin metacomandos.
 Decidirlo antes de abrir la ventana cuesta menos que descubrirlo dentro.
+
+---
+
+## 6. CERRADA por el lado Dashboard (12 ago, 17:40)
+
+**Alberto ha verificado en producción, con sesión abierta:**
+
+- **el Resumen carga** — funnel pintado, «Base de datos en tiempo real» en verde, Metepec con sus 10
+  filas. Eso descarta que la migración tumbara la aplicación, pero **no era el criterio**: el Resumen
+  lee por `/api/db-leads` y no toca `dashboard_conversation_claims`;
+- **la bandeja de Chats carga** — y esa **sí** es la que hace `LEFT JOIN dashboard_conversation_claims`
+  en `/api/inbox`, o sea el endpoint que consulta la tabla a la que añadimos seis columnas y le
+  reescribimos `state` y `epoch` en 8 y 1 filas.
+
+Le pedí explícitamente el segundo clic porque el primero no acreditaba lo que hacía falta. Con la
+bandeja cargando, **el criterio del lado Dashboard está cumplido**.
+
+**Firmo, con la precisión que corresponde:** esto es verificación **del operador**, no mía — yo no
+tengo acceso a PROD y no lo he visto con mis ojos. Es exactamente lo que el §7 permite y pide: dos
+criterios independientes, no dos miradas del mismo.
+
+### Estado final de la acreditación
+
+| | |
+|---|---|
+| Esquema y datos | **firmado** — contrastado contra la predicción del cluster efímero, coincidencia exacta |
+| Servicio · Dashboard | **firmado** — bandeja de Chats cargando en PROD |
+| Servicio · bot n8n | **pendiente**, no es mío |
+
+Queda abierto solo lo del bot, que corresponde al lado n8n. Y las dos divergencias ya clasificadas:
+`session_id` sin `NOT NULL` a la segunda ventana con guarda de cero nulos, y
+`dashboard_claims_active_idx` a Fase 5.
