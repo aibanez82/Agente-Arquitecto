@@ -102,3 +102,36 @@ minuto y no las vi.
 
 Que las encontrara el segundo par de ojos es exactamente para lo que existe el segundo par de ojos. La
 regla no es una formalidad: **es lo que convierte «no encontré fallos» en «no hay fallos».**
+
+---
+
+# Anexo — Fase 2: Dashboard promovido a producción (12 ago)
+
+**Aplica:** Arquitecto (merge `stg` → `main`, `0d2ee73` → `fb808bc`) · **Verifica:** Alberto (prueba
+observable en la UI) · **Acredita:** Arquitecto (estado en base). Autorizado por Alberto.
+
+**Precondiciones, verificadas en el momento y no de memoria:** impacto del endurecimiento del visor
+**remedido justo antes → 0 de 1084 sesiones afectadas** · punto de retorno anotado · merge sin
+conflictos · Fase 1 aplicada.
+
+**Despliegue:** Vercel `Ready` en 32 s.
+
+**Acreditación — la prueba que nunca se había ejecutado:** primer clic de «Tomar conversación» → crea
+claim; segundo clic → rechazado; liberar → funciona.
+
+| Evidencia | |
+|---|---|
+| Fila creada | `id=17 · lead=2040 · quotation_id=3492 · epoch=1 · control_id presente` |
+| **Por qué prueba que corre el código nuevo** | el `claim.js` anterior insertaba **solo** `lead_id, session_id, agent_id`. Que la fila traiga `quotation_id` es imposible con el código viejo. Las filas 15 y 16, anteriores, lo tienen a `NULL` |
+| Liberar | la fila acabó en `state='released'` — el camino nuevo exige `control_id` **y** `epoch` **y** ser su dueño |
+| Invariantes | 0 sesiones con >1 claim activo · 0 pares `(session_id, epoch)` repetidos |
+
+> El «Ready» de Vercel dice que **se desplegó**. La fila con `quotation_id` dice que **se ejecutó**. Solo
+> la segunda es acreditación.
+
+**Arregla dos fallos que estaban vivos en producción:** «Tomar conversación» (roto desde el 28 jul,
+fallaba siempre y para todos, y nadie lo detectó porque no se había vuelto a pulsar) y el `parseInt`
+sobre `lead_id`/`cotizacion_id`, que redondea por encima de 2^53 y podía seleccionar el lead vecino —
+el del FAIL P1 del 4 de agosto.
+
+**Rollback disponible y no usado:** promover el deployment anterior en Vercel.
