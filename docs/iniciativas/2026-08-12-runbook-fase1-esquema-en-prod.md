@@ -10,6 +10,30 @@
 
 ---
 
+## 0 ante. ⚠️ El orden de las migraciones es un **requisito duro**, no una preferencia
+
+**Las migraciones de paridad de la Fase 0 van SIEMPRE antes que las de `#156`.** Invertirlo no degrada
+nada: **aborta**.
+
+Motivo, medido: las dos banderas del archive tienen **tres** estados posibles, no dos —ausente en PROD,
+nullable en STG, y `NOT NULL DEFAULT false` que no existe en ninguna base pero que **crearía** el paso
+P2 de `migrations/156/001-readiness`, porque copia la nulabilidad de la tabla activa—.
+
+| Orden | Qué pasa |
+|---|---|
+| **Fase 0 → `156/001`** (el del plan) | Las siete entran **nullable** en el archive. Después, P2 las encuentra y es un no-op. PROD acaba igual que STG. **Correcto** |
+| `156/001` → Fase 0 (invertido) | P2 las crea `NOT NULL DEFAULT false`. Luego la guarda G3 de la Fase 0 ve una columna con otra forma que su objetivo y **aborta la transacción entera**: `STOP/G3: … ya existe con NOT NULL=t y el objetivo es NOT NULL=f. Nada escrito.` |
+
+Ese aborto es *fail-closed* y es el comportamiento correcto —mejor abortar que escribir sobre un
+esquema que no se reconoce—, pero significa que **el orden es una dependencia**. Queda declarado aquí,
+que es el documento de la ventana, y no en un comentario dentro de un fichero.
+
+**Consecuencia práctica:** el merge de `#156` a `stg` y la aplicación de sus migraciones **no pueden
+adelantarse** a las ventanas de paridad. Está alineado con el plan —#156 va después de la Fase 5— pero
+ahora se sabe *por qué* y no solo *en qué orden*.
+
+---
+
 ## 0 bis. Quién aplica y quién acredita — **decidir antes de abrir**
 
 Lo levantó el Agente Dashboard y al primer borrador de este runbook le faltaba. La regla de ventana es:
