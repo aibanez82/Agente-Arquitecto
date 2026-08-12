@@ -163,8 +163,8 @@ Suite 120/120 (partía de 89). Entrega en `docs/156/entrega-dashboard.md`.
 |---|---|---|
 | 1 | **Lanzar la sonda del rango** de descuento (continuo vs discreto) | Alberto |
 | 2 | Decidir si el **20 por defecto** se mueve, ahora que se acepta 40 | Alberto / Hylant |
-| 3 | Llevar a #156 los **10 conectores sin sesión** como excepciones nominales | Alberto decide canal |
-| 4 | Llevar a #156 la **divergencia de wire** 400 vs 404 | Alberto decide canal |
+| 3 | ~~Llevar a #156 los 10 conectores sin sesión~~ → **hecho 12 ago**, `#156` comentario `5272121781`. Esperando dictamen de Juan | Juan |
+| 4 | ~~Llevar a #156 la divergencia de wire 400 vs 404~~ → **hecho 12 ago**, mismo comentario. Esperando dictamen de Juan | Juan |
 | 5 | **Brecha de roles Postgres** (mono-rol) — gate de rollout declarado por los dos ejecutores | pendiente de decisión |
 | 6 | Autorizar el **merge a `stg`**: no es nuestro, lo da el checkpoint de #156 tras PR-ready | Juan |
 | 7 | **Métricas de adquisición**: el funnel actual contará cada recotización como lead nuevo (hasta 3×) el día que Discounts se active. E5 se construye como superficie nueva **sin tocar** `lib/metrics.js` ni `FunnelV2.js`; el Dashboard entrega el desfase cuantificado (fichero:línea + factor) y hay que **decidirlo con Hylant**, no heredarlo | Alberto / Hylant |
