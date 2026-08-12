@@ -67,11 +67,31 @@ expresamente no tocarlo («esta migración no borra nada»). Con `state` ya pobl
 → **Acción:** retirarlo en la **Fase 5 (higiene)**, junto al índice duplicado de
 `whatsapp_sessions.quotation_id`. No urge y no molesta.
 
-## Lo que falta para cerrar del todo
+## Servicio verificado — **ventana CERRADA**
 
-- **El Dashboard sigue leyendo en producción** — abrir la bandeja y comprobar que carga. Pendiente.
-- **El bot sigue respondiendo** — es del lado n8n, y esta migración no toca sus tablas, pero el runbook
-  lo pide igual. Pendiente.
+- **El Dashboard lee en producción:** bandeja de **Chats** cargando, verificado por Alberto. Se pidió
+  expresamente ese segundo clic porque la primera comprobación fue sobre *Resumen*, que **no toca** la
+  tabla migrada — matiz del Agente Dashboard, y es el que convierte la comprobación en prueba.
+- **El bot responde:** verificado por Alberto.
+- **Lecturas acreditadas por el Arquitecto** contra producción: el `JOIN` exacto del `inbox.js`
+  desplegado devuelve 1 312 leads · 8 con claim · 8 con agente, y la consulta del `409` también corre.
+
+**Firmado como segundo criterio por el Agente Dashboard** (`informes/2026-08-12-dashboard-cierre-jornada.md`).
+
+## Corrección: el DDL fue aditivo en columnas pero **restrictivo en escrituras**
+
+Dije que producción no cambiaba de comportamiento «porque nadie lee esas columnas». Las **lecturas** no
+cambian — verificado. Las **escrituras sí**, y no por las columnas sino por un índice nuevo:
+
+`uq_claims_active_session` es único sobre `session_id` donde `state='active'`. En producción
+**`session_id` es el teléfono**, así que dos leads del mismo teléfono ya no pueden estar tomados a la
+vez. Y eso ocurre: hay **12 pares de leads con el mismo teléfono** en 30 días (`qualitas-issues#20`).
+
+**Degrada bien y es deseable:** el `claim.js` desplegado captura el `23505` y devuelve **409**, no un
+500 — leído en el código. El único defecto es cosmético: busca al dueño por `lead_id` y, como el claim
+vive en *el otro* lead, dice «Ya tomada por otro agente» sin nombrarlo. Y lo que impide es exactamente
+lo que un claim existe para impedir: dos agentes escribiendo en la misma conversación de WhatsApp.
+Hoy hay **0 sesiones con más de un claim activo**.
 
 ## La lección, que es de método y es mía
 
