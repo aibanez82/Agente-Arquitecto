@@ -184,6 +184,7 @@ Roles y protocolos completos: tabla "Mapa de sistemas". Reglas operativas:
 - **Seguimiento leads estancados:** ✅ en PROD (sin filtro de horario — aceptado; mejora deseable). En STG apagado/dry-run. `docs/iniciativas/seguimiento-leads-estancados.md`.
 - **Conversation ID:** en PROD modo `shadow`. Pendiente: merge rama Dashboard `fix/conversation-id-whatsapp-n8n` y paso a `dual` con Juan. `docs/iniciativas/conversation-id-whatsapp-n8n.md`.
 - **Recordatorios por fecha mencionada:** diseño entregado a Juan; bloqueado por plantilla Meta re-enganche 24h. `docs/iniciativas/2026-07-10-recordatorios-seguimiento-por-fecha-mencionada-design.md`.
+- **Promoción STG → PROD (v2, 12 ago):** Dashboard y n8n primero; bloqueadas por esquema que se aplicó a mano en STG y nunca se versionó. `docs/iniciativas/2026-08-12-plan-promocion-stg-a-prod-v2.md`.
 - **HYL-WAI#156 Descuentos + Conversation Control:** Juan congeló 2 contratos y terminó Django; n8n y Dashboard son nuestros, offline en ramas desde `stg`. Handoffs y canal `dudas/` REACTIVADOS solo para esto. `docs/iniciativas/2026-08-11-hyl-wai-156-descuentos-lado-nuestro.md`.
 
 ---

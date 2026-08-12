@@ -1,3 +1,9 @@
+> ⚠️ **SUSTITUIDO el 12 ago 2026 por `2026-08-12-plan-promocion-stg-a-prod-v2.md`.**
+> Sigue siendo válido su §0 (tesis), §3 (lo irreversible), §5 bis (issues) y §7 (reglas de ventana).
+> **Su §1 contiene un error mío:** comprobé que las tablas existían en PROD, no su FORMA. La tabla de
+> claims y `whatsapp_sessions` de PROD les faltan columnas que el código de STG usa. El v2 lo mide y
+> añade una fase previa de esquema.
+
 # Plan de promoción STG → PRODUCCIÓN — vista cross de los cuatro sistemas
 
 **Autor:** Arquitecto-IA-Qualitas, como arquitecto del proyecto (no de un lado).
