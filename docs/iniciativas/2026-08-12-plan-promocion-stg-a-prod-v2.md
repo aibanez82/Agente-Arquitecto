@@ -369,3 +369,43 @@ fallo que se repite: el error no está en el razonamiento, está en **contra qu�
 
 Regla que se aplica desde ya: **ninguna ventana se cierra sin una conversación real**. Los checks estáticos son
 condición necesaria y nunca suficiente.
+
+### CORRECCIÓN (13 ago, mismo día) — «dormida esperando `dual`» era falso: PROD ya está en `dual`
+
+Escrito arriba que Multicotización quedaba dormida hasta que Conversation ID pasara de `shadow` a `dual` en
+producción. **La premisa es falsa y la retiro.** Verificado en Heroku:
+
+```
+hyl-wai-production   WHATSAPP_CONVERSATION_ID_MODE = dual   (release v341, 13 ago 11:39 -0600 = 17:39 UTC, Juan)
+hyl-wai-stg          WHATSAPP_CONVERSATION_ID_MODE = dual   (desde el 8 ago)
+```
+
+Nadie está en `shadow`. Y el código no deja lugar a duda: `CONVERSATION_ID_SESSION_MODES = {"dual","enforced"}`
+con `session_id = conversation_id if uses_conversation_id_session else phone_number`
+(`qualitas/whatsapp_conversations.py:100-106`). En `dual`, cada lead nuevo se crea con su propia sesión
+`waq_<qid>_<hex>`.
+
+**Lo que sí es cierto, y es otra cosa:** en PROD **no se ha creado ninguna sesión desde el cambio** — la última es
+de las 14:57 UTC, dos horas y media antes de que Juan lo activara. Las 1084 filas existentes son todas anteriores,
+una por teléfono, y por eso la lista solo podía ofrecer una opción. No es un bloqueo: es que el corpus de datos es
+previo al cambio.
+
+Diferencia observable entre entornos, medida hoy:
+
+| | PROD | STG |
+|---|---|---|
+| modo | `dual` (hoy 17:39 UTC) | `dual` (8 ago) |
+| sesiones / teléfonos | 1084 / 1084 | 19 / 8 |
+| teléfonos con >1 sesión | 0 | 2 |
+| `session_id` tipo `waq_` | 0 | 12 |
+| filas con `conversation_id` | 620 | 17 |
+
+Salvedad que no me callo: que `dual` keye por conversación está **probado en STG y todavía no en producción**,
+porque PROD no ha creado ni una sesión desde el cambio. Lo prueba el primer lead nuevo.
+
+**Consecuencia para la prueba:** ya no vale la de tubería. Hay que crear **dos leads nuevos desde la landing con el
+mismo teléfono** (posteriores a las 17:39 UTC del 13 ago) y pedirle al bot ver las cotizaciones: debe listar dos.
+
+**Lección, otra vez la misma forma:** afirmé el modo de memoria en vez de leerlo, y encima construí sobre esa
+afirmación un bloqueo inexistente atribuido a Juan. El fallo no estaba en el razonamiento —dado `shadow`, todo lo
+demás se seguía— sino en **no verificar el hecho de partida**.
