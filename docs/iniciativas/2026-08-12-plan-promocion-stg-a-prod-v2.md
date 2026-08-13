@@ -249,3 +249,66 @@ desaparque.
 **El patrón, que ya va cuarto en un día:** tomar algo cierto en un ámbito y afirmarlo en otro sin
 volver a medir. Regla: **una afirmación sobre «los sistemas» se verifica por sistema, o se escribe
 nombrando el sistema al que aplica.**
+
+---
+
+## Actualización (13 ago) — Multicotización vuelve, y dos workflows que el inventario no tenía
+
+### Multicotización **vuelve al viaje**
+
+La saqué el 12 ago por criterio propio, alegando que dependía de S1. **La decisión no me correspondía:**
+la orden es mover a producción lo que vive en STG, y Multicotización vive en STG y está verde. Encontré
+una dificultad técnica y retiré alcance en vez de resolverla — que es exactamente lo que este plan
+prohíbe. Retirada esa decisión.
+
+**Medido el subconjunto mínimo que necesita, y no es «todo S1». Son tres piezas:**
+
+| Pieza | Qué es | Coste medido |
+|---|---|---|
+| **A** · `Prepare Resolution Context` | 1 nodo `code`, autocontenido, cero referencias `$()` | **Dos aristas.** Entra en serie entre `Session Context Builder` y `Resolve Session`, los dos ya en PROD. Pasa el payload entero con spread, así que no cambia nada de lo que hoy funciona |
+| **B** · bloque de prompt del cambio | ~7 menciones en **cada** `systemMessage` | Trabajo de **extracción**: el bloque está mezclado con el flujo de METEPEC (que llama a una tool inexistente en PROD) y con correcciones de copy. **Lo valida el Arquitecto** por tocar el `systemMessage` |
+| **C** · `SELECT` de `Resolve Session` | fail-open → fail-closed (blocklist → allowlist) | **Cero sesiones afectadas**, medido |
+
+**La pieza C parecía el riesgo y no lo es.** La medición inicial del ejecutor daba 23 sesiones que
+«dejarían de resolver», pero su fórmula comparaba contra un «antes» incompleto: le faltaba la blocklist,
+que es la otra mitad del criterio viejo. Comparados los dos criterios enteros:
+
+```
+SELECT viejo resuelve como vivas : 1041
+SELECT nuevo resolvería como vivas: 1041      diferencia: 0
+```
+
+Y **los conjuntos son idénticos, no solo equinumerosos**: en PROD hay **0** sesiones con `status` NULL
+y **0** con fase desconocida, así que las nueve fases se reparten exactamente entre la blocklist de tres
+y la allowlist de seis. Las 23 `open`/`completed` que aparecían **ya están muertas para los dos**.
+
+**Condiciones:** re-medir justo antes de la ventana (es un hecho sobre datos, y los datos se mueven), y
+la pieza B pasa por validación del Arquitecto contra los hitos por LIKE y los Bugs #10/#14.
+
+**Nota que el ejecutor levantó sin que se le preguntara:** la pieza A calcula `qcTerminal`, un veredicto
+que en PROD **nadie lee** porque su consumidor es de S1 y no viaja. No es regresión —hoy tampoco se
+corta— pero se promueve código que decide algo que no se obedece.
+
+### Dos workflows en STG que este plan no inventarió
+
+Salieron al preguntar «¿qué más hay en STG que no esté en el plan?». **Ninguno entra en las cinco
+iniciativas** que el §2 listó:
+
+| Workflow | Qué es | Estado |
+|---|---|---|
+| **`Issue Policy Guard`** | Sub-workflow de 7 nodos: comprueba **de forma determinista** el límite de 30 días antes de emitir, y luego llama a la emisión real. Es el arreglo de `qualitas-issues#66` — hoy esa validación la hace el LLM y promete fechas que Quálitas rechaza | `active=false` **y el bot de STG no lo invoca**: no hay ningún nodo `executeWorkflow` que lo llame |
+| **`Metepec Liberar`** | 4 nodos, webhook `metepec-liberar`, pone `metepec_derived = false`. El plan trata METEPEC como **una** iniciativa y son **dos** workflows | `active=false` |
+
+**Los dos están inactivos en STG, y el guard además no está conectado a nada.** «Está en STG» es cierto;
+«funciona en STG» no. **No son candidatos a ventana: son trabajo a medio terminar en STG.** Promoverlos
+movería funcionalidad que tampoco funciona allí.
+
+- **`Issue Policy Guard`:** falta conectarlo al bot (`Issue_Policy` tiene que llamarlo) y probarlo en
+  STG. Eso es **desarrollo, no promoción**. Cuando esté verde allí, viaja con el bot.
+- **`Metepec Liberar`:** se anota como parte de METEPEC, ya aplazada. Cuando METEPEC viaje, viaja
+  completa — o se podría marcar y no desmarcar.
+
+### Estado del código, medido el 13 ago
+
+**Dashboard y Django: `stg` y `main` al día, 0 commits pendientes en los dos.** Todo lo que quedaba por
+promover de esos dos sistemas está en producción.
