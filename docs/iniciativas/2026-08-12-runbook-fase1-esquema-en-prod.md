@@ -323,3 +323,32 @@ sistema; pero ya no es una incógnita, y poner o quitar esa variable en producci
 candidata S1 acreditada** (`feature/s1-v11-dashboard`) — los guards fueron retirados el 9 de agosto.
 En producción esos guards nunca actuaron (el modo siempre fue `null` allí), así que **no hay cambio de
 comportamiento por eso**. Pero conviene que conste: se promueve `stg`, no la candidata.
+
+
+---
+
+## Corrección (13 ago) — retirada la excepción de «dos sistemas» para Atención Humana
+
+En el trabajo de la Fase 4 se declaró que la ventana de Atención Humana era una **excepción** a «un
+sistema, una ventana», porque los `webhookId` se generarían al crear el workflow y habría que cablear
+el Dashboard **en medio** de la secuencia.
+
+**La premisa era falsa.** La URL de un webhook de n8n se construye con su **`path`**, no con su
+`webhookId`; el id solo hace de path cuando el `path` está vacío. Verificado contra producción:
+
+```
+Retomar Conversacion · nodo Webhook
+  path       proactive-wa-message      <- de aquí sale la URL
+  webhookId  afd2b47d-bd99-4525-93a6-42764b8f56df   (interno)
+```
+
+**Consecuencias:** las URLs de Atención Humana **se conocen desde ya**, el Dashboard puede cablearse
+**antes y en paralelo**, y **la excepción queda retirada**: vuelve a ser una ventana normal.
+
+Lo único que sobrevive: la URL **solo responde con el workflow activo** (inactivo → 404), así que
+activar es el último paso.
+
+**De quién salió el error y cómo se encontró:** lo dedujo el Agente n8n y lo trasladé yo sin
+verificarlo. Lo encontró él mismo al escribir los datos exactos que le pedí — la precisión destapó una
+premisa que el razonamiento correcto había dado por buena. Es la cuarta vez hoy que el fallo no está en
+el razonamiento sino en el hecho de partida.
