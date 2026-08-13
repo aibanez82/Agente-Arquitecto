@@ -19,32 +19,55 @@ el guion **aborta** en las precondiciones y lo dice — no falla en silencio.
 **Lo que NO se copia de STG:** el sufijo `STG` del nombre (obvio pero es justo lo que preguntas) y el
 **id**, que PROD genera por su cuenta y no hay que reproducir.
 
-## 2 · Nombre de la cabecera — **no puedo leerlo, y por qué**
+## 2 · Nombre de la cabecera — **`X-Operator-Auth`**, leído. **Mi inferencia era FALSA**
 
-**No existe en ningún artefacto versionado.** El nombre de la cabecera vive dentro del campo `data` de
-la credencial, y:
+> ### ⚠️ CORRECCIÓN inmediata a lo que decía este informe
+>
+> Escribí que el nombre de la cabecera «no se puede leer de ningún sitio» y ofrecí `Authorization` como
+> **inferencia**, deducida de la credencial hermana de Retomar. **Es falso, y en los dos sentidos:**
+>
+> 1. **El valor real es `X-Operator-Auth`.** Lo leyó Alberto en la UI de STG.
+> 2. **Y sí estaba escrito**, en evidencia versionada que no encontré:
+>    `Agente-n8n@6f1d394:docs/2026-07-29-fase6-5-reporte-port-issue-132.md` §(g), punto 1 —
+>    *«Credencial `httpHeaderAuth` "Atencion Humana Header Auth STG" (a mano; header
+>    **`X-Operator-Auth`**) + secreto al Dashboard»*. Busqué en los scripts, que es donde suelen estar
+>    los payloads, y no en los reportes de fase.
+>
+> Etiquetarla como inferencia sirvió —Alberto fue a leerla en vez de copiarla— pero el fallo de fondo es
+> mío: **deduje de la credencial hermana en vez de buscar la propia**, y la propia estaba documentada.
+> Es el mismo patrón del día por tercera vez: una deducción razonable sobre lo que no verifiqué.
 
-- la API pública de n8n **nunca devuelve `data`** (ni con el `PATCH` no documentado: «la API nunca
-  devuelve el valor guardado», gotcha #11 del repo);
-- y **esta credencial la creó Alberto a mano en la UI de STG**. El código del port #132 solo la
-  referenciaba por nombre con un id placeholder — literal:
-  `PLACEHOLDER_ATENCION_HUMANA_HEADER_AUTH_STG`
-  (`scripts/port-132/steps/lib/header-auth-credential.js`). O sea que **ningún script la creó**, y por eso
-  no hay payload del que leer la cabecera.
+**El dato bueno:**
 
-**Lo que sí tengo es la convención, con evidencia:** la credencial hermana de Retomar se creó con
+| Campo de la credencial | Valor |
+|---|---|
+| nombre de la cabecera (`data.name`) | **`X-Operator-Auth`** |
+| valor (`data.value`) | el secreto, **sin prefijo `Bearer`** — ver abajo |
 
-```python
-{"name": CRED_NAME, "type": "httpHeaderAuth",
- "data": {"name": "Authorization", "value": token}}     # scripts/add-stg-auth-retomar-conversacion.py:159
+**Y esto arrastra otra corrección mía, esta con consecuencia operativa.** Le había dicho a Alberto que el
+`Value` tenía que llevar `Bearer <token>`, razonando desde el código vivo del proactivo
+(`Dashboard:apps/operacion/pages/api/n8n-proactive-message.js:98`, `Authorization: Bearer ${token}`).
+**Ese razonamiento vale para el par de Retomar y NO para este:** `Bearer` es un esquema de
+`Authorization`, y `X-Operator-Auth` es una cabecera propia que lleva el secreto **crudo**. El reporte de
+Fase 6.5 lo llama «secreto», no token bearer.
+
+La invariante, que es lo único que no cambia: **lo que el Dashboard mande en `X-Operator-Auth` tiene que
+ser byte a byte lo que haya en el `Value`.** Y ojo — **este par nunca se ha ejercitado**: los webhooks de
+Atención Humana tienen **0 ejecuciones** en STG, así que ni siquiera el par de STG está validado contra un
+llamador real. La convención la fijamos ahora, y lo simple es el secreto crudo.
+
+### Y de paso, los nombres que el Dashboard tendría que usar
+
+El mismo reporte los deja escritos, y **el Dashboard no los tiene todavía** (comprobado en su repo):
+
+```
+N8N_OPERATOR_WEBHOOK_BASE_URL     -> el host de PROD; el Dashboard construye  <base>/webhook/atencion-humana-*
+N8N_OPERATOR_WEBHOOK_SECRET       -> el valor que va en X-Operator-Auth
 ```
 
-o sea cabecera **`Authorization`**. Es lo más probable, **pero es inferencia, no lectura**, y hoy ya nos
-ha costado dos correcciones dar por leído lo que era deducido.
-
-**Cómo cerrarlo en 30 segundos y sin adivinar:** abrir `Atencion Humana Header Auth STG` en la UI de
-**STG**. n8n enmascara el **valor**, pero **muestra el nombre de la cabecera**. Ese es el dato bueno, y
-STG es la referencia porque es donde el par funciona hoy.
+Encaja con mi §4.bis: los `path` son conocidos y estables, así que lo único que cambia por entorno es la
+base. Si su agente prefiere otros nombres, es su decisión — pero estos son los del diseño original y
+conviene que la elección sea explícita y no por omisión.
 
 ## 3 · Qué nodos la usan, y en qué `path` escucha cada uno
 
