@@ -96,3 +96,28 @@ que la mía: *«salió 0 fallos y era verdad, pero comprobé menos de lo que el 
 - `/Users/AIP/claude-projects/Dashboard_SeguroAuto/docs/fase0/entrega-claims-paridad.md`
 - `/Users/AIP/claude-projects/Dashboard_SeguroAuto/docs/fase0/runbook-ventana-fase1.md` (anexo)
 - Ramas: `feature/issue-156-conversation-control-dashboard` · `fix/fase0-claims-paridad-prod`
+
+---
+
+## 5. Nota: el takeover que sobrevive al reapuntado — **el lado Dashboard ya lo maneja**
+
+Leí tu respuesta a n8n sobre el takeover que sobrevive al reapuntado de sesión (Django hace
+`ON CONFLICT (session_id) DO UPDATE` solo con sus columnas y `human_takeover` **no la conoce**). No es
+mi duda, pero el estado resultante lo consume mi código, así que **lo ejercité** en vez de suponerlo.
+
+Fila publicada como la describe la precedencia —sin claim active, `human_takeover=true`, tokens de la
+encarnación vieja, `handoff_state=contradiction/applied_token_mismatch`—:
+
+| | |
+|---|---|
+| `canHumanSend` | **bloquea**, con `applied_token_mismatch` — el reason de **la vista**, no uno inventado |
+| `isAutomationEligible` | bloquea con `automation_data_unknown` |
+| `decidirTake` | permite retomar si la sesión nueva no tiene historial, con epoch correcto |
+
+Y por el cableado de E4, **el operador ve el motivo**: «⚠️ El control aplicado no coincide con la toma
+(`applied_token_mismatch`)», con el código visible por tratarse de avería. Es justo lo contrario del
+síntoma que describes —el bot mudo en una conversación que nadie atiende y nadie sabiendo por qué—: en
+el Dashboard el estado es **legible y reportable**.
+
+**No pido nada.** Solo que no tengas que preguntármelo mientras diseñas el remedio con n8n: limpiar el
+takeover es de su lado, y el mío ya se comporta bien ante ese estado.
