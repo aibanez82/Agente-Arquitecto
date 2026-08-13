@@ -74,7 +74,7 @@ por presente. Las dos se escribieron contra STG, donde ya estaban. Contra PROD a
 | `whatsapp_sessions` **NO** tiene | `human_takeover` · `human_takeover_control_id` · `human_takeover_epoch` · `metepec_derived` |
 | `dashboard_conversation_claims` | existe, **16 filas**, forma antigua de 6 columnas (arriba) |
 | Existen | `whatsapp_sessions_archive` (113) · `n8n_chat_histories` (5435) · `n8n_chat_histories_archive` (1105) · `dashboard_message_audit` (18) · `conciliacion_pagos` (297) · `leads_metepec` (10) · `qualitas_whatsappmessage` (1912) · `comisiones_facturas` (0) · `comisiones_recibos` (0) · `dashboard_users` (4) |
-| **No** existen | `n8n_payment_events` · `dashboard_outbound_dispatch` |
+| **No** existen | `n8n_payment_events` · `dashboard_outbound_dispatch` — **ojo: las dos son de n8n, no de Django** (corregido 12 ago; ver §Atribución) |
 
 **Lo que esto despeja:** todas las tablas que consulta el código del Dashboard de `stg` existen en PROD
 —incluidas `leads_metepec` y `qualitas_whatsappmessage`, que eran las dudosas— y `dashboard_outbound_dispatch`
@@ -222,3 +222,30 @@ Se heredan tal cual del §7 del plan del 10 ago. Las tres que más se rompen:
 - **Nada se arregla dentro de una ventana abierta.** Si algo no está verde, la ventana se cierra y se
   reabre otro día.
 - **El rollback se escribe antes de empezar**, no se improvisa.
+
+
+---
+
+## Corrección (12 ago) — la atribución de las cinco tablas ausentes estaba mal en tres
+
+Este plan afirmó que las cinco tablas que faltan en PROD eran «todas de Django, que queda fuera de esta
+promoción». **Falso en tres de cinco**, comprobado tabla a tabla:
+
+| Tabla | Dueño real |
+|---|---|
+| `qualitas_paymentevidence` · `qualitas_businessoutboxdelivery` | Django ✔ |
+| `dashboard_outbound_dispatch` | **n8n** — la crea y la escribe solo n8n. El prefijo `dashboard_` engaña |
+| `n8n_payment_events` | **n8n** |
+| `conciliacion_verificacion_api` | **Agente Conciliación** — y tiene migración versionada propia |
+
+**Consecuencia inmediata:** `dashboard_outbound_dispatch` la usan **3 nodos** de `Atención Humana`, así
+que esa iniciativa **no estaba desbloqueada** por las dos ventanas de esquema. Necesita una tercera,
+corta, que **cree la tabla** — y eso **excede la autorización de Alberto**, que cubría paridad de
+columnas. Pendiente de su decisión.
+
+**Consecuencia diferida:** `n8n_payment_events` le espera igual a Payment Confirmation cuando se
+desaparque.
+
+**El patrón, que ya va cuarto en un día:** tomar algo cierto en un ámbito y afirmarlo en otro sin
+volver a medir. Regla: **una afirmación sobre «los sistemas» se verifica por sistema, o se escribe
+nombrando el sistema al que aplica.**
