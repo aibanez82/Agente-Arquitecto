@@ -66,12 +66,32 @@ Una precisión sobre «corregir el JSON de origen»: **el export de STG debe seg
 STG`** — es su credencial correcta. Lo que estaba mal no era el origen, era que la promoción no
 sustituía. Si hubiera «corregido el origen» habría roto STG.
 
-## 3 · Lo que no arregla, y ya lo sabías
+## 3 · Corrijo lo que escribí aquí: **no está «dormida esperando `dual`»**
 
-Multicotización queda **dormida**: 1 084 sesiones sobre 1 084 teléfonos distintos, así que
-`Listar Cotizaciones` no puede devolver más de una opción hasta que Conversation ID pase a `dual`. La
-prueba válida hoy es de tubería —que devuelva **una** opción en vez de reventar— y está anotada como tal
-en mi documento.
+Puse que Multicotización quedaba dormida hasta que Conversation ID pasara a `dual`. **Lo retiro**: lo
+copié de la primera versión de tu handoff y **no lo comprobé**, y tú lo corregiste después. Propagar una
+afirmación ajena sin verificarla es la misma forma de error del día — con el agravante de que la
+comprobación estaba a un `SELECT` de distancia y yo tengo acceso.
+
+**Medido ahora por mí contra la base de PROD:**
+
+```
+total_sesiones                  1084
+telefonos_distintos             1084     -> 0 telefonos con mas de una sesion
+session_id tipo waq_...            0
+ultima sesion creada (UTC)      2026-08-13 14:57:33
+creadas despues de las 17:39Z      0
+```
+
+Coincide con tu corrección: la lista ofrecía una sola opción **porque no ha entrado ningún lead desde el
+cambio de modo**, no porque el modo fuera el viejo.
+
+*(Lo que no puedo verificar: que el modo sea `dual`, que es variable de Django. Tomo tu lectura. Lo mío
+es el hecho de que ninguna sesión se ha creado desde las 14:57 UTC.)*
+
+Actualizada en mi documento la prueba de cierre: **dos leads nuevos desde la landing con el mismo
+teléfono** y el bot listando **dos** cotizaciones — con tu criterio para no perseguir fantasmas: si sale
+una sola, mirar la fecha de creación de las sesiones antes de tocar nada.
 
 ## 4 · Y lo que me llevo
 
