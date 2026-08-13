@@ -135,3 +135,51 @@ sobre `lead_id`/`cotizacion_id`, que redondea por encima de 2^53 y podía selecc
 el del FAIL P1 del 4 de agosto.
 
 **Rollback disponible y no usado:** promover el deployment anterior en Vercel.
+
+---
+
+# Anexo — Fase 4, promoción 1: Retomar Conversación en producción (13 ago)
+
+**Autoriza:** Alberto · **Ejecuta:** Agente n8n (`promover-retomar.py --go --confirm-ventana`) ·
+**Acredita:** Arquitecto (API de n8n, retrato propio del antes) · **Cierra:** Alberto (envío real).
+
+**Alcance real:** un solo parámetro de un solo nodo — `Normalize & Validate.jsCode`, **1 338 → 10 169**
+caracteres. El plan del 10 ago describía además un cambio `WA Config STG` → `WA Config` que **no
+existía**: producción ya tiene su propio nodo. Menos cambio del previsto, medido y no supuesto.
+
+**Acreditación — 0 fallos**, contra un retrato del antes que tomé por separado:
+
+| | | |
+|---|---|---|
+| ① | `webhookId` de `Webhook` y de `Send message` | **intactos** — Bug #12 evitado |
+| ② | 12 nodos, `active = true` | sin pérdidas ni añadidos |
+| ③ | `jsCode` 1 338 → 10 169 | el cambio entró |
+| ④ | referencias `$('...')` en el código vivo | **0** — portable |
+
+`versionId`: `a83ec90c…` → `fa42a9b4…`.
+
+**Cierre por comportamiento:** mensaje proactivo real desde el Dashboard de producción, **recibido en el
+teléfono**. Registrado en `n8n_chat_histories` (`id=10673`, 03:05:02) y en `dashboard_message_audit`
+(`id=19`, `claim=18`, `webhook_ok=true`). Atravesó el nodo cambiado de punta a punta.
+
+**Acreditado de propina:** `dashboard_message_audit.claim_id` **se escribe en producción**. Era la
+columna que el Agente Dashboard levantó como posible pérdida silenciosa de rastro; queda probada con un
+envío real.
+
+## El falso positivo, que es la lección de esta ventana
+
+La guarda anti-Bug#15 del guion era `'WA Config STG' in json.dumps(workflow)` y **abortó**: el `jsCode`
+que se promovía menciona esa cadena en **dos líneas de comentario**, y copiarlo byte a byte era una
+decisión tomada y escrita.
+
+En palabras del ejecutor: *«el guion abortaba por cumplir su propio plan, y además gritaba REVERTIR ya
+sobre una promoción correcta — la peor clase de falso positivo: el que empuja a deshacer algo que
+estaba bien.»*
+
+Corregido en el sitio correcto: la guarda ahora busca **un nodo** llamado `WA Config STG` o **una
+referencia `$('WA Config STG')`**, que es lo único que ejecutaría. Un comentario no ejecuta nada. Se
+aplicó también al guion de Atención Humana, que tenía el mismo defecto y aún no se había usado.
+
+> **Y el patrón del día, completo:** una comprobación **más ancha** que el criterio grita en falso; una
+> **más estrecha** deja pasar. Hoy nos han pasado las dos — su guarda y mi primera acreditación — y las
+> dos se pagan.
