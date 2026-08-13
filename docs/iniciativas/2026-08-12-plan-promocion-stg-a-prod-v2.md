@@ -451,3 +451,46 @@ Dos puntos que el ejecutor levantó en vez de resolver por su cuenta:
 
 Los 97 son los teléfonos con más de una cotización histórica. Crece con cada cliente que vuelva a cotizar, así que
 hay margen para hacerlo bien pero no para dejarlo parado.
+
+### RECTIFICACIÓN (13 ago, mismas horas) — se retira A y se autoriza **C**
+
+**Autoriza:** Alberto, 13 ago: «C con tu añadidura». Sustituye a la autorización de A de arriba, que queda
+**retirada sin ejecutar**. Ventana vigente:
+`Agente-n8n:handoffs/2026-08-13-VENTANA-C-retirar-desambiguacion-automatica.md`.
+
+**Qué se hace en vez de promover S1:** retirar la desambiguación automática. Con 2+ candidatas vivas,
+`Session Resolution` continúa con la sesión `active` si la hay y con la más reciente si no la hay, y el cambio de
+cotización queda donde ya funciona: las tools de Multicotización, que listan con vehículo y **persisten** la
+elección. Sin nodos nuevos, sin superficie contractual de S1, y reversible — `Format Disambiguation Message` y su
+router se quedan inertes en su sitio.
+
+**La añadidura, que es condición y no extra:** cuando el bot continúe solo, **dice con cuál cotización sigue** en
+una línea antes de responder. Sin eso, un cliente con dos coches recibe respuestas del coche equivocado sin
+enterarse — el único riesgo real de C. El bloque de copy va validado y es aditivo, 0 borrados.
+
+### Por qué me equivoqué al autorizar A, que es lo que hay que recordar
+
+Iba a mover cinco nodos y a tocar superficie contractual de S1 **para traer una persistencia de afinidad que ya
+estaba en producción**: `Cambiar Cotizacion`, promovido esa misma mañana, hace exactamente lo mismo que el
+`Apply Affinity Update` de STG. Lo único que faltaba era **leerla**.
+
+Diseñé el arreglo mirando el entorno de origen en vez de mirar lo que el destino ya tenía. Es la misma forma del
+fallo que se repitió todo el día —acreditar contra el artefacto y no contra el destino— solo que en la postura
+contraria: esta vez el destino tenía **de más**, no de menos.
+
+Lo encontró el ejecutor levantando una opción que no estaba en mi consulta. Eso es exactamente lo que debe hacer
+un ejecutor con criterio, y conviene que el precedente quede escrito: **una opción mejor que la del Arquitecto se
+adopta, no se negocia**.
+
+### Dato de urgencia (medido, para dimensionar)
+
+Clientes que vuelven a cotizar en producción, por semana: `jul: 31 · 51 · 41 · 24` · `ago: 7 · 4`. Entre 1 y 7 al
+día en régimen normal — varios clientes reales por semana caerían en el bucle.
+
+### Pregunta abierta que no se cierra sola
+
+**No está explicado quién pone `active` una sesión recién nacida.** `waq_3496_72ac17c320b9` nació a las 20:18:16 y
+un segundo después ya estaba `active`, sin ningún turno de por medio. Descartados midiendo: Django inserta
+`"status": "open"` y no escribe `'active'` en ningún punto del repo; el default de la columna es `'open'`; no hay
+triggers; el Dashboard solo lee; y en n8n solo escriben status `Cambiar Cotizacion` y `Mark Session Closed`.
+Pedida explicación como parte de la ventana C — no bloquea arrancar, pero sí cerrar.
