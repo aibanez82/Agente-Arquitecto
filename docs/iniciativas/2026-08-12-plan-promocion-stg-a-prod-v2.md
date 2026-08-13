@@ -409,3 +409,45 @@ mismo teléfono** (posteriores a las 17:39 UTC del 13 ago) y pedirle al bot ver 
 **Lección, otra vez la misma forma:** afirmé el modo de memoria en vez de leerlo, y encima construí sobre esa
 afirmación un bloqueo inexistente atribuido a Juan. El fallo no estaba en el razonamiento —dado `shadow`, todo lo
 demás se seguía— sino en **no verificar el hecho de partida**.
+
+---
+
+## AUTORIZACIÓN (13 ago) — Alberto aprueba promover el bloque de resolución de S1 al bot de PROD
+
+**Autoriza:** Alberto, 13 ago 2026, opción **A** de dos presentadas (A: promover el bloque; B: pedir a Juan que
+devuelva PROD a `shadow` mientras tanto). Elegida A con el alcance y los riesgos por delante.
+
+**Qué autoriza:** promover al bot de producción `Session Resolution` (versión STG), los tres nodos de afinidad
+`Needs Affinity Update?` / `Apply Affinity Update` / `Check Affinity Result` con su cableado,
+`Session Context Builder` (versión STG) y **solo la frase de cierre** de `Format Disambiguation Message`.
+Handoff: `Agente-n8n:handoffs/2026-08-13-VENTANA-s1-bloque-de-resolucion-a-prod.md`.
+
+**Clasificación de gobernanza:** toca superficie contractual de **S1** y es acción viva sobre PROD, con el monitor
+de Juan vigilando. Registro preventivo aquí + aviso a Juan por el Arquitecto. El ejecutor no comunica fuera.
+
+### Por qué deja de ser aplazable
+
+«S1 en el bot principal» estaba **aplazado** en este plan. Deja de serlo porque se convirtió en bloqueante de un
+defecto crítico vivo (`qualitas-issues#77`): con `dual` activo en producción desde el 13 ago 17:39 UTC (release
+Heroku v341, Juan), un teléfono puede tener varias sesiones abiertas, y el bot de PROD **no lleva la lógica de
+resolución que ese modo exige**. Resultado: el cliente entra en bucle de desambiguación y nunca llega al agente.
+
+Es **activación asimétrica**, no regresión: media pieza del contrato está activa y la otra media no.
+
+### Lo que decidió el Arquitecto, no Alberto
+
+Dos puntos que el ejecutor levantó en vez de resolver por su cuenta:
+
+1. **`chatInputOverride` se acepta** — el mensaje del cliente se sustituye por `[SESION RETOMADA -- folio N]`
+   antes de llegar al agente. Evita que el modelo lea el folio como dato de la cotización, y no introduce una
+   clase nueva (ya inyectamos el prefijo `[CTX: …]`). **Con precondición medible:** si el `systemMessage` de STG
+   menciona el marcador, ese fragmento viaja también — el de PROD lleva +4035 chars de Multicotización y no lo
+   conoce.
+2. **Se acepta perder el destino del diagnóstico, no el diagnóstico.** `Terminal Sink` e `Identity Terminal?` no
+   viajan; a cambio `terminalReason` debe seguir emitiéndose en el payload para que un caso terminal se pueda
+   diagnosticar abriendo la ejecución.
+
+### Alcance medido: 1 teléfono atrapado hoy, 97 en riesgo
+
+Los 97 son los teléfonos con más de una cotización histórica. Crece con cada cliente que vuelva a cotizar, así que
+hay margen para hacerlo bien pero no para dejarlo parado.
