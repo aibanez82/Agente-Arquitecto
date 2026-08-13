@@ -312,3 +312,60 @@ movería funcionalidad que tampoco funciona allí.
 
 **Dashboard y Django: `stg` y `main` al día, 0 commits pendientes en los dos.** Todo lo que quedaba por
 promover de esos dos sistemas está en producción.
+
+---
+
+## Cierre de la ventana de Multicotización (13 ago) — promovida, rota, y dormida
+
+La promoción entró bien escrita (acreditada 5/5: grafo en serie, `Resolve Session.query` 865→3615, ambos
+systemMessages +4035 con 0 borrados, paridad de pieza C 1041/1041). **Y aun así la función no funcionó.** Dos
+hallazgos, los dos de secuencia, los dos míos.
+
+### 1. Fuga de credencial de staging — defecto real, en producción
+
+Los tres nodos nuevos (`Listar Cotizaciones`, `Cambiar Cotizacion`, `Limpiar Turno De Cambio`) viajaron apuntando
+a `Postgres STG` (`5wlLe3gD07CLIM7U`), que no existe en la instancia de producción. La tool revienta y el bot cae
+al fallback de «No conozco esta respuesta». Verificado en `n8n_chat_histories` de PROD, sesión `525551074144`,
+ejecuciones de las 14:58 y 19:49 UTC, con el error literal `Credential with ID "..." does not exist for type
+"postgres"`.
+
+Lo que **sí** funcionó: el modelo entendió la petición y llamó a la tool correcta. El prompt y el enrutamiento
+están bien; lo roto era la tubería.
+
+Alcance medido sobre los 6 workflows de PROD y sus 12 credenciales (todos los tipos, no solo Postgres): la única
+credencial de staging son esos 3 nodos, ni uno más. No hubo que revertir nada.
+
+**Por qué pasó el guard:** el guard antifugas mira nombres de nodo (`WA Config STG`) y referencias `$('…')`. El
+**ID de credencial es una tercera forma de fuga** y no estaba en la lista — acotación que aprobé yo. Corregido vía
+handoff `Agente-n8n:handoffs/2026-08-13-fuga-credencial-stg-en-multicotizacion-PROD.md`.
+
+**Por qué no se arregló por UI:** el editor de n8n de PROD no retiene el cambio de credencial (`updatedAt` y
+`versionId` inmóviles, «Publish» en gris). Dos pruebas de WhatsApp gastadas. La corrección va por API y sobre el
+JSON de origen — si solo se toca la UI, vuelve en la próxima promoción.
+
+### 2. Multicotización queda dormida en PROD — depende de Conversation ID
+
+```
+PROD — teléfonos con MÁS DE UNA sesión: 0
+PROD — 1084 sesiones sobre 1084 teléfonos distintos
+PROD — sesiones con session_id nuevo (waq_...): 0
+```
+
+`Listar Cotizaciones` lee **sesiones**, no cotizaciones. En producción Django mantiene una sola fila de
+`whatsapp_sessions` por teléfono y la reapunta a la cotización más nueva: la lista **nunca puede devolver más de
+una opción**. Las múltiples sesiones por teléfono las crea Conversation ID (`waq_<qid>_<hex>`), que en PROD sigue
+en `shadow` y en STG está en `dual`.
+
+**Consecuencia para el plan:** Multicotización se promueve completa y verificable, pero **no entra en servicio**
+hasta que Conversation ID pase a `dual` en PROD (pendiente con Juan/Django). No es un fallo del ejecutor ni motivo
+para retirar alcance: es una dependencia que no vi al ordenar el viaje.
+
+### Lección — la que de verdad deja
+
+**Una promoción no se acredita contra su propio artefacto; se acredita contra el entorno de destino.** Mis 5/5
+comprobaron que el workflow quedó bien escrito, y las dos cosas que lo tumbaron —una credencial que no existe allí,
+y un modelo de sesiones distinto del de origen— eran hechos **del destino**, no del cambio. Es la misma forma del
+fallo que se repite: el error no está en el razonamiento, está en **contra qué se compara**.
+
+Regla que se aplica desde ya: **ninguna ventana se cierra sin una conversación real**. Los checks estáticos son
+condición necesaria y nunca suficiente.
