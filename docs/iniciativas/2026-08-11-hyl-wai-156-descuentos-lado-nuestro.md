@@ -474,3 +474,19 @@ demuestra que **cuatro días bastan para que deje de describir la instancia**. P
 **Veredictos de los otros dos:** `retomar-candidato` **limpio** —contiene el operativo entero y sus 4
 nodos distintos son los 4 cambios declarados de #156—. **Worker confirmado nuevo**: su `id` no tiene
 forma de id de n8n y no choca con ninguno vivo.
+
+---
+
+## 13. Reportado a Juan (14 ago) — `#156` comentario `5289308059`
+
+Publicado por el Arquitecto a petición de Alberto. Contenido: estado de los tres `stg` y sus entornos ·
+ventana de DDL 12/12 con cifras · Conversation Control probado E2E (claim 67, cruce `control_id`/epoch,
+`stable_human`) · los **tres** defectos de v0.6 tapados por tests en verde y su causa común (suite
+100 % stubs, el SQL nunca se parsea) · **el motivo del parón en descuentos, declarado como error
+nuestro y no de v0.6** · y las tres cosas que se le piden por orden de bloqueo: `success: false`, los
+10 conectores, el wire 400/404.
+
+**Se dijo explícitamente que el bloqueo del import es de nuestro builder**, no de su entrega. Un parón
+que se reporta sin decir de quién es la causa se lee como reproche velado, y aquí la causa es nuestra:
+una constante apuntando a un baseline que dejó de describir la instancia.
+
