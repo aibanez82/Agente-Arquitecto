@@ -241,16 +241,50 @@ y hoy ninguna de las cuatro está en condiciones de salir.** Medido contra las r
 | G6 | **DDL vivo en STG** | 5 migraciones n8n (`001`–`005`) + `2026-08-11-claims-epoch-anti-aba.sql`. Es una ventana con guardas, no un merge; y arrastra la **brecha de roles Postgres** (pendiente 5), declarada gate de rollout por los dos ejecutores | ventana |
 | G7 | **Sin dictamen de Juan** | Los 10 conectores sin sesión (el fence cubre **8 de 18**) y la divergencia de wire 400 vs 404. Reclamados hoy en #156 | Juan |
 
-### Orden obligado
-
-1. **G1 + G2 juntos** — un comentario en #156 pidiendo el GO y el PR de Django a `stg`. Django primero: es el productor.
-2. **n8n** — traer `d3a6387` del fork a una **rama de integración** en el upstream, revisar por contenido, y solo entonces merge a `stg`. **Sin importar workflows en la instancia STG.**
-3. **Dashboard** — merge de `stg` en la rama 156, resolver `claim.js` **contra el código de Atención Humana que ya corre en PROD**, subir `next` a `14.2.35` en la línea `stg`, y decidir G5 antes de mergear.
-4. **Ventana de DDL en STG** (G6), idempotente y con guardas.
-5. **Import de workflows en STG con todo OFF** y matriz E2E sintética.
-
 ### El riesgo que no hay que perder de vista
 
 El conflicto de G4 es sobre `claim.js`, es decir sobre **«Tomar conversación»**, que llevaba roto desde
-el 28 de julio y se acaba de arreglar en producción. Una resolución de conflicto descuidada en STG es la
-forma más barata que tenemos hoy de volver a romperlo.
+el 28 de julio y se acaba de arreglar en producción. Dimensionado: la rama 156 mueve **+411/−82** sobre
+ese fichero y la Fase 4 **+86/−4**. Resolver no es elegir un lado: es **re-aplicar las tres llamadas de
+Atención Humana sobre el `claim.js` nuevo**.
+
+---
+
+## 10. Decisión de Alberto (13 ago) y plan de ejecución
+
+**Alberto tiene el GO de Juan por escrito** → G1 cerrado. **Instrucción: a STG con todo, sin dejarse
+nada; lo que se rompa en STG se arregla en STG.** Consecuencias registradas:
+
+- **G5 cerrado por decisión de Alberto:** `FunnelV2.js` y `lib/metrics.js` **entran**. Queda dicho que
+  a partir del merge los números del funnel **en STG** se cuentan por root y no por lead, así que STG
+  deja de ser comparable con PROD en esa superficie. Es reversible y es STG. La decisión para PROD
+  sigue siendo de Hylant y **no** se hereda de este merge.
+- **Objeción retirada:** planteé que romper STG nos deja sin entorno de referencia para acreditar
+  futuras promociones. Alberto lo reafirma: es un entorno de pruebas. Adelante.
+
+### Inventario — qué es «todo» (no dejarse nada)
+
+| Repo | Rama | SHA | Contenido |
+|---|---|---|---|
+| HYL-WAI | `feature/issue-156-discounts-admin-adjustments-v0.6` | `e7b97e7` | Django v0.6 — **lo mergea Juan** |
+| HYL-WAI | `feature/issue-156-discounts-django-v0.5` | — | v0.5, superseded por v0.6. **No se promueve**; se conserva por los contratos congelados en `docs/contracts/` |
+| Agente-n8n (fork) | `feature/issue-156-conversation-control-n8n` | `d3a6387` | Conversation Control **+ módulo de descuentos**: 11 migraciones (`001`–`011`), 3 candidatos de workflow + worker nuevo, 14 nodos `discount-*.njs`, `matriz-integracion-descuentos-v06.md`, `runbook-veredicto-final-v06.md` |
+| Agente-n8n | `feature/issue-156-descuentos-n8n` | `cce595d` | **Solo un doc de plan** (203 líneas) y **no está contenido en el fork** — si no se trae a mano, se pierde |
+| Dashboard | `feature/issue-156-conversation-control-dashboard` | `997c34b` | E1–E5 + los 4 commits de Pi Coding Agent (incluye `FunnelV2`/`metrics`) |
+
+### Orden de ejecución
+
+1. **n8n — reconciliar el fork.** Traer `d3a6387` al upstream (fast-forward, no hay nada nuestro
+   fuera), revisar los 30 commits **por contenido**, incorporar el doc de plan de
+   `feature/issue-156-descuentos-n8n`, y merge a `stg`. Sin tocar la instancia.
+2. **Dashboard.** Merge de `stg` en la rama, resolver `claim.js` re-aplicando Atención Humana, subir
+   `next` a `14.2.35` en la línea `stg` (hoy solo está en `main`), merge a `stg` y deploy STG.
+3. **Django (Juan).** PR de `e7b97e7` → `stg` y despliegue en `hyl-wai-stg`. Es el productor: sin él
+   los read models no existen y la E2E no puede pasar de la mitad.
+4. **Ventana de DDL en STG.** `001`–`011` de n8n + `2026-08-11-claims-epoch-anti-aba.sql` del
+   Dashboard, en orden, idempotentes y con guardas. La **brecha de roles** (pendiente 5) se declara,
+   no se resuelve: en STG se aplica con el rol que haya.
+5. **Import en la instancia n8n STG con todo OFF.** Los tres candidatos + el worker. Antes de
+   importar, **diff del candidato contra el workflow vivo**, porque el baseline exportado es del
+   10 ago (`b98f568`) y desde entonces STG ha recibido promociones.
+6. **E2E sintética** — matriz 8/8 de la entrega de Juan más los casos de descuento del runbook v0.6.
