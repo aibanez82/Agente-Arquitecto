@@ -280,7 +280,10 @@ nada; lo que se rompa en STG se arregla en STG.** Consecuencias registradas:
 2. **Dashboard.** Merge de `stg` en la rama, resolver `claim.js` re-aplicando Atención Humana, subir
    `next` a `14.2.35` en la línea `stg` (hoy solo está en `main`), merge a `stg` y deploy STG.
 3. **Django (Juan).** PR de `e7b97e7` → `stg` y despliegue en `hyl-wai-stg`. Es el productor: sin él
-   los read models no existen y la E2E no puede pasar de la mitad.
+   los read models no existen y la E2E no puede pasar de la mitad. **Va el último por decisión de
+   Alberto (13 ago):** sus despliegues en Heroku tardan ~5 min, así que ponerlo primero convertiría a
+   Juan en bloqueo de dos merges nuestros a cambio de nada. Los pasos 1 y 2 son **paralelos entre sí**
+   —repos y superficies distintas— y ninguno de los dos necesita Django hasta el paso 6.
 4. **Ventana de DDL en STG.** `001`–`011` de n8n + `2026-08-11-claims-epoch-anti-aba.sql` del
    Dashboard, en orden, idempotentes y con guardas. La **brecha de roles** (pendiente 5) se declara,
    no se resuelve: en STG se aplica con el rol que haya.
