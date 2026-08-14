@@ -760,3 +760,60 @@ petición explícita de que **retire la alarma si me equivoco**.
 **Rollback disponible y no aplicado:** `workflows/vivo-stg-2026-08-14/` devuelve la instancia al estado
 de esta mañana. Recupera el bot y cuesta #156 hasta el siguiente intento. Decisión de Alberto.
 
+---
+
+## 22. Cierre del 14 ago — dónde queda todo
+
+**Alberto pasa a trabajar directamente con el Agente n8n en las pruebas.** El Arquitecto queda a la
+espera.
+
+### Hecho y acreditado
+
+| | |
+|---|---|
+| Código en `stg` (n8n, Dashboard) y Django en rama + entorno (v221) | ✅ |
+| BD de STG: 12 migraciones | ✅ |
+| Conversation Control E2E con claim real (id 67) | ✅ |
+| Fence **9/9 en STG**, con su nota al pie declarada | ✅ |
+| GO de Juan para importar | ✅ |
+| Módulo de Descuentos encendido (3 interruptores, trigger `quote_sent:2` → 35 %, v222) | ✅ |
+| Los 4 workflows importados y publicados | ✅ |
+| Duplicados de la instancia **archivados** (reversibles, en el repo) | ✅ |
+
+### Abierto
+
+1. **Qué versión del Main está viva**: si lleva los gates C1 **habilitados** (primer import, bloquea)
+   o los **desactivados** (candidato corregido). Lo dice el preflight sin mutar nada.
+2. **El E2E no se ha ejecutado.** Caso escrito en `2026-08-14-caso-prueba-e2e-descuentos-stg.md`; la
+   clave es pararse en `data_capture` **sin dar los datos personales** y esperar al **follow-up 2**.
+3. **Re-exportar el baseline** cuando la instancia se estabilice: `vivo-stg-2026-08-14` ya no la
+   describe.
+4. Ventana de higiene: 7 ítems + `detect-drift` parado desde el 10 ago.
+
+### Cambio de regla: el acceso a la instancia
+
+Mis handoffs decían *«ni import, ni activación, ni lectura por API»*. **Alberto le dio GO directo** al
+Agente n8n para leer y para borrar los duplicados. **Regla corregida: el acceso a la instancia lo
+autoriza Alberto caso por caso**, no está vedado por defecto. Se escribe así en adelante para que el
+ejecutor no reciba dos instrucciones contradictorias.
+
+### Las tres barreras aprobadas (para que esto no se repita)
+
+1. **Un mensaje de prueba tras cada import**, antes de darlo por bueno. La más barata y la que más
+   habría ahorrado hoy.
+2. **Lo que no debe ejecutarse sale inejecutable, no advertido** — el builder emite `disabled` según la
+   **política embebida**, no según el nombre. Autocorrectora.
+3. **Test: ningún `Code` alcanzable desde un trigger puede lanzar excepción** salvo lista explícita.
+   Complemento del test de efectos: uno mira lo que *hace*, el otro lo que *impide*.
+
+### Lo que me llevo yo
+
+- **Verificar una promoción es comprobar las dos direcciones.** Lo que falta se ve contando; lo que
+  sobra hay que ir a buscarlo. Conté 293 aristas y 33 eran un candado.
+- **Un `push` que dice OK no ha publicado nada necesariamente.** Dos veces hoy: empujando `main` desde
+  `stg`, y desde un worktree detached. **Se verifica contra `origin`, no contra el mensaje.**
+- **En un clon compartido no se ejecuta `checkout -- .`** ni ningún descarte masivo. Descarté una
+  modificación sin commitear del ejecutor.
+- **Cuando la aritmética no cuadra, el que pregunta mal soy yo.** «58 de 59 alcanzables» con dos nodos
+  supuestamente inalcanzables era un error de nombres, no un fallo del grafo.
+
