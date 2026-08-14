@@ -59,6 +59,30 @@ producción**.
 
 > **Orden no negociable: escopear → ventana.** No al revés, y no «lo miro después».
 
+> ### ✅ HECHO — 13 ago, 20:42 (verificado por el Arquitecto)
+>
+> Las dos con alcance **`Preview (stg)`** (`BASE_URL` ~20:30, `SECRET` ~20:35), y el alias de STG
+> sirve **`dpl_GL6iUZ8PANpWzvT8sCs6ju5rrKKr`, creado 20:42:25** — **posterior a ambas**, así que el
+> build las tomó. `Ready`.
+>
+> **La sintaxis del bug #17 ya no vale:** la CLI 54.16 pasó la rama a **posicional**
+> (`vercel env add <name> preview <rama>`); `--git-branch` da *unknown option*.
+>
+> **Secreto rotado, no descubierto.** n8n no muestra el valor de una credencial guardada (ni UI ni
+> API), así que se fijó uno nuevo en `Atencion Humana Header Auth STG` (`TyxFAIYtKfgHt9cv`) y el mismo
+> en Vercel. Seguro porque el otro workflow que comparte esa credencial —`Metepec Liberar_stg`— está
+> **`active: false`** y no lo llama Django (0 coincidencias en `stg` de HYL-WAI), y el Dashboard hoy
+> corta con 503 antes de la red.
+>
+> **Lo que NO queda acreditado, y es deliberado:** los valores se guardaron como *sensitive*, así que
+> ni `vercel env pull` los devuelve (`[SENSITIVE]`). Los dos modos de fallo siguen vivos hasta la
+> primera llamada real: que `BASE_URL` **no lleve `/webhook`** (el cliente lo añade; con él iría a
+> `/webhook/webhook/…`) y que el secreto coincida con la credencial. **Síntoma de cada uno: 404 el
+> primero, 401/403 el segundo.**
+>
+> Higiene anotada para otra ventana: `Atencion Humana` y `Metepec Liberar` comparten credencial sin
+> motivo — hoy da igual porque Metepec está apagado.
+
 ### 1.2 Punto de retorno
 
 **`hyl-wai-stg` no tiene ni un backup** (`heroku pg:backups` → *No backups*). Antes de abrir:
