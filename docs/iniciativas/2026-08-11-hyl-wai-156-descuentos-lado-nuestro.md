@@ -426,8 +426,10 @@ lo reafirma: se omite y se avanza. Queda registrado como decisión suya, no como
 `main-candidato` **comparte `id` (`dNqtM20ij6ecZYAX`) con `main-operativo-dual-stg`**, así que importar
 **sustituye** el Main vivo. Y el candidato **no contiene tres nodos del operativo**:
 `Cambiar Cotizacion`, `Listar Cotizaciones` (los dos `postgresTool` conectados por **`ai_tool` al
-`AI Agent` y al `RAG IA Agent`**) y `Limpiar Turno De Cambio` (recibe de `Send message`). Falta también
-`S1 Observable — Main`.
+`AI Agent` y al `RAG IA Agent`**) y `Limpiar Turno De Cambio` (recibe de `Send message`).
+
+> **Corrección del Agente n8n (14 ago), con su medición:** son **tres**, no cuatro —
+> `S1 Observable — Main` **sí** está en el candidato; tampoco está en `bot_stg` y lo añade el builder.
 
 **Importarlo le quitaría al bot de STG la multicotización**, promovida y verificada con conversación
 real. Causa: el candidato se construyó sobre `WhatsApp Insurance Quotation Bot_stg` (153 nodos, que sí
@@ -436,3 +438,39 @@ contenido distinto**, sin nada que declare cuál describe la instancia.
 
 Handoff con el encargo: `Agente-n8n@f7d68aa`. Mismo patrón a revisar en `retomar-candidato`
 (`nYRaRzU83qDLuEWI`, 12 → 24 nodos). El worker es workflow nuevo, sin riesgo de sustitución.
+
+
+### La pérdida real es mayor, y no se ve contando nodos (Agente n8n, 14 ago)
+
+De los **128 nodos compartidos** entre operativo y `bot_stg`, **once difieren y el candidato lleva la
+versión vieja en nueve**: importarlo **revierte ~13 KB de lógica viva sin quitar un solo nodo**. Dentro
+van los bloques `CAMBIO DE COTIZACION` y `QUE COTIZACION ESTA ACTIVA` de los dos agentes (~62 y ~65
+líneas), el campo vehículo del prefijo CTX y la query SQL de `Resolve Session`.
+
+**Y hay algo peor que perder una función:** `QUE COTIZACION ESTA ACTIVA` es **el parche del gotcha de
+memoria** —el modelo creyéndose su propia frase antes que el contexto—, el que se ordenó cerrar el
+10 ago. Revertirlo no deja el bot como antes de la multicotización: lo deja **con multicotización a
+medias y sin el parche**.
+
+**Susto acotado donde toca:** de las 47 aristas del operativo ausentes en el candidato, **42 son
+reencaminamientos** por los 25 gates C1 interpuestos (comprobado por alcanzabilidad). Las **5 pérdidas
+reales** son las de los tres nodos.
+
+**Causa raíz — la misma regla incumplida por segunda vez:** `VIGENTE_MAIN`
+(`build-candidatos.js:24`) y `mainVigente` (`lib/export.js:15`) apuntan a `bot_stg` (153) en vez del
+operativo (132). Es la convención «cambiar una convención = actualizar su herramienta en el acto»:
+cuando un deploy cambió el fichero del que sale lo desplegado, **se actualizó el baseline de drift y no
+el del builder de S1**.
+
+**No se arregla reapuntando la constante:** el operativo vivo **no tiene ni un gate C1** —los 25 le
+llegan al candidato gratis por venir de `bot_stg`—, así que reapuntar cambia un agujero por otro. **Hay
+que componer.**
+
+**El ejecutor NO entregó el candidato reconstruido, y hace bien:** reconstruirlo hoy repetiría el error
+que este handoff denuncia, porque el punto de partida acreditado es del 10 ago y este episodio
+demuestra que **cuatro días bastan para que deje de describir la instancia**. Pide una sola cosa: un
+**re-export al día de los workflows vivos**, que solo puede hacer Alberto.
+
+**Veredictos de los otros dos:** `retomar-candidato` **limpio** —contiene el operativo entero y sus 4
+nodos distintos son los 4 cambios declarados de #156—. **Worker confirmado nuevo**: su `id` no tiene
+forma de id de n8n y no choca con ninguno vivo.
