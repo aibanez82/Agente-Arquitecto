@@ -138,3 +138,19 @@ El día que exista el camino de «diferir y avisar», Payment es su destinatario
 
 Ver §5. Mismo criterio: en STG se declara, en PROD hay que cerrarlo antes de promover.
 
+### 8. No tenemos entorno para correr los gates de Django (14 ago)
+
+Al implementar la corrección `active`/`open` en `HYL-WAI` se descubrió que **no podemos acreditar
+nuestro propio código en ese repo**: `wagtail 6.2` no compila con el Python 3.14 de la máquina
+(`pillow-heif`) y no hay Docker, pese a que el repo trae `docker-compose.pruebas.yml` listo.
+
+**Consecuencia:** dependemos de que **Juan** corra la regresión para validar código que escribimos
+nosotros. Es una dependencia mala de tener ahora que Alberto tiene autoridad táctica sobre HYL-WAI y
+acceso de editor.
+
+**Salida barata, decidida pero aplazada por Alberto (14 ago):** `brew install python@3.12` y montar el
+venv en el scratchpad. Reversible, no toca el 3.14. Se aplazó porque n8n iba por detrás igualmente y no
+bloqueaba nada.
+
+**Ownership: Alberto.** Cuando se retome, el entorno queda disponible para las siguientes veces.
+
