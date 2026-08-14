@@ -817,3 +817,41 @@ ejecutor no reciba dos instrucciones contradictorias.
 - **Cuando la aritmética no cuadra, el que pregunta mal soy yo.** «58 de 59 alcanzables» con dos nodos
   supuestamente inalcanzables era un error de nombres, no un fallo del grafo.
 
+---
+
+## 23. El bloqueo real del E2E: `active` vs `open` — `#156` comentario `5298036485`
+
+**El primer mensaje real tras desbloquear los gates murió en el fence, y el fence hizo lo correcto.**
+Ejecución 1090, `success` en 6 s, sin error: `puede_intentar=false`, rechazo `sesion_no_elegible`,
+rama falsa, **cero outbound**. No hubo respuesta porque el fallo cerrado funcionó.
+
+**La causa, verificada por el Arquitecto contra la BD y contra el código de Django:**
+
+- la sesión está en `status='active'` → la vista publica `automation_gate=blocked`,
+  `automation_reason_code=session_not_open` (y `handoff_state=stable_automation`: **no es el humano**);
+- **quien pone ese `active` es Django**, no n8n — `activate_whatsapp_session_affinity()`
+  (`whatsapp_conversations.py:796`) desde `services.py:1445`, al crear el lead;
+- comprobado que **no lo puso el bot**: la sesión ya estaba `active` con cero mensajes en el historial.
+
+**Por qué no es un caso borde:** la sesión con la que el bot habla **es siempre la `active`** de ese
+teléfono. Con el fence puesto, **ninguna conversación nueva puede recibir envío automático**. Las 17
+`open` de STG son sesiones cuya afinidad ya se movió; la viva es la bloqueada.
+
+**Corrige el encuadre del ejecutor**, que lo atribuyó a la multicotización de n8n: el choque es **entre
+dos piezas de Django** — la que escribe `active` y el contrato que exige `open`.
+
+> **La raíz: `whatsapp_sessions.status` codifica dos ejes distintos** — ciclo de vida
+> (`open`/`completed`/`closed`) y afinidad/selección (`active` = la elegida del teléfono). Chocan
+> porque comparten columna.
+
+**Cuatro salidas llevadas a Juan.** Recomendación del **ejecutor: la 3** (la vista normaliza `active`
+como `open`, migración `013`, cambio mínimo). Recomendación del **Arquitecto: la 4** (sacar la
+selección a su propia columna) — porque la 3 deja la sobrecarga viva para que vuelva a morder en el
+siguiente sitio que lea `status`. Las dos son legítimas; la diferencia es plazo contra deuda.
+
+**Y avisado: reaparecerá en PROD**, donde la afinidad y la multicotización ya están desplegadas.
+
+**La duda de Alberto, contestada y descartada:** preguntó si el `active` sería artefacto de sus pruebas
+o del borrado del teléfono. **No**: lo pone Django al crear cualquier lead, así que **una prueba desde
+cero daría exactamente lo mismo**. Preguntarlo evitó una vuelta inútil.
+
