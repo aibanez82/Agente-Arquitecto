@@ -113,3 +113,27 @@ el mismo formato al instruir.
 **Ampliación del rol:** definición de requerimientos con más profundidad. Alberto detalla el
 requerimiento de negocio y el Arquitecto devuelve las instrucciones para el ejecutor que toque.
 Primer caso: recordatorios de pago (`docs/iniciativas/recordatorios-de-pago.md`, `HYL-WAI#144`).
+
+## El trabajo para un repo nuestro vive en una rama nuestra (13 ago 2026)
+
+**Incidente:** el módulo de descuentos de n8n de `HYL-WAI#156` se quedó **solo** en
+`oilycoyote/Agente-n8n@feature/issue-156-conversation-control-n8n` (`d3a6387`) — 30 commits, 57
+ficheros, +16.494 líneas — porque la cuenta de integración de Juan tiene solo `READ` en
+`aibanez82/Agente-n8n` y publicó en su fork. Nuestro upstream se quedó en `383f6c2`, con Conversation
+Control y **sin el módulo**. Nadie lo movió durante dos días.
+
+**Diagnóstico de Alberto (13 ago):** el error es nuestro, no de Juan. La falta de escritura era un
+hecho conocido; la respuesta correcta era abrirle una rama en nuestro repo o traer la suya el mismo
+día, no dejar que el entregable viviera fuera.
+
+**Tres costes concretos, todos materializados:**
+1. **Invisibilidad.** El trabajo no aparece en `git branch -r` de nuestro repo. Se descubre leyendo un
+   comentario del tracker, no mirando el repo.
+2. **Sin respaldo.** Queda fuera de nuestros backups y depende de que un fork ajeno siga existiendo.
+3. **La autoría deja de acreditar.** 25 de esos 30 commits llevan `aibanez82 <a.ibanez@gmail.com>`
+   como autor *y* committer, porque el agente de Juan trabajó con la config git del clon. Solo 5
+   llevan `Pi Coding Agent`. Es el mismo mecanismo que el 12 ago provocó una acusación equivocada en
+   el Dashboard (`044d252`): **en repos compartidos con agentes, la firma git no dice quién escribió
+   el código.** Revisar por contenido, siempre.
+
+**Regla derivada:** ningún entregable para un repo nuestro pernocta en un fork ajeno.
