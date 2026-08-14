@@ -219,3 +219,38 @@ producto/UI y nunca autoridad conversacional (cláusula del contrato).
 **PROD no está verificado** y puede diferir: `readonly_leads` no puede leer esta tabla. Por eso la
 migración del Dashboard se mantiene **aditiva e idempotente**, acreditada partiendo de una tabla
 deliberadamente deficiente — decisión correcta que este hallazgo confirma.
+
+---
+
+## 9. Subida a STG — estado real y orden (13 ago, pedido por Alberto)
+
+**La condición que yo mismo puse ya está cumplida.** Mi comentario en #156 de hoy decía que el merge a
+`stg` esperaba a que terminara la promoción STG→PROD; esa promoción está cerrada (acta `50029b1`). El
+orden ya no bloquea.
+
+**Lo que sí bloquea: esto no es un merge, son cuatro promociones en tres repos más una ventana de DDL,
+y hoy ninguna de las cuatro está en condiciones de salir.** Medido contra las ramas remotas, 13 ago.
+
+| # | Gate | Estado medido | De quién |
+|---|---|---|---|
+| G1 | **Autorización del merge a `stg`** | El comentario v0.6 de Juan asigna la tarea a Alberto («preparar la promoción coordinada… ejecutar la matriz E2E») y **en el mismo texto** lista «merge a `stg`» entre las *acciones todavía no autorizadas*. Contradicción literal: hace falta un GO explícito | Juan |
+| G2 | **Django no está en `stg`** | `feature/issue-156-discounts-admin-adjustments-v0.6` = `e7b97e7`, **sin PR abierto** y **no mergeada** a `origin/stg` de HYL-WAI. Sin Django no hay read models, ni checkpoint, ni E2E | Juan |
+| G3 | **El descuento de n8n no está en nuestro repo** | `aibanez82/Agente-n8n@feature/…-n8n` = `383f6c2` (solo Conversation Control, E1–E7). El módulo vive **solo en el fork** `oilycoyote/Agente-n8n` = `d3a6387`: **365 commits y +16.494 líneas** por encima de nuestra punta — `main-candidato.json` (+3.153), `discount-application-worker-candidato.json`, 14 nodos `discount-*.njs`, y toca `retomar-normalize-validate.njs` y `wire.js`. El fork **sí contiene** nuestro trabajo (fast-forward posible). **La autoría git no acredita nada**: los 365 commits llevan `a.ibanez@gmail.com` como autor *y* committer, así que la revisión tiene que ser por contenido | Arquitecto + Agente n8n |
+| G4 | **Conflicto real en el Dashboard** | `git merge-tree stg ↔ rama156` da **CONFLICT en `apps/operacion/pages/api/claim.js`**, que es justo el fichero que la Fase 4 de Atención Humana acaba de promover a PROD. La rama 156 no lleva los 4 commits de Fase 4 ni `next 14.2.35` (que existe **solo en `main`**: `stg` y la rama siguen en `14.2.3`, o sea el gate de dependencias de Juan sigue abierto en la línea `stg`) | Dashboard |
+| G5 | **La rama 156 del Dashboard toca `FunnelV2.js` y `lib/metrics.js`** | +23/−… y +48/−… frente a `stg`, dentro de los 4 commits de Pi Coding Agent posteriores a la entrega (`060e858` → `997c34b`). Es la superficie que mira Hylant y el **pendiente 7** la excluía expresamente de esta rama. Mergear tal cual mete en STG un cambio de conteo que nadie ha decidido | Alberto / Hylant |
+| G6 | **DDL vivo en STG** | 5 migraciones n8n (`001`–`005`) + `2026-08-11-claims-epoch-anti-aba.sql`. Es una ventana con guardas, no un merge; y arrastra la **brecha de roles Postgres** (pendiente 5), declarada gate de rollout por los dos ejecutores | ventana |
+| G7 | **Sin dictamen de Juan** | Los 10 conectores sin sesión (el fence cubre **8 de 18**) y la divergencia de wire 400 vs 404. Reclamados hoy en #156 | Juan |
+
+### Orden obligado
+
+1. **G1 + G2 juntos** — un comentario en #156 pidiendo el GO y el PR de Django a `stg`. Django primero: es el productor.
+2. **n8n** — traer `d3a6387` del fork a una **rama de integración** en el upstream, revisar por contenido, y solo entonces merge a `stg`. **Sin importar workflows en la instancia STG.**
+3. **Dashboard** — merge de `stg` en la rama 156, resolver `claim.js` **contra el código de Atención Humana que ya corre en PROD**, subir `next` a `14.2.35` en la línea `stg`, y decidir G5 antes de mergear.
+4. **Ventana de DDL en STG** (G6), idempotente y con guardas.
+5. **Import de workflows en STG con todo OFF** y matriz E2E sintética.
+
+### El riesgo que no hay que perder de vista
+
+El conflicto de G4 es sobre `claim.js`, es decir sobre **«Tomar conversación»**, que llevaba roto desde
+el 28 de julio y se acaba de arreglar en producción. Una resolución de conflicto descuidada en STG es la
+forma más barata que tenemos hoy de volver a romperlo.
