@@ -396,3 +396,43 @@ del `§13` pasa a **lista cerrada enumerada** (22 nodos en Main, 5 en Retomar) �
 objeto de #156 es añadir nodos con efecto, y una lista enumerada es la forma correcta; el gate de
 credenciales sigue impidiendo introducir credenciales nuevas. Queda dicho que **ampliar esa lista sin
 declararlo deja el gate sin proteger nada**.
+
+---
+
+## 12. Qué falta para «descuentos 100 % en STG» (14 ago) — y el bloqueante del import
+
+Lo acreditado hasta hoy es **Conversation Control**, no descuentos. Estado medido del módulo:
+
+| Pieza | Estado en STG |
+|---|---|
+| Tablas Django de descuento (18) | ✅ migradas |
+| `DiscountSettings.module_enabled` | ❌ **false** |
+| `phase_1_checkpoint_enabled` / `phase_2_intent_enabled` | ❌ **false** las dos |
+| `qualitas_discounttrigger` | ❌ **0 filas** — sin trigger la Fase 1 no dispara |
+| `WHATSAPP_CHECKPOINT_FOLLOWUPS_ENABLED` (Heroku) | ❌ **false** — es el carril del checkpoint |
+| `DiscountAIUseCase PRICE_OBJECTION` | ✅ active |
+| Programas | ✅ 2 activos, creados el **14 ago 02:08–02:09**: `CHECKPOINT_INTRO_35` (35 %, fase 1) y `POR_PRECIO_ALTO_PARA_IA_30` (30 %, fase 2) |
+| Import de workflows en la instancia | ❌ **no hecho** |
+
+**No hay flags de entorno: el módulo se enciende por BD** (`DiscountSettings`, `DiscountProgram`,
+`DiscountTrigger`), desde el admin de Wagtail.
+
+**La sonda del rango: EXCLUIDA por Alberto (14 ago).** Planteé que encender programas del 30 y el 35
+sin saber si el rango de Quálitas es continuo o discreto arriesga un fallo con cliente delante. Alberto
+lo reafirma: se omite y se avanza. Queda registrado como decisión suya, no como olvido.
+
+### ⛔ Bloqueante encontrado al preparar el import
+
+`main-candidato` **comparte `id` (`dNqtM20ij6ecZYAX`) con `main-operativo-dual-stg`**, así que importar
+**sustituye** el Main vivo. Y el candidato **no contiene tres nodos del operativo**:
+`Cambiar Cotizacion`, `Listar Cotizaciones` (los dos `postgresTool` conectados por **`ai_tool` al
+`AI Agent` y al `RAG IA Agent`**) y `Limpiar Turno De Cambio` (recibe de `Send message`). Falta también
+`S1 Observable — Main`.
+
+**Importarlo le quitaría al bot de STG la multicotización**, promovida y verificada con conversación
+real. Causa: el candidato se construyó sobre `WhatsApp Insurance Quotation Bot_stg` (153 nodos, que sí
+contiene entero) y no sobre el operativo (132). Problema de fondo: **dos ficheros con el mismo `id` y
+contenido distinto**, sin nada que declare cuál describe la instancia.
+
+Handoff con el encargo: `Agente-n8n@f7d68aa`. Mismo patrón a revisar en `retomar-candidato`
+(`nYRaRzU83qDLuEWI`, 12 → 24 nodos). El worker es workflow nuevo, sin riesgo de sustitución.
