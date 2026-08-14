@@ -137,3 +137,26 @@ día, no dejar que el entregable viviera fuera.
    el código.** Revisar por contenido, siempre.
 
 **Regla derivada:** ningún entregable para un repo nuestro pernocta en un fork ajeno.
+
+## Gitflow en todos los repos, no solo en el de Juan (14 ago 2026)
+
+**Observación de Alberto:** *«Juan desarrolla basándose en gitflow, siento que nosotros no.»* Y los
+datos del día le dan la razón:
+
+- el **Agente n8n commiteó directo en `stg`** todo el 14 ago — el fence, los scripts de import y
+  borrado, los archivados de duplicados;
+- el **Arquitecto publicó directo en `main`** de los repos de los ejecutores (handoffs, baselines);
+- solo aparecieron ramas `feature/…` **cuando Juan lo exigió explícitamente** en su decisión de
+  `#156`, y entonces salió natural en los dos lados a la vez.
+
+Teníamos la convención escrita **solo para `aguayo-co/HYL-WAI`** (memoria `feedback-gitflow-hyl-wai`,
+de una indicación de Juan) y nunca se extendió a los nuestros. No fue una decisión: fue un hueco.
+
+**Lo que costó, el mismo día en que se detectó:** tres veces se commiteó en la rama equivocada por
+trabajar sobre la rama viva de un clon compartido —un handoff cayó en `stg`, otro en una rama
+`feature` del ejecutor, y un `push origin main` desde otra rama dijo «OK» sin publicar nada—. Con
+ramas propias por tarea, el destino no depende de dónde estuviera parado el clon.
+
+**La excepción declarada** —`handoffs/`, `dudas/`, `informes/` directos a `main`— no es pereza: los
+monitores de los ejecutores vigilan `handoffs/` de `origin/main`. Meter la comunicación en el flujo de
+release rompería el canal sin mejorar nada. Es coordinación, no artefacto de release.
