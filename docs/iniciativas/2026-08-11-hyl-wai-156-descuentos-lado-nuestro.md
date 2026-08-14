@@ -662,3 +662,58 @@ de ellas fuera de alcance, no es rigor: es abrir una puerta.
 De la contradicción no se sigue que haya que resolverla tocando producción, sino **ajustando el gate al
 entorno del que se habla**.
 
+---
+
+## 20. Descuentos ENCENDIDO en STG (14 ago, 12:22) — encendido, no probado
+
+**GO de Juan** (`#156`, 14 ago): *«GO para importar en STG, con el gate de cobertura 9/9 en STG»*, sin
+condiciones añadidas.
+
+### Import — verificado contra la instancia, no contra el informe
+
+Alberto exportó los tres tras publicar y el Arquitecto los comparó con los candidatos:
+
+| | id conservado | nodos | aristas |
+|---|---|---|---|
+| Main | `dNqtM20ij6ecZYAX` | **249/249** | **293/293** |
+| Retomar | `nYRaRzU83qDLuEWI` | **31/31** | **32/32** |
+| Payment | `Ob5JYHYbc23SLp0A` | **19/19** | **19/19** |
+
+Ningún nodo falta ni sobra; **ninguna arista falta ni sobra**. `Cambiar Cotizacion` y
+`Listar Cotizaciones` presentes con `ai_tool → AI Agent` **y** `RAG IA Agent`. URLs intactas
+(`proactive-wa-message`, `payment-confirmation`, webhookId `19640449-…`). Las 41 diferencias de
+parámetros son **normalización de n8n**: metadatos del builder que descarta y valores por defecto
+omitidos (`method: GET`); el `jsCode` de los gates, idéntico byte a byte.
+
+### Encendido
+
+| | |
+|---|---|
+| `module_enabled` · `phase_1_checkpoint_enabled` · `phase_2_intent_enabled` | **true** |
+| `qualitas_discounttrigger` | **1 activo**: `quote_sent:2` → programa 2 (`CHECKPOINT_INTRO_35`, **35 %**), validez 60 min |
+| Programas activos | 2 · `PRICE_OBJECTION` activo |
+| `WHATSAPP_CHECKPOINT_FOLLOWUPS_ENABLED` | **true** — release **v222** |
+| Workflows | los 4 publicados, incluido el worker |
+
+### Lo que esto es, y lo que NO es
+
+**Todas las piezas están encendidas. Ninguna se ha ejercitado:** 0 ofertas, 0 aplicaciones, 0 filas en
+el ledger de checkpoint, 0 intentos de fase 2, 0 reservas de outbound. **Descuentos está encendido, no
+probado.** Lo que falta es la E2E.
+
+### Tres cosas del import que hay que arreglar antes de que muerdan
+
+1. **`Import from File` en n8n no reemplaza: añade.** Desde la lista crea un workflow nuevo; desde
+   dentro del editor, **suma los nodos al canvas** renombrando los que colisionan (`…1`). La vía que
+   funciona es **despublicar → `Cmd+A` + `Supr` → importar → guardar → publicar**, y así se conserva el
+   `id`. No estaba escrito en el runbook y costó dos vueltas.
+2. **Al vaciar e importar, el workflow adopta el nombre del fichero.** Por eso `3-main-bot-principal`
+   entró en el workflow de Retomar y lo dejó llamándose `WhatsApp Insurance Quotation Bot_stg`: el
+   nombre deja de servir para identificar, hay que ir por fecha de creación o por `id`. Recuperado
+   importando el candidato correcto encima.
+3. **El worker recibió un `id` nuevo** (`DeCguAaVtCuW2CUj`): el del fichero no tenía formato n8n. No
+   afecta —no se le llama por URL— pero el repo y la instancia ya no coinciden en ese campo.
+
+**Pendiente inmediato: re-exportar la instancia** para que el baseline vuelva a describirla. Es la
+misma disciplina que hoy nos evitó borrar la multicotización.
+
