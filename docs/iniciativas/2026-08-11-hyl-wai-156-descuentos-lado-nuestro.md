@@ -591,3 +591,30 @@ byte**, no «parecidos».
 cosa, y la tentación era arreglarlos allí mismo. Un cambio que entra dentro de otro es el que nadie
 revisa.
 
+---
+
+## 17. Decisión de Alberto (14 ago): el gate es **9/9 en STG** — `#156` comentario `5295176864`
+
+**Alberto decide el alcance:** el objetivo es Descuentos funcionando **en STG**, y el gate del import en
+STG es la cobertura de los **9 puntos de envío de STG**. Comunicado a Juan como decisión, no como
+propuesta.
+
+**El argumento, en una línea:** el gate 18/18 pide **tocar producción como requisito para importar en
+staging** — los 9 de PROD necesitan `n8n_outbound_reserve`, que no existe allí (verificado: 0 funciones
+`n8n_*`), y fencearlos exige una ventana de DDL que el propio dictamen prohíbe. **PROD no queda sin
+fence: queda a su propia secuencia.**
+
+**Dos consecuencias cerradas con la misma decisión:**
+
+1. El **camino de recogida de entregas diferidas** de `Send Quote Document` **no se construye ahora**.
+   En STG un PDF fallido queda en el ledger sin recoger; aceptable en pruebas **porque está
+   declarado**, no en PROD. Entra en el alcance de su promoción.
+2. Los **7 conectores sin salida de error** se declaran, no se arreglan (ítem 5 de la ventana de
+   higiene, con su matiz del duplicado).
+
+**Lo pedido a Juan:** el **GO del import en STG** contra el diff semántico, el inventario y las
+pruebas — no la activación de Descuentos, que es paso posterior. Y se le dice explícitamente que si
+mantiene el 18/18, entonces hace falta lo contrario de lo que dice su lista de no autorizados:
+**autorización expresa para una ventana de DDL en producción**. Las dos cosas a la vez no son
+compatibles.
+
