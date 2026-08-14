@@ -642,3 +642,23 @@ Alberto. **La cifra lleva su nota al pie.**
 
 **Nuestro lado de #156 está completo.** Lo único que falta para importar en STG es el **GO de Juan**.
 
+---
+
+## 19. Corrección (14 ago): retirada la alternativa del DDL en producción
+
+En los comentarios `5295176864` y `5296224799` cerré el planteamiento con «si mantienes el 18/18,
+entonces necesitamos autorización expresa para una ventana de DDL en producción». **Retirado en
+`5296236176`.**
+
+**El error, y por qué importa:** la observación era correcta —el gate 18/18 no es alcanzable sin tocar
+PROD— pero **ofrecer la alternativa le daba a Juan una salida que Alberto había excluido**. Si hubiera
+respondido «de acuerdo, hagamos la ventana en producción», habría conseguido justo lo que no se pidió,
+y con nuestra propia frase como invitación.
+
+**Regla que queda:** cuando se señala una contradicción en un gate ajeno, se señala **y se propone la
+salida que está autorizada** — no se enumeran todas las salidas lógicas. Un dilema con dos ramas, una
+de ellas fuera de alcance, no es rigor: es abrir una puerta.
+
+De la contradicción no se sigue que haya que resolverla tocando producción, sino **ajustando el gate al
+entorno del que se habla**.
+
