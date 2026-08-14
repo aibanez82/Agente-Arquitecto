@@ -291,3 +291,54 @@ nada; lo que se rompa en STG se arregla en STG.** Consecuencias registradas:
    importar, **diff del candidato contra el workflow vivo**, porque el baseline exportado es del
    10 ago (`b98f568`) y desde entonces STG ha recibido promociones.
 6. **E2E sintética** — matriz 8/8 de la entrega de Juan más los casos de descuento del runbook v0.6.
+
+---
+
+## 11. Pasos 1 y 2 cerrados (13 ago) — y lo que la ejecución descubrió
+
+**Los dos repos nuestros están en `stg`.** n8n `89dec79`, Dashboard `44d889d`. Verificado por el
+Arquitecto contra los criterios de cada handoff, no contra el informe: en n8n los baselines `_stg`
+intactos y `workflows/` con solo los tres candidatos (`A`/`M`/`M`), 11 migraciones presentes y
+ninguna ejecutada; en Dashboard `next` en `14.2.35`, Fase 4 dentro y `claim.js` conservando las tres
+operaciones de Atención Humana.
+
+### Dos defectos que justifican por sí solos haber pasado por STG
+
+Ninguno es regresión del merge: los dos venían **dentro de la entrega v0.6**, y los dos estaban
+tapados por tests en verde.
+
+1. **El `/webhook/` perdido** (`lib/s1/n8nOperatorWebhook.js`). El código de #156 daba por hecho que
+   `N8N_OPERATOR_WEBHOOK_BASE_URL` trae el `/webhook`; la variable real en STG y PROD es **solo el
+   host** — el segmento lo pone el cliente. Las tres llamadas de Atención Humana habrían salido a
+   `…/atencion-humana-iniciar`: **404**. El test no lo veía porque asertaba **por sufijo**, que es
+   justo la aserción ciega a la pérdida de un segmento intermedio. Habría estrenado en producción un
+   fallo silencioso sobre lo que se arregló el 12 ago.
+2. **`continuation.test.js` atado a una máquina.** Traía `DJANGO_REPO = '/home/oilycoyote/projects/…'`
+   y **reventaba al requerirse**, así que node lo contaba como *1 test que falla* en vez de los *14*
+   que son: **la matriz que acredita el contrato Django↔Dashboard v0.6 nunca corrió fuera de esa
+   máquina**. Además su gate comparaba `rev-parse HEAD === DJANGO_SHA`, que no acredita el pin sino
+   dónde tiene el HEAD quien ejecuta. Suite real: **212/212** (198 antes).
+
+### Los cinco hallazgos de n8n, decididos
+
+| # | Hallazgo | Decisión del Arquitecto |
+|---|---|---|
+| 1 | El validador nuevo de Retomar exige 11 claves y el Django **desplegado** manda 10 (`e7b97e7` las emite; `main` no). Importar contra el Django actual rechaza **el carril entero** con `missing_checkpoint_followup` | **Dependencia dura, no secuencia cómoda.** Django v0.6 desplegado en el entorno **antes** de importar. Y queda escrito para el futuro: `retomar-candidato` **no puede ir a PROD sin Django v0.6** — allí Retomar está activo desde el 11 ago |
+| 2 | El worker nuevo incrusta el `phone_number_id` de STG en dos URLs, sin nodo `WA Config STG` | **Se corrige antes del import.** El procedimiento de rotación documentado edita ese nodo en 3 workflows; un cuarto sin él se salta la rotación **en silencio**, y el modo de fallo es el Bug #15 (envíos cruzados de entorno). Barato ahora, caro después |
+| 3 | `Check Idempotency` pasa a llamar `n8n_checkpoint_outbound_claim()`, que **crea la migración `006`** y hoy no existe en ninguna base | **Confirmada como dependencia dura**: ventana de DDL (paso 4) antes del import (paso 5) |
+| 4 | La respuesta de Retomar cambia de forma: `success` podía ser solo `true` y ahora puede ser **`false`** | **Superficie contractual — va a Juan antes del import.** Nadie ha declarado qué hace Django ante `success: false`: si reintenta, un rechazo persistente se vuelve **bucle de reintentos** |
+| 5 | El worker trae `scheduleTrigger` de **1 minuto**: activarlo consulta Django, escribe en Postgres y **envía PDFs por WhatsApp** | Import con `active: false`; **activar es una decisión explícita**, nunca efecto lateral del import |
+
+**`.pi-web/`** (contabilidad interna del relay del agente de Juan, 4 ficheros): cosmético, sin
+secretos, expone la disposición de su máquina. Decide Alberto. Recomendación: **dejarlo** — es
+registro de cómo se construyó esto.
+
+**Anotado sin bloquear:** `lib/wire.js` valida `body.timestamp` crudo y el nodo `.njs` valida el ya
+normalizado, así que con `timestamp: ""` el oráculo y el nodo **discrepan**. El Django real no produce
+ese caso; los dos ficheros están para decir lo mismo y aquí no lo dicen.
+
+**Gates relajados, revisados y aceptados:** la prohibición «ningún nodo nuevo toca base/red/conector»
+del `§13` pasa a **lista cerrada enumerada** (22 nodos en Main, 5 en Retomar) — inevitable, porque el
+objeto de #156 es añadir nodos con efecto, y una lista enumerada es la forma correcta; el gate de
+credenciales sigue impidiendo introducir credenciales nuevas. Queda dicho que **ampliar esa lista sin
+declararlo deja el gate sin proteger nada**.
