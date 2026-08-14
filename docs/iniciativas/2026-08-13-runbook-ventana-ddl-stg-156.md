@@ -267,3 +267,51 @@ Acreditado por el Arquitecto contra el catálogo vivo, no contra el informe de e
 3. Llama al Arquitecto: leo el catálogo y digo dónde se quedó.
 4. `heroku pg:backups:restore` solo como último recurso y con el Arquitecto delante: restaurar tira
    también los datos de STG posteriores a la captura.
+
+---
+
+## 7. Lo que la ventana desbloqueó — claim real en STG (14 ago, 03:19 UTC)
+
+**Acreditado por el Arquitecto cruzando tres fuentes**, no por el informe del ejecutor.
+
+| | |
+|---|---|
+| Claim | **`id = 67`**, sesión `waq_1990_07356b35d390`, `epoch = 3` (tras 1 y 2: **anti-ABA correcto**) |
+| n8n escribió en `whatsapp_sessions` | `human_takeover = true`, `control_id = a988d3f1-…`, `epoch = 3` |
+| Cruce claim ↔ sesión | **mismo UUID, mismo epoch** |
+| Vista | `applied_human_takeover=true` · `authority_epoch=3` · `handoff_state='stable_human'` · `human_control_confirmed` |
+| Ledger | 1 fila, `operation='take'`, `outcome='in_flight'` |
+
+### Las variables de Vercel quedan acreditadas POR EFECTO, no por configuración
+
+Era lo que no se pudo verificar al escoparlas (son *sensitive*). Un `/webhook` de más habría dado
+**404**; un secreto que no casara, **401**. El webhook llegó, autenticó y n8n escribió las banderas.
+**La rotación del secreto y el escopeo funcionan.**
+
+### El `202` es más interesante de lo que anticipé
+
+No significa «no pasó nada»: significa **«pasó, y no me lo confirmaron en el formato que espero»**.
+n8n hizo el trabajo —las banderas están escritas— pero contesta cuerpos de Fase 4 y `claim.js` de #156
+los clasifica `control_outcome_unknown`. De ahí `outcome='in_flight'` en el ledger. **Se cierra con el
+import**, no con un fix.
+
+### Cuarto defecto del día invisible en verde — y ya es un patrón
+
+`42P08` en `persistOutcome`: `$3` usado en dos posiciones con tipos deducidos distintos
+(`varchar(16)` en el `SET`, `text` en el `IN`), rechazado **en el parseo**. Reaparición del mismo
+defecto que `30e2fb4` cerró el 10 ago, resucitado por la reescritura de #156.
+
+Los cuatro de hoy —el `/webhook/` perdido, `continuation.test.js` sin cargar, el `42P08`, y la
+sobrecarga con un llamante en un test— comparten causa: **la suite del Dashboard es 100 % stubs por
+doctrina S1, así que el SQL nunca se parsea contra un Postgres real y las URLs solo se asertan por
+sufijo**. El ejecutor lo cerró con una regla estructural (todo `$n` repetido en una sentencia lleva
+cast, verificable offline) en vez de un caso más. **La doctrina de stubs tiene un coste medible y hoy
+se ha cobrado cuatro piezas.**
+
+### Falsa alarma mía, verificada antes de plantearla
+
+`automation_gate='eligible'` con `handoff_state='stable_human'` **no es contradicción**:
+`automation_gate` solo mira estado de sesión (cerrada, banned, metepec, fase) replicando el `409` de
+Django, y el control humano vive en `handoff_state`. Son dos ejes. **Nota para consumidores:** leer
+solo `automation_gate` para decidir si el bot responde se saltaría el control humano — que es
+literalmente el `#57`.
