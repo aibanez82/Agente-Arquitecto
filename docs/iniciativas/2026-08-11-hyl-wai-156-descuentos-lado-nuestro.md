@@ -855,3 +855,25 @@ siguiente sitio que lea `status`. Las dos son legítimas; la diferencia es plazo
 o del borrado del teléfono. **No**: lo pone Django al crear cualquier lead, así que **una prueba desde
 cero daría exactamente lo mismo**. Preguntarlo evitó una vuelta inútil.
 
+### Corrección (mismo día) — `active` lo escriben **los dos** · `#156` `5298060795`
+
+Escribí a Juan que *«quien pone ese `active` es Django, **no n8n**»*. **Incorrecto en la parte
+excluyente.** Lo escriben los dos, y el dato que faltaba lo aportó el Agente n8n:
+
+| Quién | Cuándo |
+|---|---|
+| Django | al crear el lead (`activate_whatsapp_session_affinity()`) |
+| **n8n** | **en cada turno resuelto** — `Apply Affinity Update`: `SET status = CASE WHEN session_id = <elegida> THEN 'active' ELSE 'open' END` |
+
+**Verificado por el Arquitecto sobre el grafo: `Apply Affinity Update` es ancestro de
+`Claim Main Reply Outbound`** — la marca se escribe **dentro del mismo turno, antes de que el fence lea
+la vista**.
+
+**Consecuencia para la decisión, y por eso se corrigió de inmediato:** cambiar un solo lado no basta.
+Aunque Django dejara de marcar `active`, n8n lo repondría antes del claim. Eso encarece la opción 2
+(hay que tocar Django **y** los cuatro nodos de multicotización) y **no afecta** a la 1 ni a la 3, que
+cambian la lectura y no dependen de quién escribe.
+
+**Efecto en mi recomendación:** mantengo que la **4** es la buena a medio plazo, pero con este dato la
+**3** —la del ejecutor— es claramente la barata y la que menos superficie toca. Se lo dije así a Juan.
+
