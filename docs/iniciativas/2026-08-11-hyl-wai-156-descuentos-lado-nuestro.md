@@ -348,8 +348,11 @@ no contra su artefacto.** Repetida a las 24 horas, en el otro sentido y por el o
 detectada antes de romper nada, porque el hallazgo 1 obligaba a mirar el entorno y no la rama.
 
 **Confirmado contra la fuente por el Arquitecto:** `build_n8n_payload` en `origin/stg` emite las 11
-claves con `checkpoint_followup` (`whatsapp_checkpoint_followups.py`); lo desplegado emite 10. La
-lectura del Agente n8n era correcta. **El import sigue bloqueado hasta el deploy.**
+claves con `checkpoint_followup` (`whatsapp_checkpoint_followups.py`); lo desplegado emitía 10. La
+lectura del Agente n8n era correcta.
+
+> **Resuelto el 13 ago 19:44 (hora local).** Juan desplegó: `hyl-wai-stg` **v221 = `Deploy e7b97e77`,
+> `succeeded`**. El hallazgo 1 deja de bloquear el import. **Paso 3 completo: rama y entorno.**
 
 ### El claim real no se pudo probar — y las dos dependencias son NUESTRAS
 
