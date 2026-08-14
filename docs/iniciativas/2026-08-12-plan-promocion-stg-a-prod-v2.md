@@ -494,3 +494,60 @@ un segundo después ya estaba `active`, sin ningún turno de por medio. Descarta
 `"status": "open"` y no escribe `'active'` en ningún punto del repo; el default de la columna es `'open'`; no hay
 triggers; el Dashboard solo lee; y en n8n solo escriben status `Cambiar Cotizacion` y `Mark Session Closed`.
 Pedida explicación como parte de la ventana C — no bloquea arrancar, pero sí cerrar.
+
+---
+
+# ACTA DE CIERRE — el viaje STG → PRODUCCIÓN está hecho (13 ago 2026)
+
+Todo lo que vivía en staging está en producción, y **cada pieza verificada con una conversación real**, no con
+comprobaciones estáticas.
+
+## Lo que entró
+
+| | |
+|---|---|
+| **Esquema** | Paridad completa. Fase 0/1 + `dashboard_outbound_dispatch`, esta última con paridad total con STG (columnas, índices y constraints idénticos) |
+| **Dashboard** | En producción, incluido el cliente de Atención Humana. `next` 14.2.3 → **14.2.35**: la vulnerabilidad crítica ya no corre |
+| **n8n** | `Retomar Conversacion` · **Multicotización** · **Atención Humana** (activa, con `iniciar` y `liberar`) |
+| **Higiene** | Workflow muerto borrado (5 workflows, los 5 activos) · baselines re-exportados · los dos índices superados, retirados |
+| **Tracker** | `#57`, `#69`, `#72`, `#76`, `#77` cerrados con evidencia |
+
+## Lo que el viaje descubrió y no estaba en el plan
+
+Dos defectos que **despertó el paso de Django a `dual`** (release v341, 13 ago 17:39 UTC, Juan), no la migración:
+
+- **`#76`** — el mensaje de desambiguación salía sin vehículo y con la hora en UTC. Leía de
+  `whatsapp_sessions.quotation_data`, vacío en las 1085 sesiones, con nombres de campo que el propio código
+  declaraba adivinados.
+- **`#77`** — la elección del cliente no se recordaba: volvía a preguntar cada turno. Un bucle del que nadie salía.
+  97 teléfonos en riesgo, y entre 1 y 7 clientes al día vuelven a cotizar.
+
+Ninguno era regresión: los dos llevaban meses escritos así y era **el primer día que se ejecutaban de verdad**.
+
+## Las tres lecciones, por orden de coste
+
+**1. Una promoción no se acredita contra su artefacto, sino contra el entorno de destino.** Di 5/5 a
+Multicotización y estaba rota: viajó con la credencial Postgres de staging. Lo que la tumbó eran hechos del
+destino —una credencial que allí no existe, y un modelo de sesiones distinto—, no del cambio. El guard antifugas
+miraba nombres de nodo y referencias `$('…')`; los **IDs de credencial** eran una tercera forma de fuga y no
+estaban en la lista, acotación que había aprobado yo.
+
+**2. El fallo casi nunca está en el razonamiento; está en contra qué se compara.** Ocurrió cuatro veces el mismo
+día: afirmé que Django no escribía `'active'` grepeando un clon parado el 27 de julio; di por bueno el modo
+`shadow` de memoria cuando ya era `dual`; conté seguimientos automáticos con un campo `source` que también
+etiqueta mensajes de personas; y leí el tracker con un límite que ocultaba un tercio de los issues.
+
+**3. Una opción mejor del ejecutor se adopta, no se negocia.** Autoricé promover el bloque entero de S1 —cinco
+nodos y superficie contractual— para traer una persistencia de afinidad **que ya estaba en producción** desde esa
+misma mañana dentro de `Cambiar Cotizacion`. El Agente n8n levantó una opción que no estaba en mi consulta, más
+pequeña y mejor. Se retiró mi ventana sin ejecutar y se fue con la suya.
+
+## Lo que queda vivo, y no es de este viaje
+
+- **`#60`** — chunk de KB con un correo falso. Daña a un cliente y se arregla con una escritura; falta decidir el
+  texto de reemplazo.
+- **`#56`** — 939 de 1085 sesiones clavadas en `greeting`, ninguna ha pasado desde el 30 jul. Volumen bajo, sin
+  conclusión.
+- **`#79`** — `metadata.source` miente sobre el origen del mensaje; bloquea verificar `#40`.
+- **`#78`** — si algún día se revive la desambiguación, copy y parser van juntos.
+- Once issues de Django, que son de Juan.
