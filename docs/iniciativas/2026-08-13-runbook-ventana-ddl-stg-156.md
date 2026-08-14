@@ -288,12 +288,28 @@ Era lo que no se pudo verificar al escoparlas (son *sensitive*). Un `/webhook` d
 **404**; un secreto que no casara, **401**. El webhook llegó, autenticó y n8n escribió las banderas.
 **La rotación del secreto y el escopeo funcionan.**
 
-### El `202` es más interesante de lo que anticipé
+### CORRECCIÓN — no hubo `202`: fue **`201`**, y el ledger acabó en `applied`
 
-No significa «no pasó nada»: significa **«pasó, y no me lo confirmaron en el formato que espero»**.
-n8n hizo el trabajo —las banderas están escritas— pero contesta cuerpos de Fase 4 y `claim.js` de #156
-los clasifica `control_outcome_unknown`. De ahí `outcome='in_flight'` en el ledger. **Se cierra con el
-import**, no con un fix.
+Escribí arriba que el `202` era lo esperado y que el ledger quedaría `in_flight` hasta el import.
+**Las dos cosas eran falsas**, y las corrijo con la medida final:
+
+| | |
+|---|---|
+| `POST /api/claim` | **HTTP 201** |
+| `DELETE /api/claim` | **HTTP 200** |
+| Ledger, los dos comandos | **`outcome = 'applied'`** |
+| Ciclo completo | claim 67 `released` a las 03:38:06, y **n8n revirtió las banderas**: 0 sesiones con `human_takeover` |
+
+Mi `in_flight` era una **foto intermedia**: consulté el ledger mientras el comando estaba en vuelo y
+lo reporté como estado final. Y el `202` no lo verifiqué: lo heredé del §2.1 de la entrega del
+Dashboard —una previsión razonable, escrita antes de probar— y lo amplifiqué a «lo correcto hoy es
+202, no 201», hasta ponerlo como criterio de aceptación en su handoff. **La prueba real lo desmintió.**
+
+**Lo que esto significa, y es mejor de lo que pensábamos:** el `Atencion Humana (STG)` que ya corre
+contesta cuerpos que `claim.js` de #156 sabe leer, así que **take y release no necesitan el import**.
+El `outcome: applied` no es autodeclarado: #156 solo lo escribe tras **observar la vista live**.
+Queda por confirmar por qué —Fase 4 clasificaba por `sent`— antes de extrapolarlo a los otros
+workflows.
 
 ### Cuarto defecto del día invisible en verde — y ya es un patrón
 
