@@ -112,3 +112,29 @@ Recomendación del Arquitecto: **dejarlo**, tiene valor como registro de cómo s
   aplazada sino alcance retirado. Vive en `2026-08-11-hyl-wai-156-descuentos-lado-nuestro.md` §12.
 - **`bot_stg`**: ya resuelto — el Agente n8n le quitó el papel de baseline y sacó la capa C1 a
   `workflows/c1/` congelada. Si queda algo, es decidir su destino final, y es suyo.
+
+---
+
+## Añadido el 14 ago — bloqueantes de la promoción a PROD (no de STG)
+
+Dos cosas que en STG se aceptan declaradas y en producción **no**:
+
+### a) Payment Confirmation con control humano activo: no envía
+
+Al fencear Payment se descubrió que `Mark Session Completed` cierra la sesión **antes** del envío
+(`status='completed'`, `closed_at=NOW()`), y el fence exige `session_status='open'`: colocado
+«inmediatamente antes de enviar» habría bloqueado **el 100 %** de las confirmaciones de pago.
+Resuelto reservando **dos nodos antes**, con la sesión aún abierta.
+
+Con eso resuelto queda la decisión de producto: **Alberto decide fence completo, sin excepción**
+(14 ago). Consecuencia aceptada y registrada: *si un agente tiene la conversación tomada cuando entra
+una confirmación de pago, el cliente no se entera de que pagó, y el agente tampoco de que había una
+confirmación silenciada.*
+
+En STG es aceptable —los clientes son pruebas—. **En PROD es un cliente real que pagó y no lo sabe.**
+El día que exista el camino de «diferir y avisar», Payment es su destinatario natural.
+
+### b) El duplicado de los 7 conectores sin salida de error
+
+Ver §5. Mismo criterio: en STG se declara, en PROD hay que cerrarlo antes de promover.
+
