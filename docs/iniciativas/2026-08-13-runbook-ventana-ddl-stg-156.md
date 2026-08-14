@@ -94,6 +94,13 @@ heroku pg:backups:capture -a hyl-wai-stg
 No es paranoia de más: son 12 migraciones y las de n8n crean funciones con `CREATE OR REPLACE`, que no
 se deshacen solas.
 
+> **Quién lo lanza (13 ago):** Alberto preguntó si esto es de Juan por ser Heroku. **Verificado:
+> `heroku access -a hyl-wai-stg` le da `member` con `deploy, operate, view`** — Juan
+> (`alfred@aguayo.co`) es `admin`. `operate` cubre las operaciones del addon, así que puede lanzarlo
+> él y **no hace falta esperar a Juan**. El plan es `essential-0`: **sin rollback continuo**, así que
+> la captura manual es el único punto de retorno que va a existir. Si Heroku lo rechazara por
+> permisos, entonces sí sube a Juan — pero el intento es inocuo: capturar un backup no cambia nada.
+
 ### 1.3 La vista `002` se genera, no se escribe
 
 `002` sale de una plantilla que `scripts/156/build-view.js` rellena con **los gates que la instancia
@@ -106,6 +113,14 @@ node scripts/156/build-view.js --check
 Si falla, el fichero commiteado no describe la instancia viva y **hay que regenerarlo antes**, no
 aplicarlo. Hoy no debería fallar —los workflows no se han importado y el vivo no ha cambiado—, pero es
 la comprobación que convierte «debería» en «es».
+
+> ### ✅ HECHO — 13 ago, ejecutado por el Arquitecto sobre `a2c38b2`
+>
+> `ok: migrations/156/002-conversation-control-v1.sql al día con los gates vigentes`
+>
+> Corrido en un **worktree detached** del scratchpad, no en el clon: `git checkout stg` habría movido
+> HEAD bajo cualquier sesión de agente que estuviera trabajando ahí, que es el incidente del 12 ago.
+> El clon quedó en `main` y limpio. No hizo falta molestar al Agente n8n: `--check` no muta nada.
 
 ---
 
