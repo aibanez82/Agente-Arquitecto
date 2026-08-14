@@ -618,3 +618,27 @@ mantiene el 18/18, entonces hace falta lo contrario de lo que dice su lista de n
 **autorización expresa para una ventana de DDL en producción**. Las dos cosas a la vez no son
 compatibles.
 
+---
+
+## 18. Fence 9/9 en STG — CERRADO y verificado (14 ago) · `Agente-n8n@2395e37`
+
+**Verificado por el Arquitecto contra `workflows/vivo-stg-2026-08-14/`, no contra el informe:**
+
+| | Vivo | Candidato | Nodos del vivo ausentes |
+|---|---|---|---|
+| Main | 132 | 249 | **ninguno** |
+| Payment | 9 | 19 | **ninguno** |
+| Retomar | 12 | 31 | **ninguno** |
+
+**Payment reserva antes de cerrar**, como se autorizó — orden verificado en el grafo:
+`S1 Request Valid? → Stash → Freeze Payment Reply Identity → Claim Payment Reply Outbound →
+IF Send? → Restore → Format & Validate → Mark Session Completed → Send message → Settle`.
+`Send message` de Retomar cuelga de su `Restore Retomar Reply Payload` como único predecesor.
+
+**Las cuatro precisiones, declaradas** en `docs/156/inventario-fence-9-de-9-stg.md`: 8 puntos por
+`n8n_outbound_reserve`, **1 por `dashboard_outbound_dispatch`** (Atención Humana, unificación diferida
+a rollout), Payment reservando dos nodos antes, y el bloqueo por control humano como decisión de
+Alberto. **La cifra lleva su nota al pie.**
+
+**Nuestro lado de #156 está completo.** Lo único que falta para importar en STG es el **GO de Juan**.
+
