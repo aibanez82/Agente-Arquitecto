@@ -226,6 +226,40 @@ Importar ni activar workflows · tocar PROD · ejecutar `GRANT`s · crear roles 
 (la brecha de roles queda **declarada**, y en STG es inocua por mono-rol) · corregir el
 `phone_number_id` incrustado del worker, que va antes del import y es trabajo del Agente n8n.
 
+## ✅ VENTANA CERRADA — 13 ago 2026, 12/12 aplicadas
+
+Acreditado por el Arquitecto contra el catálogo vivo, no contra el informe de ejecución.
+
+| | |
+|---|---|
+| Los 5 canónicos | `conversation_control_v1` · `dashboard_control_commands` · `n8n_outbound_dispatch` · `n8n_checkpoint_outbound_claim` · **42 funciones `n8n_*`** (partía de 2) |
+| Objetos nuevos | **4 vistas + 9 tablas** |
+| La vista **responde** | `SELECT count(*) FROM conversation_control_v1` → **19** |
+| Datos vivos | 137 `chat_histories` · 19 sesiones · 48 archive · 9 claims — **intactos de principio a fin** |
+
+### Cuatro cosas que la ejecución enseñó, y que el runbook no preveía
+
+1. **Las migraciones de n8n están escritas para `psql`, no para SQL plano.** `BEGIN;` arriba y el
+   `COMMIT` **dentro** de un `\if :dry_run … \else COMMIT; \endif`. En TablePlus el cuerpo se ejecuta,
+   el meta-comando falla y **nunca se llega al `COMMIT`**: la transacción se deshace entera y parece
+   que la migración pasó cuando no persistió nada. Se adaptaron las once (literal en el `SET`, bloque
+   final → `COMMIT;`), con variante `ensayo/` (`'on'` + `ROLLBACK`). **El modo ensayo era del autor y
+   resultó valioso**: validó el `UNIQUE INDEX` sobre `n8n_chat_histories` antes de aplicarlo.
+2. **Error de artefacto mío: doble numeración.** Los ficheros llevaban orden de ejecución *y* número
+   de migración (`03-n8n-002-…`), así que «el 02» era ambiguo y se ejecutó la **vista antes del
+   readiness**. Consecuencia real: `ALTER … TYPE bigint` → `cannot alter type of a column used by a
+   view or rule`. Recuperación limpia: `DROP VIEW` → readiness → recrear vista. **Renombrados a
+   `PASO-NN_nombre-descriptivo.sql`, un solo número.**
+3. **`to_regproc` devuelve `NULL` con nombres sobrecargados.** `n8n_outbound_reserve` existía con dos
+   firmas y mi comprobación la dio por ausente. **Contar en `pg_proc`, no usar `to_regproc`**, o un
+   éxito se reporta como fallo.
+4. **`CREATE OR REPLACE` no sustituye si cambia la firma.** `PASO-11` y `PASO-12` definen ambos
+   `n8n_discount_conversation_handoff_claim`, pero con **firmas distintas** (`p_now` vs
+   `p_now, p_application_id`), así que **coexisten**. El worker invoca con dos argumentos → usa la del
+   12, la correcta. La de un argumento queda **huérfana**. Mi aviso de «el orden 11→12 es obligatorio
+   o queda la definición vieja» era **incorrecto**: no se pisan. **Pendiente para el Agente n8n:**
+   confirmar si `011` pretendía redefinir la de `010` y decidir si se retira la huérfana.
+
 ## 6. Si algo sale mal
 
 1. **Para.** No sigas con el siguiente fichero.
