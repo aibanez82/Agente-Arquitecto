@@ -337,6 +337,20 @@ registro de cómo se construyó esto.
 normalizado, así que con `timestamp: ""` el oráculo y el nodo **discrepan**. El Django real no produce
 ese caso; los dos ficheros están para decir lo mismo y aquí no lo dicen.
 
+### Paso 3 (Django) — a medias, y la lección de ayer repetida
+
+Juan promovió **la rama**: `origin/stg` de HYL-WAI = `e7b97e7`, fast-forward, `main` intacto. Pero su
+propio comentario dice «no se ejecutaron migraciones vivas, **deploy**, activación», y el entorno lo
+confirma: **`hyl-wai-stg` corre `df05f0ad`, release v220 del 10 ago** — el `stg` anterior.
+
+Es, literal, la lección del acta del 13 ago: **una promoción se acredita contra el entorno de destino,
+no contra su artefacto.** Repetida a las 24 horas, en el otro sentido y por el otro lado. Esta vez
+detectada antes de romper nada, porque el hallazgo 1 obligaba a mirar el entorno y no la rama.
+
+**Confirmado contra la fuente por el Arquitecto:** `build_n8n_payload` en `origin/stg` emite las 11
+claves con `checkpoint_followup` (`whatsapp_checkpoint_followups.py`); lo desplegado emite 10. La
+lectura del Agente n8n era correcta. **El import sigue bloqueado hasta el deploy.**
+
 **Gates relajados, revisados y aceptados:** la prohibición «ningún nodo nuevo toca base/red/conector»
 del `§13` pasa a **lista cerrada enumerada** (22 nodos en Main, 5 en Retomar) — inevitable, porque el
 objeto de #156 es añadir nodos con efecto, y una lista enumerada es la forma correcta; el gate de
