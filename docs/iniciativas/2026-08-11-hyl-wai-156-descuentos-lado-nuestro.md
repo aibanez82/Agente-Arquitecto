@@ -351,6 +351,43 @@ detectada antes de romper nada, porque el hallazgo 1 obligaba a mirar el entorno
 claves con `checkpoint_followup` (`whatsapp_checkpoint_followups.py`); lo desplegado emite 10. La
 lectura del Agente n8n era correcta. **El import sigue bloqueado hasta el deploy.**
 
+### El claim real no se pudo probar — y las dos dependencias son NUESTRAS
+
+Dashboard desplegado en STG (`dpl_F9L29J6FMgRJ8PEwASQsiMYP65J3`, suite 212/212). El POST a `/api/claim`
+devuelve **503 `dependency_unavailable`** y **no se creó ningún claim**. Falla **cerrado y sin daño**,
+verificado tras las tres llamadas: `dashboard_conversation_claims` sigue con la última fila en `id=36`
+y `whatsapp_sessions.human_takeover` en `f` con los dos tokens vacíos.
+
+**Corrijo la atribución de su entrega**, que da las dos dependencias por «lado de Juan». Verificado
+contra las migraciones que ya están en `stg`:
+
+| Falta en STG | La crea | Es de |
+|---|---|---|
+| `public.conversation_control_v1` | `Agente-n8n:migrations/156/002-conversation-control-v1.sql:40` | **nuestra** (E3 del Agente n8n) |
+| `public.dashboard_control_commands` | `Dashboard:migrations/2026-08-11-claims-epoch-anti-aba.sql:347` | **nuestra** |
+
+**Consecuencia: desbloquear el claim real NO depende de Juan.** Depende de la ventana de DDL (paso 4),
+que es nuestra y la abre Alberto. De Juan solo cuelga el **deploy de `hyl-wai-stg`**, que bloquea el
+import de Retomar (hallazgo 1) — otra cosa distinta.
+
+Segunda corrección menor, mismo origen: su §2.1 dice «mientras Juan no mergee el lado n8n de #156».
+Ya está mergeado — lo hicimos hoy, `89dec79`. Lo que falta es **importar los workflows en la
+instancia**, no el merge. El **202 «pendiente de confirmación»** que describe sigue siendo el
+resultado esperado hasta ese import, y es señal correcta, no avería.
+
+### ⚠️ Precondición nueva de la ventana de DDL — una variable de Vercel que apunta a PROD
+
+`N8N_OPERATOR_WEBHOOK_BASE_URL` y `N8N_OPERATOR_WEBHOOK_SECRET` existen con alcance **`Preview` a
+secas**, **sin override para la rama `stg`**. Es el patrón exacto del **bug #17** con
+`N8N_PROACTIVE_WEBHOOK_URL`: el Preview de `stg` acabó apuntando al n8n de **PROD**.
+
+Hoy no ha hecho daño **solo porque el 503 corta antes de llegar a la red**. En cuanto la vista y el
+ledger existan, **la primera toma en STG puede llamar al workflow de producción** — y eso sí es una
+acción viva sobre PROD disparada desde STG, que es justo lo que el régimen prohíbe.
+
+**Se escopea antes de abrir la ventana de DDL, no durante.** Es decisión de Alberto (config de Vercel).
+Orden correcto: escopear variable → ventana de DDL → repetir el POST.
+
 **Gates relajados, revisados y aceptados:** la prohibición «ningún nodo nuevo toca base/red/conector»
 del `§13` pasa a **lista cerrada enumerada** (22 nodos en Main, 5 en Retomar) — inevitable, porque el
 objeto de #156 es añadir nodos con efecto, y una lista enumerada es la forma correcta; el gate de
