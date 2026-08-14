@@ -182,9 +182,9 @@ Roles y protocolos completos: tabla "Mapa de sistemas". Reglas operativas:
 
 **Iniciativas (estado en su doc, no aquí):**
 - **Seguimiento leads estancados:** ✅ en PROD (sin filtro de horario — aceptado; mejora deseable). En STG apagado/dry-run. `docs/iniciativas/seguimiento-leads-estancados.md`.
-- **Conversation ID:** en PROD modo `shadow`. Pendiente: merge rama Dashboard `fix/conversation-id-whatsapp-n8n` y paso a `dual` con Juan. `docs/iniciativas/conversation-id-whatsapp-n8n.md`.
+- **Conversation ID:** ✅ **PROD y STG los dos en `dual`** (PROD desde el 13 ago 17:39 UTC, release Heroku v341 de Juan). Cada lead nuevo crea su sesión `waq_<qid>_<hex>`, y Django mantiene **una sola `active` por teléfono** vía `activate_whatsapp_session_affinity()`. Consecuencia: un teléfono puede tener varias sesiones vivas — despertó `qualitas-issues#76` y `#77`. `docs/iniciativas/conversation-id-whatsapp-n8n.md`.
 - **Recordatorios por fecha mencionada:** diseño entregado a Juan; bloqueado por plantilla Meta re-enganche 24h. `docs/iniciativas/2026-07-10-recordatorios-seguimiento-por-fecha-mencionada-design.md`.
-- **Promoción STG → PROD (v2, 12 ago):** Dashboard y n8n primero; bloqueadas por esquema que se aplicó a mano en STG y nunca se versionó. `docs/iniciativas/2026-08-12-plan-promocion-stg-a-prod-v2.md`.
+- **Promoción STG → PROD:** ✅ **CERRADA el 13 ago.** Esquema, Dashboard (con `next` 14.2.35), y en n8n Retomar · Multicotización · Atención Humana — cada pieza verificada con conversación real. Acta y lecciones: `docs/iniciativas/2026-08-12-plan-promocion-stg-a-prod-v2.md`.
 - **HYL-WAI#156 Descuentos + Conversation Control:** Juan congeló 2 contratos y terminó Django; n8n y Dashboard son nuestros, offline en ramas desde `stg`. Handoffs y canal `dudas/` REACTIVADOS solo para esto. `docs/iniciativas/2026-08-11-hyl-wai-156-descuentos-lado-nuestro.md`.
 
 ---

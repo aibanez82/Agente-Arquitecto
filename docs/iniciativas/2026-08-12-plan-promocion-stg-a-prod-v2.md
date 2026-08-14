@@ -551,3 +551,21 @@ pequeña y mejor. Se retiró mi ventana sin ejecutar y se fue con la suya.
 - **`#79`** — `metadata.source` miente sobre el origen del mensaje; bloquea verificar `#40`.
 - **`#78`** — si algún día se revive la desambiguación, copy y parser van juntos.
 - Once issues de Django, que son de Juan.
+
+## Precisión al acta — «todo lo que vivía en staging» es falso, y conviene no dejarlo escrito así
+
+Lo que se cerró es **el alcance de este plan**, no el contenido íntegro de staging. Se quedaron atrás, a
+propósito y con decisión registrada:
+
+- **El bloque de resolución de S1 en el bot** (`Session Resolution` de STG, los tres nodos de afinidad,
+  `Session Context Builder`, la selección por folio y `chatInputOverride`). No viajó porque la opción C lo hizo
+  innecesario para arreglar `#77`. Sigue aplazado con su propio dictamen.
+- **`atencion-humana-enviar`**: promovido pero **sin cablear**, por decisión — entrega WhatsApp de verdad y junto
+  a Retomar habría duplicado el mensaje al cliente. Su webhook queda creado y sin llamador.
+- Lo que el plan ya listaba en §5 como fuera de viaje: **Payment Confirmation (S1)**, **METEPEC** (inactiva en
+  STG) y **Descuentos `#156`**, que va por su rama en paralelo.
+- **El fix de las 3 barreras del Bug #7** (`HYL-WAI#69`), que sigue en STG y no se promovió aquí: producción
+  todavía acepta `[phase:completed]` sin pago verificado. Continúa en la tabla de pendientes de `CLAUDE.md`.
+
+La frase correcta es: **todo lo que este plan se propuso llevar está en producción y verificado**. La otra versión
+es la misma clase de afirmación cómoda que me ha costado cuatro correcciones hoy.
