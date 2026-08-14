@@ -490,3 +490,40 @@ nuestro y no de v0.6** · y las tres cosas que se le piden por orden de bloqueo:
 que se reporta sin decir de quién es la causa se lee como reproche velado, y aquí la causa es nuestra:
 una constante apuntando a un baseline que dejó de describir la instancia.
 
+---
+
+## 14. Candidatos recompuestos y verificados (14 ago) — `Agente-n8n@59b12e0`
+
+**Verificado por el Arquitecto contra `workflows/vivo-stg-2026-08-14/`, no contra el informe:**
+
+| | |
+|---|---|
+| Nodos del vivo ausentes en `main-candidato` | **ninguno** (132/132) |
+| Los tres de multicotización | presentes |
+| Aristas `ai_tool` → `AI Agent` y `RAG IA Agent` | las cuatro |
+| Nodos del vivo con parámetros distintos | **1**: `Session Context Builder`, y es **adición** (`messageType`), superconjunto textual del vivo |
+| `retomar-candidato` | 12/12 del vivo; los 4 distintos son los 4 cambios declarados de #156 |
+
+Main = **213 nodos** = 132 vivo + 25 capa C1 + 56 de #156.
+
+**Los 6 parámetros eran normalización**, confirmado con prueba interna al propio export: 7 claves
+eliminadas (todas con valor por defecto), 3 `options{}` añadidos, **cero valores cambiados** — y dentro
+de un mismo objeto n8n tira `outputPropertyName: "data"` (default) y conserva `responseFormat: "file"`
+(no default).
+
+### Tres hallazgos del ejecutor que valen más que el arreglo
+
+1. **Parte de S1 ya está desplegada en STG** —Payment entero, el endurecimiento de
+   `Prepare Resolution Context` y el observable— **y no constaba en ningún sitio**. Se descubrió al
+   mover la base.
+2. **La versión viva de `S1 Observable — Main` es MÁS NUEVA que nuestro `.njs`**: lleva acceso literal
+   a los ancestros porque con `$(variable)` el nodo se colgaba 300 s. Reescribirlo habría reintroducido
+   el cuelgue. **Van dos veces que nuestro fichero es más viejo que la instancia.**
+3. **`bot_stg` no se borra: era la única copia de la capa C1 del repo.** Se le quita el papel de
+   baseline y la capa sale a `workflows/c1/` congelada — porque `detect-drift` declara los espejos como
+   destino y con `--go` **los sobreescribe**: el primer drift que volviera a correr habría borrado la
+   capa entera, y el builder no habría fallado, **habría producido candidatos sin gates en silencio**.
+
+**El bloqueo del import queda levantado por nuestro lado.** Lo que falta para importar sigue siendo la
+respuesta de Juan al `success: false`.
+
