@@ -527,3 +527,50 @@ de un mismo objeto n8n tira `outputPropertyName: "data"` (default) y conserva `r
 **El bloqueo del import queda levantado por nuestro lado.** Lo que falta para importar sigue siendo la
 respuesta de Juan al `success: false`.
 
+---
+
+## 15. Dictamen de Juan (14 ago 05:41) y el gate que no cierra
+
+**Los tres puntos resueltos:**
+
+| | Decisión | Efecto |
+|---|---|---|
+| `success: false` | Django lo trata como **fallo, sin reintento automático** (`failed` + `failed_attempt_requires_manual_retry`) | **El bucle que temíamos no existe.** Desbloquea |
+| 10 conectores | **Ninguna excepción nominal.** Los 5 patrones entran al fence; `session_id` propagado **no basta**; sin sesión exacta se **falla cerrado**. Gate: **18/18** antes de import | Trabajo nuevo, nuestro |
+| `400` vs `404` | Se **conserva `400`** en Dashboard: compatibilidad intencional entre superficies, **no divergencia** | Cerrado sin trabajo |
+
+Juan añade una **condición de no regresión del Main** que el candidato recompuesto **ya cumple punto
+por punto** — la escribió después de que el ejecutor la hubiera arreglado.
+
+### El gate 18/18 no es alcanzable con las autorizaciones dadas
+
+Los 5 puntos de PROD exigen `n8n_outbound_reserve`, que lee `conversation_control_v1`,
+`whatsapp_sessions` y `n8n_outbound_dispatch`. **Verificado por el Arquitecto contra la BD de
+PRODUCCIÓN:** vista `null`, dispatch `null`, ledger `null`, `n8n_outbound_reserve` 0, **funciones
+`n8n_*`: 0**. Las once migraciones se aplicaron **solo a STG**.
+
+Llegar a 18/18 exige **una ventana de DDL en PROD**, y la lista de no autorizados del mismo dictamen
+prohíbe «DDL o grants vivos adicionales» y «PROD». **Propuesta llevada a #156: 9/9 en STG, y PROD a su
+propia secuencia.**
+
+### Tres cosas más que salieron, y una cifra corregida
+
+1. **La cobertura de partida es 0/18, no 8/18.** Los 8 acreditan **sesión exacta**, que es
+   *precondición* del fence, no pertenencia. **Ninguno de los 18 llama al fence hoy**, porque el Main
+   vivo no tiene un solo nodo de #156. La cifra que veníamos repitiendo —y que el dictamen recoge—
+   medía otra cosa.
+2. **`Send Quote Document`: «diferir» no está completo.** El ledger existe (Data Table
+   `quote_document_deliveries`, idempotente por `inbound_message_id`), pero **nadie recoge una entrega
+   diferida**: `Mark Delivery Failed` sale a `[]` y no hay poller. Hoy «difiere o requiere
+   intervención» significa que **nadie se entera de que la hay**. Alcance nuevo, declarado.
+3. **Retiro una preocupación mía:** señalé un posible hueco entre revalidar y reservar. **No existe, y
+   es por diseño** — la revalidación va **dentro** de la reserva, después del advisory lock, releyendo
+   identidad, teléfono pre/post, `handoff_state`, `authority_epoch`, `automation_gate` y
+   `session_status`; el lock se suelta en el `COMMIT`, antes de red.
+
+**El ejecutor no implementó los cinco patrones a propósito**, porque la forma del entregable depende
+del veredicto sobre PROD y porque `Send Quote Document` no cierra sin decidir qué pasa con una entrega
+diferida — decisión que no debe quedar sepultada en un commit suyo. Correcto.
+
+Consulta publicada: `#156` comentario `5289981004`.
+
