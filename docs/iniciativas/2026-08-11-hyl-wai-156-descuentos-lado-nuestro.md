@@ -574,3 +574,20 @@ diferida — decisión que no debe quedar sepultada en un commit suyo. Correcto.
 
 Consulta publicada: `#156` comentario `5289981004`.
 
+---
+
+## 16. Ventana de higiene
+
+Lo que fue apareciendo durante #156 y **no bloquea nada** se agrupa en
+`docs/iniciativas/2026-08-14-ventana-higiene-stg.md`, con siete ítems y su ownership: la migración
+`012`, el `CHECK` duplicado en claims, los dos índices idénticos sobre `quotation_id`, la credencial
+compartida entre Atención Humana y Metepec, los 7 conectores sin salida de error, las variables de
+Vercel en `Preview` a secas, y `.pi-web/`.
+
+Tres de ellos verificados en vivo el 14 ago antes de listarlos — los dos duplicados lo son **byte a
+byte**, no «parecidos».
+
+**Por qué se agrupan en vez de arreglarse al vuelo:** varios se descubrieron mientras se hacía otra
+cosa, y la tentación era arreglarlos allí mismo. Un cambio que entra dentro de otro es el que nadie
+revisa.
+
