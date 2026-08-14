@@ -717,3 +717,46 @@ probado.** Lo que falta es la E2E.
 **Pendiente inmediato: re-exportar la instancia** para que el baseline vuelva a describirla. Es la
 misma disciplina que hoy nos evitó borrar la multicotización.
 
+---
+
+## 21. Incidente (14 ago) — la capa C1 del candidato deja el bot de STG sin procesar
+
+**El E2E no llegó a empezar.** Al importar los candidatos entró también la **capa C1 de contención**
+del 2 de agosto, que el bot vivo **nunca había tenido**.
+
+| | gates `C1 Gate — …` | desactivados |
+|---|---|---|
+| Main | **33** | 0 |
+| Retomar | 4 | 0 |
+| Payment | 3 | 0 |
+
+El primer nodo tras `WhatsApp Message Trigger` es su gate, y su código embebido lleva
+`C1_ACREDITABLE = false` con `C1_POLITICA` de listas vacías: **la primera comprobación deniega sin
+llegar a mirar la allowlist** y lanza `C1_GATE_DENY`.
+
+**Confirmado con tráfico real:** Alberto pulsó el botón de la cotización a propósito, para generar
+evidencia. Resultado en la base: **efecto cero** — `last_activity` clavado en el minuto de creación,
+0 mensajes en `n8n_chat_histories`, fase sin moverse. **El flujo muere antes de tocar Postgres**, que
+es lo que hace un gate en el primer nodo. El log de la ejecución se le pasó al Agente n8n.
+
+### De dónde salió, y de quién es el fallo
+
+El candidato se compuso como **132 del vivo + 25 de la capa C1 + 56 de #156**. Los 25 vienen de
+`bot_stg`, el fichero que no describía la instancia. **El ejecutor lo había avisado por escrito**
+—«los 25 le llegan al candidato gratis por venir de `bot_stg`»— y aun así entró.
+
+**El fallo de criterio es del Arquitecto:** verifiqué exhaustivamente que **no faltara** nada del vivo
+—nodos, 293 aristas, las cuatro `ai_tool` de Multicotización— y **no cuestioné lo que se añadía**.
+Conté las 293 aristas y no vi que 33 de ellas fueran un candado.
+
+> **Regla que queda:** verificar una promoción es comprobar las dos direcciones. **Lo que falta se ve
+> contando; lo que sobra hay que ir a buscarlo.** Una capa nueva completa puede pasar entera por
+> debajo de un diff que solo pregunta «¿está todo lo que estaba?».
+
+**Consulta abierta al Agente n8n** (`Agente-n8n@607dc24`), pidiendo diagnóstico y **no código**: si la
+capa C1 debe ir en el candidato operativo, con qué política si va, y cuál es la vía limpia. Con
+petición explícita de que **retire la alarma si me equivoco**.
+
+**Rollback disponible y no aplicado:** `workflows/vivo-stg-2026-08-14/` devuelve la instancia al estado
+de esta mañana. Recupera el bot y cuesta #156 hasta el siguiente intento. Decisión de Alberto.
+
