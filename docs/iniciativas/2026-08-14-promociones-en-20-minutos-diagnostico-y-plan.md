@@ -255,3 +255,170 @@ Queda fuera por indicación de Alberto, y se anota lo que eso implica para este 
 - La cadena de promoción de Django (Heroku, `stg`→`main`) no entra en el comando `promote`. El gate
   debe **declarar explícitamente** que no lo cubre, para que «todo a PROD» no se lea como que
   Django viajó.
+
+---
+
+# Anexo I — Cómo se implementa la Fase A (especificación)
+
+Escrito el 14 ago a petición de Alberto. Esto es **el requerimiento**, no el código: lo construye un
+ejecutor, lo corre un cron, y el Arquitecto lo consume.
+
+## I.1 Qué es
+
+Una **sonda de paridad** de solo lectura que responde una pregunta todos los días:
+*«¿en qué se diferencian STG y PROD hoy, descontando lo que debe diferir?»*
+
+No aplica nada, no arregla nada, no toca nada vivo. Compara y publica.
+
+## I.2 Dónde vive — decisión pendiente de Alberto
+
+**Recomendación: una única copia canónica en `Agente-Arquitecto`, rama `main`.** Razones:
+
+- Es **transversal por definición** (cruza n8n, Dashboard y BD); repartirla por eje entre tres repos
+  reproduce el fallo ya conocido de `detect-drift.py` viviendo en 26 ramas con cuatro versiones.
+- Es **solo lectura**: publicar un informe es observación, que es exactamente mi rol, no ejecución.
+- El consumidor del informe soy yo.
+
+**Lo que no cambia:** la escribe un **ejecutor** (Nivel 3) por instrucción de Alberto, y la corre un
+cron de GitHub Actions. El Arquitecto especifica y consume; no la mantiene a mano.
+
+Alternativa si Alberto prefiere no meter tooling en este repo: `Agente_QATest_Qualitas`, que ya tiene
+runners, agregador de reporte y disciplina de solo lectura. Es la segunda mejor opción y no es mala.
+
+## I.3 Los cuatro ejes
+
+### A1 · Esquema — catálogo contra catálogo
+
+Por cada tabla del conjunto compartido: columnas (nombre, tipo, nullable, default), índices,
+constraints. **No «existe la tabla»: la forma de la tabla** — es la distinción exacta que costó la
+Fase 0 de agosto.
+
+- Leer de `pg_catalog`, **no de `information_schema`**: este último filtra por privilegio y devuelve
+  «cero filas» tanto si no hay como si no ves. Ya casi publicamos una conclusión falsa por eso.
+- Salida por tabla: columnas solo en un lado · tipos que no casan · índices y constraints ausentes.
+
+### A2 · Workflows n8n — grafo contra grafo
+
+`GET` a las dos instancias, normalizar con la **lista blanca de nivel superior** ya establecida
+(`name`, `active`, `nodes`, `connections`, `settings`) y comparar por nombre de nodo:
+
+- nodos solo en STG · nodos solo en PROD
+- nodos comunes con **parámetros** distintos
+- nodos comunes con **IDs de credencial** distintos ← la tercera vía de fuga que se coló en agosto
+
+Es el script que se corrió a mano el 14 ago y tardó treinta segundos. Convertirlo en cron es trivial.
+
+### A3 · Variables de entorno — Vercel
+
+Nombres y presencia por entorno, **nunca valores**. Contraste contra un manifiesto de las que
+**deben** diferir. Recordatorio que ya nos mordió: en Vercel cambiar una variable **no afecta a los
+despliegues existentes**, solo a los nuevos — así que el informe declara la variable, no el efecto.
+
+**Heroku/Django queda fuera por petición:** el informe debe decirlo explícitamente, para que
+«paridad verde» no se lea como que las config vars de Django están cubiertas.
+
+### A4 · Versiones
+
+Motor de n8n por instancia, `next` del Dashboard, Node. Cinco líneas, y fue un punto ciego real:
+las dos instancias de n8n corrieron **3 599 commits** de diferencia sin que nadie lo mirara.
+
+**Laguna conocida:** la API pública de n8n **no expone la versión**. O se lee del panel, o se toma de
+`n8nDetails.n8nVersion` dentro del payload de error de una ejecución. Si no se resuelve, el informe
+declara **dónde se buscó**, no «no observable».
+
+## I.4 Cómo se publica — y por qué así
+
+- Un fichero por corrida en `docs/monitores/paridad/AAAA-MM-DD.md`, commiteado. Histórico gratis.
+- **Alerta solo cuando cambia el delta**, no cuando hay delta. Un canal con falsos positivos
+  permanentes acaba ignorándose — está en el catálogo de trampas y lo hemos vivido.
+- **`esperado.yaml`**: la diferencia legítima (IDs de credencial, `phoneNumberId`, URLs, los gates de
+  STG) se declara y se descuenta. Lo que el informe enseña es **lo no esperado**. Cuando algo entra
+  ahí, entra con fecha y motivo — un allowlist sin justificación es un tapón, no una decisión.
+
+## I.5 Reconocimiento de entorno — aplicando el §1 del manual a esto mismo
+
+El manual dice responder esta tabla **en vivo antes** de escribir el plan. Aplicado a la propia
+sonda, esto es lo que hay que verificar **antes** de escribir una línea:
+
+| Pregunta | Por qué importa aquí |
+|---|---|
+| ¿Existe rol de **solo lectura** en la BD de STG? | En S1 **no existía**; se resolvió con una opción de sesión y deuda declarada. A1 lo necesita en los dos lados |
+| ¿Qué `sslmode` acepta cada BD? | STG solo aceptó `no-verify`. Un DSN sin esto no conecta y `require` tampoco |
+| ¿Hay API key vigente de **las dos** instancias n8n? | La de PROD se rotó el 29 jul. Sin las dos, A2 no existe |
+| ¿Token de Vercel con permiso de **listar** env vars sin leer valores? | Si no lo hay, A3 se reduce a nombres desde el CLI |
+| ¿Desde dónde corre el cron alcanza las dos BD? | GH Actions sale por IP no fija; si hay filtrado, cambia el alojamiento |
+
+Si alguna sale «no», entra en el alcance de A como trabajo previo — no como sorpresa a mitad.
+
+## I.6 Criterio de aceptación — conductual, no «salió verde»
+
+1. **Canarios en las dos direcciones.** Se inyecta una diferencia conocida (una columna en una tabla
+   de pruebas de STG, un parámetro de nodo) y la sonda **debe** reportarla; se retira y debe volver a
+   cero. Un detector que nadie ha visto detectar no es un detector.
+2. **Determinista:** dos corridas seguidas sin cambios → salida idéntica.
+3. **Prueba contra el caso real:** la sonda, corrida contra el estado del 12 de agosto, tendría que
+   haber cantado las cuatro columnas ausentes de `dashboard_conversation_claims`. Ese es el examen.
+4. **Sin escrituras:** acreditado por el rol, no por lectura del código — el rol de la sonda no tiene
+   permiso de escritura, y se comprueba intentando escribir y viendo el rechazo del servidor.
+
+## I.7 Coste y secuencia
+
+2–3 días de un ejecutor. Riesgo nulo (solo lectura, sin acción viva, sin superficie contractual).
+**No compite con #156** salvo por la agenda del ejecutor; si el Agente n8n está ocupado, el Agente QA
+puede hacerla entera.
+
+---
+
+# Anexo II — Qué metodología es esto
+
+**Respuesta honesta primero:** el plan **no se dedujo de un estándar**, se dedujo de nuestros propios
+fallos medidos. Pero **coincide pieza por pieza con prácticas establecidas**, y decirlo no es adorno:
+cambia dos decisiones concretas (§II.3).
+
+## II.1 El mapa
+
+| Pieza del plan | Práctica establecida |
+|---|---|
+| Artefacto único + overlay por entorno (Pieza 3) | **«Build once, deploy many»** — principio central de *Continuous Delivery* (Humble & Farley). El mismo artefacto atraviesa entornos; la configuración se inyecta desde fuera |
+| `env/stg.json` · `env/prod.json` | **Base + overlays** (Kustomize) / *values* (Helm). Configuración como datos, no como código duplicado |
+| Config fuera del artefacto · paridad entre entornos | **12-Factor App**, factores **III** (config en el entorno) y **X** (paridad dev/prod). El eje A2/A3 mide literalmente el cumplimiento del factor X |
+| Sonda de paridad (Fase A) | **GitOps**, principio de *reconciliación continua* (OpenGitOps). Es el `OutOfSync` de ArgoCD: estado deseado contra estado real, publicado de forma continua |
+| `apply.py` idempotente con reversión pre-escrita | **Reconciler** declarativo · *desired state* · rollback como artefacto, no como improvisación |
+| Migraciones versionadas + registro con checksum (Pieza 2) | **Evolutionary Database Design** (Ambler & Sadalage); herramientas de referencia: **Flyway**, **Liquibase**, **Atlas** |
+| Fase 0/1 de agosto (DDL aditivo antes del código) | **Expand & contract** (*parallel change*): ampliar esquema → migrar código → contraer. Lo hicimos bien, sin saber que tenía nombre |
+| Gate `promote` con preflight (Pieza 4) | **Deployment pipeline** con *quality gates*; el preflight es una **fitness function** (*Building Evolutionary Architectures*) |
+| Ventana + GO + acta | **Change record** de corte ITIL. Se conserva, pero **generado** por el pipeline en vez de redactado |
+| Cómo sabremos si funcionó | **DORA / Accelerate**: *lead time for changes*, *deployment frequency*, *change failure rate*, *MTTR* |
+
+## II.2 Una decisión deliberada que se aparta del estándar
+
+GitOps canónico **reconcilia solo**: detecta desviación y la corrige. **Nosotros solo detectamos.**
+
+Es a propósito. Auto-corregir un bot de WhatsApp vivo, con dueño humano y con un colaborador externo
+escribiendo en la misma base, convierte cada desviación en una acción no autorizada. La mitad
+*detectar* es la que compra el tiempo; la mitad *aplicar sola* es la que compra los incidentes. Se
+adopta la primera y se rechaza la segunda, **con la razón escrita** para que dentro de seis meses no
+parezca un olvido.
+
+## II.3 Qué cambia por reconocer el estándar — y esto es lo útil
+
+1. **La Pieza 2 no se escribe: se instala.** Un runner de migraciones con registro, checksum e
+   idempotencia es **Flyway/Liquibase/Atlas** desde 2010. Escribir el nuestro es reinventar mal.
+   Recomendación: **Atlas** o **Flyway** sobre el Postgres compartido, con un esquema de registro por
+   dueño. *(Salvedad honesta: no he verificado en vivo la compatibilidad con la configuración exacta
+   de nuestro Postgres — eso entra en el reconocimiento de la Fase B, no se da por hecho aquí.)*
+2. **La Pieza 3 sí es a medida, y hay que saber por qué.** No existe operador GitOps para n8n: el
+   estándar aporta **la forma** (base + overlay + reconciler), no la implementación. Igual con «un
+   Postgres compartido por cuatro escritores sin dueño único», que ningún manual contempla porque
+   ninguno lo recomienda.
+3. **Vocabulario común.** Llamar a las cosas *desired state*, *drift*, *overlay*, *expand/contract* y
+   *fitness function* hace que los ejecutores encuentren precedentes en vez de inventarlos, y que la
+   próxima persona que lea esto sepa buscar.
+
+## II.4 La medida, para que «duele menos» no sea una impresión
+
+Antes de empezar se toma la línea base con las cuatro métricas DORA, medidas sobre el viaje de
+agosto, y se vuelve a medir después. Sin eso, la mejora es una sensación.
+
+Objetivo declarado: **lead time de días a minutos** para el tramo mecánico, dejando intactos —porque
+son juicio y no tubería— la autorización de Alberto, los dos criterios y la conversación real.
