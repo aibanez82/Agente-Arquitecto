@@ -422,3 +422,93 @@ agosto, y se vuelve a medir después. Sin eso, la mejora es una sensación.
 
 Objetivo declarado: **lead time de días a minutos** para el tramo mecánico, dejando intactos —porque
 son juicio y no tubería— la autorización de Alberto, los dos criterios y la conversación real.
+
+---
+
+# Anexo III — Cuánto habría ahorrado la Fase A, medido contra los dos viajes reales
+
+Pregunta de Alberto (14 ago): *«si implemento A, el plan de pasar a PRO cuánto me hubiera demorado vs
+cuánto me demoré. ¿Y con descuentos a STG?»*
+
+**Método:** los tiempos **medidos** salen de los commits de `Agente-Arquitecto` y `Agente-n8n`; las
+horas **ahorradas** son estimación mía, marcada como tal. Se separan las dos cosas a propósito: la
+tentación aquí es publicar el número que me favorece.
+
+## III.1 Viaje STG → PROD (10–13 ago)
+
+**Medido:**
+
+| | |
+|---|---|
+| Plan inicial (`…-cross.md`) | **10/08 17:38** |
+| Plan v2, tras descubrir el hueco de esquema | **12/08 16:32** |
+| Fase 0 (migración escrita) → Fase 1 (DDL) → Dashboard en PROD | **12/08 16:49 → 17:59** |
+| Acta de cierre | **13/08 18:47** |
+| **Calendario total** | **3 días 1 h** |
+| **Trabajo efectivo de promoción** | **~15 h**, repartidas en dos jornadas (el 11 se fue entero en #156) |
+
+**El dato que más dice:** una vez conocido el delta, **escribir la migración, aplicarla en PROD y
+promover el Dashboard costó 1 h 27 min**. Descubrir ese delta costó **dos días de calendario y un
+plan entero tirado**. La proporción es la tesis de todo este documento.
+
+**Lo que A habría quitado (estimado: 4–6 h de trabajo y ~1 de los 3 días de calendario):**
+
+- El reconocimiento manual de PROD del 12 ago. Ya estaría en el informe del día.
+- **El plan v2 no existiría:** el plan del 10 habría nacido con la Fase 0/1 dentro, en vez de
+  publicarse afirmando que el esquema estaba bien y reescribirse dos días después.
+- **`dashboard_outbound_dispatch` entera ausente**, descubierta a las **18:19 del 12** — con el viaje
+  ya en marcha. Obligó a una tercera ventana y a corregir la atribución de 3 de 5 tablas.
+
+**Lo que A NO habría quitado:** las tres ventanas de n8n, las migraciones, la fuga de credencial STG
+a PROD (eso lo para el preflight de la Pieza D, no A), los defectos `#76`/`#77` —que los despertó el
+paso de Django a `dual`, no la migración— y el error de dar `shadow` por bueno de memoria, porque
+**ese valor vive en Heroku, que está fuera de alcance por tu decisión**.
+
+**Veredicto: 3 días → ~2 días.** Una reducción de en torno al 30 %, toda ella en *no empezar mal*.
+
+## III.2 Descuentos #156 → STG (13–14 ago, aún abierto)
+
+**Medido:**
+
+| | |
+|---|---|
+| Plan → GO → arranque | **13/08 18:56 → 19:09 → 19:12** |
+| Ventana DDL en STG, 12 de 12 | **13/08 21:12** |
+| «Descuentos **encendido** en STG» | **14/08 12:25** |
+| **Elapsed hasta encendido** | **~17 h 30 min** |
+| Estado a 14/08 17:13 | **E2E aún no verde** — bloqueado por `active` vs `open`, dos piezas de Django |
+
+**Lo que A habría quitado (estimado: 2–3 h de 17,5):**
+
+- Las variables de Vercel sin escopar a `stg`, resueltas como precondición a las 20:44 — **es
+  literalmente el eje A3**.
+- El import bloqueado por divergencia entre el candidato y lo vivo en STG (**21:50 → 22:31, 40 min**
+  recomponiendo candidatos): el eje A2 lo enseña a diario.
+- Parte del `503` del claim del Dashboard a las 19:48.
+
+**Lo que A NO habría quitado, y es la mayor parte:**
+
+- **«Juan promovió la rama pero no el entorno»** (19:45) — `hyl-wai-stg` corriendo el Django viejo.
+  Es un hecho del destino… **en Heroku**. Segundo caso del día en que la exclusión cuesta.
+- El dictamen de Juan (23:51), el fence 9/9 y sus decisiones (14/08 09:24–10:36): son **juicio**.
+- **El incidente de la capa C1 dejando el bot de STG sin procesar (14/08 13:23).** A lo habría
+  *mostrado* como divergencia todos los días, pero no lo evita: eso lo arregla la **Pieza C**, que es
+  precisamente la que convierte esos 27 nodos en overlay.
+- El bloqueo vivo de `active` vs `open`: Django.
+
+**Veredicto: ~17,5 h → ~15 h.** Menos del 20 %, porque **la restricción activa de este viaje no fue
+nuestro descubrimiento: fue Django y las decisiones.**
+
+## III.3 La conclusión, que no es cómoda
+
+**A no es la pieza que trae los 20 minutos.** A hace que el plan **nazca correcto**; C y D son las que
+hacen que la ejecución sea **rápida**. Se ve en el número: una vez conocido el delta, el trabajo real
+del 12 de agosto fueron 87 minutos.
+
+Sigue mereciendo ser lo primero —2–3 días, riesgo nulo, y en los dos viajes habría evitado empezar
+con el plan equivocado— pero **venderla como la que cumple el encargo sería falso**.
+
+Y el hallazgo incómodo de los dos viajes: **la exclusión de Heroku aparece dos veces como causa
+directa de tiempo perdido** (el modo `shadow`/`dual` dado por bueno de memoria; el entorno de
+`hyl-wai-stg` sin promover). No pido revisar la decisión: pido que quede escrito que ese tramo seguirá
+costando, porque no lo cubre ninguna de las cuatro piezas.
