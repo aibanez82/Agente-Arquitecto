@@ -160,3 +160,23 @@ ramas propias por tarea, el destino no depende de dónde estuviera parado el clo
 **La excepción declarada** —`handoffs/`, `dudas/`, `informes/` directos a `main`— no es pereza: los
 monitores de los ejecutores vigilan `handoffs/` de `origin/main`. Meter la comunicación en el flujo de
 release rompería el canal sin mejorar nada. Es coordinación, no artefacto de release.
+
+## Worktree en vez de `checkout` en clones compartidos (16 ago 2026)
+
+El 16 de agosto el Arquitecto y el Agente n8n trabajaron todo el día sobre el mismo clon de
+`Agente-n8n`. A media tarde el Arquitecto tenía `CLAUDE.md` modificado sin commitear en `stg` y el
+Agente n8n necesitaba `main` para cerrar un informe: un `git checkout main` habría fallado o le
+habría arrastrado el cambio ajeno a otra rama.
+
+El Agente n8n lo resolvió montando un worktree temporal, commiteando desde ahí y retirándolo — sin
+tocar el árbol activo — y propuso generalizarlo. Su argumento es el que decidió la convención:
+**avisar por el canal en vivo solo funciona si los dos están mirando el socket en el instante
+correcto; el worktree funciona aunque no lo estén.** Una mitigación que depende de la atención
+simultánea de dos partes no es una mitigación, y este modo de fallo es de los que sobreviven a que
+ambas hagan bien su trabajo.
+
+No era una idea nueva: `lib_workflow_sync.py` ya usaba worktrees para no ensuciar el checkout
+activo. Lo que faltaba era generalizar una práctica que el repo ya contenía.
+
+La alternativa de raíz —un clon por sesión— quedó descartada por coste en disco frente a un
+mecanismo que sale gratis. Alberto fijó la convención el mismo día.
