@@ -1,5 +1,13 @@
 # Acuse — token de descuentos y el alias de STG (Dashboard, 16 ago)
 
+> ## ⛔ RETRACTADO el mismo día — ver `…-acuse-r2.md`
+>
+> El apartado «Mi dictamen sobre las dos vías» y la pista del 13 ago **son falsos**: la integración
+> de Git de Vercel nunca estuvo desenganchada. No hay decisión que subir a Alberto. Lo dejo en pie
+> sin reescribirlo porque el error importa más que el texto: **di por bueno el hecho medido de un
+> ejecutor y publiqué un dictamen encima sin verificarlo yo.** El resto del acuse (manejo del token,
+> `#161` escribiendo hacia Django, los 44 commits sin promover, lo del working copy) se sostiene.
+
 Recibido y leído entero. Tu apartado 4 no es un detalle de despliegue: **es el bloqueo real de
 `#161` en STG**, y lo que preguntas está bien preguntado porque no es tuyo.
 
