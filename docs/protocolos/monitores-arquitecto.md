@@ -5,6 +5,14 @@
 > Antes de armarlos: hacer el barrido de arranque (dudas/ pendientes, informes/, `gh issue list`
 > en qualitas-issues, y comentarios nuevos en #132/#140 desde la última actividad conocida) —
 > los monitores solo cubren lo NUEVO a partir de su arranque.
+>
+> **Los scripts están versionados en `scripts/monitores/` (m1…m5)** — desde el 16 ago no hay que
+> reescribirlos de la prosa en cada sesión. Armar con `Monitor` (`persistent: true`) apuntando a
+> `<repo>/scripts/monitores/mN-*.sh`. Cada uno **siembra su estado con lo que ya existe** al
+> arrancar, así que no vomita el histórico en el primer latido; por eso el barrido de arranque
+> —que sí mira hacia atrás— no es opcional. Los ficheros de estado (`.mN-seen`, `.m3-state`) se
+> escriben junto al script: si se ejecutan desde el clon, van al working copy y hay que
+> gitignorarlos.
 
 ## 1. Dictámenes/comentarios de Juan en HYL-WAI#132
 
@@ -18,13 +26,22 @@ Cubre: dictámenes, freezes, STOPs, resoluciones §12, entregas Django.
 y **quitando antes los timestamps ISO**, porque su campo «Próxima revisión» se reescribe cada ~30
 min sin que cambie nada material y dispara el monitor en vacío (visto el 7 ago).
 
-## 2. Comentarios nuevos en HYL-WAI#140 (gobernanza)
+## 2. Comentarios nuevos en los issues vivos de gobernanza e iniciativa
 
-Igual que el 1 pero sobre `issues/140/comments`. Baja frecuencia real; poll 120s.
+Igual que el 1, poll 120s, pero sobre **varios** issues en el mismo ciclo. Baja frecuencia real.
+
+**#140 está CERRADO desde el 4 ago** (fue la decisión de separar Dual de Atención Humana/Metepec):
+apuntar ahí un monitor es vigilar una puerta tapiada. Desde el 16 ago este monitor cubre
+**`135 156 161 128 143`** — la cadena Contract-First viva más Descuentos, que es donde Juan escribe
+hoy. **Revisar esta lista al armar**, no heredarla: un issue que se cierra deja de ser señal y otro
+que se abre (como el #161, abierto el 15 ago) nace sin vigilancia hasta que alguien lo añade.
 
 ## 3. Ejecutores: pushes en ramas candidatas + commits en main + PRs
 
-Poll cada 60s de los remotos de `~/claude-projects/Agente-n8n` y `~/claude-projects/Dashboard_SeguroAuto`:
+Poll cada 60-90s de los remotos de los clones de ejecutores. Desde el 16 ago la lista incluye
+también **`HYL-WAI`** —el orden de integración `#161 → Payments → #135` se juega en sus ramas y un
+rebase ahí nos afecta— y los tres ejecutores que entregan por commit (`Agente_QATest_Qualitas`,
+`Agente-MejorasConversacion`, `Agente-Conciliacion`). Núcleo original:
 `git fetch --prune` + comparar SHAs de TODAS las refs de `origin` contra los últimos vistos (no una
 lista fija de ramas: así aparecen también las nuevas); emitir "REPO rama: SHA mensaje" por cambio.
 Cubre: entregas, informes n8n, handoffs propios (eco), ramas nuevas.
