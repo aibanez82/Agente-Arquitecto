@@ -1,8 +1,13 @@
 #!/bin/bash
-# Monitor 2 — gobernanza e iniciativa viva. #140 quedó CERRADO el 4 ago, así que
-# este monitor apunta a los issues vivos: #135 (funnel/estados), #156 (Descuentos,
-# nuestro lado) y #161 (worker de descuentos, de Juan). Emite comentarios de Juan.
-ISSUES="135 156 161 128 143"
+# Monitor 2 — TODA la palabra de Juan en un solo proceso. #140 quedó CERRADO el
+# 4 ago, así que apunta a los issues vivos: #132 (Contract-First S1, antes monitor
+# 1 aparte), #135 (funnel/estados), #156 (Descuentos, nuestro lado), #161 (worker
+# de descuentos, de Juan), #128 y #143.
+#
+# El #132 tenía monitor propio hasta el 16 ago. No lo merecía: la lógica de dedupe
+# es idéntica y un issue más en la lista cuesta una llamada por ciclo, no un
+# proceso. Un monitor por canal, no por asunto.
+ISSUES="132 135 156 161 128 143"
 SEEN_FILE="$(dirname "$0")/.m2-seen"
 : > "$SEEN_FILE"
 SINCE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
