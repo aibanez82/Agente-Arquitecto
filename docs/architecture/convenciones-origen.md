@@ -215,3 +215,25 @@ ya no la sostenga — y quien actúe sobre él actuará mal, sin culpa de nadie.
 
 Alberto las aprobó las dos el mismo día. El apunte operativo que las acompaña: para hechos de
 plataforma Vercel, la API REST, nunca el CLI.
+
+## Hablar en git, y no confundir rama con entorno (17 ago 2026)
+
+Alberto la pidió él mismo, con dos motivos suyos: familiarizarse con git y —el que pesa— **no
+equivocarse al ordenar**. Es él quien autoriza las acciones vivas, así que necesita poder nombrar
+con precisión lo que autoriza. Un «hazlo» sobre una frase ambigua es el modo de fallo a evitar.
+
+El día que la pidió habían pasado dos cosas que la justifican solas:
+
+- El Dashboard dio por desplegado lo que solo estaba **mergeado**, y de ahí salió un informe con un
+  diagnóstico falso, un acuse mío construido encima y una decisión escalada que no existía. Juan nos
+  lo escribió el mismo día con otras palabras: *«el merge en `stg` no equivale a confirmación de
+  deploy»*.
+- Al revisar ramas viejas aparecieron dos ya fusionadas (0 commits fuera de `main`) y una con **3
+  commits de trabajo real** sin integrar desde hacía tres días. En un listado se parecen; borrar la
+  segunda habría destruido un diagnóstico entero. Lo que las distingue es un contador, no el nombre
+  ni la fecha.
+
+De ahí las dos mitades de la convención: **situar el objeto** (clon, rama local, `origin/<rama>`,
+PR, y de qué repo) y **separar rama de entorno**. Con el corolario operativo de que el estado del
+entorno se pregunta a su fuente y el `fetch` va antes de mirar, porque `origin/<rama>` es una foto
+del último fetch y no el presente.
