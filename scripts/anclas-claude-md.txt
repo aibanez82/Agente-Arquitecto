@@ -1,0 +1,53 @@
+# Anclas de CLAUDE.md — contrato de la higiene (protocolo: docs/protocolos/higiene-claude-md.md)
+#
+# Una línea por hecho o regla que NO puede desaparecer del ecosistema.
+# Formato:  <texto literal>  |  <doc destino si se permite moverlo>
+# Sin destino = tiene que estar en CLAUDE.md sí o sí.
+# Con destino = puede vivir fuera, pero SOLO si CLAUDE.md conserva el puntero a ese doc.
+#
+# Generado el 16 ago 2026 sobre el estado PRE-higiene: es la foto que la higiene no puede romper.
+
+## --- ROJO: su ausencia produce un error SILENCIOSO (test §1.2) ---
+l.cotizacion_id = c.id
+ws.quotation_id = c.id
+l.canal_atencion
+c.codigo_postal
+message->>'type'
+d.numero_poliza != null
+Procederemos con Cobertura
+fue emitida exitosamente
+lib/db.js
+America/Mexico_City
+
+## --- ROJO: reglas de arquitectura anti-error ---
+dispara webhook
+enviar_webhook_whatsapp
+comparten la misma BD Postgres
+
+## --- ROJO: prohibiciones y límites de rol (test §1.3) ---
+No ejecuto nada
+nunca se coordinan lateralmente
+solo el Arquitecto cierra/certifica
+no pushear código
+
+## --- CONVENCIONES: el cuerpo no sale nunca (protocolo §3) ---
+Persistencia entre máquinas
+Timezone
+GitHub Issues
+n8n API
+Tres canales, y cada uno hace una cosa
+Alertar conflictos con el plan de Juan
+Revisión periódica del tracker
+Verificar contra la fuente antes de publicar
+Una retractación solo existe si se escribe en el mismo canal que el error
+Gitflow en TODOS los repos
+El trabajo para un repo nuestro vive en una rama nuestra
+Nunca `checkout` en un clon que otra sesión pueda estar usando
+Respaldos/housekeeping de ejecutores
+Cambiar una convención = actualizar su herramienta en el acto
+Publicar no es ordenar
+Manual de migración a STG
+
+## --- MOVIBLES: pueden salir, pero exigen puntero desde CLAUDE.md ---
+whatsapp_event | docs/architecture/whatsapp-event-canonico-propuesta.md
+VENCIDO | docs/architecture/estatus-pago-qualitas.md
