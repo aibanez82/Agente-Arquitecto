@@ -3,3 +3,6 @@
 .DS_Store
 __pycache__/
 *.pyc
+
+scripts/monitores/.m*-seen
+scripts/monitores/.m*-state

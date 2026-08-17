@@ -1,14 +1,57 @@
 # Monitores de sesión del Arquitecto — especificación para rearmarlos
 
 > Los monitores viven solo mientras la sesión está abierta. Al abrir sesión nueva durante trabajo
-> activo con Juan (etapas S1–S5), armar los CUATRO con la herramienta Monitor (`persistent: true`).
+> activo con Juan (etapas S1–S5), armar los **CINCO** con la herramienta Monitor (`persistent: true`).
 > Antes de armarlos: hacer el barrido de arranque (dudas/ pendientes, informes/, `gh issue list`
-> en qualitas-issues, y comentarios nuevos en #132/#140 desde la última actividad conocida) —
+> en qualitas-issues, y comentarios nuevos en los issues vivos desde la última actividad conocida) —
 > los monitores solo cubren lo NUEVO a partir de su arranque.
+>
+> **Son cinco, uno por CANAL, y esa es la regla que los mantiene a raya (Alberto, 16 ago):**
+> lo que se pregunta (`m4` dudas) · lo que se entrega (`m5` informes) · lo que se empuja (`m3` git) ·
+> lo que Juan escribe (`m2` issues) · lo que Juan despliega (`m6` releases de STG). **Un monitor por
+> canal, no por asunto.** Ese día había **diez** vivos y cuatro no aportaban nada: tres vigilaban
+> ramas concretas (`fase0`, Fase 4, `feature/issue-156`) que `m3` ya cubre entera al mirar TODAS las
+> refs, y el cuarto duplicaba `m4`. Nacieron para un trabajo puntual del 11–13 ago, sobrevivieron a
+> un `/clear` —el contexto se limpia, los procesos no— y siguieron corriendo sin dueño. **Un monitor
+> nuevo para un asunto concreto es casi siempre señal de que falta una lista en uno existente.**
+>
+> **Los scripts están versionados en `scripts/monitores/` (m2…m6)** — desde el 16 ago no hay que
+> reescribirlos de la prosa en cada sesión. Armar con `Monitor` (`persistent: true`) apuntando a
+> `<repo>/scripts/monitores/mN-*.sh`. Cada uno **siembra su estado con lo que ya existe** al
+> arrancar, así que no vomita el histórico en el primer latido; por eso el barrido de arranque
+> —que sí mira hacia atrás— no es opcional. Los ficheros de estado (`.mN-seen`, `.m3-state`) se
+> escriben junto al script: si se ejecutan desde el clon, van al working copy y hay que
+> gitignorarlos.
 
-## 1. Dictámenes/comentarios de Juan en HYL-WAI#132
+## 0. Antes de armar nada: dos comprobaciones que el 16 ago costaron caras
 
-Poll cada 60-90s de `gh api "repos/aguayo-co/HYL-WAI/issues/132/comments?since=<ahora>"` filtrando
+**A · ¿Hay monitores vivos ya?** Un `/clear` borra el contexto pero **no mata los procesos de
+fondo**: la sesión nueva no recuerda haberlos armado y los arma otra vez. Así se llegó a **diez**
+vivos el 16 ago, cuatro de ellos residuos del 11–13 ago que nadie podía atribuir. Comprobar SIEMPRE
+antes de armar:
+
+```bash
+ps -eo pid,lstart,command | grep -E "monitores/m[0-9]|heroku releases" | grep -v grep
+```
+
+Si ya están corriendo, **no rearmar**: mirar si el script cambió desde que arrancó el proceso
+(`ps -o lstart= -p <pid>` contra el `mtime` del fichero) y rearmar solo los desfasados. Los procesos
+huérfanos (`ppid=1`) no aparecen en `/bashes` y solo se matan por PID.
+
+**B · ¿Qué publicó NUESTRO lado hoy?** El barrido miraba lo que escribe Juan y se saltaba lo
+nuestro. Tras un `/clear` eso es justo lo que falta: el 16 ago la sesión anterior de esta misma
+ventana había publicado **cinco** comentarios en `#161` y abierto dos issues, y la sesión nueva los
+leyó como trabajo ajeno. Añadir al barrido: comentarios propios del día en los issues vivos
+(`--jq 'select(.user.login=="aibanez82")'`), issues abiertos hoy en `qualitas-issues`, y
+`gh pr list` en nuestros repos.
+
+## 1. ~~Dictámenes de Juan en HYL-WAI#132~~ → FUNDIDO EN EL 2 (16 ago)
+
+**No existe como monitor propio.** El #132 es un issue más de la lista del monitor 2: misma lógica
+de dedupe, misma llamada. Un issue más cuesta una llamada por ciclo; un monitor más cuesta un
+proceso, y encima uno que nadie recuerda haber armado. Lo que sigue vale igual, aplicado por el 2:
+
+Poll de `gh api "repos/aguayo-co/HYL-WAI/issues/<N>/comments?since=<ahora>"` filtrando
 `user.login=="oilycoyote"`; emitir una línea por comentario nuevo (fecha + primeras ~200 chars).
 Cubre: dictámenes, freezes, STOPs, resoluciones §12, entregas Django.
 
@@ -18,13 +61,22 @@ Cubre: dictámenes, freezes, STOPs, resoluciones §12, entregas Django.
 y **quitando antes los timestamps ISO**, porque su campo «Próxima revisión» se reescribe cada ~30
 min sin que cambie nada material y dispara el monitor en vacío (visto el 7 ago).
 
-## 2. Comentarios nuevos en HYL-WAI#140 (gobernanza)
+## 2. Comentarios nuevos en los issues vivos de gobernanza e iniciativa
 
-Igual que el 1 pero sobre `issues/140/comments`. Baja frecuencia real; poll 120s.
+Igual que el 1, poll 120s, pero sobre **varios** issues en el mismo ciclo. Baja frecuencia real.
+
+**#140 está CERRADO desde el 4 ago** (fue la decisión de separar Dual de Atención Humana/Metepec):
+apuntar ahí un monitor es vigilar una puerta tapiada. Desde el 16 ago este monitor cubre
+**`135 156 161 128 143`** — la cadena Contract-First viva más Descuentos, que es donde Juan escribe
+hoy. **Revisar esta lista al armar**, no heredarla: un issue que se cierra deja de ser señal y otro
+que se abre (como el #161, abierto el 15 ago) nace sin vigilancia hasta que alguien lo añade.
 
 ## 3. Ejecutores: pushes en ramas candidatas + commits en main + PRs
 
-Poll cada 60s de los remotos de `~/claude-projects/Agente-n8n` y `~/claude-projects/Dashboard_SeguroAuto`:
+Poll cada 60-90s de los remotos de los clones de ejecutores. Desde el 16 ago la lista incluye
+también **`HYL-WAI`** —el orden de integración `#161 → Payments → #135` se juega en sus ramas y un
+rebase ahí nos afecta— y los tres ejecutores que entregan por commit (`Agente_QATest_Qualitas`,
+`Agente-MejorasConversacion`, `Agente-Conciliacion`). Núcleo original:
 `git fetch --prune` + comparar SHAs de TODAS las refs de `origin` contra los últimos vistos (no una
 lista fija de ramas: así aparecen también las nuevas); emitir "REPO rama: SHA mensaje" por cambio.
 Cubre: entregas, informes n8n, handoffs propios (eco), ramas nuevas.
@@ -60,6 +112,18 @@ DOCS-ONLY**, que no mueve ninguna rama suya. Le encargué el inventario S3, entr
 este canal y **ningún monitor avisó**: lo detectó Alberto preguntando. Corolario general: cuando se
 encarga trabajo cuya entrega no mueve la superficie que vigilan los monitores existentes, el canal
 de entrega necesita el suyo **antes** de mandar el encargo.
+
+## 6. Releases de Django en `hyl-wai-stg` (Heroku)
+
+Poll 180s de `heroku releases -a hyl-wai-stg -n 1 --json`; emitir cuando cambie `version`,
+`description` o `status`, incluyendo el valor anterior. Es el **único monitor que ve a Juan
+desplegar**: los otros cuatro ven lo que escribe o lo que empuja a git, no lo que pone a correr. Con
+la cadena `#161 → Payments → #135` viva, un release nuevo cambia contra qué estamos midiendo, y un
+rollback lo cambia **sin que nadie lo anuncie**.
+
+**Llevaba vivo desde el 13 ago sin estar escrito aquí**, y en la poda del 16 ago estuvo a punto de
+morir con los redundantes: no por serlo, sino porque no había forma de acreditar para qué servía sin
+leerle el `ps`. Corolario: un monitor sin sección en esta spec es indistinguible de un residuo.
 
 ## Notas
 
