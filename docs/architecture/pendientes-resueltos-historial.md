@@ -63,3 +63,19 @@ la rutina solo copiaba a un buzón que nadie leía antes de abrir sesión, y no 
 clásico `repo` de amplio alcance). Valor residual descartado: notificación móvil (Alberto no la
 usa) y captura forense de comentarios editados in situ. Issues de control #70/#71 cerrados.
 Si algún día se quiere el "avísame al móvil": rearmarla con token clásico sabiendo el trade-off.
+
+## Retirados de `CLAUDE.md` en la higiene del 16 ago 2026 (fase verde)
+
+Verificados uno a uno contra su fuente antes de retirarlos — no de memoria:
+
+| Ítem | Verdad comprobada |
+|---|---|
+| Bug #8 en Django (`HYL-WAI#70`) — «⏳ Pendiente externo — Juan» | **Cerrado el 2 jul 2026.** Llevaba mes y medio figurando como pendiente. Era el teléfono celular del asegurado que no se enviaba a la API SOAP de Quálitas |
+| `fecha_inicio` en emisión (`HYL-WAI#114`) | **Cerrado el 24 jul 2026.** De aquella fila solo seguía vivo lo que ahora queda listado aparte: `qualitas-issues#66` y la promoción de n8n a PROD |
+| Promoción STG → PROD (iniciativa) | **Cerrada el 13 ago.** Acta y lecciones en `docs/iniciativas/2026-08-12-plan-promocion-stg-a-prod-v2.md` |
+| Plantilla Meta re-enganche fuera de ventana 24h | No retirada: estaba **duplicada**. Vive donde importa, en la iniciativa «Recordatorios» que bloquea |
+
+**La lección, que es el motivo del protocolo:** un pendiente resuelto no se anuncia solo. Se queda
+en el fichero pareciendo trabajo vivo hasta que alguien lo verifica, y mientras tanto ensucia cada
+decisión que lo lee. Dos de estos llevaban meses. Detalle del método:
+`docs/protocolos/higiene-claude-md.md`.

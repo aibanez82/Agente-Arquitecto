@@ -182,29 +182,32 @@ Roles y protocolos completos: tabla "Mapa de sistemas". Reglas operativas:
 
 **Iniciativas (estado en su doc, no aquí):**
 - **Seguimiento leads estancados:** ✅ en PROD (sin filtro de horario — aceptado; mejora deseable). En STG apagado/dry-run. `docs/iniciativas/seguimiento-leads-estancados.md`.
-- **Conversation ID:** ✅ **PROD y STG los dos en `dual`** (PROD desde el 13 ago 17:39 UTC, release Heroku v341 de Juan). Cada lead nuevo crea su sesión `waq_<qid>_<hex>`, y Django mantiene **una sola `active` por teléfono** vía `activate_whatsapp_session_affinity()`. Consecuencia: un teléfono puede tener varias sesiones vivas — despertó `qualitas-issues#76` y `#77`. `docs/iniciativas/conversation-id-whatsapp-n8n.md`.
+- **Conversation ID:** ✅ **PROD y STG los dos en `dual`**. Cada lead nuevo crea su sesión `waq_<qid>_<hex>`, y Django mantiene **una sola `active` por teléfono** vía `activate_whatsapp_session_affinity()`. **Consecuencia operativa: un teléfono puede tener varias sesiones vivas.** `docs/iniciativas/conversation-id-whatsapp-n8n.md`.
 - **Recordatorios por fecha mencionada:** diseño entregado a Juan; bloqueado por plantilla Meta re-enganche 24h. `docs/iniciativas/2026-07-10-recordatorios-seguimiento-por-fecha-mencionada-design.md`.
-- **Promoción STG → PROD:** ✅ **CERRADA el 13 ago.** Esquema, Dashboard (con `next` 14.2.35), y en n8n Retomar · Multicotización · Atención Humana — cada pieza verificada con conversación real. Acta y lecciones: `docs/iniciativas/2026-08-12-plan-promocion-stg-a-prod-v2.md`.
-- **HYL-WAI#156 Descuentos + Conversation Control:** Juan congeló 2 contratos y terminó Django; n8n y Dashboard son nuestros, offline en ramas desde `stg`. Handoffs y canal `dudas/` REACTIVADOS solo para esto. `docs/iniciativas/2026-08-11-hyl-wai-156-descuentos-lado-nuestro.md`.
+- **HYL-WAI#156 Descuentos + Conversation Control:** Juan congeló 2 contratos y terminó Django; n8n y Dashboard son nuestros. Handoffs y canal `dudas/` REACTIVADOS solo para esto. `docs/iniciativas/2026-08-11-hyl-wai-156-descuentos-lado-nuestro.md`.
 
 ---
 
 ## Pendientes de infraestructura
 
+> Solo lo VIVO y bloqueante; el estado detallado vive en su tracker. Verificado el 16 ago contra la
+> fuente: `HYL-WAI#70` llevaba cerrado desde el 2 jul y `#114` desde el 24 jul, ambos aquí listados
+> como pendientes.
+
 | Item | Estado |
 |---|---|
-| Rotar service account key Google Cloud | 🟡 Desprioritizado por Alberto — no proponer salvo señal de exposición |
-| Regenerar token Meta Business API | 🟡 Lo ejecuta JUAN — coordinar junto con la plantilla de re-enganche |
-| Bug #7 / `HYL-WAI#69` — `[phase:completed]` sin pago verificado | 🔴 Fix (3 barreras) ya en STG; **PROD aún lo acepta** — falta promover (acción viva, requiere autorización) |
-| Bug #8 en Django (`HYL-WAI#70`) | ⏳ Pendiente externo — Juan |
-| Tabla canónica `whatsapp_event` | 💡 Sin decisión. `docs/architecture/whatsapp-event-canonico-propuesta.md` |
+| Bug #7 / `HYL-WAI#69` — `[phase:completed]` sin pago verificado | 🔴 Fix (3 barreras) en STG; **PROD aún lo acepta** — falta promover (acción viva, requiere autorización) |
 | `N8N_TOKEN` hardcodeado como default (`qualitas/views.py:1291`) | 🔴 `HYL-WAI#130`: quitar default + rotar, coordinado con credenciales n8n |
-| Pólizas `VENCIDO`/`CANCELADO` del Agente Conciliación | 💡 Sin decisión. `docs/architecture/estatus-pago-qualitas.md` |
-| Plantilla Meta re-enganche fuera de ventana 24h | ⚠️ Bloqueante de "Recordatorios"; pedida a Juan, no sometida |
-| `fecha_inicio` en emisión (`HYL-WAI#114`) | ✅ Django PROD + E2E STG ok. Falta `qualitas-issues#66` y promoción n8n a PROD (desbloquea M47/M48) |
 | `/api/emitir-externo/` — 400 sin causa + acepta POST sin credencial | ⏳ `HYL-WAI#119` — Juan (hallazgo auth: `c.5183416152`) |
+| Promoción a PROD de `fecha_inicio` en n8n | ⏳ Desbloquea M47/M48; `qualitas-issues#66` |
 
-Ítems resueltos: `docs/architecture/pendientes-resueltos-historial.md`.
+**Reglas, no pendientes:** la rotación de la service account key de Google Cloud está
+**desprioritizada — no proponerla** salvo señal de exposición; el token de Meta **lo ejecuta Juan**,
+junto con la plantilla de re-enganche.
+
+Sin decisión: `whatsapp_event` (`docs/architecture/whatsapp-event-canonico-propuesta.md`) ·
+`VENCIDO`/`CANCELADO` de Conciliación (`docs/architecture/estatus-pago-qualitas.md`).
+Resueltos: `docs/architecture/pendientes-resueltos-historial.md`.
 
 ---
 
