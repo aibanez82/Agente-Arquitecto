@@ -45,29 +45,15 @@ Google Ads → Landing (Wagtail/Django · Heroku)
 ## Arquitectura completa del sistema
 
 ```
-Landing (Wagtail/Django · Heroku)
-    ↓ formulario completado
-Django → crea qualitas_lead + qualitas_cotizacion en Postgres
-Django → 1er WhatsApp directo (Meta Graph API) + INSERT whatsapp_sessions (SQL crudo)
+Landing (Wagtail/Django) → lead + cotización en Postgres → 1er WhatsApp directo (Meta Graph API)
          ↓ cliente responde
-    n8n (Hostinger)
-    ├── Lee/escribe whatsapp_sessions → Postgres DIRECTO
-    ├── Lee/escribe n8n_chat_histories → Postgres DIRECTO
-    ├── Claude Haiku — jailbreak detection + intent router
-    ├── Claude Sonnet — agente conversacional principal
-    └── Meta Cloud API → WhatsApp → Lead
-
-Dashboard (Next.js · Vercel)
-    ├── Lee Postgres directamente (read-only, sin pasar por Django)
-    └── Botón "Tomar conversación" → webhook n8n → INSERT n8n_chat_histories + Send WhatsApp
-
-Observabilidad:
-├── GA4 → visitas landing
-├── Meta Business API → métricas WhatsApp (enviados/leídos/respondidos)
-├── Dashboard → funnel completo
-└── n8n PROD "Monitor Qualitas SIO PROD" → chequeo cada 10 min contra el SOAP real de
-    Quálitas, alerta por Telegram si cae (repetida mientras siga caído) y al recuperarse
+n8n (Hostinger) → Haiku (jailbreak + intent) · Sonnet (agente) → Meta Cloud API → Lead
+         ↕ lee/escribe whatsapp_sessions y n8n_chat_histories en Postgres DIRECTO
+Dashboard (Next.js · Vercel) → lee Postgres read-only; escribe solo vía webhook proactivo de n8n
 ```
+
+Diagrama completo, observabilidad, JOIN de producción, hitos y detalle de nodos n8n:
+**`docs/architecture/data-flow.md`**.
 
 **Reglas críticas de arquitectura:**
 - Django y n8n comparten la misma BD Postgres. Wagtail no es otro sistema: es una app Django más del mismo proceso Heroku y mismo repo; Django lleva la lógica de negocio.
@@ -126,11 +112,9 @@ Observabilidad:
 
 > Exportar y hacer commit aquí cada vez que se modifique un workflow en producción — única red de seguridad; el backup automático está descontinuado (política: `docs/architecture/backup-policy-n8n.md`).
 
-El bot tiene 3 nodos que llaman a Claude: **Jailbreak detection** (Haiku) · **Intent Router** (Haiku) · **Agente conversacional principal** (Sonnet).
+El bot tiene 3 nodos que llaman a Claude: **Jailbreak detection** (Haiku) · **Intent Router** (Haiku) · **Agente conversacional principal** (Sonnet). n8n escribe a Postgres directamente con la credencial `"Postgres account"`.
 
-n8n escribe a Postgres directamente (credencial `"Postgres account"`): `Check Session Exists`/`Load Session` (SELECT `whatsapp_sessions`) · `Update Activity` (UPDATE `last_activity`) · `Postgres Chat Memory` (lee/escribe `n8n_chat_histories`).
-
-**Workflow proactivo (Dashboard → WhatsApp):** recibe `POST /webhook/proactive-wa-message` del Dashboard, INSERT en `n8n_chat_histories` y envía el WhatsApp. Detalle: `docs/protocolos/workflow-proactivo-dashboard.md`.
+Nodos concretos, workflow proactivo y detalle: `docs/architecture/data-flow.md` · `docs/protocolos/workflow-proactivo-dashboard.md`.
 
 ---
 
