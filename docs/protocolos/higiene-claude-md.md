@@ -113,6 +113,20 @@ por la puerta de atrás.
 | 16 ago 2026 · fase ámbar | — | — | **PARADA antes de empezar**: los destinos (`overview.md`, `data-flow.md`) estaban obsoletos desde el 28 jun y contradecían el esquema. Marcados como obsoletos; la fase espera a que exista un destino sano del ecosistema |
 | 16 ago 2026 | 22.983 → 22.979 | — | Compactada la justificación ya duplicada de 4 convenciones para meter 2 reglas nuevas. **Bajo presión de techo — el caso que este protocolo existe para no repetir.** |
 
+## 7.ter Pendiente identificado, aún sin ejecutar (Alberto lo aparcó el 17 ago)
+
+**`CLAUDE.md` señala la red de seguridad equivocada.** Dice que los workflows exportados de
+`docs/n8n-workflows/` son «la única red de seguridad». Medido el 17 ago: ese directorio está
+desfasado entre **18 y 43 días** (bot 26 jul, Retomar 1 jul, Payment 1 jul) y **le faltan dos
+workflows enteros de PROD** — `Atencion Humana` y `Monitor Qualitas SIO PROD`.
+
+La copia buena y completa está en **`Agente-n8n:main/workflows/`**: los cinco, al día del 13 ago.
+
+Al corregirlo: repuntar `CLAUDE.md` a ese destino y **retirar los exports viejos** de
+`docs/n8n-workflows/`, para que nadie los confunda con la copia buena en una emergencia. Es el
+patrón de siempre: no da error, da una respuesta plausible y equivocada — restaurarías una versión
+de julio y perderías Atención Humana y Multicotización.
+
 ## 8. Primera pasada, propuesta
 
 Con el techo en 30 KB ya no hay urgencia, así que se hace bien: 🟢 verde (estado que caduca, ~2 KB)
