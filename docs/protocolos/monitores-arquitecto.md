@@ -23,6 +23,28 @@
 > escriben junto al script: si se ejecutan desde el clon, van al working copy y hay que
 > gitignorarlos.
 
+## 0. Antes de armar nada: dos comprobaciones que el 16 ago costaron caras
+
+**A · ¿Hay monitores vivos ya?** Un `/clear` borra el contexto pero **no mata los procesos de
+fondo**: la sesión nueva no recuerda haberlos armado y los arma otra vez. Así se llegó a **diez**
+vivos el 16 ago, cuatro de ellos residuos del 11–13 ago que nadie podía atribuir. Comprobar SIEMPRE
+antes de armar:
+
+```bash
+ps -eo pid,lstart,command | grep -E "monitores/m[0-9]|heroku releases" | grep -v grep
+```
+
+Si ya están corriendo, **no rearmar**: mirar si el script cambió desde que arrancó el proceso
+(`ps -o lstart= -p <pid>` contra el `mtime` del fichero) y rearmar solo los desfasados. Los procesos
+huérfanos (`ppid=1`) no aparecen en `/bashes` y solo se matan por PID.
+
+**B · ¿Qué publicó NUESTRO lado hoy?** El barrido miraba lo que escribe Juan y se saltaba lo
+nuestro. Tras un `/clear` eso es justo lo que falta: el 16 ago la sesión anterior de esta misma
+ventana había publicado **cinco** comentarios en `#161` y abierto dos issues, y la sesión nueva los
+leyó como trabajo ajeno. Añadir al barrido: comentarios propios del día en los issues vivos
+(`--jq 'select(.user.login=="aibanez82")'`), issues abiertos hoy en `qualitas-issues`, y
+`gh pr list` en nuestros repos.
+
 ## 1. ~~Dictámenes de Juan en HYL-WAI#132~~ → FUNDIDO EN EL 2 (16 ago)
 
 **No existe como monitor propio.** El #132 es un issue más de la lista del monitor 2: misma lógica
