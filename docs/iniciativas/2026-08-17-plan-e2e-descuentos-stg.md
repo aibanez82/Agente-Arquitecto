@@ -1,171 +1,141 @@
-# Plan de pruebas E2E — Descuentos en STG (`#161` / `#163` / `#156`)
+# E2E de Descuentos en STG — plan y **acta de la primera ejecución**
 
-> **Ejecuta Alberto** (landing, WhatsApp real, Dashboard). **Verifica el Arquitecto** por SQL y API.
-> Estado del entorno al escribir: SQL `#161` y `#163` aplicados, workflow actualizado y verificado,
-> **worker `DeCguAaVtCuW2CUj` APAGADO**. Nada de esto toca PROD.
+> **Ejecutado el 17 ago 2026, 22:33–23:25 UTC.** Alberto conduce (landing, WhatsApp real, UI de n8n);
+> el Arquitecto verifica por SQL y API. Nada de esto tocó PROD.
 >
-> Este plan **no sustituye** el E2E que Juan se reserva en el paso 6 de `#161`. Es nuestro, para
-> encontrar errores antes y llegar a su prueba con el terreno despejado.
+> El plan original preveía dos rutas según si Quálitas aceptaba el porcentaje. **La realidad fue otra
+> y mejor**: entró por una vía que no habíamos contemplado, el descuento se aplicó, y el flujo murió
+> más adelante por un motivo que nadie había visto. Este documento queda como **acta + guía para la
+> próxima**, que es lo único que sirve cuando la predicción falla.
 
 ---
 
-## 0. El porcentaje: incógnita a medir, no problema conocido
+## 1. Lo que aprendimos, por orden de importancia
 
-Medido hoy en la BD de STG:
+### 1.1 · El disparador real es la INTENCIÓN, no el checkpoint de seguimiento
 
-| dónde | valor |
-|---|---|
-| `qualitas_discountsettings.default_qualitas_percentage` | **20** |
-| Único trigger activo (`quote_sent`, `attempt=2`) | apunta al programa **`CHECKPOINT_INTRO_35`** |
-| `CHECKPOINT_INTRO_35.qualitas_percentage` | **35** |
-| `POR_PRECIO_ALTO_PARA_IA_30` | 30, y **no** disponible para checkpoint |
-| Aplicaciones existentes | `1`, `34`, `67` — **las tres en `uncertain`** |
+Preparamos toda la prueba para provocar el checkpoint `quote_sent` + `attempt=2`, que es el trigger
+configurado. **No hizo falta.** El cliente escribió *«es muy cara»* y el bot lo enrutó por
+`Discount Reply Intake` → creó la aplicación directamente. `phase_2_intent_enabled = true`.
 
-> **Aviso, y es de Alberto (17 ago):** existe un sondeo nuestro del 31 jul que concluía que el campo
-> de descuento de Quálitas solo admitía 0 o 20. **Esa conclusión está OBSOLETA: el webservice de
-> Quálitas ha cambiado desde entonces.** No se use como premisa ni para explicar los `uncertain`
-> existentes. Lo que acepta hoy **se mide en esta prueba**, no se supone.
->
-> Queda pendiente corregirlo también en el plan del 11 ago del Agente n8n
-> (`Agente-n8n:feature/issue-156-descuentos-n8n`, commit `cce595d`), que sigue afirmándolo y vive en
-> una rama sin integrar.
+**Para la próxima:** si quieres provocar un descuento, **basta con quejarse del precio**. El camino
+del seguimiento es más lento, exige que el Scheduler dispare y encima está condicionado (§1.2).
 
-Así que el 35 % del trigger **no es un fallo anunciado**: es simplemente lo que se va a pedir, y la
-prueba dirá si Quálitas lo acepta. Los dos desenlaces son útiles y están cubiertos abajo.
+### 1.2 · Pulsar el botón NO cuenta como mensaje humano
 
----
+El template inicial (`saludos_inicial_sin_pdf_con_boton`) trae un botón «ver cotización». Al
+pulsarlo, Django envía el documento y queda registrado como `ai · quote_document_sent`, pero **no se
+crea ninguna entrada `human`** en `n8n_chat_histories`, y `whatsapp_sessions.last_activity` **no se
+actualiza**.
 
-## Ruta A — la prueba, con la configuración actual (35 %)
+Consecuencia, verificada en `qualitas/whatsapp_checkpoint_followups.py:387`:
 
-Se prueba tal como está el sistema. **Los dos desenlaces sirven:**
+```python
+if not chat_activity.last_human_message_at:   # -> "missing_recent_human_message"
+```
 
-- **Si Quálitas acepta el 35 %** → tenemos camino feliz y se puede validar de una lo que `#161`
-  promete (dos corridas, segunda descarga exacta, un handoff, un delivery). Salta directo a la
-  tabla de condiciones de la Ruta B, que pasa a ser innecesaria como ruta aparte.
-- **Si lo rechaza** → tenemos el `error_code` exacto y el rango real de hoy, y de paso se ejercitan
-  los dos huecos abiertos (`qualitas-issues#81` y `HYL-WAI#164`) con un cliente real.
+**Un cliente que solo pulsa el botón y no escribe nunca entra en el circuito de seguimientos**, y por
+tanto nunca recibirá una oferta por esa vía. Es de la familia de `qualitas-issues#41`, pero un paso
+antes y más silencioso: el cliente *sí* interactuó.
 
-### A.1 · Preparación (yo)
+### 1.3 · Quálitas acepta el 30 % — la premisa del rango 0/20 está muerta
 
-1. Registro el estado inicial: filas de `n8n_discount_application_poll`, `qualitas_discountoffer`,
-   `qualitas_discountapplication` y `whatsapp_sessions` del teléfono de prueba.
-2. **Reactivo el worker** (`active=true`). Hoy es inocuo: 0 aplicaciones reclamables.
-3. Dejo un reloj: apunto la hora UTC de arranque para acotar la evidencia.
+Confirmado con datos: programa `POR_PRECIO_ALTO_PARA_IA_30`, aplicación `100`, cotización resultado
+`2114` creada. **El sondeo del 31 jul ya no vale** (Alberto: el webservice cambió). No usarlo.
 
-### A.2 · Cotización desde la landing (Alberto)
+### 1.4 · **El bloqueante: la cotización con descuento no tiene PDF**
 
-1. Entra en la landing de **STG** y cotiza con **tu teléfono real**.
-2. Anota: marca/modelo/año, CP y la hora.
-3. Debes recibir el **primer WhatsApp** con la cotización.
+La aplicación terminó en `uncertain` / `document_binary_invalid`. El documento que recibe el worker:
 
-> **Verifico yo:** `qualitas_lead` + `qualitas_cotizacion` creados, `whatsapp_sessions` con sesión
-> nueva `waq_<qid>_<hex>` y una sola `active` para tu teléfono.
+```
+qualitas_discountquotedocument · discount-quote-2114.pdf · 1167 bytes · PDF 1.4, 1 página
+   "Cotizacion con descuento aplicacion #100"
+   "Programa: POR_PRECIO_ALTO_PARA_IA_30"
+   "Descuento Qualitas: 30%"
+```
 
-### A.3 · Provocar el checkpoint `quote_sent`, intento 2 (Alberto + yo)
+Un **placeholder de tres líneas**. Y la causa está aguas arriba: `qualitas_cotizacion.2114` tiene
+**`pdf_cotizacion_url` vacío**, mientras la original `2113` sí tiene su PDF en S3.
 
-El trigger dispara en el **segundo seguimiento** tras enviar la cotización, no en el primero.
+`document_binary_invalid` **no es un bug del guard: es el guard funcionando.** Lo que falta es
+generar el PDF real de la cotización con descuento — y eso es Django.
 
-1. **No respondas todavía** al WhatsApp inicial: el seguimiento es lo que arrastra la oferta.
-2. Avísame y **compruebo cuándo está programado el intento 2**; si el tiempo es largo, te digo si
-   conviene esperar o si hay que forzarlo desde el Scheduler (eso lo decides tú, es acción viva).
+**Reproducible:** la aplicación `67` está igual, con placeholder de 1169 bytes y el mismo motivo.
+**Mientras no se arregle, el E2E de `#161` no es ejecutable**: ni segunda descarga exacta, ni
+delivery, ni «cero llamada nueva a Quálitas» pueden verificarse, porque el flujo muere antes.
 
-> **Verifico yo:** creación de `qualitas_discountoffer` con su `offered_copy`, y que el programa
-> asociado es el del trigger.
+### 1.5 · Defecto del candidato `#161`, encontrado y corregido
 
-### A.4 · Recibir y aceptar la oferta (Alberto)
+`Discount Conversation Handoff Claim` reventaba con *«Query Parameters must be a string…»*. Su
+`queryReplacement` era **una sola expresión** con `|| null`: por la vía que `#161` añadió no llega
+aplicación, colapsa a `null`, y el nodo Postgres exige string o array.
 
-1. Debes recibir un WhatsApp ofreciendo el descuento. **Cópiame el texto literal** — sirve para
-   comprobar si el copy administrable de Wagtail (`#161`) se está usando de verdad.
-2. **Acéptala** como lo haría un cliente.
-3. Debes recibir *«Estamos preparando la nueva cotización. Espera un momento.»*
+Los tres valores posibles hacen tres cosas distintas — **esto es lo que hay que recordar**:
 
-> **Verifico yo:** `qualitas_discountapplication` creada, y la entrada en
-> `n8n_discount_application_poll` con su `poll_key`.
-
-### A.5 · Observar el desenlace (yo, y aquí está lo que buscamos)
-
-Con el 35 %, lo esperable es que Quálitas rechace y la aplicación termine en `failed` o `uncertain`.
-Lo que hay que mirar, en este orden:
-
-| # | qué compruebo | por qué importa |
+| valor | efecto | resultado |
 |---|---|---|
-| 1 | El `error_code` exacto que devuelve Quálitas | **Confirma o refuta el rango 20-20.** Es el dato que llevamos semanas suponiendo |
-| 2 | Si te llega el **aviso terminal** por WhatsApp | Es lo que `#161` §4 promete y lo que cerraba el silencio de `#81` |
-| 3 | Si el `attempt` llegó a **9** | La constraint nueva lo permite; antes reventaba en 8 |
-| 4 | Que el `poll_key` casa con `\.poll\.[1-9]$` | Valida la constraint de `#161` con datos reales |
+| `\|\| null` | el campo entero es `null` | *«Query Parameters must be a string…»* |
+| `\|\| ''` | `stringToArray('')` deja la lista vacía | *«there is no parameter $1»* |
+| **`\|\| 'null'`** | manda el texto `"null"` | lo caza `NULLIF(NULLIF($1,''),'null')` ✅ |
 
-### A.6 · Los dos huecos abiertos (Alberto)
-
-**Este es el valor añadido de tener a un humano en el bucle.** Con la aplicación ya en terminal:
-
-1. **`qualitas-issues#81`** — escribe *«Continuemos»* por WhatsApp. **¿El bot sigue vendiendo la
-   cotización anterior y te pide datos para emitir?** Si sí, queda confirmado con evidencia nueva.
-2. **`HYL-WAI#164`** — si el bot te pide los datos, **dáselos** y llega hasta donde te deje.
-   **¿Te emite póliza con el precio antiguo?** Eso es lo que el guard que pedí debería impedir.
-   **Para justo antes del pago**: no completes ningún cobro.
-3. **`#163`** — comprueba conmigo si **dejas de recibir seguimientos** de la cotización origen. Es
-   la decisión de producto de Juan funcionando: silencio deliberado, no avería.
-
-> **Verifico yo:** `qualitas_polizaemitida` (si llega a crearse), `estatus_pago`, y si la cotización
-> origen queda excluida por `discount_handoff`.
-
-### A.7 · Dashboard (Alberto)
-
-1. Abre la conversación en el Dashboard de STG.
-2. **¿Aparece el panel de descuentos** con el estado `uncertain` → *«Requiere conciliación manual»*?
-3. **¿Ves la línea `Descuento autorizado X %` · `Cotización actual: …`?**
-4. **No pulses ninguna acción de reconciliación**: las aplicaciones `1`/`34` están vetadas por Juan,
-   y la nueva conviene dejarla intacta como evidencia.
-
-> Esto además ejercita `qualitas-issues#83`: comprobar si desde el Dashboard **hay forma de saber que
-> hay una aplicación esperando** sin abrir esa conversación concreta.
+Corregido en `Agente-n8n:stg` (`316a9f9`) e importado a la instancia. Rompe el hash acreditado
+`5d542e2b…`, con OK de Juan.
 
 ---
 
-## Ruta B — camino feliz (requiere decisión previa)
+## 2. Cosas operativas que cuestan media hora si no las sabes
 
-**Contingencia**, solo si la Ruta A muestra que el 35 % se rechaza. Habría que ofrecer un porcentaje
-que Quálitas sí acepte hoy:
+- **Las ejecuciones del worker NO se guardan.** Sus `settings` traen `saveDataSuccessExecution:none`,
+  `saveDataErrorExecution:none`, `saveManualExecutions:false`. En la API **no vas a ver nada** aunque
+  se ejecute. El error solo se ve **en la pantalla de quien pulsa** «Execute workflow»: pídeselo.
+  Y no concluyas «no se ejecuta» por no encontrar registros — ese error lo cometí dos veces.
+- **El worker se ejecuta a mano desde la UI.** La API pública de n8n no expone ejecución manual, y
+  activar/desactivar por API no basta.
+- **Django y n8n comparten la misma base en STG** (`dei0jssp8kr5kv`, PG 17.9), distinta de la de PROD
+  (`d779dc6ojpjvn5`). Se consulta con `STG_DATABASE_URL` de `Agente-n8n/.env.local`.
+- **Nombres de columna que no son los obvios:** `qualitas_cotizacion` usa `nombre_marca`/`submarca`/
+  `modelo` (el año) y `pdf_cotizacion_url`; `whatsapp_sessions` usa `status`, no `session_status`;
+  `DiscountProgram.offered_copy` (no `DiscountTrigger`, pese a lo que dice `#161`).
 
-- **Opción 1:** poner el trigger a un programa con `qualitas_percentage = 20`. Es configuración de
-  negocio, la decides tú (o Juan), no yo.
-- **Opción 2:** gestión comercial con Quálitas para ampliar el rango del negocio 08545. No es un
-  cambio de código y no depende de nosotros.
+## 3. Estados por los que pasa una aplicación (observado)
 
-Con eso resuelto, se repite A.2–A.5 y **entonces sí** se puede validar lo que `#161` promete:
+```
+queued → awaiting_conversation / history_inheritance   (slot reserved, result_quote_id creado)
+       → [claim del worker] → uncertain / document_binary_invalid
+```
 
-| condición de aceptación de Juan | cómo la compruebo |
+En la cola: `n8n_discount_application_poll`, con `poll_key` del tipo
+`d156.app.<id>.g0.poll.<n>` — el `<n>` es lo que la constraint de `#161` amplió a `[1-9]`.
+
+## 4. Guion para la próxima ejecución
+
+1. **Baseline**: máximos de `qualitas_lead`, `qualitas_cotizacion`, `qualitas_polizaemitida` y estado
+   de `n8n_discount_application_poll`. Sin esto no se distingue lo que crea la prueba.
+2. Cotizar en la landing con teléfono real.
+3. Pulsar «ver cotización» → llega el documento.
+4. **Escribir una queja de precio** («es muy cara»). Esa es la vía rápida.
+5. Verificar la aplicación creada y su `result_quote_id`.
+6. **Comprobar que la cotización resultado tiene `pdf_cotizacion_url`** ← si está vacío, para: el
+   flujo va a morir en el paso siguiente.
+7. Ejecutar el worker desde la UI, **dos veces**, pidiendo el error de pantalla si lo hay.
+8. Verificar handoff, segunda descarga y delivery.
+
+## 5. Lo que NO se hace
+
+- Nada en PROD. No se reconcilian las aplicaciones `1`, `34`, `67` ni `100` — vetadas por Juan y
+  además son evidencia. No se completa ningún pago.
+
+## 6. Rollback disponible
+
+`~/Desktop/161-backup/`: `worker-VIVO-antes-*.json` (204 KB), `funciones-previas.sql` (4
+definiciones), `163-definicion-previa.sql` y `163-rollback-una-funcion.sql`.
+
+## 7. Evidencia de esta ejecución
+
+| qué | valor |
 |---|---|
-| **Dos corridas** del worker | ejecuciones del workflow: la primera termina en `Discount Poll Terminal` |
-| **Segunda descarga exacta** | segundo `Fetch Private Discount Document` con hash/length idénticos |
-| **Un solo handoff** | una fila en `n8n_discount_conversation_handoff` |
-| **Un solo delivery** | un envío, sin segundo `Send Discount PDF WhatsApp` |
-| **Cero llamada nueva a Quálitas** | ninguna recotización adicional tras el PDF |
-| **Cero follow-up source competidor** | la cotización origen no genera seguimientos |
-
----
-
-## Qué NO se hace, en ninguna ruta
-
-- **Nada en PROD.**
-- **No se reconcilian las aplicaciones `1`, `34` ni `67`** — Juan lo prohíbe expresamente.
-- **No se completa ningún pago.**
-- No se importan ni editan otros workflows, ni se tocan `C1`/`S1`.
-- Si algo se desvía de lo previsto, **se para y se anota**; no se improvisa sobre datos vivos.
-
-## Rollback
-
-- **Workflow:** `~/Desktop/161-backup/worker-VIVO-antes-20260817T221109Z.json` (204 KB).
-- **Funciones SQL:** `~/Desktop/161-backup/funciones-previas.sql` (4 definiciones, 586 líneas).
-- **Worker:** se puede desactivar en cualquier momento por API; es lo primero que haría ante
-  cualquier comportamiento inesperado.
-- Los leads y aplicaciones que cree la prueba **no se borran**: quedan como evidencia, anotados aquí
-  con su `id` y hora.
-
-## Anotación pendiente para Juan
-
-- Aparece una aplicación **`67`** en `uncertain` por `document_binary_invalid` que él no menciona
-  —su veto nombra solo la `1` y la `34`—. Conviene preguntarle si la conoce.
-- En su comentario dice que el copy se edita en `DiscountTrigger.offered_copy`; el campo vive en
-  realidad en **`DiscountProgram.offered_copy`**. No es un fallo funcional, pero el panel está donde
-  está y conviene saberlo antes de buscarlo en Wagtail.
+| lead / cotización origen | `760` / `2113` (TOYOTA SIENNA 2024) |
+| aplicación / cotización resultado | `100` / `2114` |
+| sesión WhatsApp | `waq_2113_32c10d18808b` (`active`) |
+| estado final | `uncertain` · `document_binary_invalid` |
+| reportado a Juan | `HYL-WAI#161`, comentario del 17 ago |
