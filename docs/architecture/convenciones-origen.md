@@ -180,3 +180,38 @@ activo. Lo que faltaba era generalizar una práctica que el repo ya contenía.
 
 La alternativa de raíz —un clon por sesión— quedó descartada por coste en disco frente a un
 mecanismo que sale gratis. Alberto fijó la convención el mismo día.
+
+## Segunda mano y retractación en su canal (16 ago 2026)
+
+Las dos salen del mismo incidente, y las dos son correcciones a cómo trabajo yo, no a un ejecutor.
+
+El Dashboard entregó un informe con una tabla de hechos medidos, cada uno con su evidencia: el alias
+de STG apuntaba a un deployment de hace 14 h, el merge de `#161` no había generado deployment de
+rama, el último con `githubCommitRef=stg` era del 13 ago. Concluía que la integración de Git del
+proyecto de Vercel estaba desenganchada, y preguntaba —bien— si reconectarla o ampliar el scope de
+las variables de Preview, porque la decisión no era suya.
+
+Acusé recibo dando el diagnóstico por bueno, dictaminé cuál de las dos vías era la mala, añadí una
+pista propia («el corte coincide con el día de la promoción, no parece casualidad») y **escalé a
+Alberto una decisión que no existía**. No verifiqué ni uno de los hechos.
+
+Era falso. El CLI de Vercel miente en tres sitios a la vez: `vercel ls --meta githubCommitRef=X` no
+filtra, `vercel inspect` no muestra rama ni commit, y los alias de rama se truncan a hash, así que
+el del `feature/issue-161` se lee igual que el de `stg`. La API lo desmentía en dos llamadas:
+deployments `githubCommitRef=stg` continuos hasta ese mismo día. El propio Dashboard lo descubrió a
+las 12:50 al ir a reconectar la integración y encontrarse un «already connected».
+
+**De ahí la primera regla.** La convención de verificar contra la fuente ya existía y ya decía «ni de
+segunda mano», pero yo la venía aplicando a lo que afirmo y no a lo que repito. Un hecho medido por
+un ejecutor **con su evidencia delante** se siente como fuente y no lo es: la tabla de evidencia es
+exactamente lo que hace que baje la guardia. Si dictamino o escalo encima, lo mido yo.
+
+**De ahí la segunda, que la formuló el Dashboard.** Él supo a las 12:50 que su informe era falso y lo
+corrigió en conversación y en su memoria, pero el fichero siguió en pie en `informes/` hasta las
+20:50. Mi acuse es de las 14:35: llegó **después** de que él ya lo supiera, construido sobre el
+documento que seguía siendo la única versión publicada. Un agente no lee la conversación de otro:
+lee el fichero. Mientras el original siga sin marca, es la verdad operativa por mucho que su autor
+ya no la sostenga — y quien actúe sobre él actuará mal, sin culpa de nadie.
+
+Alberto las aprobó las dos el mismo día. El apunte operativo que las acompaña: para hechos de
+plataforma Vercel, la API REST, nunca el CLI.
