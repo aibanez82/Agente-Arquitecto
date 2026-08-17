@@ -9,7 +9,7 @@
 
 ---
 
-## 0. Antes de gastar una prueba: la contradicción del porcentaje
+## 0. El porcentaje: incógnita a medir, no problema conocido
 
 Medido hoy en la BD de STG:
 
@@ -21,23 +21,29 @@ Medido hoy en la BD de STG:
 | `POR_PRECIO_ALTO_PARA_IA_30` | 30, y **no** disponible para checkpoint |
 | Aplicaciones existentes | `1`, `34`, `67` — **las tres en `uncertain`** |
 
-Y un sondeo nuestro del 31 jul contra QA y PROD concluyó que el campo de descuento de Quálitas
-**solo admite 0 o 20**: 21, 25, 35, 40, 50 y 100 devolvían *«Descuento fuera de Rango, rango válido
-20 a 20»*.
+> **Aviso, y es de Alberto (17 ago):** existe un sondeo nuestro del 31 jul que concluía que el campo
+> de descuento de Quálitas solo admitía 0 o 20. **Esa conclusión está OBSOLETA: el webservice de
+> Quálitas ha cambiado desde entonces.** No se use como premisa ni para explicar los `uncertain`
+> existentes. Lo que acepta hoy **se mide en esta prueba**, no se supone.
+>
+> Queda pendiente corregirlo también en el plan del 11 ago del Agente n8n
+> (`Agente-n8n:feature/issue-156-descuentos-n8n`, commit `cce595d`), que sigue afirmándolo y vive en
+> una rama sin integrar.
 
-**Si eso sigue vigente, cualquier prueba con el trigger tal como está acabará en fallo**, porque
-pediría un 35 %. Eso explicaría por qué las tres aplicaciones existentes están en `uncertain`.
-
-De ahí las dos rutas. **La A es gratis y confirma o descarta la hipótesis; la B requiere tocar
-configuración.** Recomiendo A primero.
+Así que el 35 % del trigger **no es un fallo anunciado**: es simplemente lo que se va a pedir, y la
+prueba dirá si Quálitas lo acepta. Los dos desenlaces son útiles y están cubiertos abajo.
 
 ---
 
-## Ruta A — diagnóstica, sin tocar nada (recomendada para empezar)
+## Ruta A — la prueba, con la configuración actual (35 %)
 
-Se prueba con la configuración actual (35 %). El resultado esperado es un **fallo controlado**, y eso
-ya vale: confirma la causa raíz de los `uncertain`, y de paso ejercita justo lo que reportamos como
-hueco — `qualitas-issues#81` y `HYL-WAI#164`.
+Se prueba tal como está el sistema. **Los dos desenlaces sirven:**
+
+- **Si Quálitas acepta el 35 %** → tenemos camino feliz y se puede validar de una lo que `#161`
+  promete (dos corridas, segunda descarga exacta, un handoff, un delivery). Salta directo a la
+  tabla de condiciones de la Ruta B, que pasa a ser innecesaria como ruta aparte.
+- **Si lo rechaza** → tenemos el `error_code` exacto y el rango real de hoy, y de paso se ejercitan
+  los dos huecos abiertos (`qualitas-issues#81` y `HYL-WAI#164`) con un cliente real.
 
 ### A.1 · Preparación (yo)
 
@@ -118,8 +124,8 @@ Lo que hay que mirar, en este orden:
 
 ## Ruta B — camino feliz (requiere decisión previa)
 
-Solo tiene sentido si la Ruta A confirma que el 35 % es el problema. Para que un descuento **funcione
-de verdad** hay que ofrecer un porcentaje que Quálitas acepte:
+**Contingencia**, solo si la Ruta A muestra que el 35 % se rechaza. Habría que ofrecer un porcentaje
+que Quálitas sí acepte hoy:
 
 - **Opción 1:** poner el trigger a un programa con `qualitas_percentage = 20`. Es configuración de
   negocio, la decides tú (o Juan), no yo.
