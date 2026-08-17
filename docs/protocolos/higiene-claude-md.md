@@ -110,8 +110,24 @@ por la puerta de atrás.
 | fecha | antes → después | densidad | qué salió y a dónde |
 |---|---|---|---|
 | 16 ago 2026 · fase verde | 23.471 → 22.965 | 35 anclas, 0 huérfanas | `Pendientes de infraestructura` reescrita solo con lo vivo: `HYL-WAI#70` llevaba cerrado desde el **2 jul** y `#114` desde el **24 jul**, ambos listados como pendientes. Promoción STG→PROD (cerrada) y plantilla Meta (duplicada) fuera. Dos ítems se quedan por pasar el test: son prohibición y regla de ruteo, no estado. Estado de iniciativas compactado |
+| 16 ago 2026 · hallazgo | 22.965 → 23.433 | 36 anclas, 0 huérfanas | **Creció, y con razón.** Buscando destino se descubrió que la §«Regla de estado real de un lead» —material 🔴 rojo— declaraba LIKE que el bot **no dice**: `confirmo_cobertura` y `dio_domicilio` llevaban tiempo siempre en `false`, aquí y en el Dashboard PROD. Corregida contra el workflow VIVO. `qualitas-issues#82` |
 | 16 ago 2026 · fase ámbar | — | — | **PARADA antes de empezar**: los destinos (`overview.md`, `data-flow.md`) estaban obsoletos desde el 28 jun y contradecían el esquema. Marcados como obsoletos; la fase espera a que exista un destino sano del ecosistema |
 | 16 ago 2026 | 22.983 → 22.979 | — | Compactada la justificación ya duplicada de 4 convenciones para meter 2 reglas nuevas. **Bajo presión de techo — el caso que este protocolo existe para no repetir.** |
+
+## 7.bis Lo que enseñó la primera pasada
+
+**La higiene no solo mueve material: lo audita al tocarlo, y ahí es donde paga.** Los 506 bytes de la
+fase verde son lo de menos. Lo que salió por el camino fue: dos issues cerrados hace meses listados
+como trabajo vivo, dos docs de destino obsoletos con SQL roto, y —lo más caro— **dos detectores de
+hito que buscaban frases inventadas**, en `CLAUDE.md` y en el Dashboard de producción a la vez.
+
+Ninguno de los tres daba error. Los tres devolvían un valor plausible: un pendiente que parece
+pendiente, un doc que parece doc, un `false` que parece un `false`. Es el patrón del test §1.2, y la
+lección es que **el fichero no se degrada por engordar, se degrada por envejecer sin que nadie lo
+compruebe**.
+
+Corolario para la próxima: si una pasada de higiene no encuentra nada falso, sospechar de la pasada
+antes que del fichero.
 
 ## 8. Primera pasada, propuesta
 

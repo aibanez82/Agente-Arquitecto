@@ -7,6 +7,13 @@
 #
 # Generado el 16 ago 2026 sobre el estado PRE-higiene: es la foto que la higiene no puede romper.
 
+# Cambiar un ancla NO es rutina: solo se toca cuando se demuestra FALSA contra la fuente viva,
+# nunca porque estorbe a una edición. Registro de cambios:
+#   16 ago 2026 — fuera «Procederemos con Cobertura» y «fue emitida exitosamente»; dentro
+#   «continuamos con», «*Domicilio:*» y «emitida exitosamente». Motivo: verificado contra el
+#   workflow VIVO de PROD (API n8n, BtOaZm7WlZT-24V7hqCnF) que el bot NO dice las dos primeras.
+#   El ancla protegía una frase inventada. Detalle: qualitas-issues#82.
+
 ## --- ROJO: su ausencia produce un error SILENCIOSO (test §1.2) ---
 l.cotizacion_id = c.id
 ws.quotation_id = c.id
@@ -14,8 +21,9 @@ l.canal_atencion
 c.codigo_postal
 message->>'type'
 d.numero_poliza != null
-Procederemos con Cobertura
-fue emitida exitosamente
+continuamos con
+*Domicilio:*
+emitida exitosamente
 lib/db.js
 America/Mexico_City
 

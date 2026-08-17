@@ -138,16 +138,18 @@ n8n escribe a Postgres directamente (credencial `"Postgres account"`): `Check Se
 
 `whatsapp_sessions.conversation_phase` tiene un bug activo (siempre stuck en `greeting`). Los hitos reales se leen de `n8n_chat_histories` con BOOL_OR + LIKE:
 
+Detectores **verificados el 16 ago contra el workflow VIVO de PROD** (`BtOaZm7WlZT-24V7hqCnF`, API n8n), no contra el export local:
+
 | Hito | Cómo se detecta |
 |---|---|
-| `has_responded` | `human_msg_count > 0` |
-| `confirmo_cobertura` | AI dijo "Procederemos con Cobertura…" |
-| `dio_datos_personales` | AI dijo "tengo registrado… Nombre:" |
-| `dio_vin` | AI dijo "Número de serie:" |
-| `dio_domicilio` | AI dijo "domicilio registrado es" |
-| `poliza_emitida_wa` | AI dijo "fue emitida exitosamente" |
+| `has_responded` | `human_msg_count > 0` (ojo `#41`: exige marcador `USER INPUT STARTS BELOW` o texto sin wrapper `[CTX:`) |
+| `confirmo_cobertura` | AI dijo `"continuamos con"` + `"cobertura"` (ILIKE) |
+| `dio_datos_personales` | AI dijo "tengo… Nombre:" |
+| `dio_vin` | AI dijo "Número de serie:" / "Placas" |
+| `dio_domicilio` | AI dijo `"*Domicilio:*"` |
+| `poliza_emitida_wa` | AI dijo "emitida exitosamente" |
 
-**Riesgo:** si cambia el copy del bot, los LIKE dejan de funcionar.
+**El riesgo ya se materializó (`qualitas-issues#82`):** `confirmo_cobertura` y `dio_domicilio` buscaban frases que el bot **no dice** —ni aquí ni en el Dashboard— y llevaban tiempo siempre en `false`. No dio error: devolvía un valor plausible. **Al tocar copy del bot, revisar estos LIKE contra el workflow vivo.**
 
 ---
 
