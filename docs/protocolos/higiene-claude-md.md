@@ -42,6 +42,15 @@ El destino no se improvisa en cada higiene — está fijado por categoría:
 
 **Un estado duplicado no es red de seguridad: es una segunda versión que se desincroniza y miente.**
 
+**Y antes de mover a un destino, hay que auditar el destino.** Un doc de destino obsoleto convierte
+la higiene en una degradación: el contenido bueno sale de donde se lee cada turno y aterriza junto a
+contenido que miente, prestándole credibilidad. Comprobar siempre tres cosas del destino: **qué
+describe** (¿el ecosistema o un solo sistema?), **cuándo se tocó por última vez** (`git log -1`), y
+si **contradice** algo de lo que sale. Si falla cualquiera, el destino se arregla primero y la fase
+espera. Ocurrió en la primera pasada, el 16 ago: `overview.md` y `data-flow.md` databan del 28 jun,
+describían solo el Dashboard y enseñaban un JOIN roto sobre `n8n_chat_histories` — la fase ámbar se
+paró y ambos quedaron marcados como obsoletos.
+
 ## 3. Qué no sale nunca
 
 Las cuatro del test, y en concreto: esquema de BD y JOINs · regla de estado real de un lead ·
@@ -100,6 +109,8 @@ por la puerta de atrás.
 
 | fecha | antes → después | densidad | qué salió y a dónde |
 |---|---|---|---|
+| 16 ago 2026 · fase verde | 23.471 → 22.965 | 35 anclas, 0 huérfanas | `Pendientes de infraestructura` reescrita solo con lo vivo: `HYL-WAI#70` llevaba cerrado desde el **2 jul** y `#114` desde el **24 jul**, ambos listados como pendientes. Promoción STG→PROD (cerrada) y plantilla Meta (duplicada) fuera. Dos ítems se quedan por pasar el test: son prohibición y regla de ruteo, no estado. Estado de iniciativas compactado |
+| 16 ago 2026 · fase ámbar | — | — | **PARADA antes de empezar**: los destinos (`overview.md`, `data-flow.md`) estaban obsoletos desde el 28 jun y contradecían el esquema. Marcados como obsoletos; la fase espera a que exista un destino sano del ecosistema |
 | 16 ago 2026 | 22.983 → 22.979 | — | Compactada la justificación ya duplicada de 4 convenciones para meter 2 reglas nuevas. **Bajo presión de techo — el caso que este protocolo existe para no repetir.** |
 
 ## 8. Primera pasada, propuesta
