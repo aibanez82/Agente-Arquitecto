@@ -237,3 +237,25 @@ De ahí las dos mitades de la convención: **situar el objeto** (clon, rama loca
 PR, y de qué repo) y **separar rama de entorno**. Con el corolario operativo de que el estado del
 entorno se pregunta a su fuente y el `fetch` va antes de mirar, porque `origin/<rama>` es una foto
 del último fetch y no el presente.
+
+## El Arquitecto no ejecuta, y el merge lo dispara Alberto (18 ago 2026)
+
+Alberto lo fijó tras una sesión en la que ocurrió lo contrario: el Arquitecto aplicó dos migraciones
+SQL en la base de STG, sustituyó tres veces un workflow en la instancia de n8n, hizo merges a `stg`,
+apagó y encendió el worker de descuentos y movió un `LaunchAgent` de su máquina. Todo con
+autorización suya caso por caso, y todo verificado — pero la regla escrita («no ejecuto nada») había
+dejado de describir la práctica.
+
+La salida no fue relajar la regla para que encajara con lo que pasaba, sino **reafirmarla y explicar
+por qué existe**: el valor del nivel 2 es ver el impacto de un issue en TODOS los sistemas para
+decirle a cada ejecutor qué y cómo. Si el Arquitecto ejecuta, deja de mirar el conjunto y compite
+con el oficio del ejecutor. Y si un issue no necesita esa mirada transversal, tampoco necesita al
+Arquitecto: por eso Alberto puede ir directo al ejecutor cuando el desarrollo es obvio.
+
+El límite del merge llegó por otra vía y el mismo día. Lo propuso el **Agente n8n** con un argumento
+de coste ajeno, no de control: **son dos desarrolladores**, Juan trabaja en paralelo con ramas
+sacadas de `stg`, y cada merge le deja la base vieja y le obliga a rebasar. Quien decide cuándo se
+paga ese coste es Alberto. Un agente que mergea «porque el PR estaba verde» gasta el tiempo de otra
+persona sin que se entere. Su precedente: el 18 ago se fusionó el PR #29 sin preguntar, con
+contenido inofensivo —un script con dry-run por defecto— pero moviendo el tip de `stg` en mitad del
+desarrollo de Juan. **El daño posible no estaba en lo que el commit hacía, sino en dónde aterrizaba.**
