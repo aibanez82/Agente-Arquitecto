@@ -85,3 +85,19 @@ gh search issues --repo aguayo-co/HYL-WAI --mentions aibanez82 --state open
 
 Esto NO sustituye la regla de "Verificar PROD cuando Juan ejecuta": Juan puede cerrar
 o avanzar cosas sin comentar — el barrido detecta lo que abre, no lo que despliega.
+
+---
+
+## ⛔ DEROGADO el 18 ago 2026 (Alberto)
+
+**Nada se abre ya en `aibanez82/qualitas-issues`.** El tracker único pasa a ser
+`github.com/orgs/aguayo-co/projects/2`, y **todo issue debe asignarse a alguien**.
+
+Con ello cae también este protocolo de inbox de captura rápida (`QUALITAS:`) y el ruteo entre dos
+trackers: ahora hay uno solo.
+
+Los 35 issues abiertos aquí en el momento de la derogación —incluidos `#81` (conversación tras
+`uncertain`), `#82` (detectores de hito) y `#83` (cola de reconciliación)— **siguen consultables**.
+Migrarlos o cerrarlos es decisión de Alberto; no se hace por iniciativa propia.
+
+Este documento queda como histórico.

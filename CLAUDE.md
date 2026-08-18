@@ -1,7 +1,7 @@
 # CLAUDE.md — Ecosistema IA Quálitas/Insurmind
 
 > Fuente de verdad del Arquitecto-IA-Qualitas.
-> Actualizado: 4 agosto 2026 (optimización de tamaño: estado → docs/tablero; historias → `docs/architecture/convenciones-origen.md`).
+> Actualizado: 18 agosto 2026 (tracker único: `orgs/aguayo-co/projects/2`).
 
 ---
 
@@ -139,13 +139,13 @@ Detectores **verificados el 16 ago contra el workflow VIVO de PROD** (`BtOaZm7Wl
 
 ## Bugs — fuente única
 
-**El estado vigente de todos los bugs vive en `github.com/aibanez82/qualitas-issues` (privado) — NO en este archivo.** Cualquier agente (y Juan) puede abrir/comentar; solo el Arquitecto cierra/certifica. Convenciones en el README de ese repo. Van ahí los defectos técnicos; las recomendaciones de copy/tono siguen la tubería del Agente Mejoras Conversación (abajo).
+**Tracker único desde el 18 ago (Alberto): `github.com/orgs/aguayo-co/projects/2`.** TODO issue nuevo se abre ahí y **se asigna a alguien** — sin responsable no es un issue, es una nota. Deroga `aibanez82/qualitas-issues` como destino: **no se abre nada más ahí**.
 
-**Ruteo entre trackers: el fix decide el repo** — fix en nuestros sistemas sin acción de Juan → `qualitas-issues`; fix en Django, decisión de Juan o coordinación → issues de `aguayo-co/HYL-WAI` (Alberto puede abrir issues ahí; no pushear código). Transversales: UN issue canónico, el otro lado solo comentario-puntero.
-
-Los `docs/bugs/bug-NN-*.md` son el cuaderno de investigación largo, enlazado desde cada issue.
-
-**`qualitas-issues` es también inbox de captura rápida** (prefijo `QUALITAS:`). Al iniciar sesión (o "revisa QUALITAS"): `gh issue list --repo aibanez82/qualitas-issues --state open` + barrido de issues que Juan nos abre en HYL-WAI (`--assignee aibanez82` y menciones), triangular, cerrar con comentario de destino — nunca ejecutar trabajo de otro repo. Detalle: `docs/protocolos/qualitas-issues-inbox.md`.
+- Los issues ya abiertos en `qualitas-issues` (35 al derogarla, incluidos `#81`, `#82` y `#83`) siguen consultables; **migrarlos o cerrarlos es decisión de Alberto**, no se hace por iniciativa propia.
+- Cae con ella el «inbox de captura rápida» con prefijo `QUALITAS:` y el ruteo entre dos trackers: ahora hay uno.
+- **Autoridad, sin cambios:** cualquier agente (y Juan) puede abrir y comentar; **solo el Arquitecto cierra/certifica**.
+- El tablero vive en la organización de Juan: abrir y comentar issues ahí es lo esperado, pero la regla de siempre no cambia: **no pushear código** a sus repos.
+- Sigue vigente que los `docs/bugs/bug-NN-*.md` son el cuaderno de investigación largo, enlazado desde cada issue.
 
 **Workaround Bug #7 (Dashboard) — póliza pagada:** `d.estatus_pago === 'PAGADO' || (d.conversation_phase === 'completed' && d.numero_poliza != null)`. `completed` lo setea n8n con confirmación verificada de la pasarela; el guard evita falsos positivos. Detalle: `docs/bugs/bug-07-estatus-pago.md`.
 
