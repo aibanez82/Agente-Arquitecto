@@ -237,3 +237,25 @@ De ahí las dos mitades de la convención: **situar el objeto** (clon, rama loca
 PR, y de qué repo) y **separar rama de entorno**. Con el corolario operativo de que el estado del
 entorno se pregunta a su fuente y el `fetch` va antes de mirar, porque `origin/<rama>` es una foto
 del último fetch y no el presente.
+
+## Decir dónde se buscó antes de decir qué se encontró (18 ago 2026)
+
+Tres resbalones el mismo día, entre el Arquitecto y el Agente n8n, y los tres de la misma familia:
+
+| quién | el fallo | la conclusión que produjo |
+|---|---|---|
+| Arquitecto | contador de ramas con **una sola base** (`origin/main..rama`) en un repo con dos troncos | «41 commits sin integrar» — eran **0**, la rama estaba entera en `stg` |
+| Agente n8n | `grep s1-dual-stg` sobre el CI, que dio positivo **por el nombre de un fichero** | «el CI referencia la rama» — la menciona un documento, no la fija |
+| Arquitecto | búsqueda en `scripts/s1/lib/` de unos ficheros que viven en `scripts/stg-operational-dual/lib/` | «no existen en ninguna rama» — estaban en **ocho** |
+
+Ninguno de los tres da error. Los tres devuelven un resultado **limpio y confiado**, que es lo que
+los hace peligrosos: una conclusión equivocada con aspecto de comprobación.
+
+Lo que los caza no es más rigor genérico, es una frase: **decir dónde se buscó antes de decir qué se
+encontró**. El Agente n8n lo formuló así al corregir el tercero: «si el mensaje hubiera dicho *busqué
+`scripts/s1/lib/` en todas las refs*, la ruta mala se ve en un segundo». El ámbito convierte una
+afirmación irrefutable en una verificable por cualquiera — incluido el que la escribió.
+
+Corolario que ya estaba en la convención de segunda mano y aquí se refuerza: **la búsqueda estrecha
+da falsos negativos y la cita amplia falsos positivos**, y desde dentro las dos se sienten igual de
+concluyentes. Por eso el remedio no es «buscar mejor», es **publicar el ámbito**.
