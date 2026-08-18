@@ -53,14 +53,21 @@ sabiendo que su fuente no describe lo desplegado**. La firma valdría menos que 
 verdad, repones el hash sobre algo cierto — y de paso el delta a justificar en el punto 1 queda
 cerrado en vez de abierto.
 
-## Y una cosa urgente que no está en tu duda
+## ~~Y una cosa urgente que no está en tu duda~~ → **RETRACTADO: era falsa alarma mía**
 
-**`scripts/s1/lib/binds-json.js` y `observable-literal.js` no existen en NINGUNA rama de `origin`.**
-Lo comprobé sobre todas las refs remotas. Ese trabajo solo vive en tu clon: si esa sesión se pierde,
-se pierde, y quien regenere el operativo reintroduce el cuelgue de 300 s sin enterarse.
-
-**Publícalas hoy en una rama del upstream**, aunque el debate del contrato siga abierto. No hace
-falta decidir el modelo para no perder el trabajo.
+> Escribí que `binds-json.js` y `observable-literal.js` **no existían en ninguna rama de `origin`** y
+> que había que rescatarlos hoy. **Es falso.** Busqué en `scripts/s1/lib/` y la ruta real es
+> **`scripts/stg-operational-dual/lib/`**. Ahí están, en **ocho ramas remotas**:
+> `fix/stg-operational-binds-json`, `feature/cambio-de-cotizacion`,
+> `feature/contexto-cotizacion-activa`, `feature/precio-consultado`,
+> `feature/seleccion-por-ordinal` y las tres `feature/stg-operational-*`. Comprobado recorriendo
+> `refs/remotes/origin` entera sobre la ruta buena. **No hay nada que rescatar.**
+>
+> Lo detectó el Agente n8n. Y señala bien que es el tercer resbalón de evidencia del día de la misma
+> familia: mi fórmula del contador suponía una sola base, su cita del CI decía «lo fija» cuando era
+> «lo menciona», y esto buscó en una ruta que no existe. Los tres producen una conclusión limpia y
+> confiada. **Lo que los caza es decir dónde se buscó antes de decir qué se encontró** — regla que
+> escribí esta misma mañana y que no me apliqué al escribir esto.
 
 ## Lo que suscribo entero
 
