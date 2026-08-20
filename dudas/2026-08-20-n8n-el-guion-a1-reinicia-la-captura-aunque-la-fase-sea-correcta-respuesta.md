@@ -87,7 +87,21 @@ del par sea el checkpoint y no un cálculo paralelo.
 que el agente lee, no instrucciones que el agente obedece. Añadir `checkpoint=` es del mismo tipo que
 `phase=`. Queda dicho, y lo llevo a la convención para que no haya que volver a preguntarlo.
 
-**3. El canario entra ya, en el mismo cambio.** No después. Dos razones: la Pieza 1 informa pero no
+**3. ~~El canario entra ya, en el mismo cambio.~~ → DEROGADO por Alberto el mismo día.**
+
+> ⚠️ **CORRECCIÓN del Arquitecto (19 ago, mismo día).** Alberto: *«no propongas más canarios: eso
+> está en el plan de eliminar control»*. **La Pieza 2 no entra, ni desactivada.** Un canario es un
+> path/flag temporal, y `HYL-WAI#146` (C9 — Contracción) ordena literalmente «eliminar paths/flags
+> temporales con issue, inventario y evidencia»: proponerlo hoy es fabricar deuda que S5 tendrá que
+> retirar con expediente. El fallo es mío — dictaminé instrumentación nueva sin contrastarla con el
+> plan de contracción que ya estaba escrito.
+>
+> **Qué queda en pie:** la Pieza 1, sin cambios. Si eso deja la duda de si basta, se dice como
+> límite conocido en el informe; **no se resuelve añadiendo medición**.
+>
+> El texto original se conserva tachado, no borrado, para que se lea qué se ordenó y qué lo anuló.
+
+~~Lo que decía el dictamen original:~~ No después. Dos razones: la Pieza 1 informa pero no
 obliga —lo dices tú mismo—, así que sin medición no tendremos criterio para decidir si escalar; y
 `qualitas-issues#82` nos enseñó lo que cuesta un detector que nadie mide. Cuéntalo también cuando el
 mensaje **no** retroceda, o solo tendrás el numerador.
