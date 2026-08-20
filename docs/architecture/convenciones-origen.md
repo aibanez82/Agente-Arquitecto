@@ -114,6 +114,35 @@ el mismo formato al instruir.
 requerimiento de negocio y el Arquitecto devuelve las instrucciones para el ejecutor que toque.
 Primer caso: recordatorios de pago (`docs/iniciativas/recordatorios-de-pago.md`, `HYL-WAI#144`).
 
+## Tracker único en HYL-WAI — `qualitas-issues` congelado (Alberto, 19 ago 2026)
+
+**La regla nueva:** todo issue nuevo nace en `aguayo-co/HYL-WAI`, sea de Django, n8n, Dashboard o
+transversal. Desaparece el ruteo «el fix decide el repo», que obligaba a clasificar antes de poder
+escribir. Autorización de Alberto en esta fecha, con el cambio ya hablado con Juan.
+
+**Por qué no se migró nada.** GitHub solo transfiere issues entre repos del **mismo owner**, y
+`aibanez82` y `aguayo-co` no lo son. Mover los 41 abiertos habría significado recrearlos a mano,
+perdiendo número, autoría y comentarios, y dejando muertas todas las referencias `qualitas-issues#NN`
+de `CLAUDE.md` y de los docs. Se eligió **corte limpio**: el repo viejo se congela, sus abiertos
+viven su curso y se cierran donde están, y se apaga solo. Coste cero y ni un puntero roto — a cambio
+de convivir con dos trackers una temporada, que es por lo que el barrido de sesión mira los dos.
+
+**Lo que hubo que mover para que el cambio funcionara:** las 18 labels de la taxonomía
+(`sistema:*`, `criticidad:*`, `reportado-por:*`, `triage`, `src:*`, `idea`) no existían en HYL-WAI
+—solo tenía las nueve por defecto de GitHub— y sin ellas el inbox de captura rápida se queda sin
+filtro. Se replicaron el mismo día. Es la convención «cambiar una convención = actualizar su
+herramienta en el acto»: un canal nuevo sin su tooling es un punto ciego.
+
+**El cabo que no está de nuestro lado:** la captura `QUALITAS:` la crea el flujo de Alberto en la
+app de Claude, y ese flujo decide en qué repo escribe. Mientras siga apuntando al repo congelado,
+las capturas nuevas caerán ahí por mucho que el protocolo diga otra cosa. Se cambia en la app, no
+aquí.
+
+**Consecuencia de gobernanza a vigilar:** el backlog de HYL-WAI pasa de 33 abiertos a recibir
+también lo nuestro, y de los 41 que quedaban en el repo viejo **19 eran de n8n y solo 7 de Django**.
+El repo es de Juan; que el volumen y la naturaleza de lo que ve cambien es precisamente lo que había
+que hablar con él antes, y se habló.
+
 ## El trabajo para un repo nuestro vive en una rama nuestra (13 ago 2026)
 
 **Incidente:** el módulo de descuentos de n8n de `HYL-WAI#156` se quedó **solo** en
