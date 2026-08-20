@@ -114,6 +114,30 @@ el mismo formato al instruir.
 requerimiento de negocio y el Arquitecto devuelve las instrucciones para el ejecutor que toque.
 Primer caso: recordatorios de pago (`docs/iniciativas/recordatorios-de-pago.md`, `HYL-WAI#144`).
 
+## No proponer instrumentación nueva (Alberto, 19 ago 2026)
+
+**La directriz, literal:** *«no propongas instrumentación nueva: el plan es retirarla»*.
+
+**El incidente.** Dictaminando la duda del guion A1 (`dudas/2026-08-20-…-respuesta.md`, commit
+`2138b47`), el Arquitecto ordenó en su §3 que entrara «ya, en el mismo cambio» un canario que midiera
+si la Pieza 1 bastaba. Alberto lo derogó el mismo día. El §3 quedó tachado en su propio fichero
+(`4dbd3e0`) y el ejecutor fue parado por mensajería antes de escribir el código.
+
+**Por qué era un error, y no una preferencia.** `HYL-WAI#146` (C9 — Contracción) ordena literalmente
+«eliminar paths/flags temporales con issue, inventario y evidencia». Un canario **es** un flag
+temporal: proponerlo es fabricar deuda que S5 tendrá que retirar con expediente, inventario y
+evidencia. El plan de contracción ya estaba escrito, y S5 figura en `CLAUDE.md` como etapa del
+Contract-First. No se escapó un detalle: no se contrastó la propuesta con el plan activo.
+
+**El razonamiento que llevó al error, porque es el que hay que desarmar.** «La Pieza 1 informa pero
+no obliga, luego hace falta medir si basta.» Suena a rigor y es el reflejo correcto en casi cualquier
+otro contexto — pero convierte cada incertidumbre en un artefacto nuevo. Cuando el plan vigente es
+contraer, la respuesta a «no sé si basta» es **decirlo**, no instrumentarlo.
+
+**Alcance, preguntado y respondido:** aplica a instrumentación **nueva**. La que ya existe —los cinco
+monitores de sesión, el gate de anclas de `CLAUDE.md`— no la toca esta regla; se retirará cuando lo
+ordene su propio plan.
+
 ## Tracker único en HYL-WAI — `qualitas-issues` congelado (Alberto, 19 ago 2026)
 
 **La regla nueva:** todo issue nuevo nace en `aguayo-co/HYL-WAI`, sea de Django, n8n, Dashboard o
