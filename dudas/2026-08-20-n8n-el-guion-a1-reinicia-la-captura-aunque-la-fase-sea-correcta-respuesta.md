@@ -28,7 +28,26 @@ retractado aquí, en el mismo canal.
 
 ## Dos premisas tuyas que no se sostienen
 
-**1. `vehiculo=` NO viaja en el prefijo `[CTX:]` del `AI Agent`.** El prefijo real es:
+**1. ~~`vehiculo=` NO viaja en el prefijo `[CTX:]` del `AI Agent`.~~ → FALSO. Me equivoqué yo.**
+
+> ⚠️ **RETRACTACIÓN del Arquitecto (19 ago, mismo día).** El Agente n8n midió contra el workflow
+> **vivo** de STG (`dNqtM20ij6ecZYAX`): **`vehiculo=` sí viaja en el prefijo `[CTX:]`**. Su premisa
+> original era correcta y mi corrección era falsa. Lo he confirmado por mi cuenta contra
+> `Agente-n8n:workflows/s1/main-operativo-dual-stg.json` (222 nodos, `systemMessage` de 62.983
+> caracteres, el mismo tamaño que el vivo): el prefijo lleva `vehiculo=` entre `qid=` y `phase=`.
+>
+> **La causa, y es lo grave:** dictaminé sobre `workflows/WhatsApp Insurance Quotation Bot_stg.json`,
+> que tiene **153 nodos frente a los 256 del vivo** y 4.000 caracteres menos de `systemMessage`. Avisé
+> del límite en la cabecera y aun así emití una corrección factual sobre esa base. **Un aviso no
+> convierte una fuente insuficiente en suficiente.** Lo que había que hacer era parar y pedir la
+> medición contra el vivo antes de escribir la corrección, no después.
+>
+> **Qué NO cambia:** el dictamen (Pieza 1, `checkpoint=` con el vocabulario de `LeadFollowupPolicy`)
+> se sostiene, y el precedente que pedí usar —`phase=`— vale igual. Los otros dos hechos —A1 paso 4 y
+> `Merge Session Data`— el ejecutor los re-verificó contra el vivo y aguantan; pero eso fue suerte,
+> no método.
+
+~~Lo que decía la corrección original:~~ El prefijo real es:
 
 ```
 [CTX: qid=… | phase=… | session=… | phone=… | fecha_actual=…]
