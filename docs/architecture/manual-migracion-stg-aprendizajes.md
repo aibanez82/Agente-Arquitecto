@@ -361,6 +361,36 @@ como salga, te diga cuál era. Así ninguna ronda se gasta solo en descartar.
 
 ---
 
+### 2.10 Un gate que nunca ha pasado no protege: enmascara
+
+El §2.5 avisa de las guardas que fallan **abiertas**. Esta es la trampa simétrica, y en S1 costó
+24 días: **una guarda que falla cerrada esconde si lo que hay detrás funciona.**
+
+**El caso (20 ago 2026, emisión de STG).** El guard de emisión llevaba 5 ejecuciones, las 5 en rojo.
+Se leía como «el gate está haciendo su trabajo». La primera que cruzó los gates destapó que el guard
+resolvía `cotizacion_id` contra `$('Merge Session Data')` — un nodo del **bot**, que en el guard no
+existe. Se copió al montarlo (`#66` etapa 2) y **nunca se ejecutó**, así que nunca falló a la vista.
+Toda emisión moría con el fallback genérico. Registrado en `HYL-WAI#181`.
+
+**Por qué no lo vio nadie, que es lo que hay que retener.** Mientras el gate deniega, el camino de
+detrás no se ejecuta; y lo que no se ejecuta no falla, **no aparece en ninguna métrica y no rompe
+ninguna suite**. El rojo del gate y el rojo del defecto son indistinguibles desde fuera: los dos se
+ven como «no pasó». Cuanto más tiempo lleva cerrado, más defecto acumulado hay detrás sin descubrir
+— y se descubre todo junto el día que se abre, que suele ser el día con menos margen.
+
+**Qué hacer, y es barato:**
+
+- **Antes de cerrar un camino con un gate, ejecútalo una vez con el gate abierto.** Una sola
+  ejecución verde de extremo a extremo, aunque sea con datos de prueba. Si no se puede, escríbelo:
+  «este camino nunca se ha ejecutado completo» es un hecho de riesgo, no un detalle.
+- **Al abrir un gate que llevaba tiempo cerrado, trátalo como estreno, no como reanudación.** Lo de
+  detrás no está probado: está sin estrenar.
+- **Un guard copiado de otro workflow hereda referencias a nodos que allí no existen.** Barrer las
+  referencias cruzadas (`$('…')`) es parte de montarlo, no una revisión posterior.
+
+**Corolario del §6, completado:** un guard que nadie ha visto denegar no es un guard — y un guard que
+nadie ha visto **pasar** tampoco: es una pared, y no sabes qué hay al otro lado.
+
 ## 3. Trazabilidad: el fallo silencioso más caro
 
 En una sola jornada, el registro atribuyó **seis veces** a nuestro lado acciones que no hizo: un
