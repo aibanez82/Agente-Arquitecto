@@ -114,6 +114,36 @@ el mismo formato al instruir.
 requerimiento de negocio y el Arquitecto devuelve las instrucciones para el ejecutor que toque.
 Primer caso: recordatorios de pago (`docs/iniciativas/recordatorios-de-pago.md`, `HYL-WAI#144`).
 
+## Un handoff que deroga a otro lo dice dentro de sí mismo (19 ago 2026)
+
+**El incidente.** El handoff `66e8dba` (Agente n8n) ordenaba en su §4: *«abre los dos issues, en
+`qualitas-issues`; ninguno va a HYL-WAI»*. El commit **siguiente** en `main` del mismo repo,
+`89c6a63`, era el handoff que congela `qualitas-issues` y lo deroga. El Agente n8n llegó a `main`
+cuando `66e8dba` era la cabeza, arrancó, y cumplió la §4 **tal como estaba escrita**: abrió
+`qualitas-issues#86` y `#87` en el repo que se acababa de congelar. Decisión de Alberto: se quedan
+donde están.
+
+**Por qué no fue culpa del ejecutor, y esto es lo que hay que retener.** Hizo lo correcto en todo:
+verificó la orden en su fuente, pidió autorización a Alberto para tocar su propio `CLAUDE.md`, y no
+reescribió ninguna referencia `#NN`. El defecto estaba en la secuencia de publicación, no en la
+ejecución. **Un ejecutor que ya arrancó no vuelve a mirar `main`** — no tiene por qué: la orden es el
+fichero que leyó. Publicar la derogación en un fichero distinto, aunque sea el commit inmediatamente
+siguiente, no lo alcanza.
+
+**Por qué no bastaba la convención que ya existía.** «Una retractación solo existe si se escribe en
+el mismo canal que el error» cubre el error *ya cometido*. Esta cubre el caso previo: la instrucción
+que todavía es correcta cuando se publica y deja de serlo minutos después. Sin la marca, el handoff
+viejo sigue siendo verdad operativa para quien lo abra, y quien obedece bien es justo quien se
+equivoca.
+
+**Quién la propuso:** el Agente n8n, en el §4 de su informe `64957db`. La sugerencia llegó por
+mensajería entre sesiones; la regla la decidió Alberto y se escribió aquí, no se aplicó por venir de
+un peer — el mismo criterio que ese ejecutor y el del Dashboard aplicaron ese día al negarse a tocar
+su `CLAUDE.md` sin luz verde suya.
+
+**Coste del día que la instauró:** dos issues abiertos en un repo congelado. Barato. La próxima
+derogación silenciosa puede caer sobre un cambio en producción.
+
 ## Tracker único en HYL-WAI — `qualitas-issues` congelado (Alberto, 19 ago 2026)
 
 **La regla nueva:** todo issue nuevo nace en `aguayo-co/HYL-WAI`, sea de Django, n8n, Dashboard o
