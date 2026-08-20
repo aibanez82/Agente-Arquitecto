@@ -135,6 +135,8 @@ Detectores **verificados el 16 ago contra el workflow VIVO de PROD** (`BtOaZm7Wl
 
 **El riesgo ya se materializó (`qualitas-issues#82`):** `confirmo_cobertura` y `dio_domicilio` buscaban frases que el bot **no dice** —ni aquí ni en el Dashboard— y llevaban tiempo siempre en `false`. No dio error: devolvía un valor plausible. **Al tocar copy del bot, revisar estos LIKE contra el workflow vivo.**
 
+**Esa tabla guarda el texto del agente, no todas sus llamadas a tools (`HYL-WAI#183`):** de cada turno solo persiste el **último** intercambio de tool. Los detectores de arriba son seguros porque leen texto, que sí se persiste siempre; **cualquier detector o auditoría construido sobre llamadas a tools verá una fracción** — para eso, las ejecuciones de n8n. Y no se arregla persistiendo más: esa tabla **es la memoria del modelo** (`contextWindowLength: 60`), no un log, así que ampliarla cambia lo que el bot ve.
+
 ---
 
 ## Bugs — fuente única
