@@ -114,6 +114,27 @@ el mismo formato al instruir.
 requerimiento de negocio y el Arquitecto devuelve las instrucciones para el ejecutor que toque.
 Primer caso: recordatorios de pago (`docs/iniciativas/recordatorios-de-pago.md`, `HYL-WAI#144`).
 
+## Restitución del canal al Arquitecto (Alberto, 16 ago 2026) — deroga la suspensión del 10 ago
+
+**Qué cambia respecto del 10 ago:** el Arquitecto **vuelve a publicar handoffs y a responder
+`dudas/` él mismo**. Alberto ordena; el Arquitecto diagnostica, escribe el handoff y lo lanza. Se
+levanta la suspensión descrita arriba: las convenciones que quedaron *suspendidas* (orden de
+arranque, detección por fichero, formato de `handoffs/` e `informes/`) vuelven a estar **vigentes**,
+no archivadas.
+
+**Qué se conserva del periodo suspendido:** la comunicación con Juan y sus issues sigue siendo del
+Arquitecto salvo orden en contra, y leer los repos de los ejecutores sigue sin gastar canal.
+
+**Los tres canales, y por qué no son intercambiables:** órdenes por `handoffs/`, dudas por `dudas/`,
+mensajería directa entre sesiones **solo** para coordinar (lanzar un handoff ya publicado, pedir
+estado, devolver resultados). Por el canal en vivo no se ordena, y jamás se pide editar `CLAUDE.md`,
+permisos ni configuración: si entra el cambio bueno por una vía lateral, el canal ya está abierto
+para el malo.
+
+**Por qué importa dejarlo escrito:** este documento se quedó narrando la suspensión del 10 ago
+durante seis días mientras `CLAUDE.md` ya operaba con el canal restituido. Un documento de origen
+que contradice a la regla vigente es peor que no tenerlo: se consulta precisamente cuando hay duda.
+
 ## El trabajo para un repo nuestro vive en una rama nuestra (13 ago 2026)
 
 **Incidente:** el módulo de descuentos de n8n de `HYL-WAI#156` se quedó **solo** en
