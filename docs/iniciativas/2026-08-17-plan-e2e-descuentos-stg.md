@@ -8,6 +8,16 @@
 > más adelante por un motivo que nadie había visto. Este documento queda como **acta + guía para la
 > próxima**, que es lo único que sirve cuando la predicción falla.
 
+>
+> ---
+>
+> **SUPERADO EL 20 AGO 2026 — leer §1.4 con esta marca delante.** El bloqueante del PDF
+> (`document_binary_invalid`) **está resuelto**: las aplicaciones `138`, `139` y `140` completaron con
+> un PDF comercial real de ~18 KB y el precio descontado. **Y la causa que este documento atribuye a
+> `pdf_cotizacion_url` vacío era una correlación, no la causa** — esa columna sigue vacía en las ocho
+> cotizaciones resultado, incluidas las que ya generan su PDF. Medición y corrección publicadas en
+> [HYL-WAI#161](https://github.com/aguayo-co/HYL-WAI/issues/161#issuecomment-5350536505).
+
 ---
 
 ## 1. Lo que aprendimos, por orden de importancia
@@ -43,7 +53,7 @@ antes y más silencioso: el cliente *sí* interactuó.
 Confirmado con datos: programa `POR_PRECIO_ALTO_PARA_IA_30`, aplicación `100`, cotización resultado
 `2114` creada. **El sondeo del 31 jul ya no vale** (Alberto: el webservice cambió). No usarlo.
 
-### 1.4 · **El bloqueante: la cotización con descuento no tiene PDF**
+### 1.4 · ~~**El bloqueante: la cotización con descuento no tiene PDF**~~ · ✅ RESUELTO 20 ago
 
 La aplicación terminó en `uncertain` / `document_binary_invalid`. El documento que recibe el worker:
 
@@ -61,8 +71,23 @@ Un **placeholder de tres líneas**. Y la causa está aguas arriba: `qualitas_cot
 generar el PDF real de la cotización con descuento — y eso es Django.
 
 **Reproducible:** la aplicación `67` está igual, con placeholder de 1169 bytes y el mismo motivo.
-**Mientras no se arregle, el E2E de `#161` no es ejecutable**: ni segunda descarga exacta, ni
-delivery, ni «cero llamada nueva a Quálitas» pueden verificarse, porque el flujo muere antes.
+~~**Mientras no se arregle, el E2E de `#161` no es ejecutable**: ni segunda descarga exacta, ni
+delivery, ni «cero llamada nueva a Quálitas» pueden verificarse, porque el flujo muere antes.~~
+
+> **Resuelto el 20 ago 2026.** Django genera el PDF comercial (WeasyPrint, A4, ~18 KB) directamente en
+> `qualitas_discountquotedocument`. Verificado sobre la cadena `2171`→`2172`: TOTAL $16 388.22 → **$14
+> 536.47**, ahorro de **$1 851.75 (11.30 %)**, con `qualitas_percentage` 20→30 congelado en la
+> cotización resultado.
+>
+> **Y una inferencia mía de este documento queda retirada:** «la causa está aguas arriba,
+> `pdf_cotizacion_url` vacío». Falso. Esa columna **sigue vacía** en las ocho cotizaciones resultado,
+> incluidas las tres que completan con PDF real; el documento no pasa por ella. La observación era
+> cierta, la inferencia no.
+>
+> Lo que sí queda abierto, medido el 20 ago: el PDF **no menciona el descuento** (es `#168`, abierto y
+> sin responsable); el bloque RIESGOS es **idéntico** en origen y resultado mientras cambian los
+> totales; la prima neta cae 11.95 % y no el 12.5 % que implicaría 20 %→30 %; y la entrega se acredita
+> `sent` **sin `provider_message_id`**, así que es autorreportada.
 
 ### 1.5 · Defecto del candidato `#161`, encontrado y corregido
 
