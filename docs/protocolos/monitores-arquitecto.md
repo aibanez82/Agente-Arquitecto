@@ -3,7 +3,8 @@
 > Los monitores viven solo mientras la sesión está abierta. Al abrir sesión nueva durante trabajo
 > activo con Juan (etapas S1–S5), armar los **CINCO** con la herramienta Monitor (`persistent: true`).
 > Antes de armarlos: hacer el barrido de arranque (dudas/ pendientes, informes/, `gh issue list`
-> en qualitas-issues, y comentarios nuevos en los issues vivos desde la última actividad conocida) —
+> en HYL-WAI —tracker único desde el 19 ago— y en `qualitas-issues` mientras le queden abiertos, y
+> comentarios nuevos en los issues vivos desde la última actividad conocida) —
 > los monitores solo cubren lo NUEVO a partir de su arranque.
 >
 > **Son cinco, uno por CANAL, y esa es la regla que los mantiene a raya (Alberto, 16 ago):**
@@ -42,7 +43,7 @@ huérfanos (`ppid=1`) no aparecen en `/bashes` y solo se matan por PID.
 nuestro. Tras un `/clear` eso es justo lo que falta: el 16 ago la sesión anterior de esta misma
 ventana había publicado **cinco** comentarios en `#161` y abierto dos issues, y la sesión nueva los
 leyó como trabajo ajeno. Añadir al barrido: comentarios propios del día en los issues vivos
-(`--jq 'select(.user.login=="aibanez82")'`), issues abiertos hoy en `qualitas-issues`, y
+(`--jq 'select(.user.login=="aibanez82")'`), issues abiertos hoy en el tracker, y
 `gh pr list` en nuestros repos.
 
 ## 1. ~~Dictámenes de Juan en HYL-WAI#132~~ → FUNDIDO EN EL 2 (16 ago)

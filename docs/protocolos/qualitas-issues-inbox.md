@@ -1,21 +1,29 @@
-# Protocolo — `qualitas-issues` como inbox de captura rápida
+# Protocolo — inbox de captura rápida `QUALITAS:`
 
-> Añadido: 20 julio 2026.
+> Añadido: 20 julio 2026. **Destino cambiado el 19 agosto 2026: el inbox es ahora
+> `aguayo-co/HYL-WAI`.** `aibanez82/qualitas-issues` quedó congelado — no se abre nada nuevo ahí,
+> pero **se sigue barriendo mientras le queden issues abiertos**, y sus números no se han movido.
+> Historia del cambio: `docs/architecture/convenciones-origen.md`.
 
 ## Función
 
 Además de ser el tracker de bugs técnicos del ecosistema (ver CLAUDE.md, sección
-"Bugs — fuente única"), `aibanez82/qualitas-issues` es el **inbox de captura rápida**
-de Alberto. Cuando está fuera de casa, dicta o escribe ideas/bugs vía Claude (app
-iOS o web) usando el prefijo `QUALITAS:`. Claude estructura cada captura como un
-Issue en ese repo.
+"Bugs — fuente única"), el tracker es el **inbox de captura rápida** de Alberto. Cuando está fuera
+de casa, dicta o escribe ideas/bugs vía Claude (app iOS o web) usando el prefijo `QUALITAS:`.
+Claude estructura cada captura como un Issue.
+
+⚠️ **El destino de esa captura lo fija el flujo de Alberto en la app de Claude, no este repo.** Si
+ese flujo sigue apuntando a `aibanez82/qualitas-issues`, las capturas nuevas seguirán cayendo en el
+repo congelado por mucho que aquí diga otra cosa — **hay que cambiarlo en la app**. Hasta
+confirmarlo, barrer los dos.
 
 ## Responsabilidad del Arquitecto
 
 1. **Al iniciar cada sesión de trabajo** (o cuando Alberto lo pida explícitamente,
    ej. "revisa QUALITAS"), consultar issues abiertos:
    ```
-   gh issue list --repo aibanez82/qualitas-issues --state open
+   gh issue list --repo aguayo-co/HYL-WAI --state open
+   gh issue list --repo aibanez82/qualitas-issues --state open   # hasta que se vacíe
    ```
 2. Cada issue trae: tipo (bug/feature/idea), repo afectado dentro del ecosistema
    (Dashboard_seguroautoqualitas, HYL-WAI, Agente_QATest_Qualitas, etc.), contexto,
@@ -24,8 +32,9 @@ Issue en ese repo.
    - Reasignar a un ejecutor existente (Nivel 3).
    - Trabajo directo del Arquitecto (diagnóstico/plan).
    - Requiere más contexto de Alberto antes de proceder.
-4. Una vez triangulado y asignado (o resuelto), **cerrar el issue en qualitas-issues**
-   con comentario indicando destino/resolución. Ejemplos:
+4. Una vez triangulado y asignado (o resuelto), **cerrar el issue donde esté** —en HYL-WAI si
+   nació ahí, en `qualitas-issues` si es de los que quedaron— con comentario indicando
+   destino/resolución. Ejemplos:
    - "Reasignado a Dashboard_seguroautoqualitas como issue #47"
    - "Resuelto directamente, ver commit xyz"
 5. **Nunca ejecutar el trabajo directamente si el issue pertenece a otro repo** — solo
@@ -46,18 +55,21 @@ backlog completo**.
 
 Comando:
 ```
-gh issue list --repo aibanez82/qualitas-issues --label triage[,src:app] --state open
+gh issue list --repo aguayo-co/HYL-WAI --label triage[,src:app] --state open
+gh issue list --repo aibanez82/qualitas-issues --label triage[,src:app] --state open   # resto
 ```
+Las labels `triage`, `src:*`, `sistema:*`, `criticidad:*` y `reportado-por:*` se replicaron en
+HYL-WAI el 19 ago: el filtro funciona igual en los dos.
 
 Para cada uno, una línea: `[#n] resumen · tipo (idea/feature/bug) · repo destino · prioridad`.
 Al final preguntar cuáles trackear y cuáles descartar. Al procesar uno, quitarle `triage` (el
 label de canal se queda como registro de origen — no se borra).
 
-## Relación con la función existente de `qualitas-issues`
+## Relación con la función de tracker
 
 No reemplaza la función de tracker de bugs técnicos ya documentada en CLAUDE.md —
 la complementa. Un issue capturado vía `QUALITAS:` puede terminar siendo, tras
-triangulación, un bug técnico que se queda en este mismo repo con su ciclo normal
+triangulación, un bug técnico que se queda en el mismo tracker con su ciclo normal
 (abrir → agente ejecutor → Arquitecto certifica → cierra).
 
 ## Extensión (27 jul 2026) — barrido de issues entrantes de Juan en HYL-WAI
