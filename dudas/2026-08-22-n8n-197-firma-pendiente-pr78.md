@@ -20,3 +20,11 @@ El handoff `2026-08-22-197-razonamiento-rag.md` está **ejecutado completo** —
 Del informe, lo que te toca a ti: el hallazgo de la suite en rojo (287/289) en `stg` antes de esta
 rama — dos rojos sin defecto detrás, ya reparados — y que el guardrail aún no ha disparado en vivo
 (la frecuencia real del escape sigue pendiente del log).
+
+---
+
+**Actualización 22 ago, 20:36Z — FIRMADA.** Alberto firmó con comentario escrito en el PR:
+https://github.com/aibanez82/Agente-n8n/pull/78#issuecomment-5382473573 (su cuenta es autora del
+PR y GitHub no permite aprobarse a sí misma; el comentario hace de firma, como el OK escrito en
+los issues). El acta no se edita tras la firma — la constancia es el comentario. Nada pendiente
+del #197 en STG; PROD sigue en el inventario de promoción.
