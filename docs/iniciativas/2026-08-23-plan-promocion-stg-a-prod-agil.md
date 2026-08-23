@@ -137,8 +137,25 @@ ventana de mantenimiento que respetar**: el orden es por dependencia técnica, n
 
 ### F0 · Red de seguridad (30 min, no toca nada vivo)
 
-1. Export de los **5 workflows vivos de PROD** al repo, en rama y commiteados. Es la marcha atrás de
-   n8n: sin esto, un import malo no se deshace.
+1. ~~Export de los **5 workflows vivos de PROD** al repo, en rama y commiteados.~~ **YA HECHO, y
+   verificado el 23 ago contra la instancia viva.** Los cinco están en
+   `aibanez82/Agente-n8n:main/workflows/` (árbol limpio desde el 13 ago) y **los cinco `versionId`
+   coinciden con los de la API de PROD** — que es la comprobación fuerte: no es que tengan el mismo
+   número de nodos, es que son el mismo objeto.
+
+   | Workflow | id | Nodos vivos = export |
+   |---|---|---|
+   | WhatsApp Insurance Quotation Bot | `BtOaZm7WlZT-24V7hqCnF` | 119 |
+   | Monitor Qualitas SIO PROD | `3NQfglVIfPSdijm9` | 19 |
+   | Atencion Humana | `B5ihE5xHg8bjeesl` | 19 |
+   | Retomar Conversacion | `96XfJZcwvlHnVJLko3G8-` | 12 |
+   | Payment Confirmation | `disvKr7iVhnNnefuiqJbJ` | 5 |
+
+   **Y un aviso que sale de aquí:** la copia de `Agente-Arquitecto:docs/n8n-workflows/` tiene **3 de
+   5**, y el bot congelado en **113 nodos desde el 26 jul**. CLAUDE.md la llama «la única red de
+   seguridad» y lleva un mes sin serlo. La red real es la del repo del n8n; hay que reapuntar el
+   puntero o retirar la copia muerta, porque **una red de seguridad falsa es peor que ninguna**:
+   invita a tirarse.
 2. `heroku pg:backups:capture -a hyl-wai-production` — la marcha atrás del esquema.
 3. Anotar la línea base: release **v341**, Django `53103dd`, 61 migraciones, `versionId` y recuento de
    nodos de cada workflow.
@@ -159,7 +176,8 @@ reentrantes: se han aplicado ya a STG y varias se han repetido sin daño.
 
 ### F2 · Django
 
-Merge `stg` → `main` (limpio, sin trabajo divergente) y deploy a `hyl-wai-production`. El release
+Promoción de **`stg@372f63f`** a `main` (limpio, sin trabajo divergente) y deploy a
+`hyl-wai-production`. El release
 phase corre las **18 migraciones** `0062…0079`.
 
 **Verificación:** `django_migrations` en 79 con `0079_first_receipt_payment_models` como última, y las
@@ -171,6 +189,28 @@ validando un árbol que ya no existe.
 **Regla:** en F2 se **anota el SHA de `stg` que se promueve** y ese es el árbol que recorre F4→F6.
 Lo que Juan integre después entra en la promoción siguiente, no en esta. Con PROD apagado, promover
 otra vez es barato; validar dos árboles a la vez, no.
+
+**Y el mecanismo, porque la regla sola no lo impide (añadido 23 ago, tarde).** Este plan decía
+«merge `stg` → `main`», y eso **ya no promueve el árbol congelado**: medido contra `origin` esta
+tarde, `origin/stg` va **32 commits por delante** de `372f63f` —el tip es `09dedd6`, el merge del
+`#203` de esta mañana— y un `merge stg` literal arrastraría las ocho migraciones que este mismo plan
+excluye:
+
+```
+0080_receipt_ledger_models       0084_receipt_ledger_same_policy_guards
+0081_general_receipt_poll_state  0085_reject_unicode_c
+0082_preserve_paid_full…         0086_receipt_ledger_query_indexes
+0083_payment_poll_observation…   0087_receipt_sensitive_base_manager
+```
+
+Una regla escrita en un documento no detiene un comando. **El congelado tiene que ser un objeto de
+git**, y la casa ya tiene el patrón: la promoción anterior entró por
+`release/promote-stg-to-main-20260810` → PR `#158`, que es el `53103dd` que hoy corre en PROD.
+
+Igual aquí: cortar **`release/promote-stg-to-main-20260823` desde `372f63f`** —no desde `stg`— y
+abrir el PR de esa rama contra `main`. El diff del PR pasa a ser la lista exacta de lo que se
+promueve, revisable **antes** de fusionar, y lo que Juan integre mientras tanto no puede colarse
+por descuido de nadie.
 
 **Vuelta atrás:** `heroku rollback v341`. **Ojo:** el rollback devuelve el código, **no** deshace las
 migraciones. Por eso F1 y F2 son aditivas por diseño: lo que entra, se queda.
