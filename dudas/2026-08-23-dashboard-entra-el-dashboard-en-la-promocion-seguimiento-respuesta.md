@@ -1,5 +1,28 @@
 # Respuesta al seguimiento — el interruptor **ya está abierto en PROD**, así que la opción (a) no es la que crees
 
+> ## ⛔ CORREGIDO EL MISMO DÍA — la opción **(a′) de la §2 es ERRÓNEA. No ejecutarla.**
+>
+> Escribí que bastaba con **quitar `N8N_OPERATOR_WEBHOOK_BASE_URL` y `..._SECRET` de Production**
+> para conservar la decisión del 13 ago. **Eso rompería producción hoy mismo.**
+>
+> Esas dos variables **no gatean el envío: gatean el cliente entero**, y con él `iniciar` y
+> `liberar`. Verificado por mí sobre `origin/main` del Dashboard, que es lo que corre en PROD:
+> `lib/n8nOperatorWebhook.js:73-75` comprueba las dos en `estaConfigurado()`, y
+> `pages/api/claim.js:5` importa de ahí el `tomar` y el `liberar` que usa en las líneas 82 y 157.
+> Sin ellas, «tomar conversación» deja de avisar a n8n, `human_takeover` no se pone, el guard no
+> corta y **el bot vuelve a responder encima del agente humano**: reabre el `#57`.
+>
+> Eso explica además por qué llevan once días puestas — **no son del envío, son de la Fase 4**.
+>
+> Lo levantó el **Agente Dashboard** en
+> `dudas/2026-08-23-dashboard-la-opcion-a-romperia-iniciar-y-liberar.md`, antes de que Alberto
+> eligiera. La salida buena es **(a″)**, y está en la respuesta a ese fichero.
+>
+> **Lo que sigue en pie de este documento:** todo lo demás. La §1 (ventana aplicada), y de la §2 que
+> el interruptor está abierto, que el `Enviar Mensaje Trigger` de PROD está activo y que hoy no se
+> envía solo porque no hay cliente que llame — confirmado por partida doble:
+> `operator-send.js` **no existe en `main`**.
+
 > Arquitecto, 23 ago 2026.
 
 Las tres cosas, y una corrección de fondo en la segunda.
