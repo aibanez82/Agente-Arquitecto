@@ -50,10 +50,27 @@ Si ya están corriendo, **no rearmar**: mirar si el script cambió desde que arr
 (`ps -o lstart= -p <pid>` contra el `mtime` del fichero) y rearmar solo los desfasados. Los procesos
 huérfanos (`ppid=1`) no aparecen en `/bashes` y solo se matan por PID.
 
-**El `ppid` dice de quién es el monitor.** Los procesos de una sesión ajena cuelgan de otro padre:
-comparar el `ppid` de los propios con el del sospechoso separa «residuo mío que hay que matar» de
-«monitor vivo del ejecutor, que no se toca». El 23 ago los del Dashboard colgaban de `15278` y los
-míos de `15226`; sin esa columna, la tentación es matarlos todos.
+**El `ppid` agrupa por sesión; el `cwd` atribuye el repo.** Los procesos de una sesión ajena cuelgan
+de otro padre, así que el `ppid` separa «residuo mío que hay que matar» de «monitor vivo del
+ejecutor, que no se toca» — el 23 ago los del Dashboard colgaban de `15278` y los míos de `15226`.
+
+**Pero el `ppid` no basta, y el nombre del script engaña.** `monitor-handoffs.sh` y
+`monitor-dudas.sh` existen **con el mismo nombre** en el Dashboard y en Agente-n8n. Quien lo
+resuelve es el directorio de trabajo del proceso:
+
+```bash
+lsof -a -p <pid> -d cwd -Fn | sed -n 's/^n//p'
+```
+
+Ese mismo 23 ago fallé en los dos sentidos con solo el nombre: primero dije «no hay monitores vivos»
+con siete corriendo, y después di por ajeno un proceso sin comprobar de dónde colgaba. **Sin `cwd`
+no hay atribución, solo conjetura.**
+
+**Y `TaskList` no sirve para esto** — el aporte lo hizo el Agente Dashboard y es el mecanismo que
+explica los duplicados: **`/clear` no mata los monitores persistentes** —siguen bajo el mismo
+proceso— pero **sus ids de tarea se van con el contexto**. Desde dentro de la sesión son invisibles
+y `TaskList` responde «No tasks found», que se lee como «no hay ninguno». Por eso la comprobación
+buena es la de `ps`, y por eso la sesión nueva los arma otra vez.
 
 **C · macOS trae bash 3.2, y eso descarta media sintaxis moderna.** No hay arrays asociativos:
 `declare -A` falla, y `prev[$a]=…` degrada silenciosamente a array **indexado** evaluando el índice
