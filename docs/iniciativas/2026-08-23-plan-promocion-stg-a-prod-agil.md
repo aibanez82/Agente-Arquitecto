@@ -4,6 +4,9 @@
 > rápido y lo que se rompa en PROD se arregla ahí. Doble objetivo: **PROD limpio** y **STG y PROD
 > espejo**.
 >
+> **Segunda premisa (Alberto, 23 ago):** **ningún mensaje de pruebas puede llegar a un teléfono de
+> cliente.** Si hay que enviar algo, se envía al de Alberto: **`5551074144`**.
+>
 > **Todo número de este documento está medido el 22-23 ago 2026 contra la fuente viva** —API de n8n,
 > base de datos de producción, Heroku y los exports que el monitor de drift acredita como fieles.
 > Nada viene de memoria ni de informes.
@@ -86,6 +89,46 @@ migraciones solo**. Hay que confirmar con Alberto si dispara él (es member de l
 se coordina con Juan.
 
 ---
+
+## 2.bis · La premisa del teléfono, traducida a controles
+
+El riesgo real no es que alguien teclee a un cliente: es que **el sistema escriba solo**. Y PROD no
+está tan apagado como suena.
+
+**Medido el 23 ago en la base de producción:**
+
+| qué | dato |
+|---|---|
+| Leads nuevos en 14 días | **9** — el último el 21 ago a las 18:03 |
+| Envíos de Django en 30 días | **273** plantillas iniciales + **183** followups de 15 min |
+| Último envío de Django | **21 ago, 18:10** |
+| Último mensaje entrante de un cliente | **19 ago** |
+| Sesiones abiertas que alimentan lo proactivo | **1.066** |
+
+La landing está casi apagada —un lead cada día o dos—, pero **el número de WhatsApp está vivo**: cada
+uno de esos leads recibió su plantilla y su seguimiento automático, a una persona real. Si uno cae en
+mitad de la promoción, se encuentra un sistema a medio migrar.
+
+**Los controles, cada uno en su punto único:**
+
+1. **Nada proactivo encendido** hasta el final: los cuatro comandos de Django
+   (`enviar_seguimientos_whatsapp`, `reintentar_checkpoint_followup`, los dos `sync_qualitas_*`), el
+   Heroku Scheduler —incluido el job legacy que nadie ha podido inventariar—, el poller de descuentos
+   y `Retomar Conversación`.
+2. **Red dura en n8n:** `public.n8n_outbound_reserve` es el punto por el que pasa **todo** envío del
+   bot y ya resuelve el teléfono internamente. Una allowlist ahí, activa durante la ventana, rechaza
+   cualquier destinatario que no sea el de pruebas — con su motivo, no en silencio.
+3. **Red dura en Django:** el envío a Meta sale por un único sitio (`qualitas/services.py`,
+   `enviar_template_whatsapp`). **Hoy no existe ninguna allowlist**: lo único parecido es un dry-run
+   de los checkpoint followups. Hay que añadirla, por variable de entorno.
+4. **La limpieza de sesiones (F7) sube de sitio:** las 1.066 abiertas son el combustible de lo
+   proactivo. Se limpian **antes** de encender nada, no después.
+5. **Identidad de pruebas única:** `5551074144`. Cualquier prueba que necesite un mensaje real usa
+   ese número y ningún otro.
+
+**Consecuencia sobre la primera premisa:** «lo que se rompa en PROD lo arreglamos ahí» sigue valiendo
+para el sistema, no para el cliente que escriba ese día. Con los controles 1-3 puestos, romper es
+barato; sin ellos, un lead a destiempo lo paga una persona.
 
 ## 3. Las fases
 
