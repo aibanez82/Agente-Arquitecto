@@ -3,13 +3,17 @@
 > Los monitores viven solo mientras la sesión está abierta. Al abrir sesión nueva durante trabajo
 > activo con Juan (etapas S1–S5), armar los **CINCO** con la herramienta Monitor (`persistent: true`).
 > Antes de armarlos: hacer el barrido de arranque (dudas/ pendientes, informes/, `gh issue list`
-> en HYL-WAI —tracker único desde el 19 ago— y en `qualitas-issues` mientras le queden abiertos, y
-> comentarios nuevos en los issues vivos desde la última actividad conocida) —
-> los monitores solo cubren lo NUEVO a partir de su arranque.
+> en HYL-WAI —tracker único desde el 19 ago— y comentarios nuevos en los issues vivos desde la
+> última actividad conocida) — los monitores solo cubren lo NUEVO a partir de su arranque.
+>
+> **`qualitas-issues` sale del barrido: el 23 ago se midió en 0 abiertos** (`gh issue list --state
+> open` → `[]`). La condición que CLAUDE.md ponía —«mientras queden abiertos el barrido mira los
+> dos»— se cumplió sola. El repo queda apagado; las referencias `qualitas-issues#NN` de los
+> documentos siguen siendo válidas y no se renumeran.
 >
 > **Son cinco, uno por CANAL, y esa es la regla que los mantiene a raya (Alberto, 16 ago):**
 > lo que se pregunta (`m4` dudas) · lo que se entrega (`m5` informes) · lo que se empuja (`m3` git) ·
-> lo que Juan escribe (`m2` issues) · lo que Juan despliega (`m6` releases de STG). **Un monitor por
+> lo que Juan escribe (`m2` issues) · lo que Juan despliega (`m6` releases de STG **y PROD**). **Un monitor por
 > canal, no por asunto.** Ese día había **diez** vivos y cuatro no aportaban nada: tres vigilaban
 > ramas concretas (`fase0`, Fase 4, `feature/issue-156`) que `m3` ya cubre entera al mirar TODAS las
 > refs, y el cuarto duplicaba `m4`. Nacieron para un trabajo puntual del 11–13 ago, sobrevivieron a
@@ -32,12 +36,33 @@ vivos el 16 ago, cuatro de ellos residuos del 11–13 ago que nadie podía atrib
 antes de armar:
 
 ```bash
-ps -eo pid,lstart,command | grep -E "monitores/m[0-9]|heroku releases" | grep -v grep
+ps -eo pid,ppid,lstart,command | grep -v grep \
+  | grep -E "monitores/m[0-9]|scripts/monitor-|heroku releases"
 ```
+
+**El patrón se amplió el 23 ago porque el viejo mentía.** `monitores/m[0-9]|heroku releases` dio
+`ps` limpio —«no hay nada vivo»— y había **siete** procesos de monitor corriendo: los del Dashboard,
+que se llaman `scripts/monitor-<canal>.sh` y no encajaban en el patrón. Un patrón de detección
+calibrado solo sobre los monitores propios acredita ausencia donde no la hay, que es la peor
+respuesta posible para una comprobación cuyo único trabajo es evitar duplicados.
 
 Si ya están corriendo, **no rearmar**: mirar si el script cambió desde que arrancó el proceso
 (`ps -o lstart= -p <pid>` contra el `mtime` del fichero) y rearmar solo los desfasados. Los procesos
 huérfanos (`ppid=1`) no aparecen en `/bashes` y solo se matan por PID.
+
+**El `ppid` dice de quién es el monitor.** Los procesos de una sesión ajena cuelgan de otro padre:
+comparar el `ppid` de los propios con el del sospechoso separa «residuo mío que hay que matar» de
+«monitor vivo del ejecutor, que no se toca». El 23 ago los del Dashboard colgaban de `15278` y los
+míos de `15226`; sin esa columna, la tentación es matarlos todos.
+
+**C · macOS trae bash 3.2, y eso descarta media sintaxis moderna.** No hay arrays asociativos:
+`declare -A` falla, y `prev[$a]=…` degrada silenciosamente a array **indexado** evaluando el índice
+como aritmética, así que todas las claves no numéricas caen en el `0` y **comparten casilla**. La
+v2 del `m6` se armó así y su primer ciclo emitió `[release hyl-wai-production] v341 (antes: v239…)`,
+comparando PROD contra el valor de STG. **Un monitor que confunde dos entornos es peor que no
+tenerlo**: el aviso parece un despliegue de PROD que nunca ocurrió. Para estado por clave, fichero
+—que además sobrevive al rearme— y nunca array asociativo. Y probar el script **una vez a mano**
+antes de armarlo: `bash -n` valida sintaxis, no semántica, y este fallo pasa `bash -n` sin ruido.
 
 **B · ¿Qué publicó NUESTRO lado hoy?** El barrido miraba lo que escribe Juan y se saltaba lo
 nuestro. Tras un `/clear` eso es justo lo que falta: el 16 ago la sesión anterior de esta misma
@@ -64,13 +89,25 @@ min sin que cambie nada material y dispara el monitor en vacío (visto el 7 ago)
 
 ## 2. Comentarios nuevos en los issues vivos de gobernanza e iniciativa
 
-Igual que el 1, poll 120s, pero sobre **varios** issues en el mismo ciclo. Baja frecuencia real.
+Poll 120s. **Ya no lleva lista de issues (v3, 23 ago).** Una llamada al endpoint de repo entero
+—`/repos/aguayo-co/HYL-WAI/issues/comments?since=…`— cubre TODOS los issues, abiertos y por abrir.
 
-**#140 está CERRADO desde el 4 ago** (fue la decisión de separar Dual de Atención Humana/Metepec):
-apuntar ahí un monitor es vigilar una puerta tapiada. Desde el 16 ago este monitor cubre
-**`135 156 161 128 143`** — la cadena Contract-First viva más Descuentos, que es donde Juan escribe
-hoy. **Revisar esta lista al armar**, no heredarla: un issue que se cierra deja de ser señal y otro
-que se abre (como el #161, abierto el 15 ago) nace sin vigilancia hasta que alguien lo añade.
+**Por qué murió la lista.** La spec decía «revisar esta lista al armar, no heredarla», y el 23 ago
+el barrido enseñó que revisar a mano no funciona: la lista heredada era `132 135 156 161 128 143`,
+con **#156 cerrado el 21 ago y #143 el 20 ago** —dos llamadas por ciclo a puertas tapiadas— y sin
+**#203, #209 ni #201**, que es exactamente donde Juan escribía ese día (37 legs de relay en #203 en
+doce horas). El fallo no fue de nadie: una lista que hay que acordarse de revisar se desactualiza
+por construcción. El endpoint de repo no se desactualiza, cuesta 2 llamadas por ciclo en lugar de
+6-14, y **un issue que Juan abra mañana nace vigilado**.
+
+**Emite además ISSUES NUEVOS**, los abra quien los abra (`/issues?since=…`, descartando los que
+traen `pull_request`). Era un punto ciego con nombre y apellidos: **#203 y #209 los abrió Juan y
+ningún monitor avisó** — se vieron en el barrido, un día tarde.
+
+**Colapso por issue para no auto-detenerse.** Más de 3 comentarios nuevos del mismo issue en un
+ciclo se emiten como **una** línea `[#NNN · Juan ×N] última: …`. Sin esto, un relay como el de #203
+—~40 comentarios al día— dispara el corte por ruido y se pierde el monitor entero, que es peor que
+perder el detalle de una leg.
 
 ## 3. Ejecutores: pushes en ramas candidatas + commits en main + PRs
 
@@ -114,10 +151,16 @@ este canal y **ningún monitor avisó**: lo detectó Alberto preguntando. Corola
 encarga trabajo cuya entrega no mueve la superficie que vigilan los monitores existentes, el canal
 de entrega necesita el suyo **antes** de mandar el encargo.
 
-## 6. Releases de Django en `hyl-wai-stg` (Heroku)
+## 6. Releases de Django en Heroku — `hyl-wai-stg` **y `hyl-wai-production`**
 
-Poll 180s de `heroku releases -a hyl-wai-stg -n 1 --json`; emitir cuando cambie `version`,
-`description` o `status`, incluyendo el valor anterior. Es el **único monitor que ve a Juan
+Poll 180s de `heroku releases -a <app> -n 1 --json` sobre **las dos** apps; emitir cuando cambie
+`version`, `description` o `status`, incluyendo el valor anterior y el nombre de la app.
+
+**PROD entra el 23 ago (v2).** Con el `#210` abierto —llevar STG a producción y dejar los dos
+entornos como espejo— el release de PROD deja de ser ruido y pasa a ser la medida del trabajo: es
+donde se ve aterrizar cada promoción, y donde un **rollback cambiaría la línea base sin que nadie
+lo anuncie**. Es el mismo canal («lo que Juan despliega»), así que va dentro de este monitor y no
+en uno nuevo. Es el **único monitor que ve a Juan
 desplegar**: los otros cuatro ven lo que escribe o lo que empuja a git, no lo que pone a correr. Con
 la cadena `#161 → Payments → #135` viva, un release nuevo cambia contra qué estamos midiendo, y un
 rollback lo cambia **sin que nadie lo anuncie**.
