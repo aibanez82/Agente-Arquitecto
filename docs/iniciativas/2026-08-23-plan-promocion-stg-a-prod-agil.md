@@ -188,6 +188,13 @@ activar, scheduler parado). Se encienden **uno a uno**, midiendo entre uno y otr
 
 Con PROD apagado esto es barato: no hay tráfico real que pueda tropezar con un flag a medias.
 
+**Antes de encender nada, inventariar el Heroku Scheduler de PROD.** La validación de STG del `#203`
+(23 ago) dejó este cabo suelto explícitamente: la CLI no expone el inventario del Scheduler clásico,
+así que **no se pudo afirmar** si el job legacy `sync_qualitas_first_payments` sigue existiendo. En
+STG da igual; en PROD, un job legacy despertando contra el proveedor mientras encendemos el nuevo
+sync es la clase de sorpresa que este plan existe para evitar. Se resuelve mirando el dashboard, no
+adivinando.
+
 ### F6 · Smoke E2E con nuestro teléfono, antes de abrir la landing
 
 El guion es el de esta noche, ampliado, y **con el número de pruebas apuntando a PROD**:
