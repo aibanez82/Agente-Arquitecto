@@ -65,6 +65,19 @@ Un espejo no puede tener nodos que se renombran al promover: cualquier test, gua
 referencie el nodo por nombre se rompe en el otro lado. **Se renombra a `WA Config`** en los dos
 entornos, con el `phoneNumberId` como valor y no como nombre.
 
+### 2.5 `Issue Policy` apunta al guard de STG **por id de instancia** — bloqueante
+
+Hallazgo de F3, verificado por mí en el candidato de PROD: el nodo `Issue Policy` referencia el
+workflow `Issue Policy Guard` por el id de la instancia de **STG** (`PuogahK4qv9YOiF4`), y ese
+workflow **no existe en PROD**.
+
+Importar el candidato tal cual haría que **la emisión de pólizas de producción llamara al guard de
+staging**. Es la operación más sensible del sistema llamando a otro entorno.
+
+**Bloquea F4** hasta que existan en PROD sus propios `Issue Policy Guard` y `Error Handler`, y la
+tabla de configuración gane una fila `workflowRefs`. El ejecutor **no** lo tapó con una columna nula,
+y hace bien: un espejo que traduce a «nada» no es un espejo.
+
 ### 2.4 Quién despliega Django en PROD
 
 Los releases de producción los ha hecho históricamente `alfred@aguayo.co` — la cuenta de Juan. El
@@ -113,7 +126,7 @@ migraciones. Por eso F1 y F2 son aditivas por diseño: lo que entra, se queda.
 **Cierra:** `#174` (el fallback genérico), `qualitas-issues#85.1` (instrucciones contradictorias) y
 todo lo Django que STG ya lleva.
 
-### F3 · Construir los candidatos de PROD
+### F3 · Construir los candidatos de PROD — **ENTREGADA la noche del 22 ago**
 
 Hoy el builder de `Agente-n8n` produce candidatos **de STG**. Para el espejo hace falta que produzca
 los dos, desde la **misma fuente de grafo** y con una **tabla de configuración por entorno**:
@@ -125,6 +138,15 @@ los dos, desde la **misma fuente de grafo** y con una **tabla de configuración 
 | `webhookId` | 4 nodos con id propio | los suyos |
 | `errorWorkflow` | el Error Handler de PROD (a crear) | `nT6395r2jjMUqVyF` |
 
+**Estado — verificado por mí contra los artefactos, no contra el informe:** entregada en
+`origin/stg@c534d64` (PR #88). Dos candidatos de **229 nodos** cada uno, mismos nombres, **conexiones
+idénticas** y **cero diferencias fuera de la tabla** (88 nodos difieren, los 88 por credenciales,
+`webhookId` o `phoneNumberId`). El guard del 7 de julio entró parametrizado en el grafo compartido y
+`WA Config` perdió el sufijo. sha256: STG `45b9c183…`, PROD `5240518e…` — calculados por mí.
+
+**Consecuencia inmediata:** hasta que el rename y el guard entren en el bot vivo de STG, el monitor
+de drift listará `main-candidato` como **deriva real esperada**. Es correcto que lo haga.
+
 **Verificación:** el candidato PROD y el de STG deben diferir **solo** en esa tabla. Cualquier otra
 diferencia es un fallo del builder, no una particularidad del entorno.
 **Cierra:** la causa raíz de que los dos entornos diverjan.
@@ -133,11 +155,14 @@ diferencia es un fallo del builder, no una particularidad del entorno.
 
 Orden, y el orden importa:
 
-1. **Error Handler en PROD** y `errorWorkflow` enlazado en los cinco workflows. Se hace **antes** que
-   nada, para que cuando el bot nuevo entre, un fallo avise en vez de morir en silencio.
-2. **Bot principal** (119 → 228 nodos).
-3. Payment Confirmation, Retomar Conversación, Atención Humana.
-4. Poller de descuentos, Metepec, Issue Policy Guard.
+1. **Los workflows auxiliares de PROD primero: `Error Handler` e `Issue Policy Guard`.** El primero
+   para que un fallo avise en vez de morir en silencio; el segundo porque sin él el candidato apunta
+   al guard de STG (§2.5). Con los dos creados, la tabla gana su fila `workflowRefs` y el candidato
+   de PROD se regenera — **no se parchea a mano**.
+2. **`errorWorkflow` enlazado** en los cinco workflows de PROD.
+3. **Bot principal** (119 → 229 nodos).
+4. Payment Confirmation, Retomar Conversación, Atención Humana.
+5. Poller de descuentos y Metepec.
 
 Cada import por **delta medido**, no por reemplazo: el reemplazo se lleva por delante los `settings`
 —y con ellos el `errorWorkflow`— como estuvo a punto de pasar esta noche en STG.
@@ -228,7 +253,7 @@ Lo que no viaja en un merge y hay que arreglar allí:
 1. Responder las cuatro de §5 — son cuatro respuestas, no cuatro reuniones.
 2. Lanzar **F0** al Agente n8n: exports, backup y línea base. No toca nada vivo y deja la marcha atrás
    montada.
-3. En paralelo, encargar **F3** —el builder de dos entornos con la tabla de configuración—, que es la
-   pieza larga y la que decide si el espejo es real o una promesa.
+3. **F3 ya está hecha** (entregada la noche del 22 ago y verificada). Lo que ocupa su sitio en el
+   camino crítico es crear los dos workflows auxiliares de PROD del §2.5: sin ellos, F4 no arranca.
 
 F1 y F2 pueden correr en cuanto F0 esté; F4 depende de F3.
