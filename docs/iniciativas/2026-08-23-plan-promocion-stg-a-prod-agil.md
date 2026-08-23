@@ -278,6 +278,49 @@ STG da igual; en PROD, un job legacy despertando contra el proveedor mientras en
 sync es la clase de sorpresa que este plan existe para evitar. Se resuelve mirando el dashboard, no
 adivinando.
 
+### F5.bis · Dashboard — **añadido el 23 ago; no estaba, y era punto ciego**
+
+Ni «incluye» ni «no incluye» lo nombraban. Lo levantó el **Agente Dashboard** leyendo este plan, y
+lo decidió Alberto: **entra en esta promoción**.
+
+`Dashboard_seguroautoqualitas` tiene `stg` **76 commits** por delante de `main` y **sin trabajo
+divergente** (los 66 que `main` tiene de más son `handoffs/` y `docs/`). Lo que producción no tiene
+es **la mitad de Atención Humana**: `apps/operacion/lib/s1/` entera, `operator-send.js`,
+`discount-reconciliation.js`, la selección comercial del `#156` y el `#177` (Metepec oculto). El
+`#57` se cierra con la cadena tomar → claim → iniciar → `human_takeover` → guard, y el primer
+eslabón es UI del Dashboard: sin esta fase, la cadena queda coja en PROD.
+
+**Orden: después de F5, antes del smoke de F6.** Antes de F5 pondría en producción una UI que llama
+a webhooks de n8n que allí todavía no responden — peor que no tener los botones, porque es un fallo
+silencioso delante de Hylant.
+
+**Por qué es seguro, medido contra la base de producción y no contra el fichero.** El riesgo de un
+consumidor de solo lectura no es escribir: es que le desaparezca por debajo algo que hoy consulta.
+En las 18 migraciones `0062…0079` hay **58 `AddField`, 48 `AddConstraint`, 18 `CreateModel`… y un
+solo `RemoveField`** — y ese quita `discounttrigger.offered_copy`, sobre una tabla que **crea la
+`0063`** dentro de esta misma tanda. Estado de PROD ahora:
+
+```
+tablas qualitas_discount*   : NINGUNA
+migraciones qualitas        : 61 | última 0061_business_outbox_identity_trigger
+conversation_control_v1     : NO existe
+```
+
+**Contra el esquema que PROD tiene hoy, F1 y F2 son netamente aditivas.** Nada de lo que el
+Dashboard lee hoy desaparece.
+
+**Matiz que no cambia el orden pero sí el smoke:** «solo lectura» no es exacto. `operator-send.js` y
+`n8nOperatorWebhook` **escriben**, vía el webhook proactivo de n8n — la excepción que `CLAUDE.md` ya
+reconoce. F6 tiene que cubrir esa cadena, no solo que la página pinte.
+
+**Abierto:** una ventana suya de `session_id NOT NULL`, pedida al Agente Dashboard **medida contra
+PROD**. Hasta que llegue es incógnita, no «probablemente ya está»; si resulta pendiente, es trabajo
+previo a esta fase.
+
+**Verificación:** el deploy de Vercel apuntando al SHA promovido, y la cadena de Atención Humana
+recorrida en F6 de punta a punta.
+**Vuelta atrás:** rollback del deployment en Vercel — inmediato y sin tocar la base.
+
 ### F6 · Smoke E2E con nuestro teléfono, antes de abrir la landing
 
 El guion es el de esta noche, ampliado, y **con el número de pruebas apuntando a PROD**:
