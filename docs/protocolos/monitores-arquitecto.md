@@ -36,12 +36,33 @@ vivos el 16 ago, cuatro de ellos residuos del 11–13 ago que nadie podía atrib
 antes de armar:
 
 ```bash
-ps -eo pid,lstart,command | grep -E "monitores/m[0-9]|heroku releases" | grep -v grep
+ps -eo pid,ppid,lstart,command | grep -v grep \
+  | grep -E "monitores/m[0-9]|scripts/monitor-|heroku releases"
 ```
+
+**El patrón se amplió el 23 ago porque el viejo mentía.** `monitores/m[0-9]|heroku releases` dio
+`ps` limpio —«no hay nada vivo»— y había **siete** procesos de monitor corriendo: los del Dashboard,
+que se llaman `scripts/monitor-<canal>.sh` y no encajaban en el patrón. Un patrón de detección
+calibrado solo sobre los monitores propios acredita ausencia donde no la hay, que es la peor
+respuesta posible para una comprobación cuyo único trabajo es evitar duplicados.
 
 Si ya están corriendo, **no rearmar**: mirar si el script cambió desde que arrancó el proceso
 (`ps -o lstart= -p <pid>` contra el `mtime` del fichero) y rearmar solo los desfasados. Los procesos
 huérfanos (`ppid=1`) no aparecen en `/bashes` y solo se matan por PID.
+
+**El `ppid` dice de quién es el monitor.** Los procesos de una sesión ajena cuelgan de otro padre:
+comparar el `ppid` de los propios con el del sospechoso separa «residuo mío que hay que matar» de
+«monitor vivo del ejecutor, que no se toca». El 23 ago los del Dashboard colgaban de `15278` y los
+míos de `15226`; sin esa columna, la tentación es matarlos todos.
+
+**C · macOS trae bash 3.2, y eso descarta media sintaxis moderna.** No hay arrays asociativos:
+`declare -A` falla, y `prev[$a]=…` degrada silenciosamente a array **indexado** evaluando el índice
+como aritmética, así que todas las claves no numéricas caen en el `0` y **comparten casilla**. La
+v2 del `m6` se armó así y su primer ciclo emitió `[release hyl-wai-production] v341 (antes: v239…)`,
+comparando PROD contra el valor de STG. **Un monitor que confunde dos entornos es peor que no
+tenerlo**: el aviso parece un despliegue de PROD que nunca ocurrió. Para estado por clave, fichero
+—que además sobrevive al rearme— y nunca array asociativo. Y probar el script **una vez a mano**
+antes de armarlo: `bash -n` valida sintaxis, no semántica, y este fallo pasa `bash -n` sin ruido.
 
 **B · ¿Qué publicó NUESTRO lado hoy?** El barrido miraba lo que escribe Juan y se saltaba lo
 nuestro. Tras un `/clear` eso es justo lo que falta: el 16 ago la sesión anterior de esta misma
