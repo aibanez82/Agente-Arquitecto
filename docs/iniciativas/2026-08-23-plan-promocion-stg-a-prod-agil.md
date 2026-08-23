@@ -489,11 +489,31 @@ de n8n y el ledger, como se hizo con el `#202`.
 > PROD**, no un health-check: sin cookie de sesión el middleware devuelve `307` en `/` y en
 > `/api/funnel-v2`, así que una petición anónima sale «viva» sin acreditar ninguna lectura.
 >
-> **Dependencia nueva que el orden de hoy escondió: `F2 → F5.bis`.** Esas dos columnas de
-> `cotizacion` **sí** se leen en el `stg` del Dashboard (4 y 5 ficheros), así que el Dashboard
-> promovido las consulta. Hoy existen porque F2 fue antes — **salió bien por casualidad**. Si F5.bis
-> se hubiera hecho primero, habría leído columnas inexistentes. Queda escrito para que la próxima vez
-> no dependa de la suerte.
+> **Dependencia real: `F1 → (F5.bis + `DASHBOARD_DISCOUNTS_V06_ENABLED`)`.** Escribí primero
+> `F2 → F5.bis` y **era incorrecto**: el Dashboard no lee columnas de `qualitas_cotizacion`, lee
+> **vistas** —`continuation.js` hace `FROM public.dashboard_*_v1`— y `pricing_source` /
+> `qualitas_percentage` son campos de esa proyección, no consultas a la tabla. Lo corrigió el Agente
+> Dashboard; confundí el ingrediente con el plato.
+>
+> **El reparto es mixto, y eso cambia a quién mirar si algo falla.** Medido contra PROD:
+>
+> | Vista que consulta el Dashboard | Quién la crea | En PROD |
+> |---|---|---|
+> | `dashboard_lead_continuation_v1` | Django `0068` (entró con F2) | ✅ |
+> | `dashboard_discount_application_v1` | Django `0068` (entró con F2) | ✅ |
+> | `dashboard_discount_terminal_notification_v1` | **capa S1 `156/017`+`018` — F1** | ❌ |
+>
+> Dos de las tres ya están: la `0068` las declara `managed: False` con `db_table` y las crea por
+> `RunSQL`. **La dependencia de F1 existe, pero por una vista, no por tres.**
+>
+> **El interruptor y el orden entre los dos.** `DASHBOARD_DISCOUNTS_V06_ENABLED` está **solo en
+> Preview**, no en Production, así que hoy `discountReadModelsEnabled()` da `false` y el código ni
+> toca las vistas. **Lo que rompe es encender la variable antes de F1, no promover el código.** La
+> variable se pone **después** de F1, nunca antes — mismo patrón que el gate del envío: sustrato
+> primero, capacidad después, y el estado seguro por omisión.
+>
+> **Anotado aparte, sin bloquear:** la `156/018` de la capa S1 y la `0068` de Django crean **el mismo
+> objeto**. Dos fuentes para una vista es una colisión esperando ocurrir; merece tarjeta propia.
 
 
 ### F7 · Limpieza de PROD
