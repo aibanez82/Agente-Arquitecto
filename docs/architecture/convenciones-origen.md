@@ -310,3 +310,38 @@ paga ese coste es Alberto. Un agente que mergea «porque el PR estaba verde» ga
 persona sin que se entere. Su precedente: el 18 ago se fusionó el PR #29 sin preguntar, con
 contenido inofensivo —un script con dry-run por defecto— pero moviendo el tip de `stg` en mitad del
 desarrollo de Juan. **El daño posible no estaba en lo que el commit hacía, sino en dónde aterrizaba.**
+
+
+## Una guarda se juzga por su mecanismo, no por su intención (23 ago 2026)
+
+Lo levantó el **Agente Dashboard** unas horas antes de que F1 escribiera en la base de producción.
+La migración `156/018` de la capa S1 lleva una precondición que existe para detectar que el contrato
+de las vistas hermanas ha cambiado:
+
+```sql
+SELECT ... INTO v FROM information_schema.columns c
+ WHERE c.table_schema = 'public' AND (...) AND c.data_type <> 'text';
+IF v IS NOT NULL THEN RAISE EXCEPTION 'STOP/PRE: ...'
+```
+
+**`information_schema` filtra por privilegios.** Si el rol que ejecuta no ve esas vistas —son de
+Django, con su propio owner— la consulta devuelve cero filas, `v` queda `NULL` y la guarda **pasa en
+silencio**. No distingue «el contrato se cumple» de «no puedo verlo»: lee ausencia de evidencia como
+evidencia de conformidad, que es justo lo contrario de lo que una guarda debe hacer.
+
+Lo que lo delata como descuido y no como criterio: **doce líneas antes, el mismo fichero lo hace
+bien**, con `pg_attribute` y `::regclass` para comprobar lo suyo. Mecanismo robusto para lo propio,
+frágil para lo ajeno.
+
+Dos matices que salieron al medirlo, y los dos importan para no describir la deuda de más:
+
+- Una tercera guarda con `to_regclass` —que **no** filtra por privilegios, porque es resolución de
+  nombre— ya cubría una de las dos vistas. El hueco real era **una**, no dos.
+- Medido con el rol que iba a ejecutar: veía las tres columnas y las tres eran `text`. **Defecto
+  latente, no activo**, así que no se paró F1 ni se tocó una migración a punto de correr.
+
+El Dashboard ya tenía la regla escrita desde su incidente con `readonly_leads`, donde «no existe» y
+«existe sin grants» se veían idénticos. El Arquitecto no la tenía, y por eso dio por buena una guarda
+**por su intención** en vez de por su mecanismo. De ahí la convención, con su corolario: una guarda
+que solo comprueba que *nada incumple* la pasa cualquier consulta vacía; tiene que exigir en
+**positivo** que aparezca lo esperado.
