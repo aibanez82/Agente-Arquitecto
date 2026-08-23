@@ -36,7 +36,7 @@ comparten la misma BD Postgres
 No ejecuto nada
 nunca se coordinan lateralmente
 solo el Arquitecto cierra/certifica
-no pushear código
+pushear código al repo de Juan, no
 
 ## --- CONVENCIONES: el cuerpo no sale nunca (protocolo §3) ---
 Persistencia entre máquinas

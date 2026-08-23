@@ -102,15 +102,17 @@ Diagrama completo, observabilidad, JOIN de producción, hitos y detalle de nodos
 
 ## n8n workflow — estructura interna
 
-**Workflows exportados (fuente de verdad local):**
+**Workflows exportados — la red de seguridad vive en `aibanez82/Agente-n8n:main/workflows/`, NO en este repo (23 ago):**
 
-| Workflow | Archivo en este repo |
-|---|---|
-| Bot principal WhatsApp | `docs/n8n-workflows/WhatsApp Insurance Quotation Bot.json` |
-| Confirmación de pago | `docs/n8n-workflows/WhatsApp Insurance Quotation Bot - Payment Confirmation.json` |
-| Mensajes proactivos (Retomar conversación) | `docs/n8n-workflows/Retomar Conversacion.json` |
+| Workflow vivo en PROD | id de instancia | Nodos |
+|---|---|---|
+| WhatsApp Insurance Quotation Bot | `BtOaZm7WlZT-24V7hqCnF` | 119 |
+| Monitor Qualitas SIO PROD | `3NQfglVIfPSdijm9` | 19 |
+| Atencion Humana | `B5ihE5xHg8bjeesl` | 19 |
+| Retomar Conversacion | `96XfJZcwvlHnVJLko3G8-` | 12 |
+| Payment Confirmation | `disvKr7iVhnNnefuiqJbJ` | 5 |
 
-> Exportar y hacer commit aquí cada vez que se modifique un workflow en producción — única red de seguridad; el backup automático está descontinuado (política: `docs/architecture/backup-policy-n8n.md`).
+> Los cinco los mantiene el Agente n8n en su repo, y se verifican **por `versionId` contra la API**, nunca por número de nodos: dos grafos distintos pueden tener el mismo recuento. `docs/n8n-workflows/` de ESTE repo está **RETIRADO** (ver su `README.md`). El backup automático sigue descontinuado (`docs/architecture/backup-policy-n8n.md`).
 
 El bot tiene 3 nodos que llaman a Claude: **Jailbreak detection** (Haiku) · **Intent Router** (Haiku) · **Agente conversacional principal** (Sonnet). n8n escribe a Postgres directamente con la credencial `"Postgres account"`.
 

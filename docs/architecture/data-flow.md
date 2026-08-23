@@ -83,9 +83,14 @@ Dashboard, `"Procederemos con Cobertura"` y `"domicilio registrado es"` aquí—
 
 ## 4. n8n por dentro
 
-Los workflows exportados viven en `docs/n8n-workflows/` de este repo y son la única red de
+Los workflows exportados viven en **`aibanez82/Agente-n8n:main/workflows/`** y son la única red de
 seguridad: el backup automático está descontinuado (`docs/architecture/backup-policy-n8n.md`).
-**Exportar y commitear cada vez que se modifique uno en producción.**
+**Exportar y commitear cada vez que se modifique uno en producción**, y comprobar la copia por
+`versionId` contra la API, no por recuento de nodos.
+
+> **Corregido el 23 ago:** esta línea decía `docs/n8n-workflows/` de este repo. Llevaba un mes
+> siendo falso —3 de 5 workflows y el bot en 113 nodos desde el 26 jul, con PROD en 119— y esa
+> carpeta está retirada. Una red de seguridad falsa es peor que ninguna: invita a tirarse.
 
 El bot principal tiene tres nodos que llaman a Claude: **Jailbreak detection** (Haiku), **Intent
 Router** (Haiku) y el **agente conversacional principal** (Sonnet).
