@@ -163,7 +163,69 @@ ventana de mantenimiento que respetar**: el orden es por dependencia técnica, n
 **Verificación:** los cinco JSON en git y el backup listado por `heroku pg:backups`.
 **Vuelta atrás:** ninguna necesaria — esta fase solo lee.
 
+> **Corrección del 23 ago por la noche — el backup no era la única marcha atrás, y yo dije que
+> bloqueaba F1.** Escribí en el `#210` que sin un `pg:backups:capture` fresco no se podía aplicar
+> F1, en negrita y como bloqueante. **Era falso.** Juan contestó que «el plan de Base de Datos tiene
+> rollback cubierto» y tenía razón, medido:
+>
+> ```
+> Plan:                  Standard 0
+> Rollback:              earliest from 2026-08-19 23:09 UTC
+> Continuous Protection: On
+> Add-on:                postgresql-flexible-50432   ← el de DATABASE_URL
+> ```
+>
+> Hay *point-in-time recovery* con ventana de días, que es mejor marcha atrás que un volcado del 13
+> de agosto. El backup sigue siendo buena práctica antes de una migración grande; **no es un
+> bloqueo**.
+>
+> (El otro addon, `essential-0`/`WHITE`, sí sale `Rollback: Unsupported` — pero **no es el de la
+> app**. Mirar el addon equivocado era una forma fácil de confirmar el error.)
+>
+> **Lección para mí, y es la tercera del día:** marqué como bloqueante algo que no había medido. Si
+> voy a poner «bloquea» en negrita en un issue de otro, lo mido antes o lo llamo hipótesis.
+
 ### F1 · El esquema de la capa S1 (aditivo)
+
+> ## ❌ ESTADO 23 ago, noche — **NO EJECUTADA**, y el orden del plan se invirtió
+>
+> Medido contra las dos bases, no supuesto:
+>
+> | | Funciones `n8n_*` | Vistas de la capa |
+> |---|---|---|
+> | **STG** (objetivo) | **48** | **7** |
+> | **PROD** | **0** | **0** |
+>
+> No falta una parte: **falta la capa entera**. Ninguna de las 24 migraciones SQL está aplicada en
+> producción.
+>
+> **Y F1 ya no precede a F2.** El plan la ponía antes; en la práctica **F2 se desplegó primero**
+> —`v342`, `Deploy 189789b7`, 23 ago 16:46 CDMX, `succeeded`, con `django_migrations` en 89—. No
+> rompió nada, y por una razón concreta: **estos objetos los consume n8n, no Django**, así que
+> Django arranca perfectamente sin ellos.
+>
+> **El límite real de F1 pasa a ser F4.** El bot candidato de 229 nodos llama a
+> `n8n_outbound_reserve`, `n8n_discount_phase2_claim` y compañía, y lee `conversation_control_v1`.
+> **Importarlo en PROD con la capa ausente rompe la conversación con clientes reales dentro** — y
+> el bot vivo de PROD (119 nodos) no las usa, así que hoy no hay síntoma que avise.
+>
+> Dicho como regla operativa: **F1 antes de F4, sin excepción.** El orden `F1 → F2` era una
+> preferencia; el orden `F1 → F4` es una dependencia dura.
+>
+> **Autorización:** concedida. Juan respondió «tú las haces» al punto 1 del `#210`, así que el
+> *schema stewardship* del `#157` está resuelto para esta tanda. Ejecuta el **Agente n8n** —las
+> migraciones viven en su repo— cuando Alberto lo ordene por `handoffs/`; el Arquitecto no ejecuta.
+>
+> **Lo que hay que aplicar,** en este orden: `migrations/156/001`→`021`, `migrations/161/001-002`,
+> `migrations/163/001`. Son aditivas y reentrantes.
+>
+> **Verificación de cierre:** volver a contar. `48` funciones `n8n_*` y las siete vistas, con
+> `conversation_control_v1`, `n8n_discount_offer_sent_v1` y `n8n_discount_application_handoff_v1`
+> entre ellas. Contar, no asumir que el script salió sin error.
+>
+> **Vuelta atrás:** ya no depende del backup. PROD tiene `Continuous Protection: On` con ventana
+> desde el 19 ago —ver la corrección en F0—, así que hay *point-in-time recovery*.
+
 
 Aplicar a la base de PROD, en orden, las 24 migraciones SQL de `Agente-n8n/migrations/`. Son
 reentrantes: se han aplicado ya a STG y varias se han repetido sin daño.
