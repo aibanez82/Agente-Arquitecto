@@ -84,10 +84,42 @@ Medido: **cero apariciones de `Discount` en el bot de producción.** Todo el mó
 | ítem | estado |
 |---|---|
 | `#183` trazabilidad del historial | documentado, sin arreglo |
-| `#189` puntos 1 y 2 | en handoff |
+| `#189` punto 2 (el carril revienta en SQL) | **resuelto y aplicado en STG** el 22 ago; el issue quedó cerrado |
+| `#189` punto 1 · **el resolutor no usa el marcador `active` para desempatar** | medido, **deliberadamente sin issue** — ver nota abajo |
 | `#184` modelo de datos de precios | propuesta a Juan |
 | Los 15 gates C1 de poller/Retomar/Payment | pendiente de decisión |
-| La divergencia de 3 nodos entre candidato e instancia | pendiente de decisión |
+| La divergencia entre candidato e instancia | **resuelta** el 22 ago: el monitor de drift, tras el `#176`, reporta 12 destinos y 0 con drift (run `32609450590`) |
+
+### Nota — el desempate por `active` (`#189` punto 1)
+
+**Decisión de Alberto, 22 ago 2026: no se abre issue.** Se anota aquí y se revisa cuando el dual se
+encienda en PROD.
+
+El resolutor trata `open` y `active` como equivalentes y ordena por recencia, así que declara
+ambigüedad aunque Django mantenga **una sola** sesión `active` por teléfono. El coste sería una
+pregunta innecesaria al cliente: «¿cuál de tus cotizaciones quieres retomar?».
+
+**Por qué no se prioriza — medido en PROD el 22 ago**, sobre el pool de candidatas ya con la vía B
+aplicada:
+
+| qué | valor |
+|---|---|
+| teléfonos con sesión candidata | **1.011** |
+| de ellos, con **una sola** candidata | 1.009 |
+| de ellos, con **varias** (ambigüedad real) | **2** — el 0,2% |
+| máximo de candidatas en un mismo teléfono | 3 |
+| sesiones marcadas `active` en todo PROD | **2** |
+
+En los dos casos ambiguos el desempate funcionaría —ambos tienen exactamente una `active`—, pero es
+el 0,2% de los teléfonos. Y con solo dos sesiones `active` en toda la base, en el resto ni siquiera
+habría por dónde desempatar.
+
+**Cuándo deja de ser marginal:** el día que el dual se encienda en PROD. Cada lead nuevo crea su
+propia sesión y Django mantiene una `active` por teléfono, así que la población de teléfonos con
+varias sesiones vivas crece. Entonces esta nota se convierte en trabajo; hoy no.
+
+En STG sí se nota —el teléfono de pruebas llegó a acumular 20 sesiones vivas—, pero eso es
+incomodidad probando, no dinero.
 
 ---
 
