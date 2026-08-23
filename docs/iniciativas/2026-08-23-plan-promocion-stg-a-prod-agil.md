@@ -174,6 +174,51 @@ reentrantes: se han aplicado ya a STG y varias se han repetido sin daño.
 **Vuelta atrás:** el backup de F0. En la práctica no hace falta: nada consume estos objetos todavía.
 **Cierra:** la mitad de `#122` (queda documentar el inventario).
 
+### ⚠️ El alcance cambió el 23 ago por la tarde: se promueven **89 migraciones, no 79**
+
+**Lo que decía este plan hasta ahora —congelar en `stg@372f63f` y promover 79 migraciones— ya no
+describe lo que se va a hacer.** Se deja escrito porque el razonamiento sigue siendo válido y porque
+un plan que no cuenta lo que pasó no sirve para la próxima vez.
+
+**Qué ocurrió.** Juan abrió `release/promote-stg-to-main-20260823` con el nombre acordado pero
+**cortada del tip de `stg` (`c178c60`), no de `372f63f`** — 40 commits de diferencia — y fusionó el
+PR `#212` a `main` antes de que llegara el aviso. `main` está en `189789b` con **89 migraciones**.
+
+**Decisión de Alberto: se acepta el árbol grande y se despliega.** Revertir el merge devolvería el
+plan a lo acordado, pero cuesta más relación que riesgo evita, con PROD casi apagado y migraciones
+aditivas. **La condición es que el plan diga la verdad**: se promueven 89.
+
+**Lo que entra de más — el `#203` y el `#209` completos:**
+
+| Migración | Qué trae |
+|---|---|
+| `0080` | `PolicyInstallment`, `PolicyPaymentMilestone`, `PolicyPaymentSummary`, `QualitasPolicyReceiptSnapshot`, `QualitasProviderReceipt` |
+| `0081`–`0087` | estado del poller, guards, índices y manager sensible del ledger |
+| `0088` | `lead_financial_permission` |
+| `0089` | `FirstReceiptDocumentEmailSettings` |
+
+**Lo que baja el riesgo, y es lo que hace aceptable la decisión:** el ledger **nace inerte**. En
+`hyl_wai/settings/base.py:109` y `:146`, `QUALITAS_POLICY_RECEIPT_SYNC_MODE` y
+`QUALITAS_FIRST_PAYMENT_SYNC_MODE` se leen con `os.getenv(..., "off")`. PROD no tiene esas variables,
+así que **el código viaja y no corre**. Encenderlo es un acto explícito y posterior.
+
+**Lo que esto obliga a cambiar en F6.** El smoke ya no cubre solo lo previsto:
+
+1. Verificar que las seis tablas nuevas existen y **están vacías**.
+2. Verificar que los dos sync están en **`off`** leídos desde la app, no supuestos.
+3. Que el admin financiero del `#209` no altera la ficha de lead que Hylant ya usa.
+4. Y lo de siempre: `django_migrations` en **89**, con `0089_first_receipt_document_email_settings`
+   como última — no 79.
+
+**Sigue sin medirse** (la sesión de la CLI de Heroku se cayó): qué variables `QUALITAS_*` tiene PROD
+hoy. Antes de encender nada hay que mirarlo.
+
+**La lección, que es la que vale para la próxima.** Cambiar «merge `stg` → `main`» por «rama desde un
+SHA» fue correcto y no bastó: **un mecanismo solo protege si quien ejecuta lo aplica**. El nombre de
+la rama viajó y el punto de corte no. Para la promoción siguiente, el congelado tiene que ser algo
+que el ejecutor no pueda saltarse por descuido — una rama ya creada por quien congela, o un PR ya
+abierto, no una instrucción para que la corte otro.
+
 ### F2 · Django
 
 Promoción de **`stg@372f63f`** a `main` (limpio, sin trabajo divergente) y deploy a
