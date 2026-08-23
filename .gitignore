@@ -7,3 +7,4 @@ __pycache__/
 scripts/monitores/.m*-seen
 scripts/monitores/.m*-state
 scripts/monitores/.m6-*
+scripts/monitores/.m6-fallos-*
