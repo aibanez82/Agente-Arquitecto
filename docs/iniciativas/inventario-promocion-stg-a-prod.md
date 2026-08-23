@@ -53,6 +53,16 @@
 
 ---
 
+### 5. `#197` · El RAG antepone su monólogo interno y sale por WhatsApp
+
+| | |
+|---|---|
+| Medición en PROD | **Pendiente de medir por el Arquitecto.** Reportado por el Agente n8n: `Format KB Response` sigue siendo pasa-todo y el `systemMessage` del RAG no lleva la frase nueva |
+| Por qué no está medido | La API key de PROD guardada en el `.env` del `Agente_QATest_Qualitas` devuelve `401` — quedó atrás en la rotación del 29 jul. Medir en cuanto haya credencial válida |
+| Qué recibe hoy el cliente | El párrafo de razonamiento del bot delante de la respuesta: habla **del cliente** en tercera persona, nombra la KB y sus herramientas |
+| Ya en STG | Sí, vivo desde el 22 ago 16:26Z (`versionId b6dc81d2…`), verificado contra la instancia |
+| Cómo viaja | Dos piezas: el guardrail de vocabulario cerrado en `Format KB Response` y las dos frases nuevas de la `REGLA GENERAL DE NO-NARRACIÓN`. En STG el guardrail **aún no ha disparado** — hoy protege el prompt |
+
 ## NO viaja — el defecto no existe en PROD
 
 Medido: **cero apariciones de `Discount` en el bot de producción.** Todo el módulo de descuentos es STG-only, y con él sus arreglos:
