@@ -1,5 +1,15 @@
 # Política de backup de workflows n8n
 
+> **⚠️ CORREGIDO EL 23 AGO 2026 — la ubicación que dice este documento ya no es la buena.**
+> Todo lo que aquí apunta a `docs/n8n-workflows/` de este repo hay que leerlo como
+> **`aibanez82/Agente-n8n:main/workflows/`**, que es donde vive la red de seguridad real y donde
+> están los **cinco** workflows de PROD (este documento habla de tres). La carpeta de este repo
+> está retirada. Lo demás del documento —el porqué, el diseño y la decisión de descontinuar el
+> backup automático— sigue vigente.
+>
+> **Y una corrección de método:** la comparación se hace por **`versionId` contra la API**, no
+> por diff del JSON ni por recuento de nodos.
+
 > Diseño Arquitecto-IA-Qualitas. Origen: pendiente #2 del 30 jun 2026 ("diseñar política de
 > backups para n8n antes de más cambios al system prompt"), tras aplicar los cambios de
 > caso-001 y caso-002 al system prompt del nodo AI Agent directamente en producción.
