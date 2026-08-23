@@ -17,6 +17,19 @@ APPS="hyl-wai-stg hyl-wai-production"
 # hipo puntual de red y no tarda en cantar una credencial caida.
 UMBRAL_FALLOS=3
 
+# La credencial se carga AQUI, no se hereda. El monitor corre como proceso de
+# fondo con el entorno de su arranque: un `export HEROKU_API_KEY=...` hecho en
+# una llamada de Bash no persiste ni llega hasta aqui. El 23 ago la CLI perdio
+# la sesion, se recupero con el token de .env.local, y el monitor siguio ciego
+# igualmente porque nadie se lo habia dado a EL. Un monitor que depende de que
+# alguien recuerde exportarle algo esta roto por diseno.
+# .env.local esta gitignorado: aqui solo viaja la ruta, nunca el valor.
+if [ -z "$HEROKU_API_KEY" ]; then
+  ENVF="$(cd "$(dirname "$0")/../.." && pwd)/.env.local"
+  [ -f "$ENVF" ] && HEROKU_API_KEY=$(grep -m1 '^HEROKU_API_KEY=' "$ENVF" | cut -d= -f2- | tr -d '"'"'"' ')
+  export HEROKU_API_KEY
+fi
+
 leer() {
   env -u NODE_OPTIONS heroku releases -a "$1" -n 1 --json 2>/dev/null \
     | python3 -c "import sys,json; r=json.load(sys.stdin)[0]; print('v%s %s [%s]' % (r['version'], r['description'], r['status']))" 2>/dev/null || true

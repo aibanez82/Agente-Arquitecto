@@ -173,6 +173,17 @@ de entrega necesita el suyo **antes** de mandar el encargo.
 Poll 180s de `heroku releases -a <app> -n 1 --json` sobre **las dos** apps; emitir cuando cambie
 `version`, `description` o `status`, incluyendo el valor anterior y el nombre de la app.
 
+**Y carga su propia credencial (v2.3, esa noche).** El aviso de ceguera funcionó a la primera y
+señaló un fallo distinto: **el monitor no hereda nada**. Corre como proceso de fondo con el entorno
+de su arranque, así que un `export HEROKU_API_KEY=…` hecho en una llamada de Bash **no llega hasta
+él**. La sesión de la CLI se recuperó con el token de `.env.local` y `m6` siguió ciego igualmente,
+porque nadie se lo había dado *a él*. Ahora lo lee del `.env.local` del repo si no viene en el
+entorno — el fichero está gitignorado, así que en git solo viaja la ruta.
+
+**Regla:** un monitor que depende de que alguien recuerde exportarle algo está roto por diseño. Si
+necesita una credencial, que la busque él. Vale para `m2` (token de `gh`) y `m3` (acceso a los
+remotos), que hoy dependen del entorno heredado y habría que revisar con este criterio.
+
 **Y no calla si se queda ciego (v2.2, misma tarde).** La v2 hacía `[ -z "$cur" ] && continue`: si
 la lectura fallaba, el monitor seguía vivo **sin emitir nada, para siempre**. Pasó ese mismo día —la
 sesión de la CLI de Heroku se cayó y `m6` dejó de vigilar los dos entornos sin un solo aviso, en
