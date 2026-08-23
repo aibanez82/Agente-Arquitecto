@@ -1,5 +1,37 @@
 # Plan — `STG-OPERATIONAL-DUAL-MAIN@1.1.0`
 
+> ## ✅ EJECUTADO — este documento es historia, no un plan pendiente (marcado el 23 ago 2026)
+>
+> Se escribió el **18 ago** como propuesta y decía «falta que Alberto redacte el acta de
+> autorización; no lo mergeo yo». **Ese acta llegó y el plan se ejecutó esa misma noche.** Lo que
+> pasó después, verificado contra la fuente:
+>
+> - **El contrato existe y corre.** `scripts/stg-operational-dual/manifest.json` de
+>   `aibanez82/Agente-n8n:stg` declara hoy `STG-OPERATIONAL-DUAL-MAIN@1.1.0`, con la premisa
+>   **`authorization`** en lugar de `review` — tal como propone la §2 de aquí. `independent_review`
+>   ya no aparece en el árbol.
+> - **`HYL-WAI#171`, el issue que lo pedía, está CERRADO** desde el 19 ago 01:21Z, con la evidencia
+>   tomada sobre `origin/stg` = `c4f5a6d` **después** del merge: `build.js --check` en verde y
+>   `26/26` pruebas, sin ficheros que no arrancaran.
+> - **El invariante de la §3 se implementó, y mejorado:** la protección quedó por **dominancia**
+>   —entrada única, remonte hasta su propio gate, sin bifurcaciones— en vez de por adyacencia, que
+>   es lo que este borrador daba por bueno. 34 gates = 24 pre-protegidos + 2 ingress + 8 por cadena
+>   declarada; artefacto de 222 nodos.
+> - **La deuda de la §7 está SALDADA.** Decía que sin restaurar la captura del vivo habría «otro
+>   `SOURCE_DRIFT` en semanas». `detect-drift` se arregló: **`HYL-WAI#176` cerrado el 23 ago** —
+>   12 destinos, 0 con drift, corrido dos veces esa noche. **No leer la §7 como pendiente.**
+> - Y el contrato ha seguido vivo desde entonces: van varias adendas de re-firma, la sexta firmada
+>   por Alberto el 22 ago en `Agente-n8n#78`.
+>
+> **Qué conserva su valor:** el razonamiento de por qué un contrato nuevo y no un acta —la fuente
+> pasó de 154 a 256 nodos y reponer el hash bajo `@1.0.0` habría declarado autorizados 102 nodos
+> que nadie revisó—, y qué se pierde al cambiar `review` por `authorization`: el manifiesto acredita
+> **autorización**, no verificación cruzada. Eso sigue siendo verdad y por eso se conserva.
+>
+> **Las cifras «por calcular al congelar» de la §2 nunca se rellenaron aquí.** Los valores reales
+> viven en el manifiesto del repo del n8n, que es la fuente; no los copio para no crear un segundo
+> sitio donde mirar.
+
 > **Borrador del Arquitecto, 18 ago 2026.** Sustituye al contrato `@1.0.0`, cuya fuente aprobada
 > (`70145cd7…`, commit `fb98f24`, 4 ago) dejó de describir el candidato.
 > **No genera nada por sí mismo:** el artefacto lo produce el builder cuando este plan y el acta de
