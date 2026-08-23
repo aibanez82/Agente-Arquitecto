@@ -473,6 +473,29 @@ El guion es el de esta noche, ampliado, y **con el número de pruebas apuntando 
 **Ninguno de estos pasos se da por bueno con «me llegó el mensaje»:** se cruza contra las ejecuciones
 de n8n y el ledger, como se hizo con el `#202`.
 
+> **Añadido el 23 ago, noche — el Dashboard de producción es un consumidor y no estaba en la lista.**
+> Lo levantó el Agente Dashboard: F2 movió el esquema **28 migraciones** por debajo y su código en
+> `main` no se ha tocado. Es la única superficie que Hylant mira a diario.
+>
+> **Riesgo descartado, medido:** de los 20 `AlterField` del rango, **ninguno toca una columna que el
+> Dashboard lea en producción**. Quince son de `discountprogram`, `discountsettings`,
+> `paymentevidence`, `discountcheckpointledger`, `businessoutboxdelivery` y `qualitaspaymentpollstate`
+> —tablas que no consulta—, y los dos de `cotizacion` (`pricing_source`, `qualitas_percentage`)
+> aparecen en **0 ficheros** de su `origin/main`. Además son **ensanchamientos** (`null=True` +
+> `default`), no estrechamientos: no rompen un `SELECT` existente.
+>
+> **Pero entra igualmente en F6**, porque «no le rompimos nada esta vez» no es lo mismo que
+> «verificamos que sigue leyendo». La comprobación es **una lectura autenticada del funnel contra
+> PROD**, no un health-check: sin cookie de sesión el middleware devuelve `307` en `/` y en
+> `/api/funnel-v2`, así que una petición anónima sale «viva» sin acreditar ninguna lectura.
+>
+> **Dependencia nueva que el orden de hoy escondió: `F2 → F5.bis`.** Esas dos columnas de
+> `cotizacion` **sí** se leen en el `stg` del Dashboard (4 y 5 ficheros), así que el Dashboard
+> promovido las consulta. Hoy existen porque F2 fue antes — **salió bien por casualidad**. Si F5.bis
+> se hubiera hecho primero, habría leído columnas inexistentes. Queda escrito para que la próxima vez
+> no dependa de la suerte.
+
+
 ### F7 · Limpieza de PROD
 
 Lo que no viaja en un merge y hay que arreglar allí:
