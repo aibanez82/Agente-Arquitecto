@@ -97,3 +97,26 @@ gh search issues --repo aguayo-co/HYL-WAI --mentions aibanez82 --state open
 
 Esto NO sustituye la regla de "Verificar PROD cuando Juan ejecuta": Juan puede cerrar
 o avanzar cosas sin comentar — el barrido detecta lo que abre, no lo que despliega.
+
+---
+
+## ⛔ DEROGADO el 18 ago 2026 (Alberto) · CERRADO del todo el 23 ago
+
+**Nada se abre ya en `aibanez82/qualitas-issues`.** Con ello cae este protocolo de inbox de captura
+rápida (`QUALITAS:`) y el ruteo entre dos trackers: ahora hay uno solo.
+
+**Dónde está el destino, con la precisión del 19 ago:** los issues **viven en el repo
+`aguayo-co/HYL-WAI`**, y el **Project `orgs/aguayo-co/projects/2`** («HYL-WAI Kanban») es la cola de
+prioridad y estado sobre ellos. La primera redacción de esta derogación decía «el tracker único pasa
+a ser el project», y no es exacto: el repo es donde nacen, el tablero es donde se ordenan. Todo
+issue se **asigna a alguien** — sin responsable no es un issue, es una nota.
+
+**Cerrado del todo el 23 ago 2026:** los 35 issues que quedaban abiertos aquí al derogarlo —incluidos
+`#81` (conversación tras `uncertain`), `#82` (detectores de hito) y `#83` (cola de reconciliación)—
+se fueron cerrando donde estaban, y ese día se midió el repo en **0 abiertos**
+(`gh issue list --repo aibanez82/qualitas-issues --state open` → `[]`). **Sale del barrido de
+sesión**, que hasta entonces tenía que mirar los dos. Las referencias `qualitas-issues#NN` de los
+documentos **siguen siendo válidas** y no se renumeran: GitHub no transfiere issues entre owners
+distintos, así que nada se movió de sitio.
+
+Este documento queda como histórico.
