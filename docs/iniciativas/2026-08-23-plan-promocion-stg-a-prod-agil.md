@@ -121,6 +121,14 @@ phase corre las **18 migraciones** `0062…0079`.
 
 **Verificación:** `django_migrations` en 79 con `0079_first_receipt_payment_models` como última, y las
 tablas de descuento presentes.
+**El objetivo se mueve, y hay que clavarlo.** Juan sigue integrando en `stg`: fusionó el `#160` el
+22 ago y el 23 aprobó el plan técnico del `#203`. Si no se congela nada, la E2E de **F6** acabará
+validando un árbol que ya no existe.
+
+**Regla:** en F2 se **anota el SHA de `stg` que se promueve** y ese es el árbol que recorre F4→F6.
+Lo que Juan integre después entra en la promoción siguiente, no en esta. Con PROD apagado, promover
+otra vez es barato; validar dos árboles a la vez, no.
+
 **Vuelta atrás:** `heroku rollback v341`. **Ojo:** el rollback devuelve el código, **no** deshace las
 migraciones. Por eso F1 y F2 son aditivas por diseño: lo que entra, se queda.
 **Cierra:** `#174` (el fallback genérico), `qualitas-issues#85.1` (instrucciones contradictorias) y
@@ -234,6 +242,10 @@ Lo que no viaja en un merge y hay que arreglar allí:
   plantilla de Meta que lleva bloqueada desde julio. La promoción no los toca.
 - **`#194`, `#190`, `#196`**: trabajo pendiente de Juan, no de la promoción.
 
+**Una preocupación que se despeja:** el plan aprobado del `#203` deja `public.conciliacion_pagos` y
+`reconciliar_pagos` **intactos y fuera de alcance**. El Agente Conciliación y el sync de pagos de
+Django no se pisan: no hay dos escritores para la misma verdad.
+
 ---
 
 ## 5. Lo que este plan asume, y que Alberto debe confirmar mañana
@@ -243,6 +255,9 @@ Lo que no viaja en un merge y hay que arreglar allí:
    detalle de implementación.
 3. **Cuándo se reabre la landing.** El plan no lo decide: lo condiciona a F6 en verde y a `#204`/`#205`
    resueltos.
+5. **El SHA de `stg` que se congela para esta promoción** (§F2). Juan sigue integrando: el `#203`
+   ya tiene plan aprobado y llegará a `stg`.
+
 4. **Si el módulo de descuentos entra en la misma tanda o en una segunda.** Entra completo por
    defecto, porque separarlo obliga a mantener dos grafos distintos y eso rompe el espejo.
 
