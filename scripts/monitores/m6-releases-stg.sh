@@ -13,6 +13,9 @@
 # Vive desde el 13 ago 2026; versionado el 16 ago porque un monitor sin sección
 # en la spec es indistinguible de un residuo.
 APPS="hyl-wai-stg hyl-wai-production"
+# Ciclos seguidos sin lectura antes de gritar. 3 x 180s = ~9 min: filtra el
+# hipo puntual de red y no tarda en cantar una credencial caida.
+UMBRAL_FALLOS=3
 
 leer() {
   env -u NODE_OPTIONS heroku releases -a "$1" -n 1 --json 2>/dev/null \
@@ -40,7 +43,23 @@ while true; do
   sleep 180
   for a in $APPS; do
     cur=$(leer "$a")
-    [ -z "$cur" ] && continue
+    # Si la lectura falla, NO callar. `leer` devuelve vacio tanto si Heroku no
+    # contesta como si la CLI perdio la sesion, y el `continue` de la v2 dejaba
+    # el monitor ciego para siempre sin decir nada: silencio y "no hay releases"
+    # se ven igual desde fuera. Paso el 23 ago -- la CLI se deslogueo y m6 dejo
+    # de vigilar PROD y STG sin un solo aviso, justo durante la promocion.
+    # Avisa una vez al cruzar el umbral y otra al recuperarse; no en cada ciclo.
+    if [ -z "$cur" ]; then
+      n=$(cat "$DIR/.m6-fallos-$a" 2>/dev/null || echo 0)
+      n=$((n + 1)); printf '%s\n' "$n" > "$DIR/.m6-fallos-$a"
+      [ "$n" = "$UMBRAL_FALLOS" ] && echo "[m6 CIEGO] $a: $UMBRAL_FALLOS lecturas seguidas sin respuesta (~$((UMBRAL_FALLOS * 3)) min). Probable sesion de la CLI de Heroku caida: 'heroku auth:whoami'. NO se esta vigilando este entorno."
+      continue
+    fi
+    prev_n=$(cat "$DIR/.m6-fallos-$a" 2>/dev/null || echo 0)
+    if [ "$prev_n" -ge "$UMBRAL_FALLOS" ] 2>/dev/null; then
+      echo "[m6 recuperado] $a: vuelve a leerse. Estado actual: $cur"
+    fi
+    printf '0\n' > "$DIR/.m6-fallos-$a"
     ant=$(cat "$DIR/.m6-$a" 2>/dev/null)
     if [ -n "$ant" ] && [ "$cur" != "$ant" ]; then
       echo "[release $a] $cur (antes: $ant)"

@@ -173,6 +173,15 @@ de entrega necesita el suyo **antes** de mandar el encargo.
 Poll 180s de `heroku releases -a <app> -n 1 --json` sobre **las dos** apps; emitir cuando cambie
 `version`, `description` o `status`, incluyendo el valor anterior y el nombre de la app.
 
+**Y no calla si se queda ciego (v2.2, misma tarde).** La v2 hacía `[ -z "$cur" ] && continue`: si
+la lectura fallaba, el monitor seguía vivo **sin emitir nada, para siempre**. Pasó ese mismo día —la
+sesión de la CLI de Heroku se cayó y `m6` dejó de vigilar los dos entornos sin un solo aviso, en
+mitad de la promoción—. **Desde fuera, «no hay releases» y «no estoy mirando» se ven exactamente
+igual**, que es el fallo que la propia herramienta `Monitor` advierte: *silence is not success*.
+Ahora cuenta fallos consecutivos, grita **una vez** al cruzar el umbral (3 ciclos ≈ 9 min) y avisa
+otra al recuperarse. Vale como regla para cualquier monitor que dependa de una credencial: **la
+pérdida de acceso es un evento, no un no-evento.**
+
 **PROD entra el 23 ago (v2).** Con el `#210` abierto —llevar STG a producción y dejar los dos
 entornos como espejo— el release de PROD deja de ser ruido y pasa a ser la medida del trabajo: es
 donde se ve aterrizar cada promoción, y donde un **rollback cambiaría la línea base sin que nadie
