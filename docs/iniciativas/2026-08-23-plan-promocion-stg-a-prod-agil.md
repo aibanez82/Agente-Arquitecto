@@ -313,9 +313,38 @@ Dashboard lee hoy desaparece.
 `n8nOperatorWebhook` **escriben**, vía el webhook proactivo de n8n — la excepción que `CLAUDE.md` ya
 reconoce. F6 tiene que cubrir esa cadena, no solo que la página pinte.
 
-**Abierto:** una ventana suya de `session_id NOT NULL`, pedida al Agente Dashboard **medida contra
-PROD**. Hasta que llegue es incógnita, no «probablemente ya está»; si resulta pendiente, es trabajo
-previo a esta fase.
+**~~Abierto: la ventana de `session_id NOT NULL`~~ — CERRADO el mismo día.** Medido por mí contra
+`hyl-wai-production`: `dashboard_conversation_claims.session_id` es `is_nullable = NO`, con
+`uq_claims_active_session`, `uq_claims_active_lead` y `uq_claims_control_id`. **No hay bloqueo de
+esquema.**
+
+### Condición real de F5.bis: el gate del envío
+
+Lo que sí apareció, y no lo vi yo: **promover `stg` mete la cadena de envío** que el handoff del 13
+ago decidió NO cablear. Lo levantó el Agente Dashboard. Al verificarlo salió peor de lo previsto:
+
+- `N8N_OPERATOR_WEBHOOK_BASE_URL` y `..._SECRET` llevan **11 días en Production**;
+- el workflow `Atencion Humana` de PROD (`B5ihE5xHg8bjeesl`) está **`active`** y expone
+  `atencion-humana-enviar` con la cadena entera detrás.
+
+Hoy no se envía **solo porque `operator-send.js` no existe en `main`**. Promover no enciende nada:
+retira lo último que tapaba algo ya encendido.
+
+**Y quitar esas dos variables NO es la salida** —fue mi primera recomendación y era errónea—:
+gatean el **cliente entero** (`lib/n8nOperatorWebhook.js:73-75`), incluidos el `tomar` y el `liberar`
+que usa `claim.js` en `:82` y `:157`. Apagarlas rompería Atención Humana hoy y reabriría el `#57`.
+El fallo, además, es del tipo peligroso: **la opción que suena conservadora era la destructiva.**
+
+**Decisión de Alberto (23 ago): opción (a″)** — gate propio `N8N_OPERATOR_SEND_ENABLED`, **ausente en
+PROD**, con un único `if` en `operator-send.js` que devuelva 503 antes de cualquier efecto. Separa
+**transporte** («sé hablar con n8n») de **capacidad** («puedo enviar»), que es la distinción que
+faltaba: por eso la decisión de agosto se sostenía con una ausencia de código y no con un control.
+El estado seguro sale **por omisión** — hay que acordarse de encender, no de apagar.
+
+Dos condiciones: `reason_code` **distinto** del `control_module_off` de transporte, y el gate **solo**
+en `operator-send.js`, nunca en el cliente. Ordenado en
+`Dashboard_seguroautoqualitas:main:handoffs/2026-08-23-gate-propio-para-el-envio-de-atencion-humana.md`
+(`7f8b0e2`). **F5.bis no entra hasta que ese gate esté.**
 
 **Verificación:** el deploy de Vercel apuntando al SHA promovido, y la cadena de Atención Humana
 recorrida en F6 de punta a punta.
