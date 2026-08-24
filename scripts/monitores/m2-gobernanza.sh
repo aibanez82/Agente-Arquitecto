@@ -58,7 +58,14 @@ while true; do
       # Sin esta excepcion, el filtro se comeria justo lo que hay que leer.
       case "$body" in
         *Relay*|*" leg "*|*"leg "[0-9]*)
-          case "$body" in
+          # El veredicto se busca SOLO en el titular -- los primeros 140 chars, que
+          # es donde Juan lo pone ("## Relay leg 25 -- review final: CHANGES").
+          # Buscarlo en todo el cuerpo deja pasar menciones hipoteticas: la primera
+          # version colo una leg por un "si se activa un STOP del charter" en la
+          # posicion 1071. Misma clase que contar sobre el texto crudo en vez de
+          # sobre la estructura -- coincidir no es significar.
+          titular=$(printf '%s' "$body" | cut -c1-140)
+          case "$titular" in
             *PASS*|*CHANGES*|*FAIL*|*STOP*|*bloqueante*|*BLOQUEANTE*) ;;
             *) echo "$(printf '%s' "$body" | huella)" >> "$SEEN_FILE"; continue ;;
           esac ;;
