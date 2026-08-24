@@ -385,6 +385,37 @@ STG da igual; en PROD, un job legacy despertando contra el proveedor mientras en
 sync es la clase de sorpresa que este plan existe para evitar. Se resuelve mirando el dashboard, no
 adivinando.
 
+> ## ⚠️ F5 NO EXISTE — los flags ya llegaron encendidos (medido el 23 ago, 20:5x CDMX)
+>
+> Esta fase decía «los módulos llegan apagados por diseño; se encienden de uno en uno, midiendo
+> entre uno y otro». **En producción llegaron encendidos.** Medido en la base:
+>
+> ```
+> qualitas_discountsettings
+>   module_enabled = true · phase_1_checkpoint_enabled = true · phase_2_intent_enabled = true
+> ```
+>
+> No los encendió nadie: son los **valores por defecto de la migración**, y entraron con el deploy de
+> F2 a las 16:46. **El módulo de descuentos llevaba cuatro horas vivo en producción y no lo sabíamos.**
+>
+> **Por qué importa, y no es un detalle de contabilidad.** El `#210` dice que `#204` y `#205` no
+> bloquean el despliegue pero sí reabrir la landing, y ese razonamiento asumía que los descuentos
+> entrarían apagados y se encenderían a mano. Con ellos vivos desde el primer minuto, el followup
+> legacy **ya puede** pisar una conversación de descuento y Django **ya puede** conceder dos ofertas
+> vigentes. Lo único que lo contiene es que no hay tráfico: 9 leads en 14 días. **No hay un control;
+> hay una ausencia de clientes.**
+>
+> **Decisión de Alberto (23 ago):** dejarlos encendidos y **acelerar F6**. No se toca la base de
+> producción de noche para revertir algo que la falta de tráfico ya contiene, y el smoke es lo que de
+> verdad acredita el bot. La landing sigue sin reabrirse hasta `#204` y `#205`.
+>
+> **La lección, que es de método y va a la bitácora:** un plan que dice «llega apagado» está haciendo
+> una **afirmación sobre el entorno de destino**, no describiendo una propiedad del artefacto. Los
+> valores por defecto de una migración son configuración que viaja, y viajan **encendidos** salvo que
+> alguien lo haya decidido al revés. **«Llega apagado» se mide, no se asume** — y se mide en el
+> destino, después del deploy, no en el código.
+
+
 ### F5.bis · Dashboard — **añadido el 23 ago; no estaba, y era punto ciego**
 
 Ni «incluye» ni «no incluye» lo nombraban. Lo levantó el **Agente Dashboard** leyendo este plan, y
