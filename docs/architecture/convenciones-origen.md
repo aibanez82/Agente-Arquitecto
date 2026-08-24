@@ -345,3 +345,31 @@ El Dashboard ya tenía la regla escrita desde su incidente con `readonly_leads`,
 **por su intención** en vez de por su mecanismo. De ahí la convención, con su corolario: una guarda
 que solo comprueba que *nada incumple* la pasa cualquier consulta vacía; tiene que exigir en
 **positivo** que aparezca lo esperado.
+
+
+## La segunda mitad: el `403` que se imprimió como «0» (24 ago 2026)
+
+La convención nació el 23 ago mirando `information_schema` y **se quedó corta el mismo día**.
+
+Horas después de escribirla, el Arquitecto midió las data tables de n8n en producción con:
+
+```python
+d = resp.json(); ts = d.get('data', [])
+print('data tables en PROD:', len(ts))     # imprimió: 0
+```
+
+El cuerpo real era `{"message":"Forbidden"}` — **HTTP 403**. `d.get('data', [])` sobre eso devuelve
+lista vacía, y el script imprimió un cero perfectamente formateado. **Ese cero acabó en negrita en un
+handoff**, como estado de partida de una fase.
+
+Lo destapó el Agente n8n al recibir el mismo `403` intentando ejecutar el handoff.
+
+**Por qué importa que sean dos formas del mismo error y no dos errores:** la primera versión de la
+convención hablaba de `information_schema` y de guardas SQL, así que no se aplicaba mentalmente a una
+llamada REST. El fallo no es del catálogo de Postgres: es de **cualquier lectura que pueda fallar
+devolviendo algo que se parece a un resultado vacío**. Una API con `403`, un `grep` sobre un fichero
+que no existe, un `git show` de una ruta equivocada, un `curl` sin `-f`.
+
+De ahí la reformulación: la regla no es «no uses `information_schema`», es **comprobar que la lectura
+funcionó antes de interpretar que no hay nada**. Y su corolario práctico: **el código HTTP se mira
+siempre**, aunque el JSON parezca bien formado.

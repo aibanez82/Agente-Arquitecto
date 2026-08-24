@@ -16,7 +16,7 @@ teniendo.
 
 ## 0. La tesis
 
-De los dieciocho errores de esta jornada, **trece eran míos** (el Arquitecto) y **ninguno lo detectó
+De los veinte errores de esta jornada, **quince eran míos** (el Arquitecto) y **ninguno lo detectó
 quien lo cometió**. Los cazaron los ejecutores, las guardas de los propios artefactos, o una
 medición que hice por otro motivo.
 
@@ -130,6 +130,50 @@ los dos candidatos lo comparten»*.
 >
 > Y antes de regenerar: **inventariar qué más difiere entre entornos y no tiene columna**. Las tres
 > aparecieron de una en una, tropezando.
+
+### 2.4 ter El recurso de instancia que no estaba en mi lista — y el `403` que se imprimió como «0»
+
+**La quinta de la clase 2.4 bis, y la que llegó a producción.** El bot de 229 nodos entró a las
+02:24 y **murió en 0,6 s con el primer mensaje real**:
+
+```
+Could not find the data table: 'bIxZXnNOotosIa5q'
+```
+
+Una **Data Table de n8n** —`quote_document_deliveries`, el candado de idempotencia del envío del
+documento— usada por cuatro nodos, existente en STG e inexistente en PROD. Es **recurso de
+instancia**, como las credenciales, pero sin fila en la tabla de configuración.
+
+**El fallo del inventario fue mío.** Al aprobar F4 pedí inventariar «credenciales, `phoneNumberId`,
+tokens, ids de workflow, hosts». El ejecutor buscó **exactamente eso**. Enumerar categorías conocidas
+es un método que solo encuentra lo que ya sospechas.
+
+> **Regla:** la pregunta no es *qué categorías conozco*, sino **¿qué recursos viven en la INSTANCIA y
+> no en el grafo?** Todos comparten firma: un **id opaco embebido en el JSON** que el espejo no
+> distingue de un dato cualquiera. Y la verificación no es una lista: es un **censo con dos números
+> que deben coincidir** — el ejecutor lo formuló mejor que yo: *91 nodos con referencia a recurso de
+> instancia, 9 recursos distintos, 8 con fila*. «8 de 9» es falsable; «he revisado y no veo nada» no.
+
+**Y encima medí mal el estado de partida.** Escribí en el handoff «en PROD hay 0 data tables». No lo
+medí: `d.get('data', [])` sobre un `{"message":"Forbidden"}` —**HTTP 403**— devuelve lista vacía, y
+mi script imprimió «0». **Es la misma trampa del §2.4, en una API en vez de en un catálogo, el mismo
+día en que la escribí como convención.** Por eso la convención se reformuló: no va de
+`information_schema`, va de **cualquier lectura que pueda fallar en silencio**.
+
+**Lo que funcionó, y es lo que hay que copiar:**
+
+- **La marcha atrás preautorizada.** El handoff decía «con el bot vivo, revierte primero y pregunta
+  después». El ejecutor revirtió **sin consultar** a los 3 min 25 s, y era lo correcto: el bot moría
+  con *cualquier* mensaje entrante, no solo con el del smoke.
+- **La red de error, puesta media hora antes, capturó este mismo fallo.** Sin ella la ejecución
+  habría muerto sin rastro.
+- **Una sola ejecución afectada** en 50 minutos de ventana rota, y era la del propio smoke. Cero
+  clientes reales — porque la landing seguía cerrada, que era el motivo de tenerla cerrada.
+- **El smoke hizo exactamente su trabajo:** encontrar el fallo antes que un cliente. Un smoke que
+  falla en el paso 1 no es un smoke fallido.
+
+Matiz que el ejecutor corrigió y vale: **el trigger y el `webhookId` sí entregaron.** Lo que murió
+fue el procesamiento aguas abajo. La superficie que más miedo daba funcionó.
 
 ### 2.5 Dar por evidencia un metadato que no puede distinguir
 
