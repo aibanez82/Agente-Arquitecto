@@ -311,6 +311,41 @@ Con dos condiciones que hubo que añadir, y las dos son huecos de la misma famil
 rota aunque nadie la incumpla todavía* — escribir el ámbito junto a la regla, no solo el porqué. Y
 *una autoridad no se hereda por conversación*: la orden existe donde se puede citar, o no existe.
 
+### 2.4 septies El resultado falso que ya estaba escrito, y lo único que lo cazó
+
+**24 ago, al verificar la igualación de `detect-drift.py`.** Comparé el fichero entre `stg` y `main`
+con:
+
+```bash
+for r in stg main; do git show origin/$r:scripts/detect-drift.py ...
+```
+
+**zsh interpretó `:s` como modificador de parámetro**, se comió la ruta, y `git show` recibió solo
+`origin/stg`: devolvió **el commit**, no el fichero. Comparé dos volcados de commit, sus hashes
+coincidieron, y **publiqué «IDÉNTICOS»**. Con longitud, con hash y con aspecto de medición.
+
+Lo que lo cazó no fue desconfiar. Fue que **la misma tanda traía una segunda medida del mismo
+hecho** —un `grep` de la línea de la guarda— que daba `0` en una rama y `1` en la otra. Dos
+resultados incompatibles sobre ficheros que acababa de declarar idénticos. Sin esa segunda medida,
+la conclusión falsa se queda escrita y nadie la vuelve a mirar.
+
+**Por qué esta merece sección propia y no es otra más de la familia.** Las anteriores —el `403`
+como cero, la ausencia sin instantánea, el `order=desc` que devolvió marzo— las pillé **antes** de
+publicar, o me salvó un contraste externo. Esta **ya estaba publicada** cuando se cayó. La
+diferencia práctica: contra las otras sirve la disciplina de comprobar la lectura; contra esta no,
+porque la lectura *parecía* haber funcionado — devolvió bytes, longitud y hash.
+
+**La regla, y es distinta de «ten cuidado»:** cuando una conclusión va a sostener una decisión,
+**medirla por dos caminos que no comparten el fallo**. Aquí bastaba: hash del contenido *y* búsqueda
+de una cadena que solo existe en una versión. Si los dos caminos concuerdan, la conclusión aguanta;
+si discrepan, uno de los dos instrumentos está roto y hay que averiguar cuál **antes** de escribir
+nada. Un solo camino, por cuidadoso que sea, no puede detectar su propio fallo.
+
+**Corolario para el shell, porque el detalle se repite:** en zsh, `$var:algo` puede parsearse como
+modificador. Escribir siempre `"origin/${r}:ruta"` con llaves y comillas. Y la trampa general:
+**`git show <ref>` sin ruta no falla — muestra el commit**, así que un error de sintaxis en la ruta
+se presenta como una salida perfectamente válida de otra cosa.
+
 ### 2.5 Dar por evidencia un metadato que no puede distinguir
 
 Escribí «el PR lo fusionó Alberto» leyendo `mergedBy`. **Todos los agentes operan con su cuenta**, así
