@@ -214,6 +214,49 @@ Corolario para los planes: **«llega inerte» y «no escribe nada» son afirmaci
 módulo puede llegar sin efectos de negocio y aun así empezar a poblar sus tablas desde el primer
 minuto — y eso cambia qué significa «volver atrás».
 
+### 2.4 quinquies La coincidencia que era una tautología
+
+**24 ago, cierre del hilo de la data table.** El Agente n8n leyó por fin las filas de
+`quote_document_deliveries` en PROD con una clave que sí tenía alcance, y encontró **uso real del 22
+al 25 de julio**: entregas de documento con `wamid` de Meta, cotizaciones reales, hasta un `+57`.
+Su informe de F4.bis decía que la tabla «apareció en la ventana de Alberto». **Preexistía un mes.**
+
+Y traía dos preguntas razonables: *¿qué escribió esas filas?* y *¿quién creó la tabla?* Las dos
+apuntaban fuera —un workflow borrado, otra mano—, porque la premisa de partida era que **el bot no
+tenía nodos `dataTable`**. Medido sobre `Agente-n8n`, todas las refs, ruta `workflows/`, cadena
+`Check Delivery Idempotency`:
+
+| | |
+|---|---|
+| 21 jul, `0a8229ce` | `deploy(prod): entrega de cotizacion por quick reply` — primer export con los cuatro nodos |
+| 26 jul | 112 nodos, los cuatro presentes |
+| 27-29 jul | 113 nodos, los cuatro presentes |
+| tabla `CKUcyIg4N6YqsjAl` | `createdAt 2026-07-22T03:15:09Z` — la misma tarde del deploy |
+
+**Los escribió el propio bot.** No había nada que buscar.
+
+Lo que hay que aprender no es el 403 —eso ya está en `2.4 ter`—, sino lo que vino después. Cuando
+comparamos el esquema del mecanismo nuevo contra el de la tabla viva, **coincidía exacto**, y lo
+leímos como una señal fuerte: dos diseños convergiendo. Era lo contrario. **Era la misma tabla que
+nuestro propio mecanismo había creado un mes antes**, así que la coincidencia no aportaba
+información: no podía haber salido de otra forma. Una comparación cuyo resultado está garantizado de
+antemano se siente como una verificación y no lo es — es la misma familia que `2.4 bis`, el test de
+paridad que no ve lo que los dos lados comparten.
+
+Y la afirmación que abrió el agujero no fue «no existe»: fue **«el bot de 119 no tenía nodos
+`dataTable`»** — una ausencia enunciada sin decir **contra qué instantánea** del bot se miró. El
+número «119» venía de la tabla de `CLAUDE.md`; los exports de julio marcan 112 y 113. Se comparó
+contra un recuento de otro sitio y se concluyó sobre un grafo que nadie abrió.
+
+**Regla, y es la que ya teníamos aplicada a un caso nuevo:** toda afirmación de ausencia lleva su
+ámbito, **y la instantánea cuenta como ámbito**. «El bot no tiene X» exige decir qué bot, de qué
+fecha, leído de dónde. Sin eso no lo puede refutar nadie, y por eso sobrevivió un mes.
+
+**Dato operativo que salió de paso, y que conviene no olvidar:** el historial de ejecuciones de n8n
+en PROD **solo conserva del 23 al 24 de agosto**. Julio no se puede reconstruir por ahí. Para
+auditar cualquier cosa anterior, la fuente es el git de los exports y los metadatos del recurso,
+nunca las ejecuciones.
+
 ### 2.5 Dar por evidencia un metadato que no puede distinguir
 
 Escribí «el PR lo fusionó Alberto» leyendo `mergedBy`. **Todos los agentes operan con su cuenta**, así
