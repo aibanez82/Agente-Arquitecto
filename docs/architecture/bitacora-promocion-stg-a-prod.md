@@ -16,7 +16,7 @@ teniendo.
 
 ## 0. La tesis
 
-De los veinte errores de esta jornada, **quince eran míos** (el Arquitecto) y **ninguno lo detectó
+De los veintiún errores de esta jornada, **dieciséis eran míos** (el Arquitecto) y **ninguno lo detectó
 quien lo cometió**. Los cazaron los ejecutores, las guardas de los propios artefactos, o una
 medición que hice por otro motivo.
 
@@ -174,6 +174,45 @@ día en que la escribí como convención.** Por eso la convención se reformuló
 
 Matiz que el ejecutor corrigió y vale: **el trigger y el `webhookId` sí entregaron.** Lo que murió
 fue el procesamiento aguas abajo. La superficie que más miedo daba funcionó.
+
+### 2.4 quater «Leí la guarda» no es «tracé la ruta» — el modo `shadow` sí escribe
+
+La noche del 23, tras la promoción, Juan encendió `QUALITAS_POLICY_RECEIPT_SYNC_MODE=shadow` en
+producción. Fui a ver qué significaba, encontré esto en dos ficheros —
+
+```
+qualitas/first_receipt_confirmation.py:66              if mode != "apply":
+qualitas/management/commands/process_first_receipt_fulfilment.py:86   if mode != "apply":
+```
+
+— y le dije a Alberto que **`shadow` observa y no escribe estado autoritativo**.
+
+**Era falso.** Horas después, con el mismo modo encendido unos minutos, el ledger pasó de **0 a 36
+filas** con datos reales del proveedor (`provider_receipt_id 2152784936`, `provider_status
+"rechazado"`, fechas de vencimiento verdaderas), más 27 `PolicyInstallment`, 5 `PolicyPaymentSummary`
+y 5 snapshots.
+
+**Lo que sí es cierto, y es la formulación correcta:**
+
+> `shadow` **ingiere y proyecta** — escribe sus propias tablas. Lo que **no** hace es **aplicar
+> efectos** sobre el dominio de negocio. Verificado: `qualitas_polizaemitida.estatus_pago` intacto
+> (52 `PENDIENTE`, 6 `PAGADO`) y `conciliacion_pagos` sin tocar (320 filas), que era la frontera que
+> el `#210` declaró fuera de alcance.
+
+Así que **no hubo daño** — pero mi afirmación no describía el sistema, y con ella dije a Alberto que
+el ledger «viajaba inerte» cuando ya no lo estaba del todo.
+
+**El error de método, que es el que se repite:** encontré **una** guarda y extrapolé su alcance a
+**todo** el subsistema. Un `if mode != "apply"` acredita que *ese* camino está protegido; no dice
+nada de los demás. Y el nombre del modo —«sombra»— empujaba hacia la conclusión cómoda.
+
+> **Regla:** leer una guarda dice qué protege **esa** guarda. Para afirmar qué hace un modo completo
+> hay que **trazar la ruta o medir el efecto**. Y cuando se puede medir barato —contar filas antes y
+> después— **se mide**: la lectura del código es una hipótesis, el recuento es el dato.
+
+Corolario para los planes: **«llega inerte» y «no escribe nada» son afirmaciones distintas.** Un
+módulo puede llegar sin efectos de negocio y aun así empezar a poblar sus tablas desde el primer
+minuto — y eso cambia qué significa «volver atrás».
 
 ### 2.5 Dar por evidencia un metadato que no puede distinguir
 
