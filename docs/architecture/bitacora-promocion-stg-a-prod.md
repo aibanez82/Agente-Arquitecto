@@ -346,6 +346,64 @@ modificador. Escribir siempre `"origin/${r}:ruta"` con llaves y comillas. Y la t
 **`git show <ref>` sin ruta no falla — muestra el commit**, así que un error de sintaxis en la ruta
 se presenta como una salida perfectamente válida de otra cosa.
 
+### 2.4 octies El punto 5 de una lista de cinco, que nadie echó de menos
+
+**24 ago, después de cerrar el `#210`.** Alberto probó el carril de descuentos en producción hasta el
+final: puso la objeción, recibió la oferta, pulsó **Aceptar**, y el bot contestó *«Perfecto! Déjame
+que arme tu nueva cotización!»*. **La cotización no llegó nunca.**
+
+La causa, medida en la ejecución `9886`: Django deja la aplicación en `state: queued` con
+`next_action: "worker"`, y **ese worker no existe en producción** — PROD tiene 7 workflows y ninguno
+es el poller; STG tiene `Discount Application Poller Candidate v1` (`DeCguAaVtCuW2CUj`, 62 nodos)
+**activo**.
+
+**Lo que hace de esto una clase y no un descuido: el plan sí lo pedía.** F4, literal:
+
+```
+1. Los workflows auxiliares de PROD primero: Error Handler e Issue Policy Guard.
+2. errorWorkflow enlazado en los cinco workflows de PROD.
+3. Bot principal (119 -> 229 nodos).
+4. Payment Confirmation, Retomar Conversación, Atención Humana.
+5. Poller de descuentos y Metepec.
+```
+
+El punto 5 no se hizo. **Y los dos informes de entrega de F4 no lo mencionan ni una vez** —
+`grep -ci poller` = 0 en ambos. No se pospuso, no se declaró fuera de alcance, no se discutió: se
+evaporó. Ni el ejecutor ni yo lo echamos de menos, y la fase se aceptó.
+
+**Por qué se evaporó, y aquí está lo aprovechable.** Los criterios de verificación de F4 que yo
+mismo escribí eran, literal: *«recuento de nodos esperado, `active`, `errorWorkflow`, `webhookId` del
+trigger y credenciales intactas, leído en la instancia»*. **Los cinco comprueban cada cosa
+importada. Ninguno comprueba que la lista se haya terminado.** Una verificación ítem por ítem no
+puede detectar el ítem que no se intentó — pasa igual de verde con cuatro que con cinco.
+
+Es exactamente la forma de fallo contra la que existe la convención de las guardas: *que toda guarda
+exija lo esperado **en positivo**; si solo comprueba que nada incumple, cero filas la pasa*. Aquí la
+guarda comprobaba que lo importado estuviera bien, no que estuviera todo.
+
+Y tiene una ironía útil: **el censo de F8 —que enumera lo vivo y reclama fila para cada uno— es
+justo el mecanismo que habría cazado esto**, y se construyó cuatro fases más tarde para el problema
+gemelo. Lo que faltaba en F4 era su equivalente: enumerar la lista del plan y exigir marca por cada
+punto.
+
+**El agravante, y es mío:** además de no verificar la lista, di F6 por verde probando el carril
+**hasta la entrega de la oferta** y no hasta la aceptación. Dos verificaciones a medias en la misma
+fase, y el `#210` se cerró encima de las dos. La corrección se publicó en el propio issue, debajo
+del cierre, porque corregirse en conversación no alcanza a quien lee el fichero.
+
+**Las dos reglas que deja:**
+
+1. **Una lista de N puntos se cierra contando N, no revisando los que se hicieron.** El informe de
+   una fase debe enumerar cada punto del plan con su marca — hecho, pospuesto con motivo, o fuera de
+   alcance. **Un punto sin línea es un punto perdido**, y se pierde en silencio.
+2. **Un flujo se prueba hasta que el cliente deja de esperar algo**, no hasta el último mensaje que
+   sabemos enviar. El camino feliz probado hasta la mitad se ve idéntico al probado entero.
+
+Alcance de lo medido: API de n8n de las dos instancias, ejecución `9886` de PROD, plan
+`docs/iniciativas/2026-08-23-plan-promocion-stg-a-prod-agil.md` §F4, e informes
+`2026-08-24-n8n-f4-import-bot-prod.md` y `2026-08-24-n8n-f4-reintento-aceptado-con-ejecucion-real.md`.
+Issue abierto: `HYL-WAI#225`.
+
 ### 2.5 Dar por evidencia un metadato que no puede distinguir
 
 Escribí «el PR lo fusionó Alberto» leyendo `mergedBy`. **Todos los agentes operan con su cuenta**, así
