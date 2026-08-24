@@ -265,3 +265,24 @@ leerle el `ps`. Corolario: un monitor sin sección en esta spec es indistinguibl
   **Cómo distinguirlo:** comparar `ps -o lstart= -p <pid>` con el `mtime` del script. Si el proceso
   es anterior, es desfase y no un fallo de contenido. Comprobado el 8 ago sobre los cinco procesos
   de aquí: los cinco arrancaron después de su última edición, así que estaban en sync.
+
+### m2 · issues abiertos bajo nuestra identidad (v6, 24 ago 2026)
+
+`m2` **ya no emite los issues nuevos cuyo autor es `aibanez82`**. Los deja en
+`scripts/monitores/.m2-propios` con fecha, URL y título, para que nada se pierda sin ruido.
+
+El motivo es el mismo que invalida `mergedBy` en un PR: **Alberto y todos los agentes comparten esa
+identidad**, así que la API no puede decir quién abrió un issue. El filtro no atribuye nada — solo
+distingue «de los nuestros» de «de fuera», que es lo que este monitor necesita: se llama *lo que
+Juan escribe en HYL-WAI*.
+
+**Lo que se pierde y hay que saberlo:** un issue abierto por otro agente nuestro tampoco se emite.
+Se acepta porque los ejecutores avisan por su canal y `m5` vigila `informes/`; si algún día un
+ejecutor abre issues sin avisar, este filtro es el punto ciego que hay que revisar primero.
+
+**Cómo se probó, porque las dos primeras pruebas no probaban nada.** La siembra de arranque marca
+como vistos todos los issues existentes, así que un ciclo normal nunca llega al filtro: salía vacío
+y parecía correcto. La prueba válida desactiva la siembra y retrasa `SINCE`. Resultado: `#213` de
+`oilycoyote` **emitido**; `#220`, `#218`, `#217` y `#204` nuestros, **silenciados y anotados**.
+Corolario para cualquier monitor: *una salida vacía no acredita que el filtro funcione* — hay que
+forzar el caso que debe pasar y el que debe callarse, y ver los dos.
