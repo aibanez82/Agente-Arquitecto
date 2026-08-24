@@ -30,6 +30,19 @@ while true; do
     [ -z "$ref" ] && continue
     old=$(grep "^$name|$ref|" "$STATE" 2>/dev/null | cut -d'|' -f3)
     repo=$(echo "$REPOS" | grep "/$name\$" | head -1)
+    # No emitir ECO de lo que publico YO en el canal de ordenes. Los handoffs, los
+    # GO y sus correcciones los escribo yo en `main` del repo del ejecutor, y m3
+    # me los devolvia como si fueran entrega suya: el 23 ago fueron ~10 avisos de
+    # cero valor, y Alberto pidio que dejaran de salir. No se puede filtrar por
+    # autor -- todos los agentes firman como aibanez82-- asi que se filtra por el
+    # prefijo del asunto, que en estos tres casos es inequivoco: ningun ejecutor
+    # se escribe un handoff a si mismo ni se da un GO.
+    asunto=$(git -C "$repo" log -1 --format=%s "$sha" 2>/dev/null)
+    case "$asunto" in
+      handoff\(*|GO\(*|correccion\(F*)
+        continue ;;
+    esac
+
     if [ -z "$old" ]; then
       echo "[push] $name RAMA NUEVA $ref -> $sha :: $(git -C "$repo" log -1 --format=%s "$sha" 2>/dev/null | cut -c1-140)"
     elif [ "$old" != "$sha" ]; then
