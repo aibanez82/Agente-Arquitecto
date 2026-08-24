@@ -51,6 +51,19 @@ while true; do
     nuevos=""
     while IFS='|' read -r num created url body; do
       [ -z "$body" ] && continue
+      # Las legs de Relay son ruido procedimental: Juan publica 30-40 por issue
+      # en un dia ("Relay leg 12 completada", "handoff leg 2 -> leg 3") y ninguna
+      # pide decision. Se silencian... SALVO que traigan veredicto: un PASS, un
+      # CHANGES o un STOP dentro de una leg si es senal y no puede perderse.
+      # Sin esta excepcion, el filtro se comeria justo lo que hay que leer.
+      case "$body" in
+        *Relay*|*" leg "*|*"leg "[0-9]*)
+          case "$body" in
+            *PASS*|*CHANGES*|*FAIL*|*STOP*|*bloqueante*|*BLOQUEANTE*) ;;
+            *) echo "$(printf '%s' "$body" | huella)" >> "$SEEN_FILE"; continue ;;
+          esac ;;
+      esac
+
       h=$(printf '%s' "$body" | huella)
       grep -q "^$h$" "$SEEN_FILE" 2>/dev/null && continue
       echo "$h" >> "$SEEN_FILE"
