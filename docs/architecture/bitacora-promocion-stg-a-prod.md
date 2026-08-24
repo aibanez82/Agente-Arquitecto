@@ -16,7 +16,7 @@ teniendo.
 
 ## 0. La tesis
 
-De los quince errores de esta jornada, **once eran míos** (el Arquitecto) y **ninguno lo detectó
+De los dieciséis errores de esta jornada, **once eran míos** (el Arquitecto) y **ninguno lo detectó
 quien lo cometió**. Los cazaron los ejecutores, las guardas de los propios artefactos, o una
 medición que hice por otro motivo.
 
@@ -97,6 +97,39 @@ Lo delata que el mismo fichero, doce líneas antes, usa `pg_attribute` + `::regc
 
 > **Regla:** para catálogo, `pg_catalog` y `to_regclass`. Y que la guarda exija **en positivo** lo
 > esperado: si solo comprueba que *nada incumple*, cualquier consulta vacía la pasa.
+
+### 2.4 bis Un test de paridad no ve lo que los dos lados tienen mal igual
+
+El builder produce los candidatos de STG y de PROD desde un solo grafo, con una tabla de
+configuración por entorno, y un test acredita que **solo** difieren en lo que la tabla declara. Suena
+hermético. **No lo es**, y falló tres veces el mismo día:
+
+| Lo que no tenía fila | Consecuencia si se importa |
+|---|---|
+| id del `Issue Policy Guard` | la emisión de pólizas de PROD llamaría al guard de **staging** |
+| `errorWorkflow` | el bot estrena 229 nodos **sin red de error** |
+| URL base de Django | **7 nodos** del candidato de PROD apuntando a `hyl-wai-stg` |
+
+El tercero es el peligroso, y explica por qué esta clase importa: el guard era un id **inexistente en
+PROD**, así que habría fallado a la vista. **`hyl-wai-stg` existe, responde y tiene datos.** Un bot de
+producción leyendo de ahí **no da error: da respuestas equivocadas** — el precio de una cotización de
+pruebas a un cliente real, y ofertas de descuento escritas en la base de staging. **El smoke puede no
+cazarlo**: el bot responde y el mensaje llega.
+
+Lo dijo el Agente n8n en una frase que vale más que el hallazgo: *«el test del espejo no podía verlo:
+los dos candidatos lo comparten»*.
+
+> **Regla:** un test de paridad acredita **diferencias declaradas**, no corrección. Lo que no tiene
+> fila en la tabla es **invisible** para la comparación, y por tanto es exactamente donde se esconden
+> los errores.
+>
+> **Corolario operativo:** verificar por **ausencia de lo ajeno**, no por presencia de lo corregido.
+> «Arreglé los 7 nodos» no prueba que no hubiera un octavo; «cero nodos del artefacto de PROD
+> mencionan un host que no sea producción» sí. Y hacerlo **en espejo**: cero hosts de producción en
+> el artefacto de STG, porque el cruce en esa dirección es peor.
+>
+> Y antes de regenerar: **inventariar qué más difiere entre entornos y no tiene columna**. Las tres
+> aparecieron de una en una, tropezando.
 
 ### 2.5 Dar por evidencia un metadato que no puede distinguir
 
