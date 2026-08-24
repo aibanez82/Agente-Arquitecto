@@ -136,6 +136,15 @@ rebase ahí nos afecta— y los tres ejecutores que entregan por commit (`Agente
 lista fija de ramas: así aparecen también las nuevas); emitir "REPO rama: SHA mensaje" por cambio.
 Cubre: entregas, informes n8n, handoffs propios (eco), ramas nuevas.
 
+**No emite eco de lo que publico yo (v3, 23 ago).** Los handoffs, los GO y sus correcciones los
+escribo yo en `main` del repo del ejecutor, y `m3` me los devolvía como si fueran entrega suya: unos
+diez avisos de cero valor en una tarde, hasta que Alberto pidió que dejaran de salir.
+
+**No se puede filtrar por autor** — todos los agentes firman como `aibanez82`, que es la misma
+limitación que hizo inválido el `mergedBy` del 23 ago. Se filtra por **prefijo del asunto**
+—`handoff(`, `GO(`, `correccion(F`— que aquí es inequívoco: **ningún ejecutor se escribe un handoff a
+sí mismo ni se da un GO**. Lo demás (`informe(`, `sync(`, `feat(`, `fix(`) pasa.
+
 Dos refinamientos que valen (v2, 7 ago):
 
 - **Distinguir avance de reescritura.** Cuando una rama se mueve, comprobar
@@ -149,6 +158,23 @@ Dos refinamientos que valen (v2, 7 ago):
 - **El head de un PR solo se emite si DIVERGE de su rama.** Que coincida es lo normal y duplicaba
   cada push (2 eventos por commit); registrarlo en silencio. Cuando NO coincide —PR reapuntado,
   rama borrada, head ajeno— sí es señal.
+
+## 3 bis. El monitor huérfano que duplicaba tres de estos (23 ago)
+
+Durante toda la jornada llegaron a la sesión avisos duplicados de `m2`, `m3` y `m4`. No eran un fallo
+de los míos: era **un monitor de otra sesión, muerta el 19 de agosto**, cuyo proceso sobrevivió
+**cuatro días** y cuyas notificaciones aterrizaban en mi conversación.
+
+Hacía a la vez lo de tres: commits de HYL-WAI en `stg` y `main`, commits y PRs de `Agente-n8n`,
+`dudas/` de este repo, issues nuevos y comentarios de Juan.
+
+**Cómo se identificó al dueño:** por la ruta de su fichero de salida, que lleva el id de sesión
+(`…/<session-id>/scratchpad`), contrastada con la fecha de la carpeta de esa sesión. Cuatro días sin
+tocar = huérfano. `ps` decía que estaba vivo; solo el id de sesión decía de quién.
+
+> **Regla:** un monitor cuya sesión ya no existe **no se hereda: se mata**. Y antes de armar, además
+> de mirar `ps`, comprobar si alguno de los procesos vivos pertenece a una sesión muerta — un
+> duplicado silencioso cuesta más que un monitor ausente, porque enseña a ignorar el canal.
 
 ## 4. Dudas de ejecutores
 
