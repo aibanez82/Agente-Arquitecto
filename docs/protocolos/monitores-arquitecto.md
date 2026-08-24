@@ -127,9 +127,15 @@ leg 3»— y **ninguno pide una decisión**. El colapso por ciclo no basta: lleg
 largo de horas, así que cada uno era un turno.
 
 **La excepción es la parte que hace útil el filtro:** un `PASS`, un `CHANGES`, un `FAIL`, un `STOP` o
-un «bloqueante` dentro de una leg **sí es señal** y se emite igual. Sin esa salvedad, el filtro se
+un «bloqueante» dentro de una leg **sí es señal** y se emite igual. Sin esa salvedad, el filtro se
 comería justo lo que hay que leer — que es el modo en que un filtro de ruido se convierte en un punto
 ciego.
+
+**Y el veredicto se busca SOLO en el titular** (los primeros 140 caracteres), no en todo el cuerpo.
+La primera versión lo buscaba en el texto entero y coló una leg procedimental por un
+*«si se activa un `STOP` del charter»* en la posición **1071** — una mención hipotética, no un
+veredicto. Es la misma clase de error que contar referencias sobre el JSON crudo en vez de sobre los
+nodos: **coincidir no es significar**, y una palabra vale por dónde está tanto como por cuál es.
 
 **Colapso por issue para no auto-detenerse.** Más de 3 comentarios nuevos del mismo issue en un
 ciclo se emiten como **una** línea `[#NNN · Juan ×N] última: …`. Sin esto, un relay como el de #203
