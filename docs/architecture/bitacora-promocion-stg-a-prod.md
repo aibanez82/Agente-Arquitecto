@@ -16,7 +16,7 @@ teniendo.
 
 ## 0. La tesis
 
-De los dieciséis errores de esta jornada, **once eran míos** (el Arquitecto) y **ninguno lo detectó
+De los dieciocho errores de esta jornada, **trece eran míos** (el Arquitecto) y **ninguno lo detectó
 quien lo cometió**. Los cazaron los ejecutores, las guardas de los propios artefactos, o una
 medición que hice por otro motivo.
 
@@ -180,6 +180,33 @@ Lo denegó el scope. Si me hubiera equivocado de scope, habría metido una varia
 **reiniciado la app con clientes dentro**.
 
 > **Regla:** una prueba de denegación se hace donde el fallo no cuesta nada. **STG existe para eso.**
+
+### 2.9 bis Entregar un secreto sin etiqueta, y estar a punto de escribirlo en git
+
+Dos errores encadenados, la misma noche, con la misma credencial.
+
+**El primero: la entregué sin decir para qué era.** Había **dos** necesidades de credencial abiertas
+a la vez —un token de Heroku para que el Dashboard midiera por su cuenta, y un PAT de GitHub para el
+arreglo del CI— y pasé la de Heroku diciendo poco más que «aquí tienes». Alberto tenía dos huecos y
+una sola credencial en la mano: acabó en `secrets.HYL_WAI_READ_TOKEN`, donde daba **401**.
+
+Lo diagnosticó el Agente Dashboard sin ver el valor: **65 bytes**, que no es la forma de ningún PAT
+—40 el clásico, ~93 el fine-grained—, y `401` en `/user`, que descarta permisos y dice «no reconozco
+esta credencial». Era `HRKU-…`, un token de Heroku. **Un `401` en `/user` es de sistema equivocado;
+un `404` en el repo habría sido de permisos.**
+
+**El segundo: al responderle, pegué el token entero** en el fichero para demostrar el prefijo. **El
+push protection de GitHub bloqueó el push** identificándolo como `Heroku Platform API OAuth2 Token`.
+Tenía razón: para acreditar de qué sistema es, bastan el prefijo y la longitud — exactamente el
+criterio que el ejecutor había aplicado al diagnosticar sin imprimir el valor. **Iba a hacer en un
+fichero de git lo que él evitó hacer en un log de CI.**
+
+> **Reglas:** una credencial se entrega con su **sistema**, su **scope**, su **id de revocación** y
+> **dónde va** — y, si hay más de una en vuelo, con dónde **no** va. Nunca se escribe entera en un
+> documento: prefijo y longitud identifican sin exponer.
+>
+> **Y la de diagnóstico, que vale para cualquier credencial:** longitud y código HTTP bastan casi
+> siempre. Si `/user` da `401`, no es permisos — es que la credencial no es de ese sistema.
 
 ### 2.10 Errores de los ejecutores, y por qué importan poco
 
