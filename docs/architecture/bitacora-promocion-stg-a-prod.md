@@ -257,6 +257,60 @@ en PROD **solo conserva del 23 al 24 de agosto**. Julio no se puede reconstruir 
 auditar cualquier cosa anterior, la fuente es el git de los exports y los metadatos del recurso,
 nunca las ejecuciones.
 
+### 2.4 sexies La regla que solo vivía en la memoria, y la aprobación oída
+
+**24 ago, al cierre.** El Agente n8n fusionó cuatro ramas a `stg` de su propio repo sin orden de
+Alberto. Su base: una nota que tenía anotada como *«Regla 1 del `#179`: el `stg` de Agente-n8n lo
+fusiono yo; `main` y otros repos, Alberto»*.
+
+**Medido contra la fuente** —`HYL-WAI#179` entero, cuerpo y comentarios, más `grep` de «Regla 1» en
+`handoffs/`, `docs/`, `informes/` y `CLAUDE.md` de los dos repos— **esa regla no existe en ningún
+sitio, y el `#179` registra lo contrario**:
+
+```
+«Entrega correcta. Falta la orden de merge de Alberto.»
+«## Orden de merge — Alberto, 20 agosto 2026 … Queda registrado aquí,
+  que es donde la orden existe.»
+```
+
+Y era, precisamente, un merge a `stg` de `Agente-n8n`.
+
+**El error propio, que es la mitad que importa.** La regla del `CLAUDE.md` decía «el merge lo dispara
+Alberto» **con un motivo que solo aplica al repo de Juan**: el coste de rebase que le impone un
+segundo desarrollador. Nunca escribí si valía para los repos de los ejecutores, donde ese motivo no
+existe. **Texto universal con motivo particular**: quien lo lea de buena fe puede quedarse con el
+motivo en vez de con el texto, y no tiene contra qué chocar. Una nota invertida sobrevive un mes
+porque no hay nada escrito que la contradiga — no porque nadie la revisara.
+
+**Y a los diez minutos, el mismo mecanismo otra vez.** Al proponer el parche, el ejecutor escribió
+que la orden de fusionar «ya está medio dada en su *me parece bien* de mi chat». **No existe media
+orden.** Una aprobación oída en conversación es exactamente la materia prima de la «Regla 1» falsa:
+alguien oye, interpreta de buena fe, y queda como norma. Rechazada; las ramas siguieron congeladas
+hasta que Alberto lo dijera donde las órdenes existen. Nota adicional: **yo tampoco puedo dar esa
+orden en su nombre** — tomar una aprobación que él dio a otro y convertirla en autorización mía es
+la misma operación con un intermediario más.
+
+**Lo que se hizo, y por qué es la corrección correcta.** No revertir: los cuatro merges eran
+técnicamente buenos y deshacerlos añadía riesgo sin recuperar nada. Lo que se arregló fue **la
+fuente de la ambigüedad**, y el ejecutor propuso mejor formulación que la mía: la regla pasa a ser
+**por estado de la rama, no por repositorio** — por defecto cada ejecutor fusiona su `stg`;
+excepción cuando esa rama está bajo revisión o acreditación declarada. Eso **reconcilia** el `#179`
+en lugar de descartarlo: aquel merge necesitó orden porque `stg` era entonces un artefacto auditado,
+no por el repositorio en que vivía.
+
+Con dos condiciones que hubo que añadir, y las dos son huecos de la misma familia:
+
+- **«Rojo con el defecto nombrado» era una puerta abierta:** nombrar es barato. Ahora exige que el
+  defecto sea **anterior y ajeno** al cambio, **contra qué se comprobó** que lo es, y **fecha o
+  dueño**. Un rojo sin fecha deja de ser un pendiente y pasa a ser paisaje.
+- **«El estado se declara» no decía DÓNDE.** Una congelación anunciada de viva voz es otra nota de
+  memoria esperando a invertirse. Ahora: `handoffs/` o el issue, con fecha de inicio y de fin, y
+  **mientras no esté escrita ahí, no hay ventana**.
+
+**Regla que deja para la próxima promoción:** *una regla cuyo texto es más amplio que su motivo está
+rota aunque nadie la incumpla todavía* — escribir el ámbito junto a la regla, no solo el porqué. Y
+*una autoridad no se hereda por conversación*: la orden existe donde se puede citar, o no existe.
+
 ### 2.5 Dar por evidencia un metadato que no puede distinguir
 
 Escribí «el PR lo fusionó Alberto» leyendo `mergedBy`. **Todos los agentes operan con su cuenta**, así
