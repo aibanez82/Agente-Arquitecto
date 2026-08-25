@@ -16,10 +16,19 @@
 #
 # Cubre además lo que ningún monitor veía: ISSUES NUEVOS abiertos por Juan.
 # #203 y #209 los abrió él y nadie avisó.
+#
+# v6 (24 ago 2026): deja de emitir los issues abiertos bajo nuestra propia
+# identidad. El #220 lo abrí yo y volvió como evento treinta segundos después.
+# Un canal que avisa de lo que uno acaba de hacer ensena a no mirarlo.
 REPO="aguayo-co/HYL-WAI"
 AUTOR="oilycoyote"
 SEEN_FILE="$(dirname "$0")/.m2-seen"
+# Identidad compartida por Alberto y todos los agentes: no distingue autor, solo
+# «de los nuestros». Sirve para callar ecos, nunca para atribuir nada a nadie.
+NUESTRA_IDENTIDAD="aibanez82"
+PROPIOS_FILE="$(dirname "$0")/.m2-propios"
 : > "$SEEN_FILE"
+touch "$PROPIOS_FILE"
 
 # Hash del cuerpo SIN timestamps ISO. El comentario «Estado canónico del monitor»
 # (marcador seguroauto-monitor:canonical) lo edita el daemon en sitio y su campo
@@ -105,6 +114,15 @@ while true; do
     [ -z "$num" ] && continue
     grep -qx "issue-$num" "$SEEN_FILE" 2>/dev/null && continue
     echo "issue-$num" >> "$SEEN_FILE"
+    # v6: un issue abierto bajo NUESTRA identidad no es noticia para esta sesión.
+    # `aibanez82` lo comparten Alberto y todos los agentes, así que la API no
+    # puede decir quién lo abrió — igual que `mergedBy` en un PR. Pero el monitor
+    # se llama «lo que Juan escribe», y todo lo nuestro ya se sabe por su canal.
+    # No se pierde: queda en .m2-propios con su URL, para auditar sin ruido.
+    if [ "$autor" = "$NUESTRA_IDENTIDAD" ]; then
+      echo "$created $url :: $titulo" >> "$PROPIOS_FILE"
+      continue
+    fi
     echo "[ISSUE NUEVO #$num · $autor] $created $url :: $(printf '%s' "$titulo" | cut -c1-160)"
   done <<< "$iss"
 done
