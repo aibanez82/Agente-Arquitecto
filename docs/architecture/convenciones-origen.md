@@ -373,3 +373,34 @@ que no existe, un `git show` de una ruta equivocada, un `curl` sin `-f`.
 De ahí la reformulación: la regla no es «no uses `information_schema`», es **comprobar que la lectura
 funcionó antes de interpretar que no hay nada**. Y su corolario práctico: **el código HTTP se mira
 siempre**, aunque el JSON parezca bien formado.
+
+## Una medición del presente no acredita el pasado (24-25 ago 2026)
+
+La aplicación de descuento `1` tardó **81 minutos** en que el worker de Django la reclamara. Para
+saber si era cadencia de scheduler, leí la configuración del trigger en Advanced Scheduler y encontré
+`discount_process_applications` con `* * * * *`, activo, ~17 s por vuelta. Concluí, y **publiqué en
+`HYL-WAI#226`**: «eso no es cadencia de scheduler… esta es la avería, y sigue sin explicación».
+
+Era falso, y de la peor manera: no por medir mal, sino por medir **tarde**. Juan había activado ese
+trigger a las ~15:33 CDMX, y la aplicación se reclamó a las 15:33:21 — en la primera vuelta del job,
+en cuanto empezó a existir. **La configuración que leí no era la que estaba en vigor durante el
+incidente.** Un cron de un minuto que tarda 81 no es un cron lento: es un cron ausente.
+
+Lo que lo cerró fue Alberto, que había visto la activación. Yo tenía los dos números que lo probaban
+—4.856 segundos que terminan exactamente en el instante de la activación, contra 63 segundos en
+régimen la noche siguiente— y no los supe leer, porque no se me ocurrió que el sistema observado
+hubiera cambiado entre el hecho y la observación.
+
+**La lectura era correcta. Lo incorrecto era el instante.** Y por eso no la cubría ninguna de las
+convenciones hermanas: `information_schema` filtra por privilegios, un `403` se imprime como «0», una
+búsqueda estrecha da falso negativo — todas hablan de *qué* se lee o *dónde*. Ésta habla de **cuándo**.
+
+> **Regla:** al explicar un incidente pasado con la configuración actual de un sistema mutable
+> —scheduler, flag, credencial, grafo de n8n, config var—, comprobar primero si esa configuración
+> pudo cambiar entremedias. Si el sistema no guarda historia (el API de Advanced Scheduler retiene
+> **10** ejecuciones; los config vars de Heroku no versionan su valor), entonces **no se puede
+> afirmar nada sobre el pasado desde ahí**, y hay que decirlo con ese ámbito en vez de concluir.
+
+Corolario operativo: el ámbito de una afirmación lleva **fecha**, no solo ruta. «Medido contra la API
+el 24 ago a las 19:40Z» es verificable; «el trigger corre cada minuto» no dice de cuándo y se lee como
+si fuera perpetuo.
