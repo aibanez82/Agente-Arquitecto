@@ -214,6 +214,196 @@ Corolario para los planes: **«llega inerte» y «no escribe nada» son afirmaci
 módulo puede llegar sin efectos de negocio y aun así empezar a poblar sus tablas desde el primer
 minuto — y eso cambia qué significa «volver atrás».
 
+### 2.4 quinquies La coincidencia que era una tautología
+
+**24 ago, cierre del hilo de la data table.** El Agente n8n leyó por fin las filas de
+`quote_document_deliveries` en PROD con una clave que sí tenía alcance, y encontró **uso real del 22
+al 25 de julio**: entregas de documento con `wamid` de Meta, cotizaciones reales, hasta un `+57`.
+Su informe de F4.bis decía que la tabla «apareció en la ventana de Alberto». **Preexistía un mes.**
+
+Y traía dos preguntas razonables: *¿qué escribió esas filas?* y *¿quién creó la tabla?* Las dos
+apuntaban fuera —un workflow borrado, otra mano—, porque la premisa de partida era que **el bot no
+tenía nodos `dataTable`**. Medido sobre `Agente-n8n`, todas las refs, ruta `workflows/`, cadena
+`Check Delivery Idempotency`:
+
+| | |
+|---|---|
+| 21 jul, `0a8229ce` | `deploy(prod): entrega de cotizacion por quick reply` — primer export con los cuatro nodos |
+| 26 jul | 112 nodos, los cuatro presentes |
+| 27-29 jul | 113 nodos, los cuatro presentes |
+| tabla `CKUcyIg4N6YqsjAl` | `createdAt 2026-07-22T03:15:09Z` — la misma tarde del deploy |
+
+**Los escribió el propio bot.** No había nada que buscar.
+
+Lo que hay que aprender no es el 403 —eso ya está en `2.4 ter`—, sino lo que vino después. Cuando
+comparamos el esquema del mecanismo nuevo contra el de la tabla viva, **coincidía exacto**, y lo
+leímos como una señal fuerte: dos diseños convergiendo. Era lo contrario. **Era la misma tabla que
+nuestro propio mecanismo había creado un mes antes**, así que la coincidencia no aportaba
+información: no podía haber salido de otra forma. Una comparación cuyo resultado está garantizado de
+antemano se siente como una verificación y no lo es — es la misma familia que `2.4 bis`, el test de
+paridad que no ve lo que los dos lados comparten.
+
+Y la afirmación que abrió el agujero no fue «no existe»: fue **«el bot de 119 no tenía nodos
+`dataTable`»** — una ausencia enunciada sin decir **contra qué instantánea** del bot se miró. El
+número «119» venía de la tabla de `CLAUDE.md`; los exports de julio marcan 112 y 113. Se comparó
+contra un recuento de otro sitio y se concluyó sobre un grafo que nadie abrió.
+
+**Regla, y es la que ya teníamos aplicada a un caso nuevo:** toda afirmación de ausencia lleva su
+ámbito, **y la instantánea cuenta como ámbito**. «El bot no tiene X» exige decir qué bot, de qué
+fecha, leído de dónde. Sin eso no lo puede refutar nadie, y por eso sobrevivió un mes.
+
+**Dato operativo que salió de paso, y que conviene no olvidar:** el historial de ejecuciones de n8n
+en PROD **solo conserva del 23 al 24 de agosto**. Julio no se puede reconstruir por ahí. Para
+auditar cualquier cosa anterior, la fuente es el git de los exports y los metadatos del recurso,
+nunca las ejecuciones.
+
+### 2.4 sexies La regla que solo vivía en la memoria, y la aprobación oída
+
+**24 ago, al cierre.** El Agente n8n fusionó cuatro ramas a `stg` de su propio repo sin orden de
+Alberto. Su base: una nota que tenía anotada como *«Regla 1 del `#179`: el `stg` de Agente-n8n lo
+fusiono yo; `main` y otros repos, Alberto»*.
+
+**Medido contra la fuente** —`HYL-WAI#179` entero, cuerpo y comentarios, más `grep` de «Regla 1» en
+`handoffs/`, `docs/`, `informes/` y `CLAUDE.md` de los dos repos— **esa regla no existe en ningún
+sitio, y el `#179` registra lo contrario**:
+
+```
+«Entrega correcta. Falta la orden de merge de Alberto.»
+«## Orden de merge — Alberto, 20 agosto 2026 … Queda registrado aquí,
+  que es donde la orden existe.»
+```
+
+Y era, precisamente, un merge a `stg` de `Agente-n8n`.
+
+**El error propio, que es la mitad que importa.** La regla del `CLAUDE.md` decía «el merge lo dispara
+Alberto» **con un motivo que solo aplica al repo de Juan**: el coste de rebase que le impone un
+segundo desarrollador. Nunca escribí si valía para los repos de los ejecutores, donde ese motivo no
+existe. **Texto universal con motivo particular**: quien lo lea de buena fe puede quedarse con el
+motivo en vez de con el texto, y no tiene contra qué chocar. Una nota invertida sobrevive un mes
+porque no hay nada escrito que la contradiga — no porque nadie la revisara.
+
+**Y a los diez minutos, el mismo mecanismo otra vez.** Al proponer el parche, el ejecutor escribió
+que la orden de fusionar «ya está medio dada en su *me parece bien* de mi chat». **No existe media
+orden.** Una aprobación oída en conversación es exactamente la materia prima de la «Regla 1» falsa:
+alguien oye, interpreta de buena fe, y queda como norma. Rechazada; las ramas siguieron congeladas
+hasta que Alberto lo dijera donde las órdenes existen. Nota adicional: **yo tampoco puedo dar esa
+orden en su nombre** — tomar una aprobación que él dio a otro y convertirla en autorización mía es
+la misma operación con un intermediario más.
+
+**Lo que se hizo, y por qué es la corrección correcta.** No revertir: los cuatro merges eran
+técnicamente buenos y deshacerlos añadía riesgo sin recuperar nada. Lo que se arregló fue **la
+fuente de la ambigüedad**, y el ejecutor propuso mejor formulación que la mía: la regla pasa a ser
+**por estado de la rama, no por repositorio** — por defecto cada ejecutor fusiona su `stg`;
+excepción cuando esa rama está bajo revisión o acreditación declarada. Eso **reconcilia** el `#179`
+en lugar de descartarlo: aquel merge necesitó orden porque `stg` era entonces un artefacto auditado,
+no por el repositorio en que vivía.
+
+Con dos condiciones que hubo que añadir, y las dos son huecos de la misma familia:
+
+- **«Rojo con el defecto nombrado» era una puerta abierta:** nombrar es barato. Ahora exige que el
+  defecto sea **anterior y ajeno** al cambio, **contra qué se comprobó** que lo es, y **fecha o
+  dueño**. Un rojo sin fecha deja de ser un pendiente y pasa a ser paisaje.
+- **«El estado se declara» no decía DÓNDE.** Una congelación anunciada de viva voz es otra nota de
+  memoria esperando a invertirse. Ahora: `handoffs/` o el issue, con fecha de inicio y de fin, y
+  **mientras no esté escrita ahí, no hay ventana**.
+
+**Regla que deja para la próxima promoción:** *una regla cuyo texto es más amplio que su motivo está
+rota aunque nadie la incumpla todavía* — escribir el ámbito junto a la regla, no solo el porqué. Y
+*una autoridad no se hereda por conversación*: la orden existe donde se puede citar, o no existe.
+
+### 2.4 septies El resultado falso que ya estaba escrito, y lo único que lo cazó
+
+**24 ago, al verificar la igualación de `detect-drift.py`.** Comparé el fichero entre `stg` y `main`
+con:
+
+```bash
+for r in stg main; do git show origin/$r:scripts/detect-drift.py ...
+```
+
+**zsh interpretó `:s` como modificador de parámetro**, se comió la ruta, y `git show` recibió solo
+`origin/stg`: devolvió **el commit**, no el fichero. Comparé dos volcados de commit, sus hashes
+coincidieron, y **publiqué «IDÉNTICOS»**. Con longitud, con hash y con aspecto de medición.
+
+Lo que lo cazó no fue desconfiar. Fue que **la misma tanda traía una segunda medida del mismo
+hecho** —un `grep` de la línea de la guarda— que daba `0` en una rama y `1` en la otra. Dos
+resultados incompatibles sobre ficheros que acababa de declarar idénticos. Sin esa segunda medida,
+la conclusión falsa se queda escrita y nadie la vuelve a mirar.
+
+**Por qué esta merece sección propia y no es otra más de la familia.** Las anteriores —el `403`
+como cero, la ausencia sin instantánea, el `order=desc` que devolvió marzo— las pillé **antes** de
+publicar, o me salvó un contraste externo. Esta **ya estaba publicada** cuando se cayó. La
+diferencia práctica: contra las otras sirve la disciplina de comprobar la lectura; contra esta no,
+porque la lectura *parecía* haber funcionado — devolvió bytes, longitud y hash.
+
+**La regla, y es distinta de «ten cuidado»:** cuando una conclusión va a sostener una decisión,
+**medirla por dos caminos que no comparten el fallo**. Aquí bastaba: hash del contenido *y* búsqueda
+de una cadena que solo existe en una versión. Si los dos caminos concuerdan, la conclusión aguanta;
+si discrepan, uno de los dos instrumentos está roto y hay que averiguar cuál **antes** de escribir
+nada. Un solo camino, por cuidadoso que sea, no puede detectar su propio fallo.
+
+**Corolario para el shell, porque el detalle se repite:** en zsh, `$var:algo` puede parsearse como
+modificador. Escribir siempre `"origin/${r}:ruta"` con llaves y comillas. Y la trampa general:
+**`git show <ref>` sin ruta no falla — muestra el commit**, así que un error de sintaxis en la ruta
+se presenta como una salida perfectamente válida de otra cosa.
+
+### 2.4 octies El punto 5 de una lista de cinco, que nadie echó de menos
+
+**24 ago, después de cerrar el `#210`.** Alberto probó el carril de descuentos en producción hasta el
+final: puso la objeción, recibió la oferta, pulsó **Aceptar**, y el bot contestó *«Perfecto! Déjame
+que arme tu nueva cotización!»*. **La cotización no llegó nunca.**
+
+La causa, medida en la ejecución `9886`: Django deja la aplicación en `state: queued` con
+`next_action: "worker"`, y **ese worker no existe en producción** — PROD tiene 7 workflows y ninguno
+es el poller; STG tiene `Discount Application Poller Candidate v1` (`DeCguAaVtCuW2CUj`, 62 nodos)
+**activo**.
+
+**Lo que hace de esto una clase y no un descuido: el plan sí lo pedía.** F4, literal:
+
+```
+1. Los workflows auxiliares de PROD primero: Error Handler e Issue Policy Guard.
+2. errorWorkflow enlazado en los cinco workflows de PROD.
+3. Bot principal (119 -> 229 nodos).
+4. Payment Confirmation, Retomar Conversación, Atención Humana.
+5. Poller de descuentos y Metepec.
+```
+
+El punto 5 no se hizo. **Y los dos informes de entrega de F4 no lo mencionan ni una vez** —
+`grep -ci poller` = 0 en ambos. No se pospuso, no se declaró fuera de alcance, no se discutió: se
+evaporó. Ni el ejecutor ni yo lo echamos de menos, y la fase se aceptó.
+
+**Por qué se evaporó, y aquí está lo aprovechable.** Los criterios de verificación de F4 que yo
+mismo escribí eran, literal: *«recuento de nodos esperado, `active`, `errorWorkflow`, `webhookId` del
+trigger y credenciales intactas, leído en la instancia»*. **Los cinco comprueban cada cosa
+importada. Ninguno comprueba que la lista se haya terminado.** Una verificación ítem por ítem no
+puede detectar el ítem que no se intentó — pasa igual de verde con cuatro que con cinco.
+
+Es exactamente la forma de fallo contra la que existe la convención de las guardas: *que toda guarda
+exija lo esperado **en positivo**; si solo comprueba que nada incumple, cero filas la pasa*. Aquí la
+guarda comprobaba que lo importado estuviera bien, no que estuviera todo.
+
+Y tiene una ironía útil: **el censo de F8 —que enumera lo vivo y reclama fila para cada uno— es
+justo el mecanismo que habría cazado esto**, y se construyó cuatro fases más tarde para el problema
+gemelo. Lo que faltaba en F4 era su equivalente: enumerar la lista del plan y exigir marca por cada
+punto.
+
+**El agravante, y es mío:** además de no verificar la lista, di F6 por verde probando el carril
+**hasta la entrega de la oferta** y no hasta la aceptación. Dos verificaciones a medias en la misma
+fase, y el `#210` se cerró encima de las dos. La corrección se publicó en el propio issue, debajo
+del cierre, porque corregirse en conversación no alcanza a quien lee el fichero.
+
+**Las dos reglas que deja:**
+
+1. **Una lista de N puntos se cierra contando N, no revisando los que se hicieron.** El informe de
+   una fase debe enumerar cada punto del plan con su marca — hecho, pospuesto con motivo, o fuera de
+   alcance. **Un punto sin línea es un punto perdido**, y se pierde en silencio.
+2. **Un flujo se prueba hasta que el cliente deja de esperar algo**, no hasta el último mensaje que
+   sabemos enviar. El camino feliz probado hasta la mitad se ve idéntico al probado entero.
+
+Alcance de lo medido: API de n8n de las dos instancias, ejecución `9886` de PROD, plan
+`docs/iniciativas/2026-08-23-plan-promocion-stg-a-prod-agil.md` §F4, e informes
+`2026-08-24-n8n-f4-import-bot-prod.md` y `2026-08-24-n8n-f4-reintento-aceptado-con-ejecucion-real.md`.
+Issue abierto: `HYL-WAI#225`.
+
 ### 2.5 Dar por evidencia un metadato que no puede distinguir
 
 Escribí «el PR lo fusionó Alberto» leyendo `mergedBy`. **Todos los agentes operan con su cuenta**, así
