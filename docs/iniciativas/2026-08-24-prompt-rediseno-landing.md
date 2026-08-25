@@ -30,19 +30,37 @@ interior, código postal…— para emitir la póliza.
 
 ## El problema, con las cifras reales de producción
 
+> **Corregido el 24 de agosto.** La primera versión de este documento daba «17 pólizas emitidas» y
+> «1 pago aprobado», leídos del estado del lead. **Estaban mal, y mal en la dirección que importa:**
+> el estado del lead no avanza cuando la póliza se emite por WhatsApp, así que ese recuento solo veía
+> el canal web. Las cifras de abajo salen de la tabla de pólizas, que sí las tiene todas. La
+> conclusión no cambia; la magnitud, mucho.
+
+**Entrada, medida sobre los leads:**
+
 ```
 1.322 leads captados
-  1.175  se quedan en «cotización iniciada»   ← el 89 %
-    110  llegan a iniciar datos de emisión
-     19  completan los datos
-     17  póliza emitida
-      1  pago aprobado
+  1.208  entran por la landing
+    114  entran por WhatsApp
 ```
 
-**Nueve de cada diez personas no pasan de la cotización.** Y de las que avanzan, la mayoría se cae
-en el formulario largo.
+**Salida, medida sobre las pólizas realmente emitidas** (excluidas las 5 del teléfono de pruebas):
 
-Reparto por canal: **1.208 entran por la landing y 114 por WhatsApp.** La landing capta; no cierra.
+| | landing | WhatsApp |
+|---|---|---|
+| leads | 1.208 | 114 |
+| pólizas emitidas | **20** | **34** |
+| pólizas pagadas | **1** | **6** |
+| de lead a póliza | **1,7 %** | **30 %** |
+
+**El canal que cierra es WhatsApp, y no por poco.** Con **once veces menos gente**, emite **más
+pólizas** y cobra **seis de los siete pagos**. La landing capta mucho y convierte casi nada: de cada
+mil personas que entran por ella, diecisiete llegan a póliza y **una** paga.
+
+Una cautela honesta al leer esa tabla: la columna «WhatsApp» no son leads que llegaran por otra
+puerta, son en buena parte **los que aceptaron pasar a la conversación**. Así que el 30 % no es «el
+canal WhatsApp convierte 30 veces mejor» en abstracto — es **la conversación cierra, y el formulario
+no**. Que es exactamente el motivo del encargo.
 
 ## La decisión ya tomada — no es tuya, es el encargo
 
