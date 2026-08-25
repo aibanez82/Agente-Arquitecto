@@ -16,7 +16,7 @@ Agente n8n analiza, propone mejora, modifica el JSON
     ↓
 Agente n8n hace commit/push a su propio repo
     ↓
-Alberto importa el JSON manualmente en n8n (producción)
+El Agente n8n importa el JSON por API (Alberto, 25 ago 2026). STG sin preguntar; PROD solo con orden explícita de Alberto.
     ↓
 Alberto re-exporta de PROD a Agente-n8n:main/workflows/
   y se verifica por versionId contra la API (no por nº de nodos)
