@@ -113,7 +113,7 @@ Diagrama completo, observabilidad, JOIN de producción, hitos y detalle de nodos
 
 | Workflow vivo en PROD | id de instancia | Nodos |
 |---|---|---|
-| WhatsApp Insurance Quotation Bot | `BtOaZm7WlZT-24V7hqCnF` | 119 |
+| WhatsApp Insurance Quotation Bot | `BtOaZm7WlZT-24V7hqCnF` | 229 (24 ago) |
 | Monitor Qualitas SIO PROD | `3NQfglVIfPSdijm9` | 19 |
 | Atencion Humana | `B5ihE5xHg8bjeesl` | 19 |
 | Retomar Conversacion | `96XfJZcwvlHnVJLko3G8-` | 12 |
@@ -129,7 +129,7 @@ Nodos concretos, workflow proactivo y detalle: `docs/architecture/data-flow.md` 
 
 ## Regla de estado real de un lead
 
-`whatsapp_sessions.conversation_phase` tiene un bug activo (siempre stuck en `greeting`). Los hitos reales se leen de `n8n_chat_histories` con BOOL_OR + LIKE:
+`whatsapp_sessions.conversation_phase` **ya no está stuck en `greeting`** — medido en PROD el 24 ago: en 20 días toma `greeting`, `data_capture`, `payment_pending` y `policy_issuance`. Los detectores de abajo siguen siendo la fuente buena de hitos (leen texto, que siempre se persiste), pero **el motivo ya no es que la fase no avance**:
 
 Detectores **verificados el 16 ago contra el workflow VIVO de PROD** (`BtOaZm7WlZT-24V7hqCnF`, API n8n), no contra el export local:
 
@@ -195,8 +195,8 @@ Roles y protocolos completos: tabla "Mapa de sistemas". Reglas operativas:
 
 | Item | Estado |
 |---|---|
-| Bug #7 / `HYL-WAI#69` — `[phase:completed]` sin pago verificado | 🔴 Fix (3 barreras) en STG; **PROD aún lo acepta** — falta promover (acción viva, requiere autorización) |
-| `N8N_TOKEN` hardcodeado como default (`qualitas/views.py:1291`) | 🔴 `HYL-WAI#130`: quitar default + rotar, coordinado con credenciales n8n |
+| Bug #7 / `HYL-WAI#69` — `[phase:completed]` sin pago verificado | 🟢 **Las barreras están en el grafo VIVO de PROD** (24 ago, `versionId 8c43fdd0`): `Phase Extractor` y `Phase Extractor1` llevan la «barrera 2» con su comentario `#69`, y `Completed Session Response` su Phase Guard. Efecto medido: ninguna sesión `completed` desde el **1 ago**, con la fase viva (`greeting`/`data_capture`/`payment_pending`/`policy_issuance` en 20 días). Daño histórico: de 38 `completed`, **28 sin póliza**. Cerrar el issue exige confirmar la barrera 1 y la 3, que no aparecen nombradas |
+| `N8N_TOKEN` hardcodeado como default | 🟡 **El default ya no existe** en `origin/main` (24 ago): `_n8n_document_access_authorized` usa `os.getenv("N8N_TOKEN", "")` y exige **en positivo** token esperado + recibido + `secrets.compare_digest`, así que sin variable **deniega**. Queda viva solo la **rotación** del `HYL-WAI#130`, que no se puede acreditar desde aquí |
 | `/api/emitir-externo/` — 400 sin causa + acepta POST sin credencial | ⏳ `HYL-WAI#119` — Juan (hallazgo auth: `c.5183416152`) |
 | Promoción a PROD de `fecha_inicio` en n8n | ⏳ Desbloquea M47/M48; `qualitas-issues#66` |
 
