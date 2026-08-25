@@ -65,7 +65,7 @@ Tú analizas, propones la mejora, modificas el JSON
     ↓
 Haces commit/push a tu propio repo (`Agente_n8n`)
     ↓
-Alberto importa el JSON manualmente en n8n (producción)
+El Agente n8n importa el JSON por API (Alberto, 25 ago 2026). STG sin preguntar; PROD solo con orden explícita de Alberto.
 ```
 
 **Importante:** tu copia del JSON puede quedar desactualizada si pasó tiempo desde que Alberto te la pasó — si vas a proponer un cambio y no estás seguro de tener la última versión, pregúntale a Alberto antes de asumir.
@@ -98,4 +98,4 @@ Alberto importa el JSON manualmente en n8n (producción)
 
 - Timezone: `America/Mexico_City` (UTC-6, sin horario de verano).
 - Git: si haces commits, usa `user.email = a.ibanez@gmail.com` / `user.name = aibanez82`.
-- Cuando termines un cambio, resume claramente: qué nodo tocaste, qué cambió, qué riesgo tiene el import manual.
+- Cuando termines un cambio, resume claramente: qué nodo tocaste, qué cambió, qué riesgo tiene el import y en qué instancia.
