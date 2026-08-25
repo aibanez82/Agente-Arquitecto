@@ -117,3 +117,29 @@ El **workflow proactivo** recibe `POST /webhook/proactive-wa-message` del Dashbo
 | `n8n_chat_histories` | n8n (Postgres Chat Memory) | historial de mensajes — fuente fiable de hitos |
 
 El Dashboard **solo lee**; escribe únicamente de forma indirecta, vía el webhook proactivo de n8n.
+
+## 6. Dónde vive cada cifra: precio, coberturas y cadena de descuento
+
+Mapa levantado por Juan en `HYL-WAI#201` (inventario, no contrato). Lo que hay que saber sin abrirlo:
+
+- **Aplicar un descuento no sobrescribe la cotización**: crea **lead y cotización nuevos** y conserva
+  la cadena `root → source → result`. Un mismo prospecto comercial tiene varios leads encadenados.
+  Consecuencia fuera del descuento: contar leads por prospecto deja de ser 1:1.
+- **El precio no está en `qualitas_lead` ni en el link público.** El `public_token` identifica una
+  sola cotización y no debe usarse como identificador de integración.
+- **Las seis opciones comerciales viven en el XML de Quálitas guardado**
+  (`qualitas_cotizacionrespuestaxml`, una columna por opción: amplia anual/semestral/trimestral/
+  mensual y limitada anual/semestral). Ahí están también **suma asegurada, deducible y prima por
+  cobertura** — el dato que el bot todavía no ve (`HYL-WAI#194`).
+- **Si el cliente ya eligió**, la opción seleccionada está en seis campos snapshot de la cotización.
+  Sin selección, las seis ofertas siguen existiendo: «no hay selección» ≠ «no hay precios».
+- **`qualitas_percentage` es el parámetro absoluto enviado a Quálitas**, no el ahorro observado sobre
+  la prima final. No presentarlo ni calcularlo como porcentaje de ahorro.
+
+**Qué puede consumir n8n hoy, sin superficie nueva:** `POST /api/cotizacion/detalle/` (seis opciones
+de una cotización + `discount_context`, que compara la selección con el source inmediato),
+`POST /api/cotizacion/seleccion/`, `GET /api/v1/discount-applications/{id}` y su `/document`.
+
+**Línea roja de Juan, aceptada:** n8n no hace joins contra tablas Django, no parsea XML y no
+recalcula precios ni porcentajes. Nuestra respuesta —no pedimos `commercial-history`— está en
+`HYL-WAI#201`.
