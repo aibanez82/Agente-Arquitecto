@@ -536,3 +536,53 @@ acordarse de apagar; hay que acordarse de encender.
 3. **Nada se llama «bloqueante» sin medición** delante.
 4. **Antes de retirar algo, mide quién lo usa.** La opción conservadora puede ser la destructiva.
 5. **Cierra contando**, y cuenta también lo que **no** debe existir.
+
+---
+
+## 6. Decisión de Alberto del 25 ago: el paquete de PROD del bot queda definido
+
+**El guardrail «Limitada» fase 1 NO va a PROD: espera a fase 2** (Alberto, 25 ago 2026).
+
+Eso cierra la pregunta que hacía indefinible el paquete. El candidato de PROD **no es el bot de STG**:
+
+| | nodos | |
+|---|---|---|
+| PROD hoy | **229** | `BtOaZm7WlZT-24V7hqCnF`, `versionId 8c43fdd0-fd0b-4392-aab4-11ca188f3ccc` |
+| STG hoy | **233** | 229 + 3 del guardrail Limitada + 1 `Outbound Leak Guard` |
+| **Candidato PROD** | **230** | 229 + **sólo** `Outbound Leak Guard` |
+
+**Promover no es importar el fichero de STG.** Hay que construir el candidato, que es justamente
+para lo que existe el builder dual.
+
+### Contenido exacto del candidato — verificado contra el PROD VIVO el 25 ago
+
+**Un nodo:** `Outbound Leak Guard` en la arista `Restore Main Reply Payload → Send message`.
+Medido en PROD: los dos nodos existen y **`Restore Main Reply Payload` es el predecesor único de
+`Send message`**, igual que en STG. La arista es la misma; la inserción es directa.
+
+**Seis sustituciones de texto**, las seis presentes **verbatim** en el PROD vivo:
+
+| Dónde | Qué |
+|---|---|
+| `AI Agent` L139 | la instrucción de cómo nombrar `qualitas_parameter` → prohibición de mencionarlo |
+| `AI Agent` L137 | el disparador gana «no autoriza a decírselo al cliente» |
+| `AI Agent` L266–267 | la regla A1 se endurece + la marca de medición |
+| `AI Agent` L310 | el `EDGE CASE` en MAYÚSCULAS gana el mismo matiz |
+| `RAG IA Agent` L94 | misma prohibición en el carril del RAG |
+| tool `Get Quotation Data` | `is a separate technical value` → prohibición explícita |
+
+**Lo que NO entra:** `IF Limitada Observada?`, `Build Limitada Alerta`, `Notify Limitada Observada`.
+Comprobado que **no existen hoy en PROD**, así que excluirlos es no añadirlos: no hay que retirar nada.
+
+### Lo que este paquete NO cubre, y sigue abierto
+
+- **La asimetría de la valla de salida.** PROD tiene la valla anti-doble-envío en el bot principal y
+  **no** en `Retomar Conversación` ni en `Payment Confirmation`. STG las tiene las tres. Eso no es
+  una mejora pendiente: es una **diferencia de protección viva en producción** entre los tres
+  caminos de salida, y merece medición propia antes de decidir si viaja en este paquete o en otro.
+- **La capa S1 de `Payment Confirmation`**: el bot de PROD ya recibió la suya, el Payment no.
+- **El carril checkpoint/descuento de `Retomar` (8 nodos)**: sin dictamen. La oferta proactiva de
+  PROD acabó yendo por el poller (`#225`); falta decidir si ese carril sigue vivo o quedó superado.
+- **La memoria del modelo guarda el texto crudo.** `n8n_chat_histories` persiste lo que el agente
+  generó, no lo que la guarda dejó salir — y esa tabla **es la memoria del modelo**, no un log. Con
+  el guard en el paquete, esto viaja a PROD tal cual. Diseño pendiente.
