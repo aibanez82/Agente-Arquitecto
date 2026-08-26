@@ -586,3 +586,45 @@ Comprobado que **no existen hoy en PROD**, así que excluirlos es no añadirlos:
 - **La memoria del modelo guarda el texto crudo.** `n8n_chat_histories` persiste lo que el agente
   generó, no lo que la guarda dejó salir — y esa tabla **es la memoria del modelo**, no un log. Con
   el guard en el paquete, esto viaja a PROD tal cual. Diseño pendiente.
+
+### 6.bis · El paquete ya no sólo arregla el leak: **redefine una métrica del funnel**
+
+Medido el 26 ago contra `n8n_chat_histories` de STG, tras las ráfagas reales del `#232`.
+
+El amortiguador de ráfaga agrupa los mensajes que llegan seguidos y **el turno es lo que persiste**
+—lo escribe el sub-nodo `ai_memory` del agente, no el buffer, que vive en Data Tables de n8n—. Una
+fila real de la prueba:
+
+```
+USER INPUT STARTS BELOW ===
+este mensaje quedo huerfano de una ejecucion muerta
+sigo aqui, dame un segundo
+ya encontre la tarjeta
+=== USER INPUT ENDS ABOVE ===
+```
+
+**Tres mensajes del cliente, una sola fila.** No se pierde texto. Pero:
+
+```
+db-leads.js:87   COUNT(...) AS human_msg_count   ->  has_responded  ->  commitment score
+```
+
+`human_msg_count` deja de contar **mensajes** del cliente y pasa a contar **turnos**. Nadie recibe un
+error, nada se rompe, **y el número baja**.
+
+**Consecuencia para la promoción, y hay que decirla antes de encender:** el amortiguador sólo vive
+hoy en STG, así que el cambio de semántica **llega con el paquete**. El día que se promueva, una
+serie histórica cambia de significado sin previo aviso y quien compare antes/después verá una caída
+que no existe.
+
+No es motivo para no promover. Es motivo para **anotar la fecha de corte** y para no leer el escalón
+como pérdida de interés del cliente.
+
+**Y es el mejor argumento para la F5 del roadmap** (`docs/iniciativas/2026-08-25-nucleo-multi-aseguradora-roadmap.md`):
+los hitos y los conteos deben vivir en **algo declarado** —columna, evento, vista— y no inferirse de
+las filas que resultan de las decisiones internas de proceso de otro sistema. Aquí una decisión de
+concurrencia de n8n redefinió una métrica del Dashboard sin tocar una sola columna.
+
+> **Crédito:** lo vio el **Agente Dashboard** leyendo el código del `#232`, no yo escribiéndolo. Yo
+> dicté el amortiguador sin anticipar que cambiaba la granularidad del histórico. Él lo dedujo de la
+> topología y lo marcó como no medido; la medición contra la base es mía.
