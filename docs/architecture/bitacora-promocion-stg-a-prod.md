@@ -628,3 +628,39 @@ concurrencia de n8n redefinió una métrica del Dashboard sin tocar una sola col
 > **Crédito:** lo vio el **Agente Dashboard** leyendo el código del `#232`, no yo escribiéndolo. Yo
 > dicté el amortiguador sin anticipar que cambiaba la granularidad del histórico. Él lo dedujo de la
 > topología y lo marcó como no medido; la medición contra la base es mía.
+
+### 6.ter · Corrección: **el paquete no se nombra por número de nodos.** Y el 230 ya está duplicado
+
+Escribí en §6 que el candidato de PROD era «**230 nodos** = 229 + `Outbound Leak Guard`». **Nombrarlo
+así fue un error**, y ha tardado un día en morder.
+
+Medido el 27 ago:
+
+| | nodos | contenido |
+|---|---|---|
+| PROD vivo | 229 | — |
+| Export de PROD en `stg` | 229 | sólo el cambio de prompt del `#228`; **no** lleva la guarda |
+| Export de PROD en la rama de Juan (`#207`) | **230** | 229 + `Get Active Payment Link` |
+| Candidato que describí en §6 | **230** | 229 + `Outbound Leak Guard` |
+
+**Dos grafos de 230 nodos que no comparten la diferencia.** Quien lea §6, vea «230» y luego mire el
+export a 230, concluye que coinciden. No coinciden en nada.
+
+`CLAUDE.md` ya avisaba: *«se verifican por `versionId`, nunca por número de nodos: dos grafos
+distintos pueden tener el mismo recuento»*. Lo escribí yo y lo incumplí al describir el paquete.
+
+**El paquete, dicho como debe decirse — por contenido, no por recuento:**
+
+Sobre el PROD vivo (`versionId 8c43fdd0-fd0b-4392-aab4-11ca188f3ccc`, 229 nodos):
+
+1. **+1 nodo** `Outbound Leak Guard` en la arista `Restore Main Reply Payload → Send message`.
+2. **6 sustituciones de texto** (`AI Agent` ×4, `RAG IA Agent` ×1, descripción de la tool
+   `Get Quotation Data` ×1) — verificadas presentes verbatim en el PROD vivo.
+3. **NO entra** el guardrail «Limitada» fase 1 (3 nodos). Decisión de Alberto del 25 ago.
+
+Si además entra el `#207` de Juan, suma **+1 nodo** `Get Active Payment Link` y el resultado son
+**231** — pero ese número tampoco identifica nada: **el candidato se acredita por su `versionId` tras
+construirlo y por la lista de arriba, no por cuántos nodos tiene.**
+
+**Regla que queda:** ningún paquete de promoción se describe por recuento de nodos. Se describe por
+**qué nodos entran, en qué aristas, y qué textos cambian** — y se acredita por `versionId`.
