@@ -474,6 +474,24 @@ Para consultar en frío, sin contexto:
 - **Buckets de almacenamiento compartidos** entre producción y staging: un documento «de staging»
   puede ser de un cliente real.
 - **Conteos que bajan no son pérdida** si existe una tabla de archivo.
+- **Texto libre por `queryReplacement` del nodo Postgres de n8n = corrupción silenciosa de
+  parámetros.** Desde `typeVersion` 2.5, cada expresión que no resuelva a array pasa por
+  `isJSON(v) ? [v] : stringToArray(v)`: **el texto no-JSON se parte por comas**. Una copia con dos
+  comas se convierte en tres parámetros y corre todo lo que venga detrás. No da error — la validación
+  del destino rechaza datos que ya llegaron corridos, y el diagnóstico apunta al sitio equivocado.
+  **Forma segura: `={{ [v1, …, vN] }}`**, con cada elemento entre paréntesis (sin ellos, un `||` o un
+  `??` dentro de un elemento se come la coma separadora y reproduce el fallo con otra sintaxis). O
+  `JSON.stringify`, que pasa por `isJSON` y viaja entero. **Al convertir, verificar el cuadre
+  `$N` ↔ número de elementos**: un array con un elemento de más o de menos no arregla nada, rompe
+  distinto. Encontrado el 28 ago 2026 (`HYL-WAI#239`) por el Agente n8n, instrumentando la BD para
+  capturar lo que n8n bindaba de verdad — el `runData` de n8n **no guarda los parámetros resueltos**
+  del nodo Postgres, así que desde la ejecución el fallo es invisible.
+- **El disparador de ese fallo es contenido, no código.** La copia vivía en Wagtail: la escribe una
+  persona de negocio, sin revisión de código y sin despliegue. El programa que funcionaba desde julio
+  tenía **cero comas** y el nuevo **dos**. Un sistema donde una coma en un CMS tumba un carril de
+  producción no tiene un bug: tiene una **frontera de confianza mal puesta**. Y en los nodos que
+  guardan datos del cliente (`Save Group1/2/3 Progress`, `Save Policy Data`) el que escribe la coma no
+  es ni siquiera una persona: **es el modelo**, cualquier día, en un domicilio.
 
 ---
 
