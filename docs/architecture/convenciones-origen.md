@@ -404,3 +404,17 @@ búsqueda estrecha da falso negativo — todas hablan de *qué* se lee o *dónde
 Corolario operativo: el ámbito de una afirmación lleva **fecha**, no solo ruta. «Medido contra la API
 el 24 ago a las 19:40Z» es verificable; «el trigger corre cada minuto» no dice de cuándo y se lee como
 si fuera perpetuo.
+
+## Un descuadre para antes del paso irreversible (29 ago 2026)
+
+El `#239 B` entró a PROD y la comprobación de `postgres` dio **55** donde mi handoff decía **54**. El
+número malo era mío: atribuí `Resolve Terminal Session` a la deuda de la adenda anterior en vez de a
+ese viaje. El Agente n8n lo diagnosticó, no revirtió —habría sido churn inútil— y **declaró la
+discrepancia en vez de ajustar el número esperado y reportar `PASS`**, que es la versión que algún
+día cuesta un defecto.
+
+Aun teniendo razón, sincronizó el espejo sobre un `FALLO`. De ahí la regla, y su razón de fondo:
+**«el fallo está en tu número, no en mi import» es exactamente lo que diría alguien cuyo import sí
+estuviera mal.** No es desconfianza en el ejecutor: es que el procedimiento no puede depender de que
+quien mide sea también quien decide si su medida importa. Cuesta los minutos que tarda el Arquitecto
+en contestar; el espejo sobrescrito ya no se puede arbitrar.
