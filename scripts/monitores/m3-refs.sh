@@ -51,7 +51,7 @@ while true; do
     esac
     asunto=$(git -C "$repo" log -1 --format=%s "$sha" 2>/dev/null)
     case "$asunto" in
-      handoff\(*|GO\(*|adenda\(*|correccion\(F*)
+      handoff\(*|GO\(*|adenda*|correccion\(F*|dictamen\(*|ALTO\(*|revert:*)
         continue ;;
     esac
 
