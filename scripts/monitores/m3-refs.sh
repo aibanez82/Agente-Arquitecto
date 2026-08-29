@@ -34,12 +34,24 @@ while true; do
     # GO y sus correcciones los escribo yo en `main` del repo del ejecutor, y m3
     # me los devolvia como si fueran entrega suya: el 23 ago fueron ~10 avisos de
     # cero valor, y Alberto pidio que dejaran de salir. No se puede filtrar por
-    # autor -- todos los agentes firman como aibanez82-- asi que se filtra por el
-    # prefijo del asunto, que en estos tres casos es inequivoco: ningun ejecutor
-    # se escribe un handoff a si mismo ni se da un GO.
+    # autor de git -- todos los agentes firman como aibanez82 -- asi que durante un
+    # tiempo se filtro por el prefijo del asunto (`handoff(`, `GO(`), inequivoco:
+    # ningun ejecutor se escribe un handoff a si mismo ni se da un GO.
+    # v3 (28 ago, noche): el filtro por prefijo de asunto se me quedo corto en
+    # cuanto empece a publicar `adenda(...)` -- el 28 por la noche me devolvio mi
+    # propia adenda del #232 treinta segundos despues de publicarla. Ampliar la
+    # lista de prefijos seria repetir el error: cada vocablo nuevo mio abriria el
+    # agujero otra vez. Se filtra por lo que SI es estable, el trailer con el que
+    # firmo mis commits (`feedback_autoria_tres_planos_trailer_agente`), y los
+    # prefijos quedan solo como red para los commits viejos que no lo llevan.
+    cuerpo=$(git -C "$repo" log -1 --format=%B "$sha" 2>/dev/null)
+    case "$cuerpo" in
+      *"Agente: Arquitecto-IA-Qualitas"*)
+        continue ;;
+    esac
     asunto=$(git -C "$repo" log -1 --format=%s "$sha" 2>/dev/null)
     case "$asunto" in
-      handoff\(*|GO\(*|correccion\(F*)
+      handoff\(*|GO\(*|adenda*|correccion\(F*|dictamen\(*|ALTO\(*|revert:*)
         continue ;;
     esac
 
