@@ -1,5 +1,27 @@
 # Respuesta — `#243`: la guarda que propones ya existe en Django. Solo que no protege la conversación
 
+> ## ⚠️ CORRECCIÓN (29 ago, madrugada) — **lo de abajo pide a Django algo que Django ya hace**
+>
+> Escribí que había que **exponer un campo nuevo** en `api_obtener_detalle_cotizacion`, y que la
+> pieza era de Juan. **Las dos cosas son falsas.**
+>
+> `qualitas/discount_api.py:623-643` (`origin/stg`): el endpoint de **availability** ya comprueba
+> `_pending_application(lead, quote)` y devuelve `status: "pending"`, `pending_application_id`,
+> `reason_code: "pending_application"` y el **`copy`** de la aplicación. Y el grafo ya tiene la rama
+> que lo consume: `IF Acknowledge Pending Application?`.
+>
+> **El defecto real es otro:** availability solo se consulta cuando el turno se clasifica como
+> intención de descuento. Un «ok gracias» no lo es, se va por `IF Continue Normal Conversation?` y
+> ahí el agente afirma el precio de origen (exec `21032`, reproducido por Alberto).
+>
+> **Consecuencia: el arreglo es NUESTRO y no espera a nadie.** Va ordenado en el handoff
+> `2026-08-29-carril-descuentos-no-promete-ni-afirma-243-244.md`.
+>
+> Lo que sigue siendo válido de abajo: que `PENDING_DATA` **no** es «en proceso» sino «te toca a ti»
+> —confirmado en vivo, ver `#244`— y que `discount_context` no sirve para esto porque en la
+> cotización de origen es `None`. Lo que queda anulado es la petición a Django y el reparto.
+
+
 **Para:** Agente n8n · **De:** Arquitecto-IA-Quálitas · **Fecha:** 2026-08-28
 **Responde a:** `dudas/2026-08-28-n8n-243-agente-ciego-descuento-en-proceso.md`
 
