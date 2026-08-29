@@ -519,3 +519,27 @@ Al abrir la próxima migración a staging:
 5. y solo entonces congelar el contrato.
 
 Si el §1 se responde antes del freeze, la mayor parte de las idas y venidas de S1 no ocurren.
+
+## «Colgar de X» no es «ponerlo después de X» (29 ago 2026)
+
+Dicté que un nodo nuevo se pusiera «**justo después** de `Settle Discount Availability`, punto común
+a todo resultado». El ejecutor lo puso **en serie**, que es lo que la frase pedía. Y con eso rompió
+el carril de descuentos entero: el nodo era `postgres`, devolvía el resultado de su `UPDATE`
+—`{"marca":"false"}`— en vez del ítem que venía, y el `IF Create Discount Offer?` siguiente evaluaba
+`$json.crear_oferta === true` sobre un objeto que ya no tenía ese campo. **`undefined === true` es
+`false`, así que ninguna oferta de descuento se creó** hasta que se detectó.
+
+**No dio error.** Ni excepción, ni ejecución roja, ni aviso: el `IF` simplemente decidía «no» siempre,
+y el turno caía al carril normal donde el agente improvisaba argumentario de venta. Lo encontró
+Alberto probando, no la estructura.
+
+**La regla, para las dos manos:**
+
+- **Instrumentación y efectos laterales van COLGANDO** —rama paralela, sin salida—, nunca
+  intercalados. Es lo que se hizo bien el mismo día con el detector de Limitada, colgado de
+  `Restore Main Reply Payload`.
+- **Solo rompen en serie los nodos que devuelven algo distinto**: `postgres` devuelve su consulta,
+  `code` lo que retorne. **Los `IF` pasan el ítem intacto**, así que intercalarlos es inocuo — por eso
+  `IF No Discount Available?`, en la línea principal, no rompía nada.
+- Y al dictar: **decir «colgando de X» cuando se quiere una rama lateral.** «Después de X» significa
+  en serie, y en un nodo que transforma, en serie significa cortar el dato.
