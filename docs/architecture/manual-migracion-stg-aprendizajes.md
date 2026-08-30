@@ -321,6 +321,34 @@ primer día.
 hay que decidir es si la suite puede ver esa clase de defecto; si no puede, arreglar la línea solo
 compra tiempo hasta el siguiente.
 
+### 2.7 bis Una batería offline prueba la lógica, no que el dato llegue (29 ago 2026)
+
+El `#254` cambiaba cuándo sube el contador que banea a un cliente. El gate decide leyendo el texto
+del cliente (`chatInput`): si el tema es del dominio —precio, póliza, cobertura, identidad— no cuenta.
+La batería offline le inyectaba al nodo un objeto **con `chatInput` dentro** y daba 19/19.
+
+**Lo que esa batería no puede ver, por construcción, es si `chatInput` llega ahí en el grafo real.**
+Y el modo de fallo es peor que un error: con `chatInput` ausente, el texto queda vacío, **nada encaja
+nunca en la exención**, todo sigue contando y el arreglo es un **no-op perfecto** — suite en verde,
+informe correcto, cliente baneado exactamente igual que antes. Nadie lo notaría hasta que se quejara
+un cliente, y entonces el issue estaría cerrado hace semanas.
+
+Se comprobó en el grafo, y llegaba: `Parse Router Output` devuelve `{...sessionCtx, routedIntent}` y
+entre él y el gate solo hay nodos `IF`, que pasan el ítem intacto. **Pero eso es una propiedad del
+cableado, no del código**, y por tanto no la acredita ninguna prueba unitaria del nodo.
+
+**Regla:** cuando un nodo decide leyendo un campo del ítem que recibe, la verificación tiene dos
+mitades y **la batería solo cubre una**:
+
+1. **la lógica** — dado el campo, ¿decide bien? → batería offline;
+2. **la llegada** — ¿ese campo está realmente en el ítem que entra a ese nodo, en el grafo vivo? →
+   se traza el camino hacia arriba hasta el nodo que lo construye, mirando qué devuelve cada eslabón
+   intermedio (§ «Colgar de X»: `postgres` y `code` devuelven lo suyo, los `IF` pasan el ítem).
+
+Es la misma familia del §2.7 y de la trampa del `#41`: **la mitad que nadie prueba es la que decide
+en producción.** Y conviene repartirla: la mitad 1 la acredita quien ejecuta, la mitad 2 quien
+verifica — son dos preguntas distintas y se contestan con instrumentos distintos.
+
 ### 2.8 «No observable» es una conclusión, y hay que ganársela
 
 Nos hizo falta la versión del motor desplegado. El endpoint obvio no la traía, así que la declaramos
