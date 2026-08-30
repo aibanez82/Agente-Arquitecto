@@ -33,6 +33,7 @@ Un solo hilo de conversación, de la cotización a la póliza.
 | **E2** | Datos del auto hasta recibir la cotización | carril normal + documento | Llega cotización **con su PDF** |
 | **E3** | **«está caro»** | `#239 A` (comas) · `#252` (no improvisar) | Oferta de descuento **con botones**; o, si no hay, el copy determinista **sin causa inventada** |
 | **E4** | **Pulsa «Aceptar»** | aplicación del descuento | **Llega la cotización nueva con su PDF, sola.** Ayer esto se rompió por un nodo puesto en serie: es el paso que lo vigila |
+| **E4 bis** | **Objeta el precio POR SEGUNDA VEZ** («sigue caro») | el escalón de descuentos | Ahora sí llega **`POR_VIN_40`** (40 %, exige VIN). **El primer «está caro» NUNCA da el descuento por VIN**: da el del 30 % sin VIN. Lo encontró Alberto probando, 30 ago — este paso faltaba en la primera versión del guion |
 | **E5** | Da el **VIN** cuando lo pida el descuento | `#255` | Más adelante, en la captura, **pide solo placas** y no vuelve a pedir el número de serie |
 | **E6** | Domicilio **con comas a propósito**: «Av. Juárez, 123, interior 4B, Col. Centro» | `#239 A` en `Save Group3` | Campo a campo en su sitio: calle, número, colonia, CP. **Cero corrimiento** |
 | **E7** | Datos de emisión con **género «M»** y **tipo de identificación «INE»** | **`#250`, el corazón de la prueba** | El bot los acepta y avanza. Son **exactamente** los dos valores que devolvían `400 invalid_emission_data` |
