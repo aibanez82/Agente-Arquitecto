@@ -389,6 +389,62 @@ como salga, te diga cuál era. Así ninguna ronda se gasta solo en descartar.
 
 ---
 
+### 2.10 Un filtro cambia de significado según dónde se ponga (30 ago 2026)
+
+El `#195` pedía una cosa razonable: **no ofrecer descuentos sobre una cotización que ya tiene póliza**.
+Se implementó como un predicado SQL —`n8n_cotizacion_sin_poliza(quotation_id)`— y se colocó en el
+`WHERE` del nodo que **resuelve la sesión**, es decir, el que decide **con quién estamos hablando**.
+
+Ahí el predicado dejó de decir «no ofrezcas descuento» y pasó a decir **«emitir termina la
+conversación»**: en cuanto se emitía la póliza, la sesión del cliente **dejaba de ser candidata para
+su propio dueño**. El cliente pedía la liga de pago un minuto después de emitir y recibía una lista de
+cotizaciones ajenas, sin salida posible.
+
+**Nada de esto daba error.** La ejecución terminaba en `success`, el resolvedor encontraba filas
+—las viejas— y el cliente simplemente se iba.
+
+**Y el agravante que solo se ve al arreglarlo:** al ir a mover el predicado a «su sitio», resultó que
+**su sitio estaba vacío**. Django no comprueba la póliza en el carril de descuentos —verificado en
+`_availability` y `_chain_context`—, así que ese filtro mal colocado era **el único guard que
+existía**. Quitarlo sin más habría arreglado el cobro y reabierto el agujero.
+
+**Reglas:**
+
+- **Una regla de negocio se escribe donde se llama como ella.** Un guard de descuentos vive en el
+  carril de descuentos. En la resolución de identidad, el mismo predicado significa otra cosa —más
+  grande— y nadie lo lee ahí cuando busca por qué se ofrecen o no descuentos.
+- **Antes de mover un guard, comprobar que su destino no está vacío.** El comentario del código decía
+  «el predicado es la fuente única del `#195`»: era verdad literal y había que creerlo.
+- **Y al relajar un filtro, exigir el valor autoritativo en positivo.** Aquí la tentación era usar la
+  copia local (`sessionRow.policy_data`); si llega vacía, la guarda pasa — fail-open. Se expuso el
+  predicado como columna calculada en la misma consulta y se exigió `=== true`.
+
+### 2.11 Prohibir un texto nombrándolo es enseñárselo (30 ago 2026)
+
+El agente decía a los clientes «tu cotización ya está al mejor precio disponible», una promesa
+comercial que no podemos respaldar. Se corrigió el prompt con una prohibición explícita:
+
+> «NUNCA afirmes que su cotización «ya está al mejor precio disponible» — es una promesa comercial que
+> no podemos respaldar.»
+
+**Y el bot la siguió diciendo.** En sesión limpia, verificado en la base: la frase aparecía **una sola
+vez en todo el historial de esa conversación, y era esa misma respuesta**. No hubo memoria
+contaminada —esa fue la primera hipótesis y era falsa—.
+
+**La prohibición falla por su forma:** deja la frase escrita, literal, en el sitio exacto del prompt
+donde el modelo busca qué contestar a esa pregunta. Es el mismo mecanismo por el que decirle a alguien
+«no pienses en un elefante» no funciona.
+
+**Reglas:**
+
+- **Prescribir, no prohibir.** Dar la frase que debe decirse en vez de nombrar la que no. Si hace
+  falta prohibir, describir la clase («no afirmes superioridad de precio») sin citar el texto.
+- **Una pregunta con una sola respuesta correcta no se le pregunta al modelo.** Se contesta con copy
+  determinista antes de llegar a él — es lo que ya funciona para «¿eres un robot?».
+- **Y al medir si una regla de prompt funcionó, comprobar primero si el historial de esa conversación
+  ya contenía el texto**: la memoria del modelo pesa más que la regla, y confundir las dos causas
+  lleva a arreglar lo que no era.
+
 ## 3. Trazabilidad: el fallo silencioso más caro
 
 En una sola jornada, el registro atribuyó **seis veces** a nuestro lado acciones que no hizo: un
