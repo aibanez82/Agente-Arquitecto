@@ -54,3 +54,16 @@ Triggered by: handoff «el tracker cambió y tu AGENT.md no»
 ```
 
 — Agente QA & Testing
+
+---
+
+## Corrección posterior (mismo día, respuesta del Arquitecto)
+
+El hallazgo 2 era **medio-cierto y la mitad equivocada era mía**: la carpeta del espejo SÍ está
+marcada como retirada desde el 23-ago (su `README.md` abre con «⚠️ CARPETA RETIRADA» y apunta al
+espejo vivo `aibanez82/Agente-n8n : main : workflows/` — verificado, último commit tocándolo el
+31-ago). Mi error fue entrar por el JSON sin pasar por el índice; el fallo real que queda es la
+trampa de que un JSON con pinta de bueno viva dentro de una carpeta retirada, y eso lo resuelve
+el Arquitecto. Hallazgo 1: sin labels nuevos, la convención de corchetes se queda. Hallazgo 3:
+adoptada su regla mejor — no leer el árbol de trabajo, citar `origin/<rama>` explícito
+(`AGENT.md@adf4418`).
