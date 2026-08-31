@@ -445,6 +445,40 @@ donde el modelo busca qué contestar a esa pregunta. Es el mismo mecanismo por e
   ya contenía el texto**: la memoria del modelo pesa más que la regla, y confundir las dos causas
   lleva a arreglar lo que no era.
 
+### 2.12 Una aceptación escrita por quien redactó la regla no la puede refutar (30-31 ago 2026)
+
+En dos días, **la misma regla de prompt produjo dos afirmaciones falsas en producción**, y las dos
+**pasaron una tabla de aceptación que yo mismo había escrito**.
+
+| Redacción | Lo que hizo decir al bot | Quién lo destapó |
+|---|---|---|
+| 1ª (`#249`) | «Amplia o Limitada traen **exactamente las mismas coberturas**» | Alberto, preguntando **«¿cubre lo mismo?»** |
+| 2ª (`#265`) | «El descuento es sobre la Amplia, **no sobre Limitada**» | **un cliente real**, preguntando «en cobertura limitada ¿también tienes descuento?» |
+
+Las dos aceptaciones preguntaban «**¿el descuento trae la misma cobertura?**» —la formulación de quien
+escribió la regla— y con esa frase el bot respondía bien. **Ninguna de las dos falsedades era
+alcanzable desde el guion.**
+
+**La causa no fue el modelo:** las dos veces obedeció una frase mía que mezclaba en una sola oración
+**qué cubre un paquete** y **a qué precio**. El modelo elegía una lectura u otra según cómo se le
+preguntara.
+
+**Reglas:**
+
+- **Quien redacta la regla no puede escribir solo él su aceptación.** Comparte el punto ciego: prueba
+  la lectura que tenía en la cabeza, que es justamente la que no falla.
+- **Las frases de prueba se toman de conversaciones reales**, con las palabras y la ortografía de la
+  gente. Las dos que destaparon esto —«cubre lo mismo?» y «en limitada también tienes descuento?»— no
+  se le habrían ocurrido a nadie en un despacho.
+- **En un cambio de prompt, el verde estructural no es la validación.** Un diff medido y un `sha256`
+  acreditan que **el texto quedó como se quería**, no que **el modelo diga la verdad**. Lo segundo
+  solo lo acredita una conversación.
+- **Un hecho por frase.** Si una regla afirma dos cosas —un precio y una cobertura, un estado y una
+  causa—, sepáralas en oraciones distintas. La vecindad basta para que se mezclen.
+- **Y antes de dictar un hecho de negocio, medirlo.** La segunda falsedad nació de deducir que el
+  descuento «era de un paquete». Bastaba mirar el XML de cuatro cadenas para ver que **baja también la
+  Limitada**; cuando por fin lo medí, la regla se escribió sola.
+
 ## 3. Trazabilidad: el fallo silencioso más caro
 
 En una sola jornada, el registro atribuyó **seis veces** a nuestro lado acciones que no hizo: un
