@@ -52,3 +52,21 @@ en recuento, y ese es justo el error que deja pasar una copia desfasada:
 curl -s -H "X-N8N-API-KEY: $N8N_API_KEY" \
   https://n8n.srv1325340.hstgr.cloud/api/v1/workflows?limit=50
 ```
+
+---
+
+## Por qué las carpetas se llaman `RETIRADO-…` (31 ago 2026)
+
+El aviso de arriba llevaba desde el 23 de agosto y **no evitó el tropiezo**: el Agente QA entró
+directamente al JSON de `staging/`, lo tomó por la fuente viva y dedujo de él que el bot tenía
+«~2.087 líneas y 3 nodos Claude» — cuando el bot vivo va por **298 nodos y 5 nodos Anthropic**.
+
+No leyó mal: **entró por el fichero y no por el índice**, que es como entra cualquiera que llega desde
+un buscador o desde un `find`.
+
+**Un aviso que solo protege a quien lee en el orden correcto no protege.** Por eso el aviso está ahora
+en el **nombre de la carpeta**, que se ve en cualquier listado, y no solo en este README.
+
+**Los JSON se conservan** —son la foto histórica de julio y git ya guarda su contenido—, pero
+**ninguno vale como fuente**. La copia viva de los cinco workflows de PROD está en
+`aibanez82/Agente-n8n:main/workflows/`, y la verdad última es la API de la instancia.
