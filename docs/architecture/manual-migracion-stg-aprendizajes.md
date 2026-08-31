@@ -479,6 +479,35 @@ preguntara.
   descuento «era de un paquete». Bastaba mirar el XML de cuatro cadenas para ver que **baja también la
   Limitada**; cuando por fin lo medí, la regla se escribió sola.
 
+### 2.13 Para un empalme, la evidencia son las aristas, no los parámetros (31 ago 2026)
+
+Toda la semana hemos verificado cada import del grafo n8n igual: **diff de `parameters` nodo a nodo**
+contra el respaldo. Funciona para cambios de contenido —una regla del prompt, una SQL, un copy— y es
+lo que ha cazado varios descuadres.
+
+**Y es ciego a un recableado.** Al meter la guarda de «una sola oferta viva», el cambio consistió en
+llevar `IF Create Discount Offer?[0]` a un nodo nuevo en vez de a `Create Discount Offer`. **Ese nodo
+no cambió ni un parámetro**: cambió una **conexión**, y las conexiones viven en `workflow.connections`,
+no en `node.parameters`.
+
+Resultado: la comprobación del ejecutor esperaba ver ese nodo en la lista de «parámetros cambiados»,
+no lo vio, y **paró creyendo que el import había fallado**. El import estaba perfecto; **la aserción
+estaba mal puesta**.
+
+**Reglas:**
+
+- **Un paquete que reconecta se verifica en dos planos:** `parameters` para el contenido —donde el
+  conjunto esperado puede ser legítimamente **vacío**— y `connections` para el empalme.
+- **Al dictar un encargo que empalma, pedir la evidencia del cableado explícitamente**, nodo origen y
+  nodo destino con su índice de rama. Si solo se pide «diff contra el respaldo», se está pidiendo la
+  mitad.
+- **Y el punto ciego es compartido:** las dos sesiones —ejecutor y arquitecto— verificábamos igual, así
+  que ninguna de las dos habría detectado un empalme mal hecho por el mismo camino. Cuando dos
+  verificadores usan el mismo instrumento, **no son dos verificaciones**.
+
+*(Corolario del `#260` y del «colgar de X» del §2.10: los tres son fallos del mismo plano — lo que un
+nodo hace se lee en sus parámetros; **dónde está enchufado, no**.)*
+
 ## 3. Trazabilidad: el fallo silencioso más caro
 
 En una sola jornada, el registro atribuyó **seis veces** a nuestro lado acciones que no hizo: un
