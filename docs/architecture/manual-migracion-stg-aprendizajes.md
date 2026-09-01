@@ -554,6 +554,29 @@ el que manda es el publicado: es el que el ejecutor va a leer.
 Corolario del §2.12: allí el problema era **quién** escribe la aceptación; aquí, **que se ejecute la
 que está escrita**.
 
+### 2.16 Una aserción sobre texto generado falla por costura, no por contenido (1 sep 2026)
+
+Dos falsas alarmas el mismo día, una del ejecutor y otra mía, con la misma forma:
+
+- Su aserción «el patrón viejo ha sido eliminado» dio FALLO. No lo era: la firma que buscaba
+  —el prefijo de la expresión— **también aparece en el patrón nuevo**, que la subsume.
+- Mi comprobación «el texto de la nota se conserva» dio negativo. Tampoco: en el SQL la frase va
+  **partida en dos literales concatenados**, así que nunca aparece contigua en el fuente.
+
+Las dos veces el código estaba bien y **el instrumento estaba mal**. Y las dos veces la alarma llegó
+justo antes de un paso irreversible, que es cuando más caro sale creérsela: una habría revertido un
+import correcto, la otra habría reabierto un encargo ya cumplido.
+
+**Regla:** cuando lo que se verifica es texto que el propio sistema arma —SQL concatenado, `jsCode`
+serializado, un prompt insertado en un nodo—, la prueba buena **no es «¿está la cadena?» sino el
+efecto**: ejecuta el SQL, evalúa la expresión, mide el comportamiento. Buscar subcadenas en código
+generado produce falsos negativos por concatenación y falsos positivos por prefijo compartido, y las
+dos formas se sienten igual de concluyentes.
+
+Corolario del §2.5 bis y del §2.13: **antes de creerte un descuadre, comprueba que tu instrumento
+mide lo que crees.** Y si el descuadre aparece justo antes del paso irreversible, esa comprobación es
+obligatoria, no opcional.
+
 ## 3. Trazabilidad: el fallo silencioso más caro
 
 En una sola jornada, el registro atribuyó **seis veces** a nuestro lado acciones que no hizo: un
