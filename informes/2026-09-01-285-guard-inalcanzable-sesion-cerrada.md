@@ -123,3 +123,62 @@ de los dos necesita otra mirada:
 y el `previousNode` del que `Claim Main Reply Outbound` recibió su flujo. Con esos dos datos sabemos
 si el fixture correcto es `closed` (null) o resuelto-con-identidad-parcial. **No cambio el fixture ni
 lo toco hasta que lo confirmes.** `QA-SUITE-285` conservada.
+
+---
+
+## Segunda vuelta — el discriminador real es `Authority Lost?`, y una sesión `closed` NO puede pasarlo
+
+Corregida tu lectura de la 22537 (gracias por medirlo hacia atrás): la ruta real fue
+`Session Router [OUT1] → Disambiguation Router → Identity Terminal? → Fallback Flag → Merge Session
+Data → … → Stash Main Reply → Claim`. **Mi clon 26636 recorrió ESA MISMA ruta hasta `Fallback
+Flag` incluido** — `Identity Terminal? → Fallback Flag` en ambos. Así que **`Identity Terminal?`
+tampoco es el discriminador**, y **mi turno ya era texto plano** (`messageType=text`,
+`buttonPayload=null`, `payloadVersion=null` en 26636 — sin envoltorio de quick reply).
+
+**La bifurcación real está aguas abajo, en `Authority Lost?`** — condición `{{ $json.writerRows === 0 }}`:
+`writerRows===0` → OUT0 `Terminal 240` (mi clon); `writerRows≠0` → OUT1 `Sanitize Output PII → … →
+Stash Main Reply → Claim` (PROD). Y `writerRows` lo produce `Update Phase in DB`.
+
+**Por qué mi clon da `writerRows=0`, con cita SQL.** El `UPDATE` de `Update Phase in DB` remata su
+`WHERE` con:
+```sql
+AND (COALESCE(ws.status,'') IN ('open','active')
+     AND COALESCE(ws.conversation_phase,'') IN ('initial','greeting','data_capture',
+         'summary_confirmation','policy_issuance','payment_pending')
+     AND ws.human_takeover IS FALSE AND ws.metepec_derived IS FALSE AND ws.is_banned IS NOT TRUE)
+```
+**Una sesión `status='closed'` no cumple ese `WHERE` → 0 filas → `writer_rows=0` → Terminal 240.**
+Es estructural: **ninguna sesión cerrada puede alcanzar `Claim`**, y por tanto **`GUARD285` es
+inalcanzable con un clon `closed`**, sea cual sea el turno.
+
+**Dos variantes probadas, ambas `closed`, ambas `writer_rows=0`:**
+1. `QA-SUITE-285` (session_id `QA-SUITE-285` ≠ phone) — exec 26636.
+2. `QA-SUITE-285B` (session_id = phone = `QA-SUITE-285B`, para descartar que el mismatch de
+   session_id fuera la causa) — exec 26654. Mismo resultado: `writer_rows=0`, Terminal 240.
+
+No probé una tercera variante `closed`: la causa (el `WHERE` de status) es la misma para todas.
+
+### El nudo de PROD que esto reabre — y necesita tu 22537 otra vez
+
+Las allowlists de **`Resolve Session`** (phone_open_sessions) y de **`Update Phase in DB`** son
+**casi idénticas** — ambas exigen `status IN ('open','active')` y las mismas fases. Entonces, en la
+22537, **`sessionRow=null` (no pasó Resolve) y `writerRows≠0` (sí pasó el UPDATE) casi no pueden
+coexistir**, salvo en una configuración muy concreta: que la fila que el `UPDATE` tocó tenga
+`session_id` = el phone del turno (lo que el contexto usa como sessionId) **pero** un `phone_number`
+que NO esté entre los `phoneNumberVariants` que `Resolve Session` buscó — así el UPDATE la encuentra
+(por session_id) y Resolve no (por phone). Es la única forma en que una sesión **open/active** se
+comporte como «no resuelta pero actualizable».
+
+**Conclusión medida (no dictamen):** el fixture que reproduce el `#285` **no es `closed`** — es una
+sesión **`open`/`active`** con `session_id` = el identificador-de-phone del turno y un `phone_number`
+que no case con los variants de resolución. Esa forma exacta depende de qué muestre la 22537
+(`ws.session_id`, `ws.phone_number`, `ws.status` de la fila que su `Update Phase in DB` actualizó).
+**No la construyo a ciegas** — dime esos tres campos de la fila real y monto el clon que sí llega a
+`Claim`. Mientras, lo acreditado y firme: **con sesión cerrada, GUARD285 no se alcanza; el paso 1 no
+es verificable en vivo por esa vía.**
+
+### Residuo de esta vuelta
+
+- `QA-SUITE-285B`: creada `status='closed'`, session_id=phone=`QA-SUITE-285B`; dejó **4 filas** en
+  `n8n_chat_histories`. **Limpiada por IDs exactos** al cerrar esta vuelta (ver conteos abajo).
+- `QA-SUITE-285`: **conservada** (como pediste), 0 filas de historial.
