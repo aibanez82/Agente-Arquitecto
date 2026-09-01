@@ -508,6 +508,29 @@ estaba mal puesta**.
 *(Corolario del `#260` y del «colgar de X» del §2.10: los tres son fallos del mismo plano — lo que un
 nodo hace se lee en sus parámetros; **dónde está enchufado, no**.)*
 
+### 2.14 En una prueba, el destino del mensaje no lo elige quien lo escribe (31 ago 2026)
+
+Ordené inyectar dos mensajes «en la sesión `waq_2314`». **No era posible**, y ni el ejecutor ni yo lo
+habríamos sabido sin mirar el código de resolución: con varias sesiones abiertas en un teléfono,
+`Session Resolution` toma la **única `active`** como respuesta autoritativa —
+`if (active.length === 1) { sessionRow = active[0] }` — y esa era otra. Los mensajes habrían aterrizado
+justo en la conversación que **la misma orden prohibía tocar**.
+
+**Escribir el mensaje no es elegir dónde cae.** Entre el texto y la sesión hay una resolución con
+reglas propias, y esas reglas mandan. Una orden de prueba que nombra una sesión de destino está
+asumiendo, sin decirlo, que existe una vía hasta ella.
+
+Y el filo largo: **eso vuelve sospechosa toda acreditación pasada por el mismo camino**. Al revisar la
+que ya daba por buena, el destino **sí** era el correcto — pero por coincidencia entre lo que pedí y lo
+que el sistema elige, no porque yo lo hubiera controlado. Con dos `active`, el mismo mensaje se va a
+otro sitio y el informe sale idéntico.
+
+**Regla:** en un entorno con sesiones múltiples, la prueba **declara la sesión que resolvió**, leída de
+la ejecución — no la que pretendía. Y si el escenario no es alcanzable por la vía normal, **clonar su
+FORMA** (mismos datos, misma fase, teléfono sintético) es válido cuando la guarda bajo prueba decide
+con datos de la sesión del turno: no se simula el escenario, se pone la misma entrada en la misma
+puerta.
+
 ## 3. Trazabilidad: el fallo silencioso más caro
 
 En una sola jornada, el registro atribuyó **seis veces** a nuestro lado acciones que no hizo: un
