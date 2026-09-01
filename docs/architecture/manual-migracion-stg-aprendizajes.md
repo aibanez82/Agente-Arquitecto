@@ -577,6 +577,29 @@ Corolario del §2.5 bis y del §2.13: **antes de creerte un descuadre, comprueba
 mide lo que crees.** Y si el descuadre aparece justo antes del paso irreversible, esa comprobación es
 obligatoria, no opcional.
 
+### 2.17 Una congelación protege una medición, no a los clientes (1 sep 2026)
+
+Juan pidió congelar el bot vivo de PROD durante su ventana de activación: sin cambios, sin rollback.
+Trasladé la orden al ejecutor, que **notó por su cuenta que revocaba una instrucción anterior mía**
+—«si la conversación normal falla, revierte sin discutirlo»— y lo dijo en alto en vez de dejar las dos
+reglas vivas. Eso es lo primero que hay que hacer cuando una orden nueva pisa otra: **decir cuál
+muere**.
+
+Lo segundo lo tuve que corregir yo: había dictado un «no toques ni ante una emergencia» que, leído al
+pie, deja a alguien mirando cómo se cae producción por respetar una ventana. **El umbral quedó así:**
+
+- **Fallo cosmético, carril raro, nodo que no dispara** → avisar y esperar. Sin excepción, aunque tarde.
+- **Producción rota para clientes reales** → avisar igual, **pero eso no espera**. Si no hay respuesta
+  de nadie con autoridad, **primero el cliente**: restaurar y dejarlo escrito con la hora exacta. Ese
+  aviso no pide permiso; explica por qué se rompió la medición ajena.
+
+Y la línea que separa los dos casos: **no revertir por precaución ni por un síntoma dudoso** — solo con
+clientes afectados delante y nadie con quien hablarlo.
+
+**El principio, que vale más allá de esta ventana:** una congelación protege **una medición**. Cuando
+la medición y el cliente chocan, gana el cliente. El mismo día en que escribimos esto, un cliente real
+pidió dos veces su enlace de pago, no lo recibió y canceló — con todo el sistema en verde.
+
 ## 3. Trazabilidad: el fallo silencioso más caro
 
 En una sola jornada, el registro atribuyó **seis veces** a nuestro lado acciones que no hizo: un
