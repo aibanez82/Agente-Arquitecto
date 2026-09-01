@@ -106,6 +106,37 @@ y no describiría ninguna decisión.**
 5. **Decir siempre si una respuesta incluye el archivo** (`*_archive`). Mirar solo la tabla viva da
    resultados incompletos, y ya costó una discrepancia.
 
+## 6 bis · Cómo se migra sin romper nada (Alberto, 1 sep 2026)
+
+**Decidido: interruptor por función y ramas cortas. Nada de rama larga de iniciativa.**
+
+El motivo de descartar la rama larga es el `#273` de hoy: un paquete preparado aparte, sobre una base
+que se separó del sistema vivo mientras se trabajaba, **arrastraba 30 nodos que nadie había pedido** y
+no se vio hasta compararlo contra el grafo real. Una rama de semanas sufriría lo mismo y peor, porque
+los dos sistemas se mueven a diario. Y en n8n una rama no aísla nada: **los workflows no viven en git**,
+git guarda espejos. Lo que aísla es la instancia de STG.
+
+**El interruptor tiene tres estados por función**, no dos:
+
+| Estado | Qué hace | Para qué |
+|---|---|---|
+| `sql` | Lee como hoy | Estado inicial y vuelta atrás |
+| `dual` | **Lee las dos fuentes, sirve la de SQL y registra las diferencias** | Detectar divergencias con tráfico real **antes** de depender de la API |
+| `api` | Sirve la API | Estado final |
+
+`dual` es la pieza que hace segura la migración: se puede tener una función comparando durante días sin
+que ningún usuario dependa de la API. Es el mismo patrón que la casa ya usa —el `dual` del
+conversation-id y el modo `DARK` del cutover del `#135`—, así que no inventamos nada.
+
+**Reglas del interruptor:**
+
+- **Uno por función**, no uno global. La bandeja puede estar en `api` mientras el resto sigue en `sql`.
+- **Por defecto `sql`.** Un despliegue nunca cambia de fuente por sí solo.
+- **La vuelta atrás no despliega**: se cambia la variable y ya.
+- **Ninguna función pasa a `api` sin haber estado en `dual`** con tráfico real y sin diferencias.
+
+**Ramas:** una corta por issue (`feature/dsc-dsh-001`), a `stg` en cuanto pase, y desaparece.
+
 ## 7 · Cómo se mide el avance
 
 No por issues cerrados, sino por **acoplamiento retirado**:
