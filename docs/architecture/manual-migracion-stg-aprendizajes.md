@@ -600,6 +600,33 @@ clientes afectados delante y nadie con quien hablarlo.
 la medición y el cliente chocan, gana el cliente. El mismo día en que escribimos esto, un cliente real
 pidió dos veces su enlace de pago, no lo recibió y canceló — con todo el sistema en verde.
 
+### 2.18 Un gate se comprueba en el entorno de DESTINO, no en el de origen (1 sep 2026)
+
+Promoví a producción la mitad n8n del `#273` con el visto bueno de Juan sobre su mitad Django. Su
+mensaje decía, literalmente y bien dicho, **`GATE_DJANGO_STG_READY`**. Yo lo leí como permiso para
+producción.
+
+**No lo era.** `POST /api/v1/discount-applications` estaba en `origin/stg` y **no en `origin/main`**;
+producción corría un release anterior al merge. El carril nuevo llamaba a un endpoint inexistente,
+Django devolvía su página de error en HTML, y el cliente **no recibía ni descuento ni oferta**.
+
+**Y el daño no fue neutro: fue una regresión.** Al incorporar el carril directo retiramos los 12 nodos
+del carril de oferta. Antes del cambio, una objeción de precio producía una oferta; después, nada.
+**Quedamos peor que sin hacer nada.**
+
+**La regla:** cuando una promoción depende de un servicio ajeno, **el gate se verifica en el entorno de
+destino**, y la verificación buena no es leer un mensaje ni mirar una rama: es **llamar al endpoint en
+ese entorno** antes de tocar nada. Diez segundos que habrían evitado la reversión entera.
+
+**Y el corolario, que es donde estuvo mi error real:** Juan no dijo nada incorrecto. Dijo «STG». **El
+fallo fue mío al extender un permiso a un ámbito que nadie le había dado.** Un gate lleva ámbito, como
+una afirmación de ausencia lleva dónde se buscó — y por el mismo motivo: sin él, cualquiera lo lee como
+universal.
+
+**Nota de reversión, que también costó aprenderla:** al revertir **no se restaura el respaldo a secas**
+si entretanto entró otra cosa buena. Aquí el cinturón del `#275` había entrado después; restaurar la
+foto anterior lo habría borrado. Se reconstruye: **quitar lo que falló, conservar lo que funciona.**
+
 ## 3. Trazabilidad: el fallo silencioso más caro
 
 En una sola jornada, el registro atribuyó **seis veces** a nuestro lado acciones que no hizo: un
