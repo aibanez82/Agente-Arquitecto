@@ -108,17 +108,18 @@ No sigo disparando VINs a ciegas contra el SOAP de Quálitas: sería el ruido de
 | `Asegurado` / `PolizaEmitida` | **ninguno** (la emisión no completó) |
 | Sesiones de WhatsApp | **ninguna** (vía web pura) · Meta/correos: **cero** |
 | `whatsapp_sessions` `QA-SUITE-*` | S1 sigue viva (suite conversacional); S2 ya se limpió ayer |
+| Intentos de emisión sobre la 2318 | **dos**: (1) con VIN del corpus/sintético → modal «serie existente»; (2) con la serie de Alberto `1GTEC19097E561364` → sin modal pero sin emisión. Ninguno creó `Asegurado` ni póliza |
 
 Los leads 964/965 y sus cotizaciones **quedan vivos** (no hay borrado autorizado de `qualitas_lead`
-en esta orden, y son solo-lectura salvo lo que ya escribió Django). Si quieres que proponga su
-limpieza, dímelo y preparo el DELETE por IDs exactos para tu aprobación.
+en esta orden, y son solo-lectura salvo lo que ya escribió Django). Se mantienen declarados; **no
+propongo borrarlos** — son las dos primeras cadenas orgánicas del embudo y valen como evidencia.
 
 ```
-🧪 QA REPORT — 1 sep 2026 · E2E estados del lead S2 (STG, vía web pura)
+🧪 QA REPORT — 1 sep 2026 · E2E estados del lead S2 (STG, vía web pura) · ENTREGA (no parcial)
 ✅ Hitos 1-3 medidos en vivo (lead_creado, cotizacion_generada, interes_confirmado) — sin saltos
 ✅ (a) cotizacion_generada NO estaba roto: dispara con lead orgánico (WEB_EVENTS=on)
-⛔ Hitos 4-6 no alcanzados: muro consultar_serie (Quálitas QA marca toda serie como existente)
-⚠️ Anomalía a confirmar por Juan: modal serie-existente presente y cero Asegurado (contradice el código)
+⛔ Hitos 4-8 no medibles en vivo: EL BLOQUEO NO ES LA SERIE — con la serie que consultar_serie acepta
+   como nueva, sigue sin crearse Asegurado ni póliza. Fallo del flujo de emisión del servidor (Juan).
 📄 (b) pago_pendiente: causa por código = carrera del recibo (confirmada, con cita)
 📄 (c) pago_observado=redirect · pago_confirmado=poll automático SOURCE_PROVIDER_POLL (corrijo lectura previa)
 ```
@@ -147,7 +148,26 @@ settings), la causa está dentro del flujo de emisión del servidor y **no es di
 resoluble desde fuera** — es del lado de Juan.
 
 **Efecto sobre el E2E:** los hitos **4-8 no son medibles en vivo** por la vía web hasta que se
-resuelva esa anomalía. La opción 3 del informe (que Alberto/Juan disparen la emisión por el form
-real mientras yo mido los eventos) sigue en pie y ahora es la única que los cierra sin depender del
-fix. No repetí disparos: un segundo POST con serie válida reprodujo el mismo resultado, y más
-intentos no cambiarían nada del lado cliente.
+resuelva esa anomalía. No repetí disparos: un segundo POST con serie válida reprodujo el mismo
+resultado, y más intentos no cambiarían nada del lado cliente.
+
+**Corrección de las opciones del informe:** la opción 3 (que Alberto/Juan disparen la emisión por
+el form real mientras yo mido) **también está bloqueada por esta misma anomalía**: si el servidor
+no crea el `Asegurado`, no lo creará tampoco con Alberto delante. Ninguna de las tres vías propuestas
+sirve mientras el fallo del servidor siga en pie. **El desbloqueo de los hitos 4-8 depende
+exclusivamente de que Juan resuelva la anomalía del `Asegurado`** — no hay maniobra por mi lado.
+
+---
+
+## Estado de esta entrega
+
+**Esto es la entrega, no un borrador a la espera.** Lo medido queda cerrado: hitos 1-3 acreditados
+en vivo (con la pregunta (a) respondida), hitos 4-9 con su causa por código y cita. Lo que falta —la
+medición en vivo de 4-8— **está bloqueado por un fallo del servidor (la anomalía del `Asegurado`),
+no por esta prueba**, y su seguimiento vive en la escalada a Juan, no en este informe. Si Juan tarda,
+esta entrega se sostiene tal cual; cuando resuelva, reabro solo el tramo 4-8 con una corrida nueva.
+
+> **Para Juan, en una línea:** el bloqueo de la emisión **NO es la serie**. Con la serie
+> `1GTEC19097E561364` (que `consultar_serie` acepta como nueva) el modal desaparece y aun así no se
+> crea `Asegurado` ni póliza. No hay que revisar el catálogo de series; el fallo está en el flujo de
+> `emitir_poliza`/`persist_emission_insured` del lado servidor.
