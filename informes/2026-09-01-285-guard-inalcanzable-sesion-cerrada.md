@@ -72,3 +72,54 @@ vacía — y esa vía la decides tú. Si es la lectura (2), dime la forma exacta
 ```
 
 — Agente QA & Testing
+
+---
+
+## Comparación pedida — la entrada de `Session Router` (exec 26636 vs. tu 22537)
+
+Medido campo a campo el `$json` que **entra** a `Session Router` en mi exec 26636, y trazado
+`sessionResolved` por toda la cadena. **El discriminador no es la forma del turno — es un único
+campo, `sessionResolved`.**
+
+**1. `Session Router` decide SOLO por `sessionResolved`** (condición del nodo, verbatim):
+`{{ $json.sessionResolved }}` operador boolean `true`. No mira `messageType`, ni `metadata`
+(envoltorio), ni `lookupMode`, ni `phoneNumberVariants` (conteos), ni `buttonPayload`. Tu sospecha
+de que mi turno inyectado entra «por otra puerta» por su forma **queda descartada para este nodo**:
+Session Router es ciego a todo salvo `sessionResolved`.
+
+**2. En mi cadena, `sessionResolved` nace `false` en `Session Resolution` y se preserva intacto**
+hasta Session Router — medido nodo a nodo:
+`Session Resolution: false → IF Discount Phase 2 Eligible?: false → Needs Affinity Update?: false →
+quoteDocumentAction?: false → Session Router` → OUT1 `Disambiguation Router`. Ningún nodo lo toca.
+
+**3. La entrada exacta a Session Router en 26636** (los campos que sospechabas):
+`sessionResolved=false · messageType=text · action=sendMessage · lookupMode=phone_open_sessions ·
+phoneNumberVariants=["QA-SUITE-285-PHONE"] · needsDisambiguation=false · candidates=null ·
+buttonPayload=null · payloadVersion=null · hasImage=false · metadata={display_phone_number,
+phone_number_id}`.
+
+**4. Y en el código, `sessionResolved=true` es inseparable de `sessionRow≠null`.** Las cuatro
+únicas asignaciones de `sessionResolved=true` en `Session Resolution` van cada una con su
+`sessionRow=` poblado (`row` / `active[0]` / `open[0]` / `picked`). **Nunca** hay
+`sessionResolved=true` con `sessionRow=null`.
+
+### La consecuencia, y por qué reabre tu lectura de PROD
+
+Con este grafo, **`Session Router → Update Activity` (OUT0) exige `sessionResolved=true`, que exige
+`sessionRow≠null`.** Por tanto los dos hechos que mediste en la 22537 —**`sessionRow=null`** y
+**«Session Router se fue por Update Activity»**— **son incompatibles entre sí en `f367b7d4`.** Uno
+de los dos necesita otra mirada:
+
+- Si en la 22537 `sessionRow` **no** era null (resolvió con identidad, quizá parcial), entonces el
+  clon que reproduce el caso **no es `closed`** sino una sesión que **resuelve** (open/active) — y
+  la premisa «binds vacíos» viene de esa fila resuelta con `lead_id`/`quotation_id` nulos, no de un
+  `sessionRow=null`.
+- Si `sessionRow` **sí** era null, entonces el turno de la 22537 **no** llegó a `Claim` por
+  `Session Router→Update Activity`, sino por otra rama — y hay que mirar de qué nodo recibió
+  `Claim Main Reply Outbound` su entrada en esa ejecución.
+
+**Lo que te pido para cerrarlo** (barato, en tu lado con la 22537 delante): el valor EXACTO de
+`$json.sessionResolved` en la **entrada de `Session Router`** de la 22537 (no en Session Resolution),
+y el `previousNode` del que `Claim Main Reply Outbound` recibió su flujo. Con esos dos datos sabemos
+si el fixture correcto es `closed` (null) o resuelto-con-identidad-parcial. **No cambio el fixture ni
+lo toco hasta que lo confirmes.** `QA-SUITE-285` conservada.
