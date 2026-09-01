@@ -124,3 +124,30 @@ limpieza, dímelo y preparo el DELETE por IDs exactos para tu aprobación.
 ```
 
 — Agente QA & Testing
+
+---
+
+## Actualización — reintento con la serie desbloqueada de Alberto (`1GTEC19097E561364`)
+
+El muro de `consultar_serie` **se levantó**: con esa serie el modal «serie existente» **no
+aparece** (`mostrar_modal_serie_existente=false`) y el form pasa validación sin campos inválidos.
+**Pero la emisión sigue sin completar**, y esto es lo importante: aislado ya de la serie,
+
+- **cero `Asegurado`** para la cotización 2318 (0 filas),
+- **cero `PolizaEmitida`**,
+- lead 965 sigue en `INTERES_CONFIRMADO`, con los mismos 3 eventos,
+- la respuesta HTTP 200 re-renderiza el **formulario de emisión** (no una página de éxito, no el
+  modal), con el puntero de sesión intacto (`cotizacion_id=2318`).
+
+**Conclusión medida: el bloqueo de la emisión NO era (solo) la serie.** Es exactamente la anomalía
+que quedó escalada a Juan — `persist_emission_insured` (`lead_funnel.py:1472`) corre en su propio
+`transaction.atomic()` antes de `consultar_serie`/SOAP y debería dejar el `Asegurado` committeado,
+pero no queda ninguno. Descartado el rollback global de request (no hay `ATOMIC_REQUESTS` en
+settings), la causa está dentro del flujo de emisión del servidor y **no es diagnosticable ni
+resoluble desde fuera** — es del lado de Juan.
+
+**Efecto sobre el E2E:** los hitos **4-8 no son medibles en vivo** por la vía web hasta que se
+resuelva esa anomalía. La opción 3 del informe (que Alberto/Juan disparen la emisión por el form
+real mientras yo mido los eventos) sigue en pie y ahora es la única que los cierra sin depender del
+fix. No repetí disparos: un segundo POST con serie válida reprodujo el mismo resultado, y más
+intentos no cambiarían nada del lado cliente.
