@@ -531,6 +531,29 @@ FORMA** (mismos datos, misma fase, teléfono sintético) es válido cuando la gu
 con datos de la sesión del turno: no se simula el escenario, se pone la misma entrada en la misma
 puerta.
 
+### 2.15 La frase del corpus es LA frase, no una parecida (1 sep 2026)
+
+Dicté una guarda con su batería de aceptación, y entre los casos que **no** debía tocar puse:
+«tu póliza está emitida; la factura no se ha emitido todavía». Al montar mi banco de pruebas escribí
+«Tu póliza **7620101919** está emitida; la factura…» — le añadí el número, que parecía más realista.
+
+**Ese añadido es justo lo que ocultó el defecto.** El patrón exigía la negación a 30 caracteres de
+«póliza»; los diez dígitos del número empujan «factura no» fuera de la ventana. Con número: pasa. Sin
+número: falso positivo. Yo medí «16/16 correcto» sobre una frase que **no era la del criterio**, y el
+ejecutor —que probó la frase tal como estaba escrita en el handoff— midió el fallo y **paró antes de
+desplegar**.
+
+**Y el defecto ya estaba vivo**, introducido por el arreglo anterior de la misma tarde. No lo trajo el
+cambio nuevo: lo destapó.
+
+**Regla:** un caso de aceptación se ejecuta **literal**. Copiar y pegar, no reescribir «igual pero
+mejor». En una condición sensible a la distancia entre dos palabras, cualquier retoque —un número, un
+nombre, una coma— **es otro caso distinto**. Y si el banco de pruebas y el criterio publicado difieren,
+el que manda es el publicado: es el que el ejecutor va a leer.
+
+Corolario del §2.12: allí el problema era **quién** escribe la aceptación; aquí, **que se ejecute la
+que está escrita**.
+
 ## 3. Trazabilidad: el fallo silencioso más caro
 
 En una sola jornada, el registro atribuyó **seis veces** a nuestro lado acciones que no hizo: un
