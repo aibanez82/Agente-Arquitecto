@@ -112,3 +112,110 @@ falta es el detalle por cobertura**.
 Cuando llegue, tres exigencias que salen de aquí: leer los paths **top-level** reales; **no inferir**
 sobre `null`/`[]`/códigos desconocidos; y **no decir un deducible sin unidad**.
 
+
+---
+
+# Anexo — Qué preguntan los clientes, qué contestamos hoy, y el plan
+
+> Medido en `n8n_chat_histories` de PROD el **2 sep 2026**. Encargo de Alberto.
+
+## A · El caso que cambia la prioridad
+
+> **Cliente:** «Y por ese rubro yo pago el 5% de deducible?»
+> **Bot:** «El deducible en **Daños Materiales es del 25%**, no 5%.»
+
+**El cliente tenía razón y el bot le corrigió con un número falso.** Verificado contra el XML de **su
+propia cotización** (`cotizacion_id` 2980): Daños Materiales al **5%** sobre suma asegurada
+**216.900** → deducible real **10.845 pesos**; el bot le dijo **54.225**.
+
+Dos turnos después se contradijo: *«Si dice 5% en tu cotización, ese es el deducible que tendrías»*.
+
+**Origen:** el `25%` es correcto **para Robo Parcial**. Sin el dato de esa cotización, el modelo buscó
+en la base de conocimiento y trajo el porcentaje más cercano.
+
+**Esto no es un hueco de cobertura informativa. Es el bot inventando un producto peor que el que
+vendemos, en el momento de decidir la compra.**
+
+## B · El volumen
+
+| | |
+|---|---|
+| Mensajes que tocan coberturas/deducible/suma/vigencia | **126** |
+| De ellos, preguntas reales (excluye elegir paquete) | **106** |
+| Sesiones afectadas | **84 de 361** — una de cada cuatro |
+| Respuestas que son un muro | **11** |
+| De esos muros, resueltos por el dato del `#194` | **4** |
+
+Reparto de las preguntas reales: **16** «qué coberturas trae» · **8** deducible · **3** suma asegurada
+· **3** comparar opciones · **2** vigencia · **74** mencionan cobertura sin preguntar por su alcance.
+
+## C · El hallazgo que simplifica el plan
+
+**El deducible es CONSTANTE en toda la historia de producción.** Medido sobre **7.932 bloques
+`<Coberturas>` de 1.322 cotizaciones** (todas las que tienen `xml_amplia_anual` en PROD), **sin una
+sola excepción**:
+
+| Cobertura | Deducible |
+|---|---|
+| Daños Materiales | **5 %** |
+| Robo Total | **10 %** |
+| Resp. Civil · Gastos Médicos · Gastos Legales · Asistencia Vial | **0** |
+
+**Consecuencia: el porcentaje se puede decir bien HOY**, sin esperar a nadie. Lo que sí exige el
+`#194` es el **importe en pesos**, porque la suma asegurada cambia con cada vehículo.
+
+> **Aviso:** constante **hasta hoy** no es constante **por contrato**. Es la configuración del paquete
+> Quálitas del negocio 8545; si el negocio cambia de paquete, cambia. Por eso la fase 1 es un parche y
+> la fase 2 lee el dato de cada cotización.
+
+## D · Plan de desarrollo en n8n
+
+### Fase 1 — Parar la mentira. **Hoy, sin depender de Juan**
+
+Corregir la base de conocimiento para que el `25%` no pueda volver a aplicarse a Daños Materiales:
+el 25% es **de Robo Parcial**, y el de Daños Materiales es 5% y el de Robo Total 10%.
+
+**Coste:** un cambio de copy en la base de conocimiento. **Cero riesgo de arquitectura.**
+**Qué compra:** que el bot deje de dar una cifra cinco veces peor que la real.
+
+### Fase 2 — Que el bot mire la cotización antes que el manual
+
+Requiere que **Juan despliegue el productor del `#194`**, hoy en `feature/issue-194-quote-scope-context`
+y **en ningún entorno**.
+
+1. **No hay endpoint nuevo ni nodo nuevo.** `Get Quotation Data` ya llama a
+   `POST /api/cotizacion/detalle/`; con el `#194` desplegado, **la misma llamada devuelve los campos
+   nuevos**. Lo que hay que tocar es la **descripción de la herramienta**, para que el modelo sepa que
+   existen y qué significan.
+2. **Regla de prioridad en el prompt:** ante una pregunta sobre el alcance de **esta** póliza
+   —deducible, suma asegurada, qué cubre, vigencia—, **la fuente es la cotización; la base de
+   conocimiento no**. Hoy es al revés de hecho, y de ahí salió el 25%.
+3. **Antes de promover, llamar al endpoint en el entorno de destino.** `401` tipado en JSON = vivo;
+   `500` con HTML = la ruta no existe. Es la lección de §2.18 del manual y nos costó una reversión.
+
+### Fase 3 — Carril determinista para las tres preguntas de siempre
+
+Las tres más repetidas **tienen una sola respuesta correcta**, y acabamos de ver al modelo contradecir
+a un cliente que acertaba. **Una pregunta con una sola respuesta correcta no se le pregunta a un
+modelo** — es el patrón del `#254` y del `#275f`.
+
+Colgar del `Intent Router`, que ya tiene destinos deterministas:
+
+| Pregunta | Respuesta |
+|---|---|
+| ¿Cuál es el deducible? | Por cobertura, en **pesos** y con el % al lado |
+| ¿Qué coberturas trae? | La lista real de **esa** cotización, con su suma asegurada |
+| ¿Las opciones traen las mismas coberturas? | Comparación entre las opciones cotizadas |
+
+**Guarda:** solo dispara si la cotización trae `coberturas_detalle` no vacío. Sin dato, el turno sigue
+al modelo — igual que en el `#275f`.
+
+**Y el importe en pesos exige acreditar la base del porcentaje** (§2). Hasta entonces, el carril dice
+el porcentaje, que ya es correcto.
+
+### Lo que NO entra
+
+- **Nombrar el tipo de valor** («valor factura», «valor comercial»): `tipo_suma` llega como `2` y no
+  está en catálogo. Pendiente de Juan.
+- **Coberturas opcionales no cotizadas** (llantas, auto sustituto, deducible cero): no vienen en el
+  XML de la cotización. Eso es venta, no dato.
