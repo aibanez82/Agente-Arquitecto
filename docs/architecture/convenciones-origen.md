@@ -418,3 +418,33 @@ Aun teniendo razón, sincronizó el espejo sobre un `FALLO`. De ahí la regla, y
 estuviera mal.** No es desconfianza en el ejecutor: es que el procedimiento no puede depender de que
 quien mide sea también quien decide si su medida importa. Cuesta los minutos que tarda el Arquitecto
 en contestar; el espejo sobrescrito ya no se puede arbitrar.
+
+## «Un viaje, una causa» (2 sep 2026)
+
+Nació de dos pasajeros en la misma semana, uno que llegó a producción y otro que se paró en la rampa.
+
+**El que llegó:** el candidato del `#273` se construyó sobre el espejo del repositorio en vez de sobre
+el grafo vivo, y arrastraba **30 nodos del `#144`** —un carril sin desplegar— hacia PROD. Se detectó
+por recuento antes del import, pero el mismo defecto había borrado ya el `#144` del espejo en sentido
+contrario: nueve sincronizaciones desde el vivo lo dejaron en cero nodos, y Juan lo leyó como DRIFT del
+builder (`HYL-WAI#194`, veredicto CHANGES).
+
+**El que se paró:** el Agente n8n propuso meter «la limpieza de `temperature` del Anthropic Chat Model»
+en el mismo `PUT` que el cambio de prompt del `#292`. Medido en los dos grafos vivos: **ningún nodo de
+PROD ni de STG menciona `temperature`**. La nota describía un pasado que ya no existía — no había
+objeto que limpiar.
+
+**Dos reglas, y la segunda vale aunque el objeto exista:**
+
+1. **Antes de proponer un cambio, verificar que su objeto está en el grafo vivo.** Una nota no acredita
+   un estado presente; es la misma trampa que «una medición del presente no acredita el pasado», leída
+   al revés.
+2. **Un `PUT` lleva exactamente lo ordenado.** Si el bot se comporta raro después del viaje, con dos
+   cambios dentro no se sabe cuál fue. Pasajeros solo si son **inertes y pactados** —el caso admitido
+   fue una corrección de comentarios `#8542`→`#239`, verificada retirando los comentarios de ambas
+   versiones y comprobando que el resto era idéntico.
+
+**Control que nació el mismo día, para diffs de prompt:** contar cada barandilla **una a una** antes y
+después (`REGLA DE GROUNDING ESTRICTA` 1→1, el fallback 2→2). Un diff de texto no distingue
+«reescrito en su sitio» de «perdido», y en el `#292` había 3.367 caracteres nuevos donde ese matiz lo
+era todo.
