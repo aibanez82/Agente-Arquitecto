@@ -64,7 +64,23 @@ de arriba, 5 % sobre 356.400 son **17.820 pesos**.
 > **ACREDITADO (Alberto, 2 sep 2026): la base es la suma asegurada del vehículo** — valor comercial o
 > valor convenido según la póliza—, que es exactamente el campo `suma_asegurada` de esa cobertura.
 >
-> **El cálculo queda cerrado:** `deducible en pesos = suma_asegurada × porcentaje / 100`.
+> **DECISIÓN DE ALBERTO (2 sep 2026): al cliente se le da el PORCENTAJE, NUNCA el importe calculado.**
+> «Mejor demos al cliente los % en lugar de hacer el cálculo, así evitamos problemas.»
+>
+> El porcentaje **sale del dato**; el importe **sale de una operación nuestra**. Si la base tuviera
+> cualquier matiz que no conocemos, daríamos una cifra en pesos con total seguridad y equivocada —
+> la familia de fallos del `#293` y del «25%». **Un porcentaje mal dicho es un dato mal leído; un
+> importe mal calculado es una promesa.**
+>
+> **Regla para el consumidor: NUNCA multiplicar.** Se dice «Daños Materiales: 5%», no «1.575 pesos».
+> Decir la `suma_asegurada` tal cual sí es válido: es leer un campo, no calcular.
+>
+> **Efecto colateral bueno: la pregunta a Quálitas por la base deja de ser bloqueante.**
+> Sigue siendo interesante, pero ya no está en el camino de nada.
+>
+> *(Se conserva abajo el cálculo acreditado, por si algún día se decide usarlo — pero hoy NO se usa.)*
+>
+> **El cálculo, acreditado y NO usado:** `deducible en pesos = suma_asegurada × porcentaje / 100`.
 > Con datos reales: 31.500 × 5% = **1.575** en Daños Materiales; × 10% = **3.150** en Robo Total.
 >
 > **Y esto NO depende de resolver el `tipo_suma = 2`**: ese código solo impide *nombrar* el tipo de
