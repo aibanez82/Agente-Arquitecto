@@ -61,10 +61,24 @@ Valores observados, estables en las 80 cotizaciones:
 respuesta útil para el cliente es **el importe**: `suma_asegurada × deducible / 100`. Con los números
 de arriba, 5 % sobre 356.400 son **17.820 pesos**.
 
-> **Lo que queda por acreditar:** que la base del porcentaje sea la `suma_asegurada` **de esa misma
-> cobertura**. Es lo estándar en auto en México y es lo que encaja con los datos, pero **no lo he
-> verificado contra fuente Quálitas**. Antes de que el bot diga un importe en pesos, confirmarlo.
-> Decir el porcentaje ya es correcto hoy.
+> **ACREDITADO (Alberto, 2 sep 2026): la base es la suma asegurada del vehículo** — valor comercial o
+> valor convenido según la póliza—, que es exactamente el campo `suma_asegurada` de esa cobertura.
+>
+> **El cálculo queda cerrado:** `deducible en pesos = suma_asegurada × porcentaje / 100`.
+> Con datos reales: 31.500 × 5% = **1.575** en Daños Materiales; × 10% = **3.150** en Robo Total.
+>
+> **Y esto NO depende de resolver el `tipo_suma = 2`**: ese código solo impide *nombrar* el tipo de
+> valor; la cifra es la misma se llame como se llame. La pregunta del `2` sigue abierta con Juan,
+> pero **no bloquea decir el importe**.
+>
+> **Aviso de la documentación oficial:** en **Responsabilidad Civil el deducible puede venir en DÍAS,
+> no en porcentaje** («ya sea en porcentaje o en días, para el caso de RC»). Hoy nuestras cotizaciones
+> traen RC con deducible `0`, así que no aplica — pero si algún día no lo es, leerlo como porcentaje
+> sería un error de la familia del «25%».
+>
+> **Y no es una constante del producto: es un parámetro comercial.** La doc dice que está limitado
+> del lado de SISE y que mover­lo «deberá contar con autorización». Por eso el 5% y el 10% **no van
+> escritos en ningún prompt**, por muy constantes que los hayamos medido en 1.322 cotizaciones.
 
 ## 3 · `tipo_suma` vale `2` y el catálogo no lo tiene
 
