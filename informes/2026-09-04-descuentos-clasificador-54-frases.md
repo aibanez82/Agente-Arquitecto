@@ -240,3 +240,44 @@ API con los parámetros exactos del nodo.
 (igual que en el banco, donde fue OK) — y aun así el carril creó una aplicación de descuento. Ese
 fallo es del **routing posterior al clasificador** (el `signal` no desvía a Limitada), justo lo que
 el rótulo de este informe decía que aquí no se mide.
+
+---
+
+## Adenda 3 — N=20: CORRIDA INCOMPLETA (declarada), 9 de 20 frases
+
+**Qué pasó:** la corrida `20260904-0928-N20` completó **9 frases** y perdió 11 por `spawnSync claude
+ENOENT` a partir de la frase 20 — el binario del CLI desapareció del PATH a mitad de corrida
+(pinta de auto-update del CLI; el runner lleva ya reintento ×3 con pausa). La re-corrida de las 11
+(`N20b`) fue **detenida por intervención local** nada más arrancar, con cero llamadas hechas;
+está pendiente de relanzamiento acordado. **Esta tabla es parcial y se publica como parcial.**
+
+| # | Tipo | Esperado | Aciertos | Distribución |
+|---|---|---|---|---|
+| 7 | fallada | PRICE_OBJECTION+price | **0/20** | 20× no_match |
+| 8 | fallada | PRICE_OBJECTION+price | **0/20** | 20× no_match |
+| 10 | fallada | PRICE_OBJECTION+price | **0/20** | 20× no_match |
+| 11 | fallada | PRICE_OBJECTION+price | 2/20 | 18× no_match / 2× price |
+| 15 | fallada (`#270`) | PRICE_OBJECTION+price | **10/20** | 10× price / 10× no_match ← **REPARTE ~50%** |
+| 19 | fallada | PRICE_OBJECTION+price | 2/20 | 18× no_match / 2× price |
+| 1 | control | PRICE_OBJECTION+price | 20/20 | 20× price |
+| 5 | control | PRICE_OBJECTION+price | **6/20** | 14× no_match / 6× price ← **REPARTE, y era un "acierto"** |
+| 14 | control | PRICE_OBJECTION+price | 19/20 | 19× price / 1× no_match |
+
+**Pendientes (no ejercitadas a N=20):** 20, 21, 22, 23, **25 (el falso positivo del contado)**,
+34, 35, 41, 50 + controles 27, 33.
+
+**Hallazgo transversal que condiciona TODO el método — varianza entre tandas medida:**
+la frase 15 dio **2/25 (~8%) por la mañana** (corridas 0658/0707-N5 + A/B) y **10/20 (50%) a las
+09:30 MX**, con catálogo **intacto** (`qualitas_discountaiusecase` sin cambios desde el 14-ago),
+grafo **idéntico** (`549bcf12` en ambas) y **mismo CLI** (la 15 corrió antes del auto-update).
+Las muestras **no son i.i.d. entre tandas**: o el servicio tras el alias `claude-sonnet-5` cambió
+entre tandas, o las respuestas se correlacionan por tanda — desde fuera no es distinguible.
+Consecuencias operativas:
+
+- **Los 0/20 secos (7, 8, 10) son la señal robusta**: ninguna tanda los ha movido de no_match.
+- **Cualquier proporción intermedia lleva barras de error anchas entre tandas** — un «10/20» de
+  una tanda no es una p estimada, es una foto.
+- El control 5 («Algún descuento?») pasó de acierto en la corrida de 54 a **6/20**: los
+  «aciertos» de una pasada también eran fotos.
+- **La p real del carril solo puede estimarse en vivo** (experimento del teléfono de Alberto,
+  o fence del `#312`).
