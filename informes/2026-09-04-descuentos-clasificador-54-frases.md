@@ -336,3 +336,41 @@ la regla pactada. Aciertos = coincidencia con el esperado del set.
   que importa: **el control estable NO garantiza proporciones comparables frase a frase** — ancla
   la tanda frente a un desplazamiento global, pero el efecto-tanda es por frase. El contado oscila
   entre dominante (70%) y frecuente (30%): la dirección del defecto es firme, su p no lo es.
+
+---
+
+## Adenda 6 — REVALIDACIÓN del prompt corregido (`ec5052cf`): los tres criterios se cumplen
+
+**Grafo vivo `ec5052cf` (19:10Z, 2.927 chars), verificado por texto antes de la primera llamada**
+(la 34 en el bloque downgrade con su desambiguación, «NOMBRARLA NO BASTA», contado como
+contraejemplo). **Método, y esto es parte de la medición:** ejecución **EN PRIMER PLANO** — tres
+tareas de fondo de esta sesión murieron hoy sin causa conocida (`b9v9im1sg`, `bb094pa02`,
+`bjuobv3x2`, la tercera en corrida activa) — con cada tanda partida en dos bloques consecutivos
+por el límite de 10 min por comando, y **el control 1 duplicado en ambos bloques** para cubrir la
+ventana completa. Tanda A: 19:45–19:52Z (`RV2A-b1/b2`). Tanda B: 21:08–21:15Z (`RV2B-b1/b2`),
+lanzada por monitor de plazo a los ~75 min. Cero pasadas perdidas.
+
+**Controles: 10/10 en los cuatro bloques → ambas tandas COMPARABLES.**
+
+| # | Frase | Esperado | Línea base (hoy) | Tanda A | Tanda B | Criterio |
+|---|---|---|---|---|---|---|
+| 7 | «tienes alguna promoción» | price | 0/20 | **10/10** | **10/10** | ✅ resuelta |
+| 8 | «Descuentod» | price | 0/20 | **10/10** | **10/10** | ✅ resuelta |
+| 10 | «ya es lo menos?» | price | 0/20 | **10/10** | **10/10** | ✅ resuelta |
+| 50 | despedida con competidor | price | 0/10+0/10 | **10/10** | **10/10** | ✅ resuelta |
+| 34 | «económico que cubra a terceros» | +downgrade | 0/10+0/10 | 8/10 | **10/10** | ✅ mayoría en ambas |
+| **25** | **contado** | no_match | 7×FP / 3×FP | **10/10 (0 FP)** | **10/10 (0 FP)** | ✅ **FP: de 7×/3× a CERO en ambas** |
+| 33 | vigilada (`#315`) | +downgrade | N=1 ✓ (banco) + 1 ✓ (vivo) | 7/10 (2× no_match, **1× price**) | **10/10** | ⚠️ ver nota |
+
+**Veredicto por los criterios pactados: 1) ✅ las cuatro pasan de 0/20 a pleno en las DOS tandas.
+2) ✅ el contado BAJA sus falsos positivos a cero en ambas. 3) la 33, con matiz:** una pasada de
+20 (tanda A) clasificó «no tengo trabajo, solo daños a terceros» como `price` a secas — la
+dirección exacta del riesgo del `#315`. Con línea base N=2 y la tanda B en 10/10, **no es
+afirmable un cambio de comportamiento**; queda declarado como observación única a vigilar (en vivo
+o en la próxima regresión del banco), no como fallo.
+
+**El rótulo del informe sigue vigente:** esto mide la intención del clasificador, no el routing.
+Y la regla del día también: los plenos y los ceros valen; las proporciones intermedias (el 8/10 de
+la 34 en A, el 7/10 de la 33 en A) son orientación. La dirección del cambio es abrumadora:
+las cinco frases del arreglo pasaron de 0 aciertos en 100 pasadas de línea base a 96/100 en la
+revalidación, sin coste medible en el contraejemplo del contado.
