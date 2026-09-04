@@ -281,3 +281,27 @@ Consecuencias operativas:
   «aciertos» de una pasada también eran fotos.
 - **La p real del carril solo puede estimarse en vivo** (experimento del teléfono de Alberto,
   o fence del `#312`).
+
+---
+
+## Adenda 4 — Tanda A del diseño 2×10 (RUN `20260904-1022-TA`, 16:22–16:32Z)
+
+**⚠️ ESTO ES UNA TANDA. Sus proporciones no se comparan con nada todavía** — la tanda B, separada
+≥1 h, está pendiente (el entorno mató el lanzador dormido; se relanza en directo a las 17:32Z, o
+17:45Z por mi cuenta si el ping no llega). **Control de tanda: frase 1 → 10/10 `price` → tanda
+COMPARABLE.** Sin pasadas perdidas: 10/10 en las siete frases.
+
+| # | Frase | Esperado | Tanda A | Distribución |
+|---|---|---|---|---|
+| 1 | control «Está muy cara, gracias» | price | **10/10** | 10× price |
+| **25** | **contado** | no_match | **3/10** | **7× PRICE_OBJECTION** / 3× no_match |
+| 23 | «Existe un seguro más económico?» | price | 3/10 | 7× no_match / 3× price |
+| 34 | «económico que cubra a terceros» | +coverage_downgrade | **0/10** | 10× no_match |
+| 35 | «una básica la más económica» | +coverage_downgrade | 1/10 | 9× no_match / 1× downgrade |
+| 41 | referido «descuento adicional» | price | **0/10** | 10× no_match |
+| 50 | despedida con competidor | price | **0/10** | 10× no_match |
+
+Lectura provisional (cerrable solo con la B): **el falso positivo del contado es dominante — 7 de
+cada 10 turnos abrirían escalón de descuento a quien pregunta por la forma de pago**; y 34, 41 y 50
+son candidatos a cero duro que, confirmados en la B, cierran la lista de ceros para el handoff del
+prompt.
