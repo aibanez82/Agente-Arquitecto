@@ -125,7 +125,7 @@ Diagrama completo, observabilidad, JOIN de producción, hitos y detalle de nodos
 
 > Los nueve los mantiene el Agente n8n en su repo, y se verifican **por `versionId` contra la API**, nunca por número de nodos: dos grafos distintos pueden tener el mismo recuento — por eso aquí ya no hay columna de recuento, que además envejece sola. Hay un décimo **inactivo que no se toca**: `#135 CANDIDATO PROD — NO ACTIVAR` (`fqdSLZ5vv2RBtnWE`), sin espejo en `main`. `docs/n8n-workflows/` de ESTE repo está **RETIRADO** (ver su `README.md`). El backup automático sigue descontinuado (`docs/architecture/backup-policy-n8n.md`).
 
-El bot tiene 3 nodos que llaman a Claude: **Jailbreak detection** (Haiku) · **Intent Router** (Haiku) · **Agente conversacional principal** (Sonnet). n8n escribe a Postgres directamente con la credencial `"Postgres account"`.
+El bot llama a Claude desde **6 sitios** (medido en el grafo vivo, 3 sep): `Anthropic Chat Model`→**AI Agent** y `Anthropic Chat Model2`→**RAG IA Agent** y `Discount Classifier Model`→**Discount Intent Classifier** (los tres **Sonnet 5**) · `Anthropic Chat Model1`→**Intent Router** y `Haiku`→**Detect Jailbreak** (**Haiku 4.5**) · y **`Extract VIN Vision`**, que **no es nodo de modelo sino un `httpRequest` a `api.anthropic.com`** con el modelo **escrito a mano** — hoy `claude-sonnet-4-5-20250929`, una generación por detrás. Ningún otro workflow de PROD llama a un LLM. Ninguno lleva `temperature` (fuera desde el `#270`). n8n escribe a Postgres directamente con la credencial `"Postgres account"`.
 
 Nodos concretos, workflow proactivo y detalle: `docs/architecture/data-flow.md` · `docs/protocolos/workflow-proactivo-dashboard.md`.
 
