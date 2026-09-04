@@ -166,3 +166,33 @@ Triggered by: handoff 2026-09-04-set-frases-carril-descuentos.md + GO del Arquit
 ```
 
 — Agente QA & Testing
+
+---
+
+## Adenda — estabilidad N=5 sobre las 9 frases pedidas (corrida `20260904-0707-N5`)
+
+Mismo runner, mismo grafo (`versionId 549bcf12`), 5 pasadas por frase:
+
+| # | Frase | Esperado | N=5 | Veredicto |
+|---|---|---|---|---|
+| 7 | «tienes alguna promoción» | PRICE_OBJECTION+price | **5× no_match** | **DEFECTO estable** |
+| 8 | «Descuentod» | PRICE_OBJECTION+price | **5× no_match** | **DEFECTO estable** |
+| 15 | caso literal `#270` | PRICE_OBJECTION+price | **5× no_match** | **DEFECTO estable** |
+| 19 | comparativa agencia | PRICE_OBJECTION+price | 3× no_match / 2× price | **BORDERLINE (3/2)** |
+| 23 | «Existe un seguro más económico?» (M50 2a) | PRICE_OBJECTION+price | **5× no_match** | **DEFECTO estable** |
+| **25** | **contado (falso positivo)** | no_match | **5× PRICE_OBJECTION+price** | **DEFECTO estable** |
+| 34 | «económico que cubra a terceros» | +coverage_downgrade | **5× no_match** | **DEFECTO estable** |
+| 35 | «una básica la más económica» | +coverage_downgrade | **5× no_match** | **DEFECTO estable** |
+| G3 | «el precio» (zona gris) | — | 4× no_match / 1× price | **BORDERLINE (4/1)** |
+
+Lecturas que cambian el dictamen:
+
+- **La 25 es 5/5: el riesgo prospectivo es firme** — con el carril corriendo, el bot abrirá un
+  escalón de descuento a quien solo pregunta por la forma de pago, cada vez.
+- **La G3 desmiente su propia primera pasada:** en la corrida de 54 salió `PRICE_OBJECTION`; a N=5
+  reparte 4 no_match / 1 price. El borderline aterrizó de casualidad en la primera corrida —
+  exactamente el fallo que la repetición existe para cazar.
+- Los 6 falsos negativos restantes son **estables**: defectos de criterio del prompt, no ruido.
+
+(45 pasadas totales; formato `bare` en todas. Runner con `QA_DESC_REPEAT` committeado — la
+repetición queda como capacidad permanente de la suite.)
