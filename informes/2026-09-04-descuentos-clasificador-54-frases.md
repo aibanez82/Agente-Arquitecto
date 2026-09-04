@@ -305,3 +305,34 @@ Lectura provisional (cerrable solo con la B): **el falso positivo del contado es
 cada 10 turnos abrirían escalón de descuento a quien pregunta por la forma de pago**; y 34, 41 y 50
 son candidatos a cero duro que, confirmados en la B, cierran la lista de ceros para el handoff del
 prompt.
+
+---
+
+## Adenda 5 — Diseño 2×10 completo: tanda A + tanda B (separadas, sin agregar)
+
+Tanda A: RUN `20260904-1022-TA`, 16:22–16:32Z. Tanda B: RUN `20260904-1145-TB`, **inicio real
+17:45:59Z** (lanzada por el respaldo del plazo, ping no recibido a las 17:32Z) — **74 min de
+separación** desde el fin de la A. Sin pasadas perdidas en ninguna (10/10 llamadas por frase).
+**Control de ambas tandas: frase 1 → 10/10 `price` en A y en B → las dos tandas COMPARABLES** por
+la regla pactada. Aciertos = coincidencia con el esperado del set.
+
+| # | Frase | Esperado | Tanda A | Tanda B |
+|---|---|---|---|---|
+| 1 | control «Está muy cara, gracias» | price | **10/10** | **10/10** |
+| 25 | contado | no_match | 3/10 (**7× FP price**) | 7/10 (**3× FP price**) |
+| 23 | «Existe un seguro más económico?» | price | 3/10 | 0/10 |
+| 34 | «económico que cubra a terceros» | +coverage_downgrade | **0/10** | **0/10** |
+| 35 | «una básica la más económica» | +coverage_downgrade | 1/10 | 0/10 |
+| 41 | referido «descuento adicional» | price | 0/10 | 1/10 |
+| 50 | despedida con competidor | price | **0/10** | **0/10** |
+
+**Mi lectura de ceros duros (la agregación es del Arquitecto):**
+
+- **Ceros duros confirmados en dos tandas separadas: 34 y 50** — 0/10 + 0/10, ni una entrada en 20
+  pasadas repartidas en 74 min. Se suman a los 0/20 de la mañana (7, 8, 10).
+- **Casi-cero, NO cero duro: 35 (1 acierto en A) y 41 (1 en B).** Un acierto aislado en 20 los
+  saca de la categoría por la regla estricta; son borderlines de p muy baja.
+- **23 se movió entre tandas (3/10 → 0/10) y el FP del contado también (7× → 3×).** Nota de método
+  que importa: **el control estable NO garantiza proporciones comparables frase a frase** — ancla
+  la tanda frente a un desplazamiento global, pero el efecto-tanda es por frase. El contado oscila
+  entre dominante (70%) y frecuente (30%): la dirección del defecto es firme, su p no lo es.
