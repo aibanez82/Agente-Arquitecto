@@ -1,0 +1,454 @@
+{
+  "rotulo": "MIDE LA INTENCIÓN DEL CLASIFICADOR, NO EL ROUTING DEL CARRIL",
+  "grafo": {
+    "workflowId": "dNqtM20ij6ecZYAX",
+    "versionId": "549bcf12-c8c8-428e-8866-2cce2f9a2229",
+    "updatedAt": "2026-09-03T00:09:51.468Z",
+    "nodos": 316
+  },
+  "modelo": "claude-sonnet-5",
+  "catalogo_codigos": [
+    "PRICE_OBJECTION"
+  ],
+  "corrida": "2026-09-04T13:11:20.142Z",
+  "frases": [
+    {
+      "n": "7",
+      "grupo": "A",
+      "texto": "tienes alguna promoción",
+      "esperadoCarril": "DESCUENTO",
+      "esperadoClasificador": {
+        "intent": "PRICE_OBJECTION",
+        "signal": "price"
+      },
+      "pasadas": [
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        }
+      ],
+      "distribucion": "5× no_match",
+      "estable": true,
+      "intent": "no_match",
+      "signal": null,
+      "consultar_disponibilidad": false,
+      "output_shape": "bare",
+      "raw": "{\"code\":\"no_match\"}"
+    },
+    {
+      "n": "8",
+      "grupo": "A",
+      "texto": "Descuentod",
+      "esperadoCarril": "DESCUENTO",
+      "esperadoClasificador": {
+        "intent": "PRICE_OBJECTION",
+        "signal": "price"
+      },
+      "pasadas": [
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        }
+      ],
+      "distribucion": "5× no_match",
+      "estable": true,
+      "intent": "no_match",
+      "signal": null,
+      "consultar_disponibilidad": false,
+      "output_shape": "bare",
+      "raw": "{\"code\":\"no_match\"}"
+    },
+    {
+      "n": "15",
+      "grupo": "A",
+      "texto": "Me cotizaron con otra compañía y me salía en mejor precio, pero la verdad a mí me gustaría Quálitas. ¿No tendrán alguna promoción?",
+      "esperadoCarril": "DESCUENTO",
+      "esperadoClasificador": {
+        "intent": "PRICE_OBJECTION",
+        "signal": "price"
+      },
+      "pasadas": [
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        }
+      ],
+      "distribucion": "5× no_match",
+      "estable": true,
+      "intent": "no_match",
+      "signal": null,
+      "consultar_disponibilidad": false,
+      "output_shape": "bare",
+      "raw": "{\"code\":\"no_match\"}"
+    },
+    {
+      "n": "19",
+      "grupo": "A",
+      "texto": "Me la checaron en la agencia y me cotizaron 14,082.90 por qué sube?",
+      "esperadoCarril": "DESCUENTO",
+      "esperadoClasificador": {
+        "intent": "PRICE_OBJECTION",
+        "signal": "price"
+      },
+      "pasadas": [
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "PRICE_OBJECTION",
+          "signal": "price",
+          "consultar": true,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "PRICE_OBJECTION",
+          "signal": "price",
+          "consultar": true,
+          "output_shape": "bare"
+        }
+      ],
+      "distribucion": "3× no_match / 2× PRICE_OBJECTION+price",
+      "estable": false,
+      "intent": "no_match",
+      "signal": null,
+      "consultar_disponibilidad": false,
+      "output_shape": "bare",
+      "raw": "{\"code\":\"no_match\"}"
+    },
+    {
+      "n": "23",
+      "grupo": "A",
+      "texto": "Existe un seguro más económico?",
+      "esperadoCarril": "DESCUENTO",
+      "esperadoClasificador": {
+        "intent": "PRICE_OBJECTION",
+        "signal": "price"
+      },
+      "pasadas": [
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        }
+      ],
+      "distribucion": "5× no_match",
+      "estable": true,
+      "intent": "no_match",
+      "signal": null,
+      "consultar_disponibilidad": false,
+      "output_shape": "bare",
+      "raw": "{\"code\":\"no_match\"}"
+    },
+    {
+      "n": "25",
+      "grupo": "B",
+      "texto": "hay algun descuento si es pago de contado?",
+      "esperadoCarril": "CONTADO",
+      "esperadoClasificador": {
+        "intent": "no_match",
+        "signal": null
+      },
+      "pasadas": [
+        {
+          "intent": "PRICE_OBJECTION",
+          "signal": "price",
+          "consultar": true,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "PRICE_OBJECTION",
+          "signal": "price",
+          "consultar": true,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "PRICE_OBJECTION",
+          "signal": "price",
+          "consultar": true,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "PRICE_OBJECTION",
+          "signal": "price",
+          "consultar": true,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "PRICE_OBJECTION",
+          "signal": "price",
+          "consultar": true,
+          "output_shape": "bare"
+        }
+      ],
+      "distribucion": "5× PRICE_OBJECTION+price",
+      "estable": true,
+      "intent": "PRICE_OBJECTION",
+      "signal": "price",
+      "consultar_disponibilidad": true,
+      "output_shape": "bare",
+      "raw": "{\"code\":\"PRICE_OBJECTION\"}"
+    },
+    {
+      "n": "34",
+      "grupo": "B",
+      "texto": "Buen día estoy buscando un seguro económico que cubra a terceros",
+      "esperadoCarril": "LIMITADA",
+      "esperadoClasificador": {
+        "intent": "PRICE_OBJECTION",
+        "signal": "coverage_downgrade"
+      },
+      "pasadas": [
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        }
+      ],
+      "distribucion": "5× no_match",
+      "estable": true,
+      "intent": "no_match",
+      "signal": null,
+      "consultar_disponibilidad": false,
+      "output_shape": "bare",
+      "raw": "{\"code\":\"no_match\"}"
+    },
+    {
+      "n": "35",
+      "grupo": "B",
+      "texto": "Me gustaría saber en cuanto me sale una básica la más económica que tengas.",
+      "esperadoCarril": "LIMITADA",
+      "esperadoClasificador": {
+        "intent": "PRICE_OBJECTION",
+        "signal": "coverage_downgrade"
+      },
+      "pasadas": [
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        }
+      ],
+      "distribucion": "5× no_match",
+      "estable": true,
+      "intent": "no_match",
+      "signal": null,
+      "consultar_disponibilidad": false,
+      "output_shape": "bare",
+      "raw": "{\"code\":\"no_match\"}"
+    },
+    {
+      "n": "G3",
+      "grupo": "C",
+      "texto": "el precio",
+      "esperadoCarril": "ACLARAR → DESCUENTO",
+      "esperadoClasificador": null,
+      "pasadas": [
+        {
+          "intent": "PRICE_OBJECTION",
+          "signal": "price",
+          "consultar": true,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        },
+        {
+          "intent": "no_match",
+          "signal": null,
+          "consultar": false,
+          "output_shape": "bare"
+        }
+      ],
+      "distribucion": "4× no_match / 1× PRICE_OBJECTION+price",
+      "estable": false,
+      "intent": "PRICE_OBJECTION",
+      "signal": "price",
+      "consultar_disponibilidad": true,
+      "output_shape": "bare",
+      "raw": "{\"code\":\"PRICE_OBJECTION\"}"
+    }
+  ]
+}
