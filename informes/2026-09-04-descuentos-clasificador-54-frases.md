@@ -196,3 +196,47 @@ Lecturas que cambian el dictamen:
 
 (45 pasadas totales; formato `bare` en todas. Runner con `QA_DESC_REPEAT` committeado — la
 repetición queda como capacidad permanente de la suite.)
+
+---
+
+## Adenda 2 — CORRECCIÓN tras la corrida real de Alberto (4-sep, tarde)
+
+**1 · La premisa del contexto no cuadra con lo medido — el clasificador NO recibe contexto.**
+Leído del grafo vivo (`549bcf12`) y verificado en la ejecución real:
+
+- Conexiones entrantes a `Discount Intent Classifier`: solo `main` (desde `IF Supported Discount
+  Intent?`) y el modelo (`ai_languageModel`). **Sin memoria**: los dos `Postgres Chat Memory` del
+  grafo cuelgan de otros agentes.
+- `Discount Phase 2 Input` construye `chat_input` = mensaje saneado a secas (substring 500, NFKC,
+  sin controles). Ni historial, ni cotización, ni fase.
+- **La prueba definitiva, de la ejecución real de Alberto (exec 30890, 15:07:12Z):** el
+  `chat_input` que entró al nodo fue la frase 15 **sola, byte a byte**, y salió
+  `{"code":"PRICE_OBJECTION"}`. En la 30889, la frase 33 sola → `{"code":"COVERAGE_DOWNGRADE"}`.
+
+**2 · Lo que la corrida real demuestra entonces: la frase 15 es un BORDERLINE de p baja, y mi
+«DEFECTO estable 5/5» de la Adenda 1 afirmó de más.** Muestras acumuladas del banco, misma frase,
+mismo prompt, mismo modelo:
+
+| Entorno de invocación | Pasadas | `PRICE_OBJECTION` |
+|---|---|---|
+| Banco original (corridas 0658 + 0707-N5) | 10 | 0 |
+| Directorio limpio + `--exclude-dynamic-system-prompt-sections` | 10 | 1 |
+| Directorio del proyecto, invocación directa | 5 | 1 |
+| **Total banco** | **25** | **2 (8%)** |
+| n8n en vivo (Alberto) | 1 | 1 |
+
+A N=5 un borderline de p≈0,1 sale «estable» con facilidad (p≈0,59 de ver 5/5 fallos). **Corrección
+formal: la 15 se reclasifica de «DEFECTO estable» a «BORDERLINE de p baja», y los demás «estables»
+de la Adenda 1 quedan degradados a «estables a N=5»** — para dictaminar «defecto» con p<0,05 de
+error hacen falta ~N≥20 por frase.
+
+**3 · La diferencia banco↔vivo que queda sin explicar es la INVOCACIÓN, no el contexto.** El nodo
+LangChain de n8n (options vacías) y el CLI local pueden diferir en parámetros no observables desde
+fuera (temperature y afines). Con 1 muestra viva no se puede estimar la p del carril real: cerrar
+esa brecha exige o más pasadas vivas (teléfono de Alberto / fence del `#312`) o replicar la llamada
+API con los parámetros exactos del nodo.
+
+**4 · Coherencia con el hallazgo 2 del Arquitecto:** la 33 en vivo clasificó `COVERAGE_DOWNGRADE`
+(igual que en el banco, donde fue OK) — y aun así el carril creó una aplicación de descuento. Ese
+fallo es del **routing posterior al clasificador** (el `signal` no desvía a Limitada), justo lo que
+el rótulo de este informe decía que aquí no se mide.
