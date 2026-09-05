@@ -8,8 +8,11 @@
 
 ## ⚠️ ALERTA OPERATIVA PRIMERO — STG SIN CRÉDITOS ANTHROPIC
 
-Desde ~02:35Z, TODO turno en STG muere en `Detect Jailbreak` con **«Your credit balance is too
-low to access the Anthropic API»** (verbatim de la exec 31776; igual en 31763-31774). No es cosa
+**Ventana medida, no estimada (corrección del Arquitecto, tenía razón):** última ejecución
+BUENA = exec 31761, terminada 02:41:59Z; primera FALLIDA = exec 31763, iniciada **02:42:43Z**.
+El corte empezó en esos 44 segundos — mi «~02:35Z» inicial era estimación y estaba mal. Desde
+entonces todo turno muere en `Detect Jailbreak` con **«Your credit balance is too low to access
+the Anthropic API»** (verbatim de la exec 31776; igual en 31763-31774). No es cosa
 de mis sesiones sintéticas: es el primer nodo LLM del grafo — **el bot de STG está caído para
 cualquier conversación** hasta recargar créditos. Los 7 últimos turnos de esta corrida (la cola
 Limitada entera) murieron ahí: **B1×2, B2×2, B3-Lim×2 y el turno de contexto quedan SIN MEDIR.**
