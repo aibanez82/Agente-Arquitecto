@@ -103,3 +103,42 @@ Siguen abiertos porque el tracker es único para los dos entornos, no porque que
 Lo que sí puedo: **empezar por la Fase 1 y no tocar nada más hasta cerrarla.** Es lo que más riesgo retira por unidad de tiempo, y las otras cuatro quedan en cola en este orden.
 
 Agente: Arquitecto-IA-Qualitas
+
+---
+
+# Adenda del mismo día — lo que cambió al medir
+
+Escrito unas horas después, con el trabajo ya en marcha. **Dos de las cinco fases no eran lo que yo creía.**
+
+## La Fase 2 ya estaba entregada, y no lo sabía
+
+Puse el `#297` y el `#296` como trabajo pendiente. **El arreglo llevaba desplegado desde el 2 de septiembre**, por un handoff que ordené yo (`bd278ea`): los nodos `Repair Window (AI)` y `Repair Window (RAG)`, activos en el grafo vivo.
+
+Lo comprobé por el camino largo —midiendo la exposición, descubriendo que la ventana son 120 mensajes y no 60, buscando sesiones atrapadas— **antes de mirar si ya existía un nodo que lo arreglara**. La lección es la del día: **mirar el grafo antes de diseñar sobre él.**
+
+Y funciona, con la cadena entera medida: se disparó **una vez**, en la sesión que el `#297` documenta, y esa conversación **volvió a hablar** (`6319` reparación → `6320` cliente → `6321` el bot contesta → sigue trabajando con sus tools).
+
+**El `#296` era el mismo defecto**, no uno distinto: el error del proveedor dice `messages.0.content.0: unexpected tool_use_id found in tool_result blocks`. Responder «`1`» no tenía nada de especial.
+
+**Queda vivo de esa fase solo la mitad de observabilidad del `#296`**: cualquier 400 que no sea éste sigue terminando en `success` sin dejar rastro.
+
+## La Fase 3 es más simple de lo que parecía
+
+Medido antes de ordenarla: **`n8n_outbound_reserve` no comprueba el estado de la sesión**, solo la identidad. Y **las 41 sesiones `closed` de STG tienen identidad completa**. O sea: una sesión cerrada **puede** reservar un envío; hoy falla porque el grafo le pasa centinelas nulos.
+
+No hay que tocar el filtro `status IN ('open','active')` —que existe por un FAIL-OPEN que mordió en producción y su propio SQL avisa de ello—: hay que **añadir un camino**.
+
+Handoff publicado y **en cola tras la Fase 1a**.
+
+## Estado de la cola
+
+| Fase | Estado |
+|---|---|
+| **1a** `#341` — guarda de fidelidad de cifras | **En ejecución.** Nodo `Figure Fidelity Guard` construido, 317 nodos, batería corriendo |
+| **1b** `#324` — cobertura afirmada que no se tiene | Pendiente. Usa el mismo nodo |
+| **2** `#297` + `#296` | **Ya entregado** salvo la observabilidad del 400 genérico |
+| **3** `#285` — la sesión cerrada | **Encargado y en cola** |
+| **4** `#275`/`#277`/`#279` | Pendiente, depende de la 1 |
+| **5** copy y contabilidad | Pendiente |
+
+Agente: Arquitecto-IA-Qualitas
