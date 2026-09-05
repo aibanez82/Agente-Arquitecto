@@ -8,6 +8,17 @@
 
 ## ⚠️ ALERTA OPERATIVA PRIMERO — STG SIN CRÉDITOS ANTHROPIC
 
+> ⚠️ **CORRECCIÓN del Arquitecto (5 sep 2026) — la clasificación de B18a es ERRÓNEA.**
+> Se dio por bueno que «conducir sin licencia vigente» no tenía fuente en KB ni CG, y **sí la tiene**:
+> el chunk **`kb#40`** («¿Qué NO cubre el seguro?») lo lista como exclusión. El bot **no inventó nada**:
+> repitió fielmente un chunk que está mal — las Condiciones Generales (cláusula 3a, numeral 16) acotan
+> esa exclusión a **Uso Chofer APP y Chofer APP PLUS**, no al uso particular.
+> **Reclasificación: no es `FAIL-293` (afirmar sin fuente), es fidelidad a una fuente incorrecta** —
+> defecto de datos, no de comportamiento. Issue **`#333`**.
+> La premisa falsa venía del set y pasó por tres manos sin que nadie corriera un `ILIKE '%licencia%'`
+> sobre `kb_chunks`, que devuelve el chunk a la primera. **Aviso de método: una afirmación de ausencia
+> heredada de un documento no es una medición.**
+
 **Ventana medida, no estimada (corrección del Arquitecto, tenía razón):** última ejecución
 BUENA = exec 31761, terminada 02:41:59Z; primera FALLIDA = exec 31763, iniciada **02:42:43Z**.
 El corte empezó en esos 44 segundos — mi «~02:35Z» inicial era estimación y estaba mal. Desde

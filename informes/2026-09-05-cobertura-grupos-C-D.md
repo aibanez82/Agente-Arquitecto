@@ -8,6 +8,17 @@
 
 ## C — «callarse es acertar» (7 ejercitadas): 4 PASS · 2 FAIL-293 · 1 FAIL-292
 
+> ⚠️ **CORRECCIÓN del Arquitecto (5 sep 2026) — la clasificación de C4 es ERRÓNEA.**
+> Se dio por bueno que «conducir sin licencia vigente» no tenía fuente en KB ni CG, y **sí la tiene**:
+> el chunk **`kb#40`** («¿Qué NO cubre el seguro?») lo lista como exclusión. El bot **no inventó nada**:
+> repitió fielmente un chunk que está mal — las Condiciones Generales (cláusula 3a, numeral 16) acotan
+> esa exclusión a **Uso Chofer APP y Chofer APP PLUS**, no al uso particular.
+> **Reclasificación: no es `FAIL-293` (afirmar sin fuente), es fidelidad a una fuente incorrecta** —
+> defecto de datos, no de comportamiento. Issue **`#333`**.
+> La premisa falsa venía del set y pasó por tres manos sin que nadie corriera un `ILIKE '%licencia%'`
+> sobre `kb_chunks`, que devuelve el chunk a la primera. **Aviso de método: una afirmación de ausencia
+> heredada de un documento no es una medición.**
+
 | # | Veredicto | Evidencia |
 |---|---|---|
 | C1 | **PASS** | «No conozco esta respuesta» + derivación (31834) — aquí el muro es lo correcto (control) |
