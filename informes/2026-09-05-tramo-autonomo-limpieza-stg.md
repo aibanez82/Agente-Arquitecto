@@ -70,3 +70,46 @@ Los cuatro son la misma forma, y ya tiene nombre: **decidir sobre un ámbito que
 **La corrección de los seis chunks de coberturas accesorias solo está en STG.** La escritura contra la otra base **la denegó el clasificador de permisos de mi sesión, y no la rodeé.** Queda para decisión de Alberto: si se corrige un solo lado, reaparece el `#330`.
 
 Agente: Arquitecto-IA-Qualitas
+
+---
+
+# Cierre del tramo
+
+Después de escribir lo de arriba se cerraron tres cosas más.
+
+## `#279` — dos patrones al `NIEGA_EMISION`
+
+**La frase que da nombre al issue ya se cazaba.** Lo que escapaba era el presente sin auxiliar («no se emite… póliza») y el participio interpuesto («no ha quedado emitida»). Dos patrones nuevos, **verificados por mí contra el código vivo**: 4/4 positivos caen, **6/6 controles salen intactos** — incluidos los de recibo, factura y link.
+
+## `#340` — no anunciar dos veces, y el defecto que destapó
+
+**22/22 offline**, con el mensaje literal de Alberto como caso 1: el párrafo repetido sale y la lista de datos sobrevive.
+
+**Pero lo importante es lo que encontró el freno.** «Un ahorro de $2.850,95» es la **resta** de dos cifras autoritativas y no viaja en ningún XML: **mi lógica de la Fase 1a la habría borrado, mutilando el anuncio del descuento** que acabábamos de construir. Corregido validando también las diferencias par a par, **solo validación, jamás sustitución**.
+
+Es la **segunda vez en la noche** que mi conjunto autoritativo se queda corto — la primera fue el 25 % del Robo Parcial, que vive en la KB y en el contrato.
+
+**El principio, que me llevo:** una cifra puede ser verdadera porque está en el payload, porque viene de otra fuente o porque **se deriva** de las que están. **Una guarda que confunde «no lo tengo escrito» con «es falso» no protege: censura.** Validación ancha, acción estrecha.
+
+## `#288` — el acuse repetido es NUESTRO
+
+Medido: la frase de Django no aparece **ni una vez** en el historial de conversación. **La que se repite es la nuestra** — 28 sesiones la recibieron más de una vez, **72 apariciones**, hasta 4 en una conversación. Las «tres veces seguidas» que el `#248` atribuye a Juan son de nuestro acuse.
+
+Y descarté una alarma propia: **no es un envío triplicado**. Las tres están separadas 25 y 17 segundos, con su oferta detrás cada una.
+
+**Consecuencia incómoda:** el `#339` de esta noche **reescribió esa frase pero no arregla la repetición**. Cambiamos una plantilla por otra mejor. Propuesta en el issue: variación determinista en el nodo que ya compone.
+
+## Estado final de STG
+
+| | |
+|---|---|
+| **Cerrados hoy con medición propia** | `#320` `#323` `#324` `#326` `#327` `#328` `#332` `#334` `#336` `#339` `#341` `#279` `#340` · `#270` y `#313` contigo |
+| **Ya estaban hechos** | `#297` y `#296` |
+| **Esperando decisión tuya** | `#285` (gate reactivo) · frase comercial del `#339` · `#288` |
+| **Reencuadrados, no construidos** | `#338` (decidir, no instrumentar) · `#325` (sin reaparición) · `#277` (la salida estructural) |
+
+## Lo que no pude hacer
+
+**Los seis chunks corregidos solo están en STG.** La escritura contra la otra base la denegó el clasificador de permisos y **no la rodeé**.
+
+Agente: Arquitecto-IA-Qualitas
