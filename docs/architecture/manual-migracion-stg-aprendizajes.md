@@ -531,6 +531,102 @@ FORMA** (mismos datos, misma fase, teléfono sintético) es válido cuando la gu
 con datos de la sesión del turno: no se simula el escenario, se pone la misma entrada en la misma
 puerta.
 
+### 2.15 La frase del corpus es LA frase, no una parecida (1 sep 2026)
+
+Dicté una guarda con su batería de aceptación, y entre los casos que **no** debía tocar puse:
+«tu póliza está emitida; la factura no se ha emitido todavía». Al montar mi banco de pruebas escribí
+«Tu póliza **7620101919** está emitida; la factura…» — le añadí el número, que parecía más realista.
+
+**Ese añadido es justo lo que ocultó el defecto.** El patrón exigía la negación a 30 caracteres de
+«póliza»; los diez dígitos del número empujan «factura no» fuera de la ventana. Con número: pasa. Sin
+número: falso positivo. Yo medí «16/16 correcto» sobre una frase que **no era la del criterio**, y el
+ejecutor —que probó la frase tal como estaba escrita en el handoff— midió el fallo y **paró antes de
+desplegar**.
+
+**Y el defecto ya estaba vivo**, introducido por el arreglo anterior de la misma tarde. No lo trajo el
+cambio nuevo: lo destapó.
+
+**Regla:** un caso de aceptación se ejecuta **literal**. Copiar y pegar, no reescribir «igual pero
+mejor». En una condición sensible a la distancia entre dos palabras, cualquier retoque —un número, un
+nombre, una coma— **es otro caso distinto**. Y si el banco de pruebas y el criterio publicado difieren,
+el que manda es el publicado: es el que el ejecutor va a leer.
+
+Corolario del §2.12: allí el problema era **quién** escribe la aceptación; aquí, **que se ejecute la
+que está escrita**.
+
+### 2.16 Una aserción sobre texto generado falla por costura, no por contenido (1 sep 2026)
+
+Dos falsas alarmas el mismo día, una del ejecutor y otra mía, con la misma forma:
+
+- Su aserción «el patrón viejo ha sido eliminado» dio FALLO. No lo era: la firma que buscaba
+  —el prefijo de la expresión— **también aparece en el patrón nuevo**, que la subsume.
+- Mi comprobación «el texto de la nota se conserva» dio negativo. Tampoco: en el SQL la frase va
+  **partida en dos literales concatenados**, así que nunca aparece contigua en el fuente.
+
+Las dos veces el código estaba bien y **el instrumento estaba mal**. Y las dos veces la alarma llegó
+justo antes de un paso irreversible, que es cuando más caro sale creérsela: una habría revertido un
+import correcto, la otra habría reabierto un encargo ya cumplido.
+
+**Regla:** cuando lo que se verifica es texto que el propio sistema arma —SQL concatenado, `jsCode`
+serializado, un prompt insertado en un nodo—, la prueba buena **no es «¿está la cadena?» sino el
+efecto**: ejecuta el SQL, evalúa la expresión, mide el comportamiento. Buscar subcadenas en código
+generado produce falsos negativos por concatenación y falsos positivos por prefijo compartido, y las
+dos formas se sienten igual de concluyentes.
+
+Corolario del §2.5 bis y del §2.13: **antes de creerte un descuadre, comprueba que tu instrumento
+mide lo que crees.** Y si el descuadre aparece justo antes del paso irreversible, esa comprobación es
+obligatoria, no opcional.
+
+### 2.17 Una congelación protege una medición, no a los clientes (1 sep 2026)
+
+Juan pidió congelar el bot vivo de PROD durante su ventana de activación: sin cambios, sin rollback.
+Trasladé la orden al ejecutor, que **notó por su cuenta que revocaba una instrucción anterior mía**
+—«si la conversación normal falla, revierte sin discutirlo»— y lo dijo en alto en vez de dejar las dos
+reglas vivas. Eso es lo primero que hay que hacer cuando una orden nueva pisa otra: **decir cuál
+muere**.
+
+Lo segundo lo tuve que corregir yo: había dictado un «no toques ni ante una emergencia» que, leído al
+pie, deja a alguien mirando cómo se cae producción por respetar una ventana. **El umbral quedó así:**
+
+- **Fallo cosmético, carril raro, nodo que no dispara** → avisar y esperar. Sin excepción, aunque tarde.
+- **Producción rota para clientes reales** → avisar igual, **pero eso no espera**. Si no hay respuesta
+  de nadie con autoridad, **primero el cliente**: restaurar y dejarlo escrito con la hora exacta. Ese
+  aviso no pide permiso; explica por qué se rompió la medición ajena.
+
+Y la línea que separa los dos casos: **no revertir por precaución ni por un síntoma dudoso** — solo con
+clientes afectados delante y nadie con quien hablarlo.
+
+**El principio, que vale más allá de esta ventana:** una congelación protege **una medición**. Cuando
+la medición y el cliente chocan, gana el cliente. El mismo día en que escribimos esto, un cliente real
+pidió dos veces su enlace de pago, no lo recibió y canceló — con todo el sistema en verde.
+
+### 2.18 Un gate se comprueba en el entorno de DESTINO, no en el de origen (1 sep 2026)
+
+Promoví a producción la mitad n8n del `#273` con el visto bueno de Juan sobre su mitad Django. Su
+mensaje decía, literalmente y bien dicho, **`GATE_DJANGO_STG_READY`**. Yo lo leí como permiso para
+producción.
+
+**No lo era.** `POST /api/v1/discount-applications` estaba en `origin/stg` y **no en `origin/main`**;
+producción corría un release anterior al merge. El carril nuevo llamaba a un endpoint inexistente,
+Django devolvía su página de error en HTML, y el cliente **no recibía ni descuento ni oferta**.
+
+**Y el daño no fue neutro: fue una regresión.** Al incorporar el carril directo retiramos los 12 nodos
+del carril de oferta. Antes del cambio, una objeción de precio producía una oferta; después, nada.
+**Quedamos peor que sin hacer nada.**
+
+**La regla:** cuando una promoción depende de un servicio ajeno, **el gate se verifica en el entorno de
+destino**, y la verificación buena no es leer un mensaje ni mirar una rama: es **llamar al endpoint en
+ese entorno** antes de tocar nada. Diez segundos que habrían evitado la reversión entera.
+
+**Y el corolario, que es donde estuvo mi error real:** Juan no dijo nada incorrecto. Dijo «STG». **El
+fallo fue mío al extender un permiso a un ámbito que nadie le había dado.** Un gate lleva ámbito, como
+una afirmación de ausencia lleva dónde se buscó — y por el mismo motivo: sin él, cualquiera lo lee como
+universal.
+
+**Nota de reversión, que también costó aprenderla:** al revertir **no se restaura el respaldo a secas**
+si entretanto entró otra cosa buena. Aquí el cinturón del `#275` había entrado después; restaurar la
+foto anterior lo habría borrado. Se reconstruye: **quitar lo que falló, conservar lo que funciona.**
+
 ## 3. Trazabilidad: el fallo silencioso más caro
 
 En una sola jornada, el registro atribuyó **seis veces** a nuestro lado acciones que no hizo: un
