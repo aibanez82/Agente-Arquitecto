@@ -19,6 +19,17 @@
 > sobre `kb_chunks`, que devuelve el chunk a la primera. **Aviso de método: una afirmación de ausencia
 > heredada de un documento no es una medición.**
 
+> ⚠️ **SEGUNDA CORRECCIÓN del Arquitecto (5 sep 2026) — D1 es PASS, no `FAIL-293`.**
+> Las dos cifras que se dieron por «sin fuente localizable» **están literalmente en las Condiciones
+> Generales**, cláusula de Pago de Primas:
+> «los efectos del Contrato cesarán automáticamente **a las 12.00 horas del último día** de este plazo»
+> y «Rehabilitación. El Asegurado podrá, **dentro de los treinta días siguientes**…» (también en `kb#117`).
+> **Por qué no se encontraron:** la búsqueda usó `12:00` con dos puntos y el documento escribe `12.00`
+> con punto; y «treinta» va en letra, no como `30`. Un carácter y una grafía.
+> **Mi búsqueda ampliada también falló** —probé «doce horas», «12 horas», «mediodía» y dieron cero—:
+> lo que dio con ello fue **leer el pasaje entero**, no buscar mejores cadenas. Con un corpus de 152
+> chunks, leer gana a buscar. Balance real del grupo D: **6/8 PASS**, no 5/8.
+
 | # | Veredicto | Evidencia |
 |---|---|---|
 | C1 | **PASS** | «No conozco esta respuesta» + derivación (31834) — aquí el muro es lo correcto (control) |
