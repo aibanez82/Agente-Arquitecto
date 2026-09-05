@@ -84,3 +84,31 @@ con sus chat_histories; limpieza única por IDs exactos al cerrar el set (LIMPIA
 ```
 
 — Agente QA & Testing
+
+---
+
+## Adenda — Cola Limitada + B8/B10 remedidos tras la recarga y el `#330` (5-sep, corridas `20260905-COB-B-*`)
+
+Grafo `f1d9aedb` (el del `#328`), KB alineada verificada antes de correr. 11 turnos, primer plano.
+
+**Cola Limitada: 7/7 PASS, y la KB corregida hizo exactamente su trabajo.**
+
+| Caso | Ambas reps | Evidencia |
+|---|---|---|
+| B1 ×2 | **PASS** | «no cubre choques/vuelcos, cristales, vandalismo, animales… inundación SÍ queda cubierta a través de Robo Total, incluyendo desbielamiento» (execs 31817/31822) — la CG y el chunk 36 corregido, literal. **El REGISTRAR previsto (si negaba incendio/inundación) no hizo falta** |
+| B2 ×2 | **PASS** | «no cubre choques ni vuelcos; eso es Daños Materiales (Amplia)» (31818/31824), consistente |
+| B3-Lim ×2 | **PASS** | inundación cubierta vía Robo Total con desbielamiento (31820/31825); no citan el deducible de RT — omisión menor sin invento |
+
+(El turno de contexto CTX2, exec 31821, respondió además con la respuesta completa de B1 — el contexto conversacional bastó como precondición.)
+
+**B8/B10 remedidos con la fuente ya presente (`#330`): la escalada a `#292` puro NO se materializó.**
+
+| Caso | Veredicto | Evidencia |
+|---|---|---|
+| B8r1 | **PASS** | «hasta 5 eventos al año cada uno, dentro de 80 km» (31826) — los topes aparecen |
+| B8r2 | **PASS completo** | «5 eventos al año… 80 km… tope de $200 MXN por evento» (31828) — el chunk nuevo, usado entero |
+| B10r1 | PASS con observación | GL completo; AV en lista sin topes, sin afirmar ilimitado (31829) |
+| B10r2 | **PASS** | «disponible las 24 horas» (31830) — verificado: «24 horas» consta en 2 chunks de las CG (`doc_chunks`); no es cifra inventada. **«Las veces que lo necesites» desapareció en las 4 remediciones** |
+
+Residuo acumulado actualizado: + 4 sesiones `QA-SUITE-MSI2-*` (remedición `#328`) y reuso de 6 del
+fixture B. Limpieza única al cerrar C y D.
