@@ -119,6 +119,24 @@ Nuestra base de conocimiento dice que Quálitas ofrece **MSI a 3, 6 y 12 meses**
 
 ---
 
-*Las diez salen de mediciones hechas contra las fuentes: Condiciones Generales, base de conocimiento, base de datos de producción y conversaciones reales. Ninguna es una suposición; todas son un hueco que ningún dato nuestro puede rellenar.*
+## 11 · Conducir sin licencia vigente, ¿excluye la cobertura?
+
+Nuestra base de conocimiento lo lista como exclusión **general** (chunk 40, «¿Qué NO cubre el seguro?»). Las Condiciones Generales solo lo excluyen para un uso concreto — cláusula 3ª, numeral 16:
+
+> «**Para el caso del Uso Chofer APP y Chofer APP PLUS**, el daño que sufra o cause el Vehículo Asegurado cuando sea conducido por persona que carezca de licencia vigente para conducir expedida por la autoridad competente.»
+
+Buscado en los 152 chunks del corpus de Condiciones Generales: cuatro apariciones de «licencia», y las otras tres son gastos médicos y requisitos del auto sustituto. **No hay exclusión general.**
+
+**Las preguntas:**
+- Un cliente de **uso particular** que conduce sin licencia vigente y tiene un siniestro, ¿está amparado?
+- Si no lo está, ¿en qué norma o criterio se apoya, ya que no está en las Condiciones Generales?
+
+**Qué desbloquea:** el `#333`. Hoy el bot le dice a clientes particulares que **«la aseguradora puede negar el pago»** — medido dos veces. Si es falso, estamos disuadiendo de reclamar a gente que sí tiene derecho.
+
+**Por qué no lo he corregido ya:** el precedente del `#320` fue «mandan las Condiciones Generales», pero aquel caso **ampliaba** una cobertura que el contrato declara. Éste **quita una exclusión**, y afirmar en positivo que alguien está cubierto no lo sostiene la mera ausencia de una cláusula. Si me equivoco, el error cae del lado caro.
+
+---
+
+*Las once salen de mediciones hechas contra las fuentes: Condiciones Generales, base de conocimiento, base de datos de producción y conversaciones reales. Ninguna es una suposición; todas son un hueco que ningún dato nuestro puede rellenar.*
 
 Agente: Arquitecto-IA-Qualitas
