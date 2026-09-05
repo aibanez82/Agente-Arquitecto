@@ -109,6 +109,16 @@ El programa que se ofrece en producción es `POR_PRECIO_ALTO_PARA_IA_30` (**30 %
 
 ---
 
-*Las nueve salen de mediciones hechas contra las fuentes: Condiciones Generales, base de conocimiento, base de datos de producción y conversaciones reales. Ninguna es una suposición; todas son un hueco que ningún dato nuestro puede rellenar.*
+## 10 · Los meses sin intereses en NUESTRA liga de pago
+
+Nuestra base de conocimiento dice que Quálitas ofrece **MSI a 3, 6 y 12 meses** con 25 bancos participantes, en el módulo **«Pago de Póliza» de Servicios en Línea**, cuando la póliza se paga de contado.
+
+**La pregunta:** la **liga de pago que enviamos por WhatsApp** ¿es ese mismo módulo y le ofrece al cliente la opción de diferir a meses sin intereses?
+
+**Qué desbloquea:** el `#326`. Hoy el bot le dice al cliente **«no manejamos meses sin intereses»** — que es falso — justo después de ofrecerle el fraccionado **con tasa de financiamiento**. Es la respuesta natural a la objeción de precio y la estamos tirando. Pero si la liga no lo ofreciera, prometerlo sería peor que callarlo: el cliente llegaría a pagar y no lo encontraría.
+
+---
+
+*Las diez salen de mediciones hechas contra las fuentes: Condiciones Generales, base de conocimiento, base de datos de producción y conversaciones reales. Ninguna es una suposición; todas son un hueco que ningún dato nuestro puede rellenar.*
 
 Agente: Arquitecto-IA-Qualitas
