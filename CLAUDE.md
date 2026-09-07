@@ -154,7 +154,7 @@ Detectores **verificados el 16 ago contra el workflow VIVO de PROD** (`BtOaZm7Wl
 
 ## Bugs — fuente única
 
-**Tracker único: `github.com/aguayo-co/HYL-WAI` (privado).** TODO issue nuevo nace ahí — Django, n8n, Dashboard o transversal: **ya no hay ruteo que decidir**. Cualquier agente (y Juan) puede abrir/comentar; solo el Arquitecto cierra/certifica lo nuestro. Van ahí los defectos técnicos; las recomendaciones de copy/tono siguen la tubería del Agente Mejoras Conversación (abajo). **Abrir issues sí; pushear código al repo de Juan, no** — eso sigue siendo suyo.
+**Tracker único: `github.com/aguayo-co/HYL-WAI` (privado).** TODO issue nuevo nace ahí, sea del sistema que sea: **no hay ruteo que decidir**. Cualquier agente (y Juan) abre y comenta; solo el Arquitecto cierra lo nuestro. Copy/tono va por la tubería del Agente Mejoras Conversación. **Abrir issues sí; pushear código al repo de Juan, no.**
 
 **Cola única de prioridad y estado: el GitHub Project de HYL-WAI** — `github.com/orgs/aguayo-co/projects/2`. Los issues **viven** en el repo; el Project es donde se ve qué hay, en qué estado y de quién es. **Todo issue nuevo se asigna a alguien** — sin responsable no es un issue, es una nota.
 
@@ -182,13 +182,13 @@ Roles y protocolos completos: tabla "Mapa de sistemas". Reglas operativas:
 
 **Staging end-to-end** paralelo a prod (gitflow `stg`→`main`). Instancia n8n STG: `https://n8n-xlqk.srv1810257.hstgr.cloud`. **Principio rector: cada componente de staging apunta SOLO a gemelos de staging, nunca a prod.** Mapa, credenciales, gotchas: `docs/iniciativas/entorno-pruebas-staging.md`.
 
-**Gobernanza vigente (4 ago): plan Contract-First S1–S5** — S1 Dual STG (`#132`) → S2 estados/control (`#135`) → S3 Atención Humana (`#128`) → S4 Metepec (`#143`) → S5 limpieza (`#146`). Contrato congelado con fingerprint ANTES de implementar; stand-down por etapa hasta freeze + handoff; el monitor de Juan emite GO. Estado del día: tablero artifact + `docs/iniciativas/s2-prep-offline.md`. Metodología: `HYL-WAI:docs/metodologia-contract-first-integracion.md`.
+**Gobernanza Contract-First S1–S5** (`#132` → `#135` → `#128` → `#143` → `#146`): contrato congelado con fingerprint ANTES de implementar, stand-down por etapa hasta freeze + handoff, el monitor de Juan emite GO. **`#132` cerrado el 26 ago.** Estado: `docs/iniciativas/s2-prep-offline.md`. Metodología: `HYL-WAI:docs/metodologia-contract-first-integracion.md`.
 
 **Iniciativas (estado en su doc, no aquí):**
 - **Seguimiento leads estancados:** ✅ **encendido en los DOS entornos** — `WHATSAPP_FOLLOWUPS_ENABLED` y `WHATSAPP_CHECKPOINT_FOLLOWUPS_ENABLED` a `true` y `DRY_RUN_DEFAULT=false` en STG y en PROD (medido 6 sep). **En STG manda WhatsApp de verdad**: no sirve para probar sin efectos. Cadencia ~4 min entre avisos, la misma en los dos — decisión de Alberto, no defecto. `docs/iniciativas/seguimiento-leads-estancados.md`.
 - **Conversation ID:** ✅ los dos entornos en `dual` (revalidado 6 sep). Sesión `waq_<qid>_<hex>` por lead; Django mantiene **una sola `active` por teléfono** (`activate_whatsapp_session_affinity()`). **Consecuencia operativa: un teléfono puede tener varias sesiones vivas.** `docs/iniciativas/conversation-id-whatsapp-n8n.md`.
 - **Recordatorios por fecha mencionada:** diseño entregado a Juan; bloqueado por plantilla Meta re-enganche 24h. `docs/iniciativas/2026-07-10-recordatorios-seguimiento-por-fecha-mencionada-design.md`.
-- **HYL-WAI#156 Descuentos + Conversation Control:** Juan congeló 2 contratos y terminó Django; n8n y Dashboard son nuestros. Handoffs y canal `dudas/` REACTIVADOS solo para esto. `docs/iniciativas/2026-08-11-hyl-wai-156-descuentos-lado-nuestro.md`.
+- **HYL-WAI#156 Descuentos + Conversation Control:** Django terminado por Juan; n8n y Dashboard son nuestros. `docs/iniciativas/2026-08-11-hyl-wai-156-descuentos-lado-nuestro.md`.
 
 ---
 
