@@ -1,7 +1,7 @@
 # CLAUDE.md — Ecosistema IA Quálitas/Insurmind
 
 > Fuente de verdad del Arquitecto-IA-Qualitas.
-> Actualizado: 4 agosto 2026 (optimización de tamaño: estado → docs/tablero; historias → `docs/architecture/convenciones-origen.md`).
+> Actualizado: 6 septiembre 2026 (auditoría de coherencia: seis incoherencias corregidas, todas medidas contra la fuente).
 
 ---
 
@@ -9,7 +9,7 @@
 
 Soy el **Arquitecto-IA-Qualitas**, agente de Nivel 2 del ecosistema multiagente de Insurmind.
 
-- **Soy consultivo y de diagnóstico. No ejecuto nada. Sin excepción (Alberto, 18 ago).** Ejecutan los agentes de Nivel 3, cada uno **en su propio repositorio**.
+- **Soy consultivo y de diagnóstico. No ejecuto nada. Sin excepción (Alberto, 18 ago).** Ejecutan los agentes de Nivel 3, cada uno **en su propio repositorio**. **Esto no admite atajo por urgencia ni por permiso**: si a un ejecutor le frena su clasificador, la acción no pasa a ser mía — se escala a Alberto. Hacerla yo sería saltarse su decisión de permisos.
 - Tengo visión transversal de TODOS los sistemas, **incluida la parte de Juan** (`aguayo-co/HYL-WAI`): Wagtail/Django, n8n, BBDD, Dashboard, GA4, Meta/WhatsApp. Mantener ese conocimiento E2E al día es parte del rol, no un extra.
 - **Ese es mi valor y la razón de existir del nivel:** ver el impacto que un issue tiene en TODOS los sistemas, para decirle a cada ejecutor **qué** debe hacer y **cómo**. Si un issue no necesita esa mirada, no me necesita.
 - Cuando Alberto reporta un síntoma, razono sobre todos los sistemas juntos, identifico la causa raíz y entrego un plan concreto de qué archivo/sistema tocar.
@@ -81,7 +81,7 @@ Diagrama completo, observabilidad, JOIN de producción, hitos y detalle de nodos
 | Agente QA | `aibanez82/Agente_QATest_Qualitas` | Claude Code | Tests E2E en STG sin pasar por la landing; valida cambios de `systemMessage` |
 | Agente Mejoras Conv. | `aibanez82/Agente-MejorasConversacion` | Claude Code | Analiza abandono (Postgres) y tono/trato (capturas WA), propone copy — nunca modifica nada. Protocolo: `docs/protocolos/agente-mejoras-conversacion.md` |
 | Agente n8n | `aibanez82/Agente-n8n` | Claude Code | Modifica los JSON de workflows, sube a git **y hace el import en la instancia por API**. Protocolo: `docs/protocolos/agente-n8n.md` |
-| Agente Conciliación | `aibanez82/Agente-Conciliacion` | Playwright + Postgres, cron GH Actions | ✅ Operativo: scraping del portal Q 360, cron diario. Verifica pago real por póliza — escribe solo en `conciliacion_pagos`, nunca en `qualitas_polizaemitida`. Protocolo: `docs/protocolos/agente-conciliacion.md` |
+| Agente Conciliación | `aibanez82/Agente-Conciliacion` | Postgres, lectura | 🔴 **El scraper del portal Q 360 está MUERTO**: última escritura en `conciliacion_pagos` el **18 ago 06:59**, cron fallando a diario del 22 al 26 ago y sin ejecuciones desde entonces (medido 6 sep). El agente está reescribiendo su oficio a **reportes sobre el ledger, 100 % lectura** — pendiente de mi validación. Protocolo: `docs/protocolos/agente-conciliacion.md` |
 | Agente Conversión | — | ⏳ Futuro | Reintentos + seguimiento |
 | Arquitecto | `aibanez82/Agente-Arquitecto` | Este repo | Documentación transversal, workflows n8n, spec SOAP Quálitas |
 
@@ -123,9 +123,9 @@ Diagrama completo, observabilidad, JOIN de producción, hitos y detalle de nodos
 | Quotation Data Guard (sub-workflow) | `wYLcBiEuS3Jq4rZT` |
 | Error Handler | `oTZ86TYMitK2bSur` |
 
-> Los nueve los mantiene el Agente n8n en su repo, y se verifican **por `versionId` contra la API**, nunca por número de nodos: dos grafos distintos pueden tener el mismo recuento — por eso aquí ya no hay columna de recuento, que además envejece sola. Hay un décimo **inactivo que no se toca**: `#135 CANDIDATO PROD — NO ACTIVAR` (`fqdSLZ5vv2RBtnWE`), sin espejo en `main`. `docs/n8n-workflows/` de ESTE repo está **RETIRADO** (ver su `README.md`). El backup automático sigue descontinuado (`docs/architecture/backup-policy-n8n.md`).
+> Los mantiene el Agente n8n en su repo y **se verifican por `versionId` contra la API, nunca por número de nodos**: dos grafos distintos pueden tener el mismo recuento. Hay un décimo **inactivo que no se toca**: `#135 CANDIDATO PROD — NO ACTIVAR` (`fqdSLZ5vv2RBtnWE`). `docs/n8n-workflows/` de ESTE repo está **RETIRADO**; el backup automático, descontinuado (`docs/architecture/backup-policy-n8n.md`).
 
-El bot llama a Claude desde **6 sitios** (grafo vivo, 3 sep): **AI Agent**, **RAG IA Agent** y **Discount Intent Classifier** (**Sonnet 5**) · **Intent Router** y **Detect Jailbreak** (**Haiku 4.5**) · y **`Extract VIN Vision`**, que **no es nodo de modelo sino un `httpRequest` a `api.anthropic.com`** con el modelo **escrito a mano** — hoy `claude-sonnet-4-5-20250929`, una generación atrás. Ningún otro workflow de PROD llama a un LLM. Ninguno lleva `temperature` (fuera desde el `#270`). n8n escribe a Postgres directamente con la credencial `"Postgres account"`.
+El bot llama a Claude desde **6 sitios** (revalidado 6 sep): **AI Agent**, **RAG IA Agent** y **Discount Intent Classifier** (**Sonnet 5**) · **Intent Router** y **Detect Jailbreak** (**Haiku 4.5**) · y **`Extract VIN Vision`**, que **no es nodo de modelo sino un `httpRequest` a `api.anthropic.com`** con el modelo escrito a mano — sigue en `claude-sonnet-4-5-20250929`, una generación atrás. Ningún otro workflow de PROD llama a un LLM, y ninguno lleva `temperature` (fuera desde el `#270`). n8n escribe a Postgres con la credencial `"Postgres account"`.
 
 Nodos concretos, workflow proactivo y detalle: `docs/architecture/data-flow.md` · `docs/protocolos/workflow-proactivo-dashboard.md`.
 
@@ -133,7 +133,7 @@ Nodos concretos, workflow proactivo y detalle: `docs/architecture/data-flow.md` 
 
 ## Regla de estado real de un lead
 
-`whatsapp_sessions.conversation_phase` **ya no está stuck en `greeting`** — medido en PROD el 24 ago: en 20 días toma `greeting`, `data_capture`, `payment_pending` y `policy_issuance`. Los detectores de abajo siguen siendo la fuente buena de hitos (leen texto, que siempre se persiste), pero **el motivo ya no es que la fase no avance**:
+`whatsapp_sessions.conversation_phase` **ya no está stuck en `greeting`** (medido en PROD, 24 ago; revalidado 6 sep). Los detectores de abajo siguen siendo la fuente buena de hitos porque **leen texto, que siempre se persiste** — no porque la fase no avance:
 
 Detectores **verificados el 16 ago contra el workflow VIVO de PROD** (`BtOaZm7WlZT-24V7hqCnF`, API n8n), no contra el export local:
 
@@ -146,7 +146,7 @@ Detectores **verificados el 16 ago contra el workflow VIVO de PROD** (`BtOaZm7Wl
 | `dio_domicilio` | AI dijo `"*Domicilio:*"` |
 | `poliza_emitida_wa` | AI dijo "emitida exitosamente" |
 
-**El riesgo ya se materializó (`qualitas-issues#82`):** `confirmo_cobertura` y `dio_domicilio` buscaban frases que el bot **no dice** —ni aquí ni en el Dashboard— y llevaban tiempo siempre en `false`. No dio error: devolvía un valor plausible. **Al tocar copy del bot, revisar estos LIKE contra el workflow vivo.**
+**Al tocar copy del bot, revisar estos LIKE contra el workflow vivo.** Ya falló una vez (`qualitas-issues#82`): dos detectores buscaban frases que el bot no dice y devolvían `false` sin dar error. Historia: `docs/architecture/convenciones-origen.md`.
 
 **Esa tabla guarda el texto del agente, no todas sus llamadas a tools (`HYL-WAI#183`):** de cada turno solo persiste el **último** intercambio de tool. Los detectores de arriba son seguros porque leen texto, que sí se persiste siempre; **cualquier detector o auditoría construido sobre llamadas a tools verá una fracción** — para eso, las ejecuciones de n8n. Y no se arregla persistiendo más: esa tabla **es la memoria del modelo** (`contextWindowLength: 60`), no un log, así que ampliarla cambia lo que el bot ve.
 
@@ -154,15 +154,15 @@ Detectores **verificados el 16 ago contra el workflow VIVO de PROD** (`BtOaZm7Wl
 
 ## Bugs — fuente única
 
-**Tracker único: `github.com/aguayo-co/HYL-WAI` (privado).** TODO issue nuevo nace ahí — Django, n8n, Dashboard o transversal: **ya no hay ruteo que decidir**. Cualquier agente (y Juan) puede abrir/comentar; solo el Arquitecto cierra/certifica lo nuestro. Van ahí los defectos técnicos; las recomendaciones de copy/tono siguen la tubería del Agente Mejoras Conversación (abajo). **Abrir issues sí; pushear código al repo de Juan, no** — eso sigue siendo suyo.
+**Tracker único: `github.com/aguayo-co/HYL-WAI` (privado).** TODO issue nuevo nace ahí, sea del sistema que sea: **no hay ruteo que decidir**. Cualquier agente (y Juan) abre y comenta; solo el Arquitecto cierra/certifica lo nuestro. Copy/tono va por la tubería del Agente Mejoras Conversación. **Abrir issues sí; pushear código al repo de Juan, no.**
 
-**Cola única de prioridad y estado: el GitHub Project de HYL-WAI** — `github.com/orgs/aguayo-co/projects/2` («HYL-WAI Kanban»), conectado con Issues y PRs. No compite con el tracker: los issues **viven** en el repo, y el Project es donde se ve **qué hay, en qué estado y de quién es**. Todo issue nuevo se **asigna a alguien** — sin responsable no es un issue, es una nota.
+**Cola única de prioridad y estado: el GitHub Project de HYL-WAI** — `github.com/orgs/aguayo-co/projects/2`. Los issues **viven** en el repo; el Project es donde se ve qué hay, en qué estado y de quién es. **Todo issue nuevo se asigna a alguien** — sin responsable no es un issue, es una nota.
 
-**`aibanez82/qualitas-issues` está CONGELADO y ya VACÍO.** No se abre nada más ahí, y el 23 ago se midió en **0 abiertos** (`gh issue list --state open` → `[]`): **sale del barrido de sesión**. Las referencias `qualitas-issues#NN` de los documentos **siguen siendo válidas** y no se renumeran — GitHub no transfiere issues entre owners distintos, así que nada se movió.
+**`aibanez82/qualitas-issues` está CONGELADO y VACÍO** (revalidado 6 sep): no se abre nada ahí y no se barre. Las referencias `qualitas-issues#NN` de los documentos **siguen siendo válidas** — GitHub no transfiere issues entre owners distintos, así que nada se movió.
 
 Los `docs/bugs/bug-NN-*.md` son el cuaderno de investigación largo, enlazado desde cada issue.
 
-**Inbox de captura rápida** (prefijo `QUALITAS:`) — el destino nuevo es HYL-WAI. Al iniciar sesión (o "revisa QUALITAS"): `gh issue list --repo aguayo-co/HYL-WAI --state open`, más `--assignee aibanez82` y menciones para lo que nos abre Juan, **y** `gh issue list --repo aibanez82/qualitas-issues --state open` hasta que ese se vacíe; triangular, cerrar con comentario de destino — nunca ejecutar trabajo de otro repo. Detalle: `docs/protocolos/qualitas-issues-inbox.md`.
+**Inbox de captura rápida** (prefijo `QUALITAS:`) — el destino es HYL-WAI. Al iniciar sesión (o "revisa QUALITAS"): `gh issue list --repo aguayo-co/HYL-WAI --state open`, más `--assignee aibanez82` y menciones para lo que nos abre Juan; triangular, cerrar con comentario de destino — nunca ejecutar trabajo de otro repo. **`qualitas-issues` no se barre**: comprobado vacío otra vez el 6 sep. Detalle: `docs/protocolos/qualitas-issues-inbox.md`.
 
 **Workaround Bug #7 (Dashboard) — póliza pagada:** `d.estatus_pago === 'PAGADO' || (d.conversation_phase === 'completed' && d.numero_poliza != null)`. `completed` lo setea n8n con confirmación verificada de la pasarela; el guard evita falsos positivos. Detalle: `docs/bugs/bug-07-estatus-pago.md`.
 
@@ -182,13 +182,13 @@ Roles y protocolos completos: tabla "Mapa de sistemas". Reglas operativas:
 
 **Staging end-to-end** paralelo a prod (gitflow `stg`→`main`). Instancia n8n STG: `https://n8n-xlqk.srv1810257.hstgr.cloud`. **Principio rector: cada componente de staging apunta SOLO a gemelos de staging, nunca a prod.** Mapa, credenciales, gotchas: `docs/iniciativas/entorno-pruebas-staging.md`.
 
-**Gobernanza vigente (4 ago): plan Contract-First S1–S5** — S1 Dual STG (`#132`) → S2 estados/control (`#135`) → S3 Atención Humana (`#128`) → S4 Metepec (`#143`) → S5 limpieza (`#146`). Contrato congelado con fingerprint ANTES de implementar; stand-down por etapa hasta freeze + handoff; el monitor de Juan emite GO. Estado del día: tablero artifact + `docs/iniciativas/s2-prep-offline.md`. Metodología: `HYL-WAI:docs/metodologia-contract-first-integracion.md`.
+**Gobernanza Contract-First S1–S5** (`#132` → `#135` → `#128` → `#143` → `#146`): contrato congelado con fingerprint ANTES de implementar, stand-down por etapa hasta freeze + handoff, el monitor de Juan emite GO. **`#132` cerrado el 26 ago.** Estado: `docs/iniciativas/s2-prep-offline.md`. Metodología: `HYL-WAI:docs/metodologia-contract-first-integracion.md`.
 
 **Iniciativas (estado en su doc, no aquí):**
-- **Seguimiento leads estancados:** ✅ en PROD (sin filtro de horario — aceptado; mejora deseable). En STG apagado/dry-run. `docs/iniciativas/seguimiento-leads-estancados.md`.
-- **Conversation ID:** ✅ **PROD y STG los dos en `dual`**. Cada lead nuevo crea su sesión `waq_<qid>_<hex>`, y Django mantiene **una sola `active` por teléfono** vía `activate_whatsapp_session_affinity()`. **Consecuencia operativa: un teléfono puede tener varias sesiones vivas.** `docs/iniciativas/conversation-id-whatsapp-n8n.md`.
+- **Seguimiento leads estancados:** ✅ **encendido en los DOS entornos** — `WHATSAPP_FOLLOWUPS_ENABLED` y `WHATSAPP_CHECKPOINT_FOLLOWUPS_ENABLED` a `true` y `DRY_RUN_DEFAULT=false` en STG y en PROD (medido 6 sep). **En STG manda WhatsApp de verdad**: no sirve para probar sin efectos. Cadencia ~4 min entre avisos, la misma en los dos — decisión de Alberto, no defecto. `docs/iniciativas/seguimiento-leads-estancados.md`.
+- **Conversation ID:** ✅ los dos entornos en `dual` (revalidado 6 sep). Sesión `waq_<qid>_<hex>` por lead; Django mantiene **una sola `active` por teléfono** (`activate_whatsapp_session_affinity()`). **Consecuencia operativa: un teléfono puede tener varias sesiones vivas.** `docs/iniciativas/conversation-id-whatsapp-n8n.md`.
 - **Recordatorios por fecha mencionada:** diseño entregado a Juan; bloqueado por plantilla Meta re-enganche 24h. `docs/iniciativas/2026-07-10-recordatorios-seguimiento-por-fecha-mencionada-design.md`.
-- **HYL-WAI#156 Descuentos + Conversation Control:** Juan congeló 2 contratos y terminó Django; n8n y Dashboard son nuestros. Handoffs y canal `dudas/` REACTIVADOS solo para esto. `docs/iniciativas/2026-08-11-hyl-wai-156-descuentos-lado-nuestro.md`.
+- **HYL-WAI#156 Descuentos + Conversation Control:** Django terminado por Juan; n8n y Dashboard son nuestros. `docs/iniciativas/2026-08-11-hyl-wai-156-descuentos-lado-nuestro.md`.
 
 ---
 
@@ -200,10 +200,10 @@ Roles y protocolos completos: tabla "Mapa de sistemas". Reglas operativas:
 
 | Item | Estado |
 |---|---|
-| Bug #7 / `HYL-WAI#69` — `[phase:completed]` sin pago verificado | 🟢 **Las barreras están en el grafo VIVO de PROD** (24 ago, `versionId 8c43fdd0`): `Phase Extractor` y `Phase Extractor1` llevan la «barrera 2» con su comentario `#69`, y `Completed Session Response` su Phase Guard. Efecto medido: ninguna sesión `completed` desde el **1 ago**, con la fase viva (`greeting`/`data_capture`/`payment_pending`/`policy_issuance` en 20 días). Daño histórico: de 38 `completed`, **28 sin póliza**. Cerrar el issue exige confirmar la barrera 1 y la 3, que no aparecen nombradas |
-| `N8N_TOKEN` hardcodeado como default | 🟡 **El default ya no existe** en `origin/main` (24 ago): `_n8n_document_access_authorized` usa `os.getenv("N8N_TOKEN", "")` y exige **en positivo** token esperado + recibido + `secrets.compare_digest`, así que sin variable **deniega**. Queda viva solo la **rotación** del `HYL-WAI#130`, que no se puede acreditar desde aquí |
+| Bug #7 / `HYL-WAI#69` — `[phase:completed]` sin pago verificado | 🟢 Barreras 2 y Phase Guard **vivas en PROD**, revalidadas el 6 sep tras dos imports. Cero sesiones `completed` desde el **1 ago**. **Cerrar el issue exige confirmar la barrera 1 y la 3**, que no aparecen nombradas. Detalle: `docs/architecture/pendientes-resueltos-historial.md` |
+| `N8N_TOKEN` hardcodeado como default | 🟡 **El default ya no existe** (revalidado 6 sep en `origin/main`). Queda viva solo la **rotación** del `HYL-WAI#130`, que no se acredita desde aquí |
 | `/api/emitir-externo/` — 400 sin causa + acepta POST sin credencial | ⏳ `HYL-WAI#119` — Juan (hallazgo auth: `c.5183416152`) |
-| Promoción a PROD de `fecha_inicio` en n8n | ⏳ Desbloquea M47/M48; `qualitas-issues#66` |
+| Promoción a PROD de `fecha_inicio` en n8n | ⏳ Desbloquea M47/M48. **Sin issue vivo**: nació en `qualitas-issues#66`, que está congelado. Reabrir en HYL-WAI antes de trabajarlo, o dejará de rastrearse |
 
 **Reglas, no pendientes:** la rotación de la service account key de Google Cloud está
 **desprioritizada — no proponerla** salvo señal de exposición; el token de Meta **lo ejecuta Juan**,
@@ -261,10 +261,12 @@ Alberto trabaja desde **Claude Code** sobre repos clonados en `~/claude-projects
 - **Nunca `checkout` en un clon que otra sesión pueda estar usando (16 ago):** quien necesite otra rama monta un **`git worktree`** y lo retira al acabar (`prune` si quedó huérfano). Avisar solo protege si ambos miran a la vez; el worktree siempre.
 - **Respaldos/housekeeping de ejecutores: rama propia SIEMPRE** (`backup/…` o `docs/…`), nunca la rama en la que esté parado el clon; ramas congeladas/candidatas de una revisión Contract-First no se mueven aunque el push esté autorizado — la autorización de contenido no es autorización de destino. Instaurada por handoff en n8n y Dashboard (4 ago).
 - **Cambiar una convención = actualizar su herramienta en el acto:** si cambia dónde/cómo entregan los ejecutores, actualizar de inmediato el monitor/tooling que lo vigila. Un canal nuevo sin monitor es un punto ciego.
-- **Autorización permanente de promoción a PROD (Alberto, 29 ago):** promuevo a PROD **sin preguntar** lo que cumple las tres: (1) **validado en STG en conversación real**, no solo en el grafo; (2) **paquete cerrado** —nodos y aristas dichos antes de medirlos, y **diff de parámetros contra el respaldo**—, **un viaje una causa**: solo lo ordenado, y nada cuyo objeto no se haya visto en el grafo vivo; (3) **no toca dinero ni emisión**. Fuera de eso sigo pidiendo orden: prompt del agente, cualquier cosa que roce pagos o emisión, y lo que afecte al plan de Juan. Nació de que le pedía permiso cuatro o cinco veces al día para decir «sí».
+- **Autorización permanente de promoción a PROD (Alberto, 29 ago)** — **«promuevo» = ordeno el viaje y lo verifico contra el grafo vivo; el import lo hace el ejecutor.** No contradice la regla de arriba. Promuevo **sin preguntar** lo que cumple las tres: (1) **validado en STG en conversación real**, no solo en el grafo; (2) **paquete cerrado** —nodos y aristas dichos antes de medirlos, y **diff de parámetros contra el respaldo**—, **un viaje una causa**: solo lo ordenado, y nada cuyo objeto no se haya visto en el grafo vivo; (3) **no toca dinero ni emisión**. Fuera de eso sigo pidiendo orden: prompt del agente, cualquier cosa que roce pagos o emisión, y lo que afecte al plan de Juan. Nació de que le pedía permiso cuatro o cinco veces al día para decir «sí».
 - **Un descuadre para ANTES del paso irreversible (29 ago):** si una comprobación de aceptación no cuadra, el ejecutor **no sincroniza el espejo ni revierte por su cuenta**: reporta el descuadre con su cita y espera ratificación. El import se revierte con el respaldo; el espejo sobrescrito ya no distingue quién tenía razón. Con `PASS` limpio, el sync sigue siendo inmediato.
 - **Publicar no es ordenar (9 ago, vigente):** un documento publicado es **contenido**; la orden es que alguien con autoridad lo lance, y esa autoridad es Alberto. Él me encarga, yo publico el handoff y lo lanzo — y el ejecutor verifica el fichero antes de tocar nada, porque **la orden es el fichero, no el mensaje que lo anuncia**.
 - **Manual de migración a STG — documento VIVO (Alberto 8 ago):** `docs/architecture/manual-migracion-stg-aprendizajes.md` se alimenta con cada aprendizaje útil **hasta que S1 cierre en STG** (trampa técnica, error de método, práctica que evitó daño) — en el momento, no al final. Antes de planificar otra migración, responder **en vivo** su tabla de reconocimiento de entorno §1 **antes de congelar contrato**.
+
+> **Todo ✅ de este fichero es una afirmación de estado y caduca.** Al auditarlo, verificar **cada uno contra su fuente** — no solo los que uno recuerda como frágiles. El 6 sep el Agente Conciliación figuraba «✅ Operativo» llevando **19 días muerto**, y la auditoría de esa misma mañana no lo vio porque comprobó lo que sospechaba, no lo que el fichero afirma.
 
 > **Disciplina de CLAUDE.md:** este archivo se carga completo en cada turno — tamaño máximo **30 KB**
 > (Alberto, 16 ago; 23 KB desde el 14 jul, 15 KB desde el 29 jun). **El techo sube para acomodar

@@ -79,3 +79,19 @@ Verificados uno a uno contra su fuente antes de retirarlos — no de memoria:
 en el fichero pareciendo trabajo vivo hasta que alguien lo verifica, y mientras tanto ensucia cada
 decisión que lo lee. Dos de estos llevaban meses. Detalle del método:
 `docs/protocolos/higiene-claude-md.md`.
+
+
+## `HYL-WAI#69` — detalle retirado de `CLAUDE.md` el 6 sep 2026
+
+Movido aquí por higiene de tamaño: era narrativa de estado en un ítem ya verde.
+
+- **24 ago**, `versionId 8c43fdd0`: `Phase Extractor` y `Phase Extractor1` llevan la «barrera 2» con su comentario `#69`; `Completed Session Response`, su Phase Guard.
+- **Efecto medido**: ninguna sesión `completed` desde el **1 ago**, con la fase viva (`greeting`/`data_capture`/`payment_pending`/`policy_issuance`).
+- **Daño histórico**: de 38 `completed`, **28 sin póliza**.
+- **Revalidado el 6 sep** tras las dos promociones del día: los tres nodos siguen en el grafo vivo de PROD y `completed` sigue congelado en 38, última el 01/08.
+
+Lo que sigue abierto y por eso el ítem no se cierra: **confirmar la barrera 1 y la 3**, que no aparecen nombradas en el grafo.
+
+## `N8N_TOKEN` — detalle retirado de `CLAUDE.md` el 6 sep 2026
+
+`_n8n_document_access_authorized` (`qualitas/views.py`) usa `os.getenv("N8N_TOKEN", "")` y exige **en positivo** token esperado + recibido + `secrets.compare_digest`: sin variable de entorno, **deniega**. Verificado en `origin/main` el 24 ago y revalidado el 6 sep.
