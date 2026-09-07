@@ -627,6 +627,40 @@ universal.
 si entretanto entró otra cosa buena. Aquí el cinturón del `#275` había entrado después; restaurar la
 foto anterior lo habría borrado. Se reconstruye: **quitar lo que falló, conservar lo que funciona.**
 
+### 2.19 Un gate que nunca ha pasado no protege: enmascara (20 ago 2026)
+
+El §2.5 avisa de las guardas que fallan **abiertas**. Esta es la trampa simétrica: **una guarda que
+falla cerrada esconde si lo que hay detrás funciona.**
+
+**El caso (20 ago 2026, emisión de STG).** El guard de emisión llevaba 5 ejecuciones, las 5 en rojo.
+Se leía como «el gate está haciendo su trabajo». La primera que cruzó los gates destapó que el guard
+resolvía `cotizacion_id` contra `$('Merge Session Data')` — un nodo del **bot**, que en el guard no
+existe. Se copió al montarlo (`#66` etapa 2) y **nunca se ejecutó**, así que nunca falló a la vista.
+Toda emisión moría con el fallback genérico. Registrado en `HYL-WAI#181`.
+
+**Por qué no lo vio nadie, que es lo que hay que retener.** Mientras el gate deniega, el camino de
+detrás no se ejecuta; y lo que no se ejecuta no falla, **no aparece en ninguna métrica y no rompe
+ninguna suite**. El rojo del gate y el rojo del defecto son indistinguibles desde fuera: los dos se
+ven como «no pasó». Cuanto más tiempo lleva cerrado, más defecto acumulado hay detrás sin descubrir
+— y se descubre todo junto el día que se abre, que suele ser el día con menos margen.
+
+**Qué hacer, y es barato:**
+
+- **Antes de cerrar un camino con un gate, ejecútalo una vez con el gate abierto.** Una sola
+  ejecución verde de extremo a extremo, aunque sea con datos de prueba. Si no se puede, escríbelo:
+  «este camino nunca se ha ejecutado completo» es un hecho de riesgo, no un detalle.
+- **Al abrir un gate que llevaba tiempo cerrado, trátalo como estreno, no como reanudación.** Lo de
+  detrás no está probado: está sin estrenar.
+- **Un guard copiado de otro workflow hereda referencias a nodos que allí no existen.** Barrer las
+  referencias cruzadas (`$('…')`) es parte de montarlo, no una revisión posterior.
+
+**Corolario del §6, completado:** un guard que nadie ha visto denegar no es un guard — y un guard que
+nadie ha visto **pasar** tampoco: es una pared, y no sabes qué hay al otro lado.
+
+> *Rescatado el 7 sep 2026 de la rama `docs/manual-stg-gate-enmascara`, escrita el 20 ago y nunca
+> integrada. Llegaba como §2.10, número que la serie ya había ocupado el 30 ago; renumerada al final
+> sin tocar el texto. La lección no estaba recogida en ninguna otra parte del manual.*
+
 ## 3. Trazabilidad: el fallo silencioso más caro
 
 En una sola jornada, el registro atribuyó **seis veces** a nuestro lado acciones que no hizo: un
