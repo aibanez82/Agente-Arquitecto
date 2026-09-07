@@ -38,8 +38,20 @@ Se evaluaron dos arreglos y los dos se descartaron con motivo:
 
 Queda como **limitación conocida y acotada**, no como deuda abierta. Si alguna vez se observa un `uncertain_no_retry` bloqueando un mensaje legítimo, eso **sí** es el defecto medido que reabre la conversación.
 
+## Cuidado: `request_hash` es un nombre repetido, y no todos son este
+
+Lo levantó el Agente Dashboard: un `grep` por `request_hash` **confunde objetos distintos**. En PROD hay **siete** columnas con ese nombre (`information_schema`, 6 sep 2026):
+
+`n8n_outbound_dispatch` · `n8n_checkpoint_outbound_decision` · `n8n_discount_phase2_attempt` · `n8n_discount_resolution_attempt` · `qualitas_landingquotesubmission` · `qualitas_paymentremindercontextresolution` · `qualitas_paymentreminderoptoutevent`
+
+Y además el Dashboard tiene **el suyo propio** en `dashboard_control_commands` —`sha256(canonical(cuerpo))`, calculado por ellos— que **sí es huella del cuerpo** y sostiene su replay exacto y el rechazo por reutilización de `command_id`. **Mismo nombre, objeto distinto, garantía distinta.**
+
+Todo lo que dice este documento se refiere **solo** a `n8n_outbound_dispatch.request_hash`. Un `grep` suelto lleva a la conclusión contraria.
+
 ## Regla práctica
 
 - Para «¿se envió algo y cuándo?» → `dispatch_id`, `outcome`, `settled_at`. **Fiables en todos los carriles.**
 - Para «¿qué decía?» → **el ledger no lo guarda.** Ni el `request_hash` lo sustituye.
 - Para «¿coincide lo enviado con lo recordado?» → comparar el texto de `n8n_chat_histories` con la fuente del nodo emisor. **No con el hash.**
+
+Y la razón de fondo, en palabras del Agente Dashboard, que la dijo mejor que yo: **no es que el campo no sirva, es que falla en silencio y en la dirección tranquilizadora.** Un hash que no cuadra se investiga; uno que cuadra cuando no debería, no.
