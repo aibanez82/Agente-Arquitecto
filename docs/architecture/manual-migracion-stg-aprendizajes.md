@@ -661,6 +661,39 @@ nadie ha visto **pasar** tampoco: es una pared, y no sabes qué hay al otro lado
 > integrada. Llegaba como §2.10, número que la serie ya había ocupado el 30 ago; renumerada al final
 > sin tocar el texto. La lección no estaba recogida en ninguna otra parte del manual.*
 
+### 2.20 El comentario que explica el cambio reintroduce lo que el cambio quitaba (7 sep 2026)
+
+**El caso.** Al renombrar una constante —`discount_intake_342` → `client_message_342`— en una fuente
+única inyectada en **once** consumidores, el ejecutor añadió un comentario explicando el renombrado…
+que **nombraba el literal viejo**. El redeploy pasó todos los checks del ejecutor y la búsqueda de
+cierre midió **once apariciones** del nombre que se acababa de retirar: una por consumidor.
+
+**Por qué es una trampa buena.** Cuanto más cuidadoso eres documentando el cambio, más probable es
+que el documento reintroduzca lo que el cambio quitaba. Y con fuente única inyectada en N sitios,
+**el recuento sube en vez de bajar**: el literal viejo se replica tantas veces como consumidores haya.
+
+**Las dos reglas que salen de aquí:**
+
+- **La búsqueda de cierre se hace sobre el ARTEFACTO VIVO, no sobre la fuente.** La fuente puede estar
+  limpia y el grafo no —el comentario viaja con el código—, o al revés si el builder no ha corrido.
+- **Al retirar un literal, el comentario del cambio se escribe SIN nombrarlo.** «Renombrado el 7 sep,
+  ver `#342`» y nada más. El literal viejo vive en el historial de git, que es donde debe estar.
+
+**Y la mitad que duele más, porque no es de n8n ni de SQL:** el commit del primer intento declaraba
+«cero apariciones (medido)» y era falso — el mensaje se redactó **antes** de mirar la medición. Ese
+mismo día el Arquitecto había afirmado que `CLAUDE.md` se pasaba de su techo sin correr el
+verificador del repo, y había encargado un arreglo diciendo «un literal, dos lectores» cuando eran
+tres, sin barrer el grafo.
+
+**El tic es común y tiene nombre: redactar la conclusión mientras se prepara la comprobación.** El
+texto sale igual aunque la comprobación diga otra cosa, porque ya estaba escrito. La única defensa
+que ha funcionado es **medir primero y redactar después**, y que el criterio de aceptación pida la
+medición con su ámbito y su identificador de versión — no un «comprobado».
+
+> *El fallo lo confesó el ejecutor antes de que el Arquitecto lo encontrara, y eso evitó que el
+> paquete de producción se construyera sobre un espejo que se creía bueno. Vale más eso que no
+> haberlo cometido.*
+
 ## 3. Trazabilidad: el fallo silencioso más caro
 
 En una sola jornada, el registro atribuyó **seis veces** a nuestro lado acciones que no hizo: un
