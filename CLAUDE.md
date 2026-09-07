@@ -154,7 +154,7 @@ Detectores **verificados el 16 ago contra el workflow VIVO de PROD** (`BtOaZm7Wl
 
 ## Bugs — fuente única
 
-**Tracker único: `github.com/aguayo-co/HYL-WAI` (privado).** TODO issue nuevo nace ahí, sea del sistema que sea: **no hay ruteo que decidir**. Cualquier agente (y Juan) abre y comenta; solo el Arquitecto cierra lo nuestro. Copy/tono va por la tubería del Agente Mejoras Conversación. **Abrir issues sí; pushear código al repo de Juan, no.**
+**Tracker único: `github.com/aguayo-co/HYL-WAI` (privado).** TODO issue nuevo nace ahí, sea del sistema que sea: **no hay ruteo que decidir**. Cualquier agente (y Juan) abre y comenta; solo el Arquitecto cierra/certifica lo nuestro. Copy/tono va por la tubería del Agente Mejoras Conversación. **Abrir issues sí; pushear código al repo de Juan, no.**
 
 **Cola única de prioridad y estado: el GitHub Project de HYL-WAI** — `github.com/orgs/aguayo-co/projects/2`. Los issues **viven** en el repo; el Project es donde se ve qué hay, en qué estado y de quién es. **Todo issue nuevo se asigna a alguien** — sin responsable no es un issue, es una nota.
 
