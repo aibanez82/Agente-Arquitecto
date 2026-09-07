@@ -81,7 +81,7 @@ Diagrama completo, observabilidad, JOIN de producción, hitos y detalle de nodos
 | Agente QA | `aibanez82/Agente_QATest_Qualitas` | Claude Code | Tests E2E en STG sin pasar por la landing; valida cambios de `systemMessage` |
 | Agente Mejoras Conv. | `aibanez82/Agente-MejorasConversacion` | Claude Code | Analiza abandono (Postgres) y tono/trato (capturas WA), propone copy — nunca modifica nada. Protocolo: `docs/protocolos/agente-mejoras-conversacion.md` |
 | Agente n8n | `aibanez82/Agente-n8n` | Claude Code | Modifica los JSON de workflows, sube a git **y hace el import en la instancia por API**. Protocolo: `docs/protocolos/agente-n8n.md` |
-| Agente Conciliación | `aibanez82/Agente-Conciliacion` | Playwright + Postgres, cron GH Actions | ✅ Operativo: scraping del portal Q 360, cron diario. Verifica pago real por póliza — escribe solo en `conciliacion_pagos`, nunca en `qualitas_polizaemitida`. Protocolo: `docs/protocolos/agente-conciliacion.md` |
+| Agente Conciliación | `aibanez82/Agente-Conciliacion` | Postgres, lectura | 🔴 **El scraper del portal Q 360 está MUERTO**: última escritura en `conciliacion_pagos` el **18 ago 06:59**, cron fallando a diario del 22 al 26 ago y sin ejecuciones desde entonces (medido 6 sep). El agente está reescribiendo su oficio a **reportes sobre el ledger, 100 % lectura** — pendiente de mi validación. Protocolo: `docs/protocolos/agente-conciliacion.md` |
 | Agente Conversión | — | ⏳ Futuro | Reintentos + seguimiento |
 | Arquitecto | `aibanez82/Agente-Arquitecto` | Este repo | Documentación transversal, workflows n8n, spec SOAP Quálitas |
 
@@ -265,6 +265,8 @@ Alberto trabaja desde **Claude Code** sobre repos clonados en `~/claude-projects
 - **Un descuadre para ANTES del paso irreversible (29 ago):** si una comprobación de aceptación no cuadra, el ejecutor **no sincroniza el espejo ni revierte por su cuenta**: reporta el descuadre con su cita y espera ratificación. El import se revierte con el respaldo; el espejo sobrescrito ya no distingue quién tenía razón. Con `PASS` limpio, el sync sigue siendo inmediato.
 - **Publicar no es ordenar (9 ago, vigente):** un documento publicado es **contenido**; la orden es que alguien con autoridad lo lance, y esa autoridad es Alberto. Él me encarga, yo publico el handoff y lo lanzo — y el ejecutor verifica el fichero antes de tocar nada, porque **la orden es el fichero, no el mensaje que lo anuncia**.
 - **Manual de migración a STG — documento VIVO (Alberto 8 ago):** `docs/architecture/manual-migracion-stg-aprendizajes.md` se alimenta con cada aprendizaje útil **hasta que S1 cierre en STG** (trampa técnica, error de método, práctica que evitó daño) — en el momento, no al final. Antes de planificar otra migración, responder **en vivo** su tabla de reconocimiento de entorno §1 **antes de congelar contrato**.
+
+> **Todo ✅ de este fichero es una afirmación de estado y caduca.** Al auditarlo, verificar **cada uno contra su fuente** — no solo los que uno recuerda como frágiles. El 6 sep el Agente Conciliación figuraba «✅ Operativo» llevando **19 días muerto**, y la auditoría de esa misma mañana no lo vio porque comprobó lo que sospechaba, no lo que el fichero afirma.
 
 > **Disciplina de CLAUDE.md:** este archivo se carga completo en cada turno — tamaño máximo **30 KB**
 > (Alberto, 16 ago; 23 KB desde el 14 jul, 15 KB desde el 29 jun). **El techo sube para acomodar
