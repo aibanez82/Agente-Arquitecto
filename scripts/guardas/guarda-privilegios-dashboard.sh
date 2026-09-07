@@ -32,6 +32,23 @@ if ! git -C "$REPO" grep -qP "(FROM|JOIN|INTO)\s+(public\.)?${CTRL}\b" "$REV" --
   echo "FALLO DE MÉTODO: el control positivo ($CTRL) no aparece. La guarda no acredita nada."; exit 2
 fi
 
+# PASO 0 · objetos que el CÓDIGO nombra y que NO existen en la base.
+# Punto ciego encontrado el 6 sep 2026: esta guarda enumeraba el catálogo y preguntaba
+# "¿lo usa el código?". Así, una tabla que el código consulta y que NO EXISTE nunca aparece
+# -- no está en pg_class, luego no se comprueba. `dashboard_control_commands` llevaba desde
+# el 11 de agosto sin crearse en PROD y esta guarda no podía verlo.
+# `to_regclass` NO filtra por privilegios: un NULL aquí es ausencia real, no falta de permiso.
+ausentes=0
+for obj in $(git -C "$REPO" grep -hoP "(?<=FROM public\.)[a-z0-9_]+|(?<=JOIN public\.)[a-z0-9_]+|(?<=INTO public\.)[a-z0-9_]+|(?<=UPDATE public\.)[a-z0-9_]+" "$REV" -- apps packages </dev/null 2>/dev/null | sort -u); do
+  existe=$(psql "$DB" -Atc "select coalesce(to_regclass('public.$obj')::text,'NO');" 2>/dev/null)
+  if [ "$existe" = "NO" ]; then
+    printf "  AUSENTE   %-46s el código lo consulta y NO EXISTE en la base\n" "$obj"
+    ausentes=$((ausentes+1))
+  fi
+done
+[ "$ausentes" -eq 0 ] && echo "  (sin objetos ausentes)"
+echo
+
 fail=0; tot=0
 # El bucle lee de fd 3: si git grep leyera de stdin se comería la lista y el bucle moriría
 # en la primera vuelta -- que es exactamente el fallo que tuvo la primera versión.
@@ -44,6 +61,7 @@ while IFS='|' read -r obj sel <&3; do
   else printf "  DENEGADO  %-46s %s consulta(s)\n" "$obj" "$n"; fail=$((fail+1)); fi
 done 3< "$ACL"
 
-echo "consultados: $tot · denegados: $fail"
+echo "consultados: $tot · denegados: $fail · ausentes: $ausentes"
+[ "$ausentes" -eq 0 ] || { echo "FAIL: $ausentes objeto(s) que el código consulta y NO EXISTEN."; exit 1; }
 [ "$fail" -eq 0 ] || { echo "FAIL: $fail objeto(s) que el código consulta y $ROL no puede leer."; exit 1; }
 echo "PASS"

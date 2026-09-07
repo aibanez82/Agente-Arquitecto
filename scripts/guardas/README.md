@@ -27,12 +27,21 @@ Así que la topología de privilegios de PROD **no se puede reproducir en STG** 
 Esta guarda sustituye a ese entorno, y sale mejor parada: compara contra el catálogo de PROD, que
 es el que manda, en vez de contra una copia que envejece.
 
-### Dos trampas que esta guarda tiene incorporadas
+### El punto ciego que tuvo, y por qué la guarda cambió (6 sep 2026)
+
+La primera versión enumeraba **el catálogo** y preguntaba «¿lo usa el código?». Con ese orden, **un objeto que el código consulta y que NO EXISTE nunca aparece**: no está en `pg_class`, luego no se comprueba. Devolvía `denegados: 4` y parecía completa.
+
+Así se nos escapó `dashboard_control_commands`: definida en `migrations/2026-08-11-claims-epoch-anti-aba.sql`, **creada en STG y nunca en PROD**, y consultada por `pages/api/claim.js` de la rama que corre en producción con `INSERT`, `SELECT` y dos `UPDATE`.
+
+Ahora la guarda hace **las dos direcciones**: del código al catálogo (¿existe?) y del catálogo al código (¿tengo permiso?). Un ausente devuelve `1` igual que un denegado.
+
+### Tres trampas que esta guarda tiene incorporadas
 
 1. **`git grep -E` NO soporta `\b`.** No da error: no casa nada. Por eso la guarda usa `-P` y por
    eso lleva un **control positivo** (`conversation_control_v1`) que aborta con código 2 si la
    búsqueda deja de encontrar lo que se sabe que está.
-2. **`to_regclass` no filtra por privilegios.** Verificado conectando como `dashboard_rw` contra
+2. **`to_regclass` no filtra por privilegios** — y por eso es exactamente la función buena para la comprobación de ausencia: un `NULL` es ausencia real, no falta de permiso. Al revés que `information_schema`, donde «no existe» y «no lo veo» son indistinguibles.
+3. **La dirección de la pregunta importa.** Verificado conectando como `dashboard_rw` contra
    PROD: `to_regclass('public.qualitas_leadfunnelevent') IS NOT NULL` → `true`, y el `SELECT`
    siguiente → `permission denied`. Cualquier detección de disponibilidad basada en `to_regclass`
    da un **falso positivo** y el camino de degradación no se activa. Usar `has_table_privilege`.
