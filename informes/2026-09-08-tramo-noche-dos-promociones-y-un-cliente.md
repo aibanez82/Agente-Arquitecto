@@ -7,7 +7,7 @@
 | # | Qué | Por qué |
 |---|---|---|
 | 1 | **Quién llama al cliente del BYD antes del 14** | 20.673,46 MXN, póliza 7620101920. Artefacto listo en `~/Desktop/COBRANZA-byd-vence-14-sep.md`. **Es lo único con fecha** |
-| 2 | **Merge del Dashboard `stg` → `main`** | `main` es suyo por nuestra regla. PROD está limpio hoy, pero el disparador es un lead y el daño la pantalla entera |
+| 2 | **Token de API de Vercel (solo lectura)** en el `.env.local` | Sin él no puedo acreditar el entorno tras una promoción del Dashboard: el `VERCEL_OIDC_TOKEN` da `403` en la API REST. Dependo de que me lo cuenten |
 | 3 | **Canal del mensaje a Juan** | Enumerado ya escrito. Mi recomendación: comentario en el `#335` |
 | 4 | **`DATABASE_URL` de Preview en Vercel** | Acotado a `stg`; el preview de cualquier otra rama revienta con 500 antes de llegar a la base |
 
@@ -21,6 +21,23 @@
 **El detalle que decidía el primero:** los once traían en STG la credencial `Postgres STG`. Sin cambiarla, once nodos de producción habrían escrito en la base de staging **en silencio**, porque el `INSERT` funciona igual.
 
 **Lo que medí y el ejecutor no podía ver, en el segundo:** el `request_hash` del carril Direct firma ese copy. Fui al ledger antes de ordenar: 215 filas, todas `sent` y liquidadas, cero `uncertain`. **Ventana vacía.** Con una sola reserva viva, el handoff habría dicho «espera».
+
+### Y una tercera, ya de día: el Dashboard a PROD
+
+**Orden expresa de Alberto.** `main` en `337007e`, deployment del mismo commit, y el **`buildId` del alias de producción medido por mí**: `VIbXUmy0ZnXb7yWZKO14r`. El embudo de fuga sustituye a las tres bandas del Resumen.
+
+Viajaron **diez** commits, no solo el embudo. Verificado contra la base antes de darlo por bueno — las cuatro cifras que lo sostienen, medidas por mí y no aceptadas de palabra:
+
+| | |
+|---|---|
+| Leads | **1352** |
+| Pólizas con número real | **61** |
+| Pagadas | **25** |
+| Reparto `sesiones_wa` | `{0: 244, 1: 1108}` |
+
+**El riesgo que declaré no era el código:** `main` tenía 54 ficheros en `handoffs/` y `stg` solo 3, porque por convención van directos a `main`. Un merge los conserva —lo simulé en un worktree desechable—; un `reset` o un `force` habría borrado el canal de órdenes entero. Comprobado después: fue merge, el `main` anterior sigue siendo ancestro.
+
+**Y un error mío en esa orden, cazado antes de que se ejecutara:** puse como criterio «53 handoffs tras el merge» habiendo contado `main` **antes de añadir el propio fichero del handoff**. Eran 54. El ejecutor habría medido 54, visto descuadre y parado por un fallo mío. Anclé el criterio a un número que yo mismo movía al publicarlo.
 
 ## El hallazgo con dinero y fecha
 
