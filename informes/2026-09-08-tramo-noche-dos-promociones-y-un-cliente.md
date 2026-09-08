@@ -1,0 +1,64 @@
+# Tramo del 7 al 8 de septiembre — dos promociones, un cliente localizado y tres correcciones mías
+
+> Arquitecto-IA-Qualitas. Horas en CDMX. **Punto de retomada tras `/clear`.**
+
+## Lo que espera a Alberto
+
+| # | Qué | Por qué |
+|---|---|---|
+| 1 | **Quién llama al cliente del BYD antes del 14** | 20.673,46 MXN, póliza 7620101920. Artefacto listo en `~/Desktop/COBRANZA-byd-vence-14-sep.md`. **Es lo único con fecha** |
+| 2 | **Merge del Dashboard `stg` → `main`** | `main` es suyo por nuestra regla. PROD está limpio hoy, pero el disparador es un lead y el daño la pantalla entera |
+| 3 | **Canal del mensaje a Juan** | Enumerado ya escrito. Mi recomendación: comentario en el `#335` |
+| 4 | **`DATABASE_URL` de Preview en Vercel** | Acotado a `stg`; el preview de cualquier otra rama revienta con 500 antes de llegar a la base |
+
+## Lo que entró en PROD, verificado por mí contra el grafo vivo
+
+| Paquete | versionId final | Qué |
+|---|---|---|
+| `#342` | `c31401a1` | Los **once** `Persist Human Row`. 319 → 330 nodos |
+| Copy mexicano | `de20a75c` | Una línea en `Build Offer Notice Copy`, la fuente única |
+
+**El detalle que decidía el primero:** los once traían en STG la credencial `Postgres STG`. Sin cambiarla, once nodos de producción habrían escrito en la base de staging **en silencio**, porque el `INSERT` funciona igual.
+
+**Lo que medí y el ejecutor no podía ver, en el segundo:** el `request_hash` del carril Direct firma ese copy. Fui al ledger antes de ordenar: 215 filas, todas `sent` y liquidadas, cero `uncertain`. **Ventana vacía.** Con una sola reserva viva, el handoff habría dicho «espera».
+
+## El hallazgo con dinero y fecha
+
+**Un cliente real sin forma de pagar.** BYD SONG PLUS 2024, póliza 7620101920, **20.673,46 MXN, vence el 14 de septiembre**.
+
+No hay **ninguna** liga de pago viva en producción — las 16 filas están `expired`, `failed` o `superseded`. La suya se generó el 4 de septiembre y **nuestro sistema la desactivó hora y media después sin crear sustituta**. Las tres `superseded` de cuota única quedaron igual: sin sucesor.
+
+**Matiz que descubrí después y cambia qué hacer:** la liga que sí tiene URL lleva la **fecha de vencimiento equivocada** (4 sep en vez del 14). Antes de reenviarla hay que ver qué presenta el portal. El importe sí es correcto.
+
+Y una falsa alarma cazada a tiempo: apareció una segunda póliza `PENDIENTE` de 14.654,73 que el issue no mencionaba — es `test@test.com`.
+
+## Issues: cuatro nuevos con dueño, dos reencuadrados
+
+- **`#345`** — nadie comprueba las rutas citadas en comentarios: **22 muertas sobre 16 rutas**.
+- **`#346`** — `whatsapp_sessions` no guarda quién creó la fila. Con tres emisores, toda limpieza es una inferencia.
+- **`#347`** — 17 leads con sesión y póliza sin historial (del Dashboard). **Medido por mí: en mi población son 9 y los 9 son `canal_atencion = LANDING`** — cerraron por web, nunca hubo conversación. No lo cierro: su población es otra y no la he medido yo.
+- **`#348`** — `Extract VIN Vision` sigue en `claude-sonnet-4-5-20250929` en **los dos entornos**. Sobrevivió a todas las revisiones porque **no es un nodo de modelo**: es un `httpRequest` con el identificador escrito a mano.
+- **`#329`** — remedido: de cinco fallos, tres se cobraron por otra vía y uno era de prueba.
+- **`#339`** — **entregado en PROD**: la frase de Alberto está puesta. No se cierra por falta de tráfico, no de trabajo.
+
+## Lo que hice en la base y en STG
+
+Retiradas mis cinco sesiones de arné de STG (13 filas de historial, 6 de dispatch, 5+1 de intentos), tras barrer **las 19 tablas con `session_id` por catálogo** — `whatsapp_sessions` no tiene ni una FK entrante. STG vuelve a **158 filas / 158 leads**.
+
+## Mis tres correcciones
+
+1. **Clasifiqué por indicio, no por acto.** Di por buena la clasificación de cinco sesiones por el prefijo del `session_id` **sin abrir la tabla**. Solo una lo llevaba; las delataba el teléfono. Las cinco eran mías, así que no se perdió nada — **si una hubiera sido real, ese criterio la habría borrado**.
+2. **Juzgué injustificada la desactivación de la liga** antes de ver que llevaba la fecha mala. Con eso delante, pudo ser lo correcto. Retractado en el `#329`.
+3. **Propuse evaluar el modelo del VIN con fotos de clientes reales.** Ni se puede —no guardamos nada de lo que entra, y n8n retiene 46 ejecuciones de cuatro días— ni **debía**: es usar sus datos para un fin que no es el que nos los dieron.
+
+## El patrón de la noche, en tres herramientas distintas
+
+**La herramienta que busca el fallo comparte el punto ciego del fallo.** El `--check` de Juan probó que el fichero existía y la ejecución murió porque el nodo dentro ya no; el primer filtro del Dashboard dio verde con tres rutas muertas dentro; y mi guarda de privilegios devolvió cero porque `git grep -E` no soporta `\b`. Tres veces el mismo día. La defensa es el **control positivo**: un caso que sabemos roto y que el barrido debe encontrar siempre.
+
+## Estado de los demás
+
+**PROD lleva sin conversaciones de clientes desde el 4 de septiembre.** Todo lo promovido este fin de semana espera tráfico para demostrarse.
+
+**Juan volvió** y avanza solo el relay del `#281` — por el leg 30 al cierre. Su «PostgreSQL manifest drift» es interno de su manifiesto de tests: **ninguna colisión** con el DDL que aplicamos en su base.
+
+Agente: Arquitecto-IA-Qualitas
