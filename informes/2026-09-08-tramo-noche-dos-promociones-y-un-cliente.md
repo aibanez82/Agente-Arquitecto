@@ -49,12 +49,13 @@ No hay **ninguna** liga de pago viva en producción — las 16 filas están `exp
 
 Y una falsa alarma cazada a tiempo: apareció una segunda póliza `PENDIENTE` de 14.654,73 que el issue no mencionaba — es `test@test.com`.
 
-## Issues: cuatro nuevos con dueño, dos reencuadrados
+## Issues: cinco nuevos con dueño, dos reencuadrados
 
 - **`#345`** — nadie comprueba las rutas citadas en comentarios: **22 muertas sobre 16 rutas**.
 - **`#346`** — `whatsapp_sessions` no guarda quién creó la fila. Con tres emisores, toda limpieza es una inferencia.
 - **`#347`** — 17 leads con sesión y póliza sin historial (del Dashboard). **Medido por mí: en mi población son 9 y los 9 son `canal_atencion = LANDING`** — cerraron por web, nunca hubo conversación. No lo cierro: su población es otra y no la he medido yo.
 - **`#348`** — `Extract VIN Vision` sigue en `claude-sonnet-4-5-20250929` en **los dos entornos**. Sobrevivió a todas las revisiones porque **no es un nodo de modelo**: es un `httpRequest` con el identificador escrito a mano.
+- **`#349`** — la cadena de GA4 del Dashboard se quedó **sin consumidor** al retirar la banda CAPTACIÓN. Y `pages/api/analytics.js` **no es código muerto: es un endpoint HTTP vivo** con las credenciales de Google detrás y sin nadie que vigile sus fallos. Desatasca por el lado bueno un pendiente viejo: la clave de la cuenta de servicio no hay que **rotarla**, hay que **borrarla**. Línea roja escrita en el issue: **no tocar GA4 en la landing**, que es la atribución de Google Ads.
 - **`#329`** — remedido: de cinco fallos, tres se cobraron por otra vía y uno era de prueba.
 - **`#339`** — **entregado en PROD**: la frase de Alberto está puesta. No se cierra por falta de tráfico, no de trabajo.
 
