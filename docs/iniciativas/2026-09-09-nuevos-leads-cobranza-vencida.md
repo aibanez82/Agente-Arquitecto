@@ -1,13 +1,18 @@
-# Rescate de cobranza vencida de Metepec — diseño v1
+# Nuevos Leads — Cobranza Vencida · diseño v1
 
 > Arquitecto-IA-Qualitas · 9 sep 2026 · **Encargo de Alberto**, decisiones suyas marcadas como tales.
 > Estado: **diseño para validar.** No hay nada implementado.
 
+> **El nombre importa y lo eligió Alberto.** Esto **no es rescatar una póliza**: la póliza cancelada
+> no se recupera ni se rehabilita. Es **captación de leads nuevos** — gente que ya demostró que
+> compra seguro de auto y que ahora está sin cobertura. La cobranza vencida es **el origen del
+> lead**, no el objeto del trabajo. Quien lo lea como «recuperar cartera» diseñará mal.
+
 ## 1. Qué es
 
-Hylant nos envía **mensualmente** una Excel con pólizas que su contact center **Metepec** emitió y que se han **cancelado por falta de pago**. La cobranza vencida **no se rehabilita** — decisión de Alberto: *«no rehabilitar, esto es muy complejo»*—: se rescata **emitiendo una póliza nueva**, que es negocio nuestro.
+Hylant nos envía **mensualmente** una Excel con pólizas que su contact center **Metepec** emitió y que se han **cancelado por falta de pago**. La cobranza vencida **no se rehabilita** — decisión de Alberto: *«no rehabilitar, esto es muy complejo»*—: se le **vende una póliza nueva**, que es negocio nuestro y entra como lead propio.
 
-El flujo: importar la Excel desde el Dashboard → ver los recibos vencidos → seleccionar → enviar un aviso por WhatsApp → el cliente entra en el bot de cotización que ya existe.
+El flujo: importar la Excel desde el Dashboard → ver los recibos vencidos → seleccionar → enviar un aviso por WhatsApp → **el cliente entra como lead en el bot de cotización que ya existe**, igual que si viniera de la landing.
 
 ## 2. La Excel, medida (agosto 2026)
 
@@ -75,11 +80,11 @@ No hay que crear nada: **`POR_VIN_40`** ya existe, está `active` desde el 27 ag
 
 ### Django (HYL-WAI — es de Juan)
 
-Tres tablas, separando el lote importado del estado de la persecución, para que la Excel de un mes no pise el historial del anterior:
+Tres tablas, separando el lote importado del estado del contacto, para que la Excel de un mes no pise el historial del anterior:
 
-- **`metepec_chase_import`** — un lote por Excel: periodo, fichero, quién y cuándo, filas leídas, filas descartadas y por qué.
-- **`metepec_chase_row`** — una fila por póliza: los 18 campos originales **sin transformar**, más los derivados (teléfono canonicalizado, VIN validado, marca y año deducidos) y el motivo de exclusión si lo hay.
-- **`metepec_chase_contact`** — un registro por intento de contacto: a quién, cuándo, con qué plantilla, resultado del envío y respuesta.
+- **`lead_cobranza_import`** — un lote por Excel: periodo, fichero, quién y cuándo, filas leídas, filas descartadas y por qué.
+- **`lead_cobranza_row`** — una fila por póliza: los 18 campos originales **sin transformar**, más los derivados (teléfono canonicalizado, VIN validado, marca y año deducidos) y el motivo de exclusión si lo hay.
+- **`lead_cobranza_contacto`** — un registro por intento de contacto: a quién, cuándo, con qué plantilla, resultado del envío y respuesta.
 
 Más una **API de lectura** para el Dashboard y un **endpoint de envío** que el botón dispare.
 
