@@ -106,18 +106,32 @@ Medido en PROD hoy: de **61 pólizas emitidas por nosotros, 36 siguen `PENDIENTE
 
 **2 · Nuestras propias pruebas.** De las 36 pendientes, **8 son internas**: tres con `test@test.com`, tres a nombre de **Juan** (`juan.aguayo@aguayo.co`), una de **Alberto** (`alberto@insurmind.ai`) y una de QA (`qa+prod-…@example.com`). **Si la campaña sale a ciegas, nos escribimos a nosotros mismos y a Juan.**
 
-### Consecuencia de diseño
+### Decisiones de Alberto sobre esto (9 sep)
 
-La importación necesita **dos exclusiones obligatorias antes de que nadie pueda seleccionar una fila**:
+**1 · Armando Lobo recibe el mensaje.** Palabras suyas: *«es un daño colateral. Por un lead no pasa nada. Es más costoso armar una lógica para estos casos.»* **Queda decidido y así se implementa.**
 
-- **Registro de «no contactar»** (`#356`) — condición de entrada, no mejora posterior.
-- **Lista de correos y teléfonos internos** — nuestros, de Juan, de QA y los `test@`/`example.com`. Y que la exclusión sea **visible en el Dashboard**, no un filtro silencioso: quien importe debe ver cuántas filas se apartaron y por qué.
+Dejo constancia de una precisión que le di y que no cambia la decisión: **esa lógica hay que construirla igual**, porque el propio flujo genera bajas —quien responda «no, gracias» no puede recibir el mes siguiente— y honrar además las bajas anteriores es **la misma tabla**, no una nueva. El `#356` sigue en pie por esa razón, no por este caso.
 
-Y una comprobación aparte que merece hacerse una vez: **de las 25 pólizas nuestras que ya aparecen en la Excel de agosto, ¿cuántas se cancelaron por el defecto del `#329`?** Si alguna lo hizo, no es un lead que recuperar: es un cliente al que perdimos nosotros.
+**2 · Las pólizas internas se marcan y NO se envían.** El Dashboard debe resaltarlas.
+
+### Cómo se identifica una fila interna, y cómo NO
+
+**Con un registro explícito y editable**, no con una heurística. Los identificadores medidos hoy en PROD:
+
+| Correo | Teléfono | Quién |
+|---|---|---|
+| `juan.aguayo@aguayo.co` | `3107696237` | Juan |
+| `test@test.com` | `5551074144` | banco de pruebas |
+| `alberto@insurmind.ai` | `5554022064` | Alberto |
+| `qa+…@example.com`, `qa.gtm.audit…@example.com` | `0000000000` | QA |
+
+**Y la regla que NO hay que usar: «muchas cotizaciones = prueba».** El teléfono `5518859302` acumula **30 cotizaciones** y parece un banco de pruebas — pero es `rarefe@hotmail.com`, **un cliente real**, con póliza emitida y pendiente de pago. Una heurística por frecuencia lo habría excluido precisamente a él, que es el lead más interesado de la lista.
+
+**El marcado es visible y bloqueante:** la fila se ve, se muestra por qué está marcada, y **no se puede seleccionar** para envío. Ocultarla sería peor: quien importe no sabría que existe.
 
 ## 6. Lo que hay que decidir antes de implementar
 
-1. **El registro de «no contactar» (`#356`)** — condición de entrada, no mejora posterior. Ver §5.bis: hay un caso concreto y con nombre.
+1. **El registro de «no contactar» (`#356`)** — Alberto decidió que no bloquea el arranque (ver §5.bis), pero **el flujo lo necesita para sus propias bajas**: quien conteste «no, gracias» no puede recibir el mes siguiente. Sigue siendo trabajo obligatorio, con otra justificación.
 2. **Las 17 filas de prima positiva** — preguntar a Hylant antes de escribirles.
 3. **La plantilla de Meta** — hay que darla de alta y aprobarla. Meta es de Juan.
 4. **Pedirle a Hylant el CP en la Excel del mes que viene.** Es gratis preguntar y convertiría el flujo en cero preguntas.
