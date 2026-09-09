@@ -36,7 +36,9 @@ El flujo: importar la Excel desde el Dashboard → ver los recibos vencidos → 
 - **El VIN resuelve el vehículo.** Da marca y año de forma determinista, sin preguntar nada. Es el dato que hacía falta.
 - **El CP hay que preguntarlo.** No viene, y es obligatorio para cotizar. **Decisión de Alberto: se pregunta en la conversación.**
 - **619 de 644 pólizas son de otros agentes.** Aunque existiera un servicio de consulta en Quálitas —y **no está documentado**: el único método documentado es `obtenerNuevaEmision`— nuestras credenciales van con el agente `27614` y no cubrirían pólizas ajenas. **Por eso el CP no se puede traer de Quálitas.**
-- **Las 17 filas con prima positiva se apartan.** No son cancelaciones; podrían ser rehabilitaciones. Escribirle «su póliza está cancelada» a quien la rehabilitó es quedar mal con un dato que teníamos.
+- **Las 17 filas con prima positiva se apartan, pero NO por lo que escribí primero.** Dije que podían ser rehabilitaciones; **medido, no lo son**: llevan `USUARIO = CANCELA-AUT` igual que las otras 627. Son cancelaciones; lo único distinto es el signo de la prima.
+
+**Se apartan porque no sabemos qué significan.** Y dos de ellas aparecen dos veces con el mismo importe al céntimo — tampoco son dos recibos: `FORMA PAGO = 'C'` e `INCISOS = 1` en las 644 filas. Pregunta concreta para Hylant: *«¿qué es un endoso `CANCELA-AUT` con prima positiva, y por qué dos se repiten con idéntico importe?»*
 - **Las 25 pólizas de nuestro agente merecen mirarse aparte**: conviene comprobar si alguna se canceló por el defecto del `#329`.
 
 ## 3. El canal
