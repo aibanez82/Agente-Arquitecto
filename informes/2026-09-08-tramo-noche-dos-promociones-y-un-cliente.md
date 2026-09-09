@@ -6,7 +6,7 @@
 
 | # | Qué | Por qué |
 |---|---|---|
-| 1 | **Quién llama al cliente del BYD antes del 14** | 20.673,46 MXN, póliza 7620101920. Artefacto listo en `~/Desktop/COBRANZA-byd-vence-14-sep.md`. **Es lo único con fecha** |
+| 1 | **Merge del Dashboard `stg` → `main`** | Lleva la retirada de GA4 **y el arreglo del falso positivo**: hoy 23 conversaciones vivas pueden decirle a un operador que envió un mensaje que no salió |
 | 2 | **Token de API de Vercel (solo lectura)** en el `.env.local` | Sin él no puedo acreditar el entorno tras una promoción del Dashboard: el `VERCEL_OIDC_TOKEN` da `403` en la API REST. Dependo de que me lo cuenten |
 | 3 | **Canal del mensaje a Juan** | Enumerado ya escrito. Mi recomendación: comentario en el `#335` |
 | 4 | **`DATABASE_URL` de Preview en Vercel** | Acotado a `stg`; el preview de cualquier otra rama revienta con 500 antes de llegar a la base |
@@ -39,15 +39,31 @@ Viajaron **diez** commits, no solo el embudo. Verificado contra la base antes de
 
 **Y un error mío en esa orden, cazado antes de que se ejecutara:** puse como criterio «53 handoffs tras el merge» habiendo contado `main` **antes de añadir el propio fichero del handoff**. Eran 54. El ejecutor habría medido 54, visto descuadre y parado por un fallo mío. Anclé el criterio a un número que yo mismo movía al publicarlo.
 
-## El hallazgo con dinero y fecha
+## El hallazgo que resultó ser otra cosa — RETRACTADO
 
-**Un cliente real sin forma de pagar.** BYD SONG PLUS 2024, póliza 7620101920, **20.673,46 MXN, vence el 14 de septiembre**.
+Escribí aquí que había **un cliente real con 20.673,46 MXN y ventana hasta el 14 de septiembre**, y preparé un artefacto para que alguien le llamara a cobrar. **Era falso, y lo descubrí al ir a buscar su teléfono.**
 
-No hay **ninguna** liga de pago viva en producción — las 16 filas están `expired`, `failed` o `superseded`. La suya se generó el 4 de septiembre y **nuestro sistema la desactivó hora y media después sin crear sustituta**. Las tres `superseded` de cuota única quedaron igual: sin sucesor.
+Armando Lobo pidió la liga de pago **dos veces el 1 de septiembre**, el sistema le falló las dos, y escribió «Cancelar el trámite por favor». A las 12:32 le respondimos: **«Tomamos nota de la cancelación y nos encargamos del trámite; no tiene que hacer nada más.»**
 
-**Matiz que descubrí después y cambia qué hacer:** la liga que sí tiene URL lleva la **fecha de vencimiento equivocada** (4 sep en vez del 14). Antes de reenviarla hay que ver qué presenta el portal. El importe sí es correcto.
+**No es cobranza pendiente: es una venta perdida por un defecto nuestro, ya cerrada con el cliente.** Llamarle a cobrar habría sido desdecirnos de una promesa escrita. El artefacto del escritorio está anulado y abre con «NO LLAMAR A COBRAR».
 
-Y una falsa alarma cazada a tiempo: apareció una segunda póliza `PENDIENTE` de 14.654,73 que el issue no mencionaba — es `test@test.com`.
+Lo que sí queda: **prometimos gestionar una cancelación y no consta que se hiciera** — la póliza sigue emitida y `PENDIENTE`. Y el cron **le siguió generando ligas hasta el 7 de septiembre**, seis días después de la baja.
+
+El `#329` está corregido y retitulado con esta evidencia.
+
+## Lo que entró en PROD de madrugada, y lo que destapó
+
+**`Retomar Conversacion` 12 → 27 nodos** (`6c894d50`) y **`Discount Application Poller` 68 → 71** (`547b47d9`). Los dos verificados por mí contra el grafo vivo: cero literal «STG», antifuga limpia, credenciales nodo a nodo, y los **siete** nodos de solo-entorno del poller **intactos byte a byte**.
+
+**El detalle que decidía los dos viajes:** en STG los nodos `WA Config STG` / `WA Config Worker STG` son **los de PROD renombrados**, no nodos nuevos. Copiar el grafo habría dejado nodos llamados «STG» en producción con otros apuntándoles por nombre.
+
+**Y lo que destapó, que no vi al promover:** el fence del `#156` llegó con Retomar. Cuando la reserva deniega, la hoja responde **sin `success` ni `status`**, y el Dashboard —que solo mira el código HTTP— **da el mensaje por enviado y lo audita como enviado**. El cliente no recibe nada.
+
+**23 conversaciones vivas** están hoy en esa condición (44 legacy bloqueadas, de las que 23 siguen abiertas; las 11 v2 se caen antes por validación y están todas cerradas). **No se revierte**: antes de la valla esos leads recibían el mensaje igualmente — lo que se rompió es el informe del envío, no el envío. El arreglo va del lado del Dashboard y ya está escrito.
+
+Issues: **`#353`** (falta `n8n_payment_events` en PROD, bloquea `Payment Confirmation`) y **`#354`** (el falso positivo).
+
+**Lo mío:** verifiqué el grafo a fondo y **no verifiqué a quién lo consume**. Lo encontró el Dashboard.
 
 ## Issues: cinco nuevos con dueño, dos reencuadrados
 
