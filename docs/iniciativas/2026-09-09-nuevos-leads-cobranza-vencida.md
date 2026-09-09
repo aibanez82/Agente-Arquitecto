@@ -104,7 +104,7 @@ Medido en PROD hoy: de **61 pólizas emitidas por nosotros, 36 siguen `PENDIENTE
 
 **1 · Gente a la que prometimos no molestar.** La póliza `7620101920` es la de **Armando Lobo**: pidió su liga de pago dos veces, el sistema le falló las dos (`#329`), canceló, y le respondimos por escrito *«no tiene que hacer nada más»*. **Venderle una póliza nueva no es menos incómodo que ofrecerle rescatar la vieja: es escribirle igual, después de prometerle que no lo haríamos.** El reencuadre de la iniciativa no suaviza esto en absoluto.
 
-**2 · Nuestras propias pruebas.** De las 36 pendientes, **8 son internas**: tres con `test@test.com`, tres a nombre de **Juan** (`juan.aguayo@aguayo.co`), una de **Alberto** (`alberto@insurmind.ai`) y una de QA (`qa+prod-…@example.com`). **Si la campaña sale a ciegas, nos escribimos a nosotros mismos y a Juan.**
+**2 · Nuestras propias pruebas.** De las 36 pendientes, **14 son internas — el 39 %** (lista completa y medida en la sección siguiente). **Si la campaña sale a ciegas, nos escribimos a nosotros mismos, a Juan y a los probadores de Hylant.**
 
 ### Decisiones de Alberto sobre esto (9 sep)
 
@@ -114,27 +114,39 @@ Dejo constancia de una precisión que le di y que no cambia la decisión: **esa 
 
 **2 · Las pólizas internas se marcan y NO se envían.** El Dashboard debe resaltarlas.
 
-### Cómo se identifica una fila interna, y cómo NO
+### El registro de internos — declarado por Alberto (9 sep)
 
-**Con un registro explícito y editable**, no con una heurística. Los identificadores medidos hoy en PROD:
+**No se deduce, se declara.** Alberto entregó la lista completa; yo la crucé con PROD para sacar los teléfonos, que es lo que de verdad atrapa las variantes.
 
-| Correo | Teléfono | Quién |
-|---|---|---|
-| `juan.aguayo@aguayo.co` | `3107696237` | Juan |
-| `test@test.com` | `5551074144` | banco de pruebas |
-| `alberto@insurmind.ai` | `5554022064` | Alberto |
-| `qa+…@example.com`, `qa.gtm.audit…@example.com` | `0000000000` | QA |
-| `rarefe@hotmail.com` | `5518859302` | **pruebas de Hylant** (confirmado por Alberto) |
+| Correo | Teléfonos vistos | Cotiz. | Pólizas | **Pendientes** |
+|---|---|---|---|---|
+| `juan.aguayo@aguayo.co` | 3107696237, 5149843762, 5555550101 | 42 | 3 | **3** |
+| `test@test.com` | 5551074144 | 42 | 3 | **3** |
+| `acer3500@gmail.com` | 5551074143/44/848/896 | 10 | 3 | **3** |
+| `alescamillar@gmail.com` | 5525592446 | 9 | 2 | **2** |
+| `rarefe@hotmail.com` | 5518859302 | 30 | 1 | **1** |
+| `alberto@insurmind.ai` | 5554022064 | 1 | 1 | **1** |
+| `qa+prod-20260727@example.com` | 0000000000 | 1 | 1 | **1** |
+| `oilycoyote@hotmail.com` | 3107696237 | 5 | 0 | 0 |
+| `juaguayo@yahoo.com` | 3107696237 | 3 | 0 | 0 |
+| `marketinghylant@e-broking.com` | 5577150462 | 3 | 0 | 0 |
+| `juaguayo@gmail.com` | 3107696237 | 1 | 0 | 0 |
+| `acer3500@gmail.co` | 5551074144 | 1 | 0 | 0 |
+| `jandersongomezfranco@gmail.com` | 3336424341 | 1 | 0 | 0 |
+| `hector.silvar@yahoo.com.mx` | 7771082776 | 1 | 0 | 0 |
 
-**Falta al menos una categoría más: los probadores de Hylant.** El teléfono `5518859302` / `rarefe@hotmail.com` acumula **30 cotizaciones y una póliza emitida sin pagar**. Yo lo di por cliente real; **Alberto lo corrigió: son pruebas desde Hylant.** Va al registro.
+**Catorce de las 36 pólizas pendientes son internas — el 39 %.** *(En una versión anterior de este documento dije «ocho». Era mi cuenta antes de tener la lista de Alberto; el número bueno es 14.)*
 
-**Y de ahí sale la regla de verdad, que es más incómoda que cualquier heurística: desde los datos no se puede distinguir un probador de un cliente.**
+### Por qué el registro necesita teléfono y no solo correo
 
-`rarefe@hotmail.com` tiene correo de dominio normal, teléfono de diez dígitos válido, cotizaciones repetidas y una póliza emitida. Se comporta **exactamente** como un cliente muy interesado. Ninguna regla automática —frecuencia, dominio, formato— lo habría separado, y si la hubiéramos escrito, habría excluido clientes buenos con el mismo perfil.
+Dos identificadores lo demuestran:
 
-**Conclusión: el registro de internos no se deduce, se declara.** Lo rellena quien sabe —Alberto para los nuestros y los de Hylant, Juan para los suyos— y se amplía cuando aparezca uno nuevo. Cualquier intento de inferirlo del comportamiento producirá las dos clases de error a la vez.
+- **`3107696237`** aparece con **cuatro correos distintos** (`juan.aguayo@aguayo.co`, `oilycoyote@hotmail.com`, `juaguayo@yahoo.com`, `juaguayo@gmail.com`).
+- **`5551074144`** con tres (`test@test.com`, `acer3500@gmail.com` y `acer3500@gmail.co`, este último con el dominio mal escrito).
 
-**El marcado es visible y bloqueante:** la fila se ve, se muestra por qué está marcada, y **no se puede seleccionar** para envío. Ocultarla sería peor: quien importe no sabría que existe.
+La Excel trae correo **y** teléfono, y no hay garantía de que el par coincida con el que tenemos. **Cruzar por los dos, y excluir si casa cualquiera de ellos.**
+
+Y `acer3500@gmail.co` —un `.com` sin la `m`— es el aviso de que **la coincidencia debe ser exacta y la lista debe poder crecer**: nadie va a acertar todas las variantes de entrada.
 
 ## 6. Lo que hay que decidir antes de implementar
 
