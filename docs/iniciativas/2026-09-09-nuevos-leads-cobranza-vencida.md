@@ -96,9 +96,28 @@ Sección **solo `admin`** —la lista blanca de roles ya existe y `agente` no la
 
 **Los dos nodos del §3.** Nada más.
 
+## 5.bis. La Excel nos devuelve nuestros propios fallos y nuestras propias pruebas
+
+**Esto no lo vi al escribir la v1 y lo cambia todo en la lista de exclusiones.** La Excel trae **25 pólizas de nuestro agente `27614`**, así que **nuestras cancelaciones vuelven a nosotros dentro del fichero de Hylant**.
+
+Medido en PROD hoy: de **61 pólizas emitidas por nosotros, 36 siguen `PENDIENTE`** — nunca se pagaron. Todas ellas son candidatas a aparecer en la Excel del mes siguiente cuando Quálitas las cancele. Y entre esas 36 hay dos clases que **no pueden recibir el mensaje**:
+
+**1 · Gente a la que prometimos no molestar.** La póliza `7620101920` es la de **Armando Lobo**: pidió su liga de pago dos veces, el sistema le falló las dos (`#329`), canceló, y le respondimos por escrito *«no tiene que hacer nada más»*. **Venderle una póliza nueva no es menos incómodo que ofrecerle rescatar la vieja: es escribirle igual, después de prometerle que no lo haríamos.** El reencuadre de la iniciativa no suaviza esto en absoluto.
+
+**2 · Nuestras propias pruebas.** De las 36 pendientes, **8 son internas**: tres con `test@test.com`, tres a nombre de **Juan** (`juan.aguayo@aguayo.co`), una de **Alberto** (`alberto@insurmind.ai`) y una de QA (`qa+prod-…@example.com`). **Si la campaña sale a ciegas, nos escribimos a nosotros mismos y a Juan.**
+
+### Consecuencia de diseño
+
+La importación necesita **dos exclusiones obligatorias antes de que nadie pueda seleccionar una fila**:
+
+- **Registro de «no contactar»** (`#356`) — condición de entrada, no mejora posterior.
+- **Lista de correos y teléfonos internos** — nuestros, de Juan, de QA y los `test@`/`example.com`. Y que la exclusión sea **visible en el Dashboard**, no un filtro silencioso: quien importe debe ver cuántas filas se apartaron y por qué.
+
+Y una comprobación aparte que merece hacerse una vez: **de las 25 pólizas nuestras que ya aparecen en la Excel de agosto, ¿cuántas se cancelaron por el defecto del `#329`?** Si alguna lo hizo, no es un lead que recuperar: es un cliente al que perdimos nosotros.
+
 ## 6. Lo que hay que decidir antes de implementar
 
-1. **El registro de «no contactar» (`#356`)** — condición de entrada, no mejora posterior.
+1. **El registro de «no contactar» (`#356`)** — condición de entrada, no mejora posterior. Ver §5.bis: hay un caso concreto y con nombre.
 2. **Las 17 filas de prima positiva** — preguntar a Hylant antes de escribirles.
 3. **La plantilla de Meta** — hay que darla de alta y aprobarla. Meta es de Juan.
 4. **Pedirle a Hylant el CP en la Excel del mes que viene.** Es gratis preguntar y convertiría el flujo en cero preguntas.
