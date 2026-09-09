@@ -124,8 +124,15 @@ Dejo constancia de una precisión que le di y que no cambia la decisión: **esa 
 | `test@test.com` | `5551074144` | banco de pruebas |
 | `alberto@insurmind.ai` | `5554022064` | Alberto |
 | `qa+…@example.com`, `qa.gtm.audit…@example.com` | `0000000000` | QA |
+| `rarefe@hotmail.com` | `5518859302` | **pruebas de Hylant** (confirmado por Alberto) |
 
-**Y la regla que NO hay que usar: «muchas cotizaciones = prueba».** El teléfono `5518859302` acumula **30 cotizaciones** y parece un banco de pruebas — pero es `rarefe@hotmail.com`, **un cliente real**, con póliza emitida y pendiente de pago. Una heurística por frecuencia lo habría excluido precisamente a él, que es el lead más interesado de la lista.
+**Falta al menos una categoría más: los probadores de Hylant.** El teléfono `5518859302` / `rarefe@hotmail.com` acumula **30 cotizaciones y una póliza emitida sin pagar**. Yo lo di por cliente real; **Alberto lo corrigió: son pruebas desde Hylant.** Va al registro.
+
+**Y de ahí sale la regla de verdad, que es más incómoda que cualquier heurística: desde los datos no se puede distinguir un probador de un cliente.**
+
+`rarefe@hotmail.com` tiene correo de dominio normal, teléfono de diez dígitos válido, cotizaciones repetidas y una póliza emitida. Se comporta **exactamente** como un cliente muy interesado. Ninguna regla automática —frecuencia, dominio, formato— lo habría separado, y si la hubiéramos escrito, habría excluido clientes buenos con el mismo perfil.
+
+**Conclusión: el registro de internos no se deduce, se declara.** Lo rellena quien sabe —Alberto para los nuestros y los de Hylant, Juan para los suyos— y se amplía cuando aparezca uno nuevo. Cualquier intento de inferirlo del comportamiento producirá las dos clases de error a la vez.
 
 **El marcado es visible y bloqueante:** la fila se ve, se muestra por qué está marcada, y **no se puede seleccionar** para envío. Ocultarla sería peor: quien importe no sabría que existe.
 
