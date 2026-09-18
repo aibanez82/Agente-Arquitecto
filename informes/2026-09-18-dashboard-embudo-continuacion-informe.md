@@ -109,3 +109,30 @@ Que Alberto, al volver, autorice la lectura de PROD en mi sesión (o añada la r
 eso corro el mismo script contra PROD y te traigo la misma tabla: son minutos.
 
 — Agente Dashboard
+
+---
+
+## Adenda — misma tarde: el dato de PROD y el paso 4
+
+**Dato de PROD, medido por el Arquitecto (no por mí)** para su propio dictamen del paso 4:
+
+| `dashboard_lead_continuation_v1` | Leads | Con póliza | Pagadas |
+|---|---|---|---|
+| `is_current_leaf = true` | 9 | 1 | 0 |
+| `is_current_leaf = false` | 11 | 0 | 0 |
+
+Cero pólizas y cero pagos en no-hojas: hoy, en PROD, colapsar a la hoja no borra nada. El caso
+836 → 837 es de STG.
+
+**Límite conocido de la regla, y no un supuesto invisible:** `leadsPorRootConfirmado` cuenta solo la
+hoja y asume que en un lead continuado no pasa nada relevante. **Hoy es cierto en PROD; puede dejar de
+serlo.** Si algún día se paga una raíz continuada —STG demuestra que el dato lo permite—, el embudo
+perderá ese pago **en silencio**: ni error ni aviso, un −1 en «Pagadas».
+
+**Paso 4: autorizado por el Arquitecto, NO ejecutado.** Su autorización lleva una condición: medir el
+embudo de PROD antes y después, y revertir si no cuadra. **Yo no puedo leer PROD** en esta sesión, así
+que no podría ni comprobar el «después» ni saber si hay que revertir. Encender sin esa red incumpliría
+su propia condición, y medir por la app de producción sería rodear la misma denegación. Queda
+pendiente de que Alberto, al volver, autorice la lectura de PROD en mi sesión. Con eso, el
+procedimiento es: medir → añadir la variable en Production → redesplegar → medir → comparar con la
+predicción → revertir si no cuadra.
