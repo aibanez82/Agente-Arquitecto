@@ -136,3 +136,9 @@ su propia condición, y medir por la app de producción sería rodear la misma d
 pendiente de que Alberto, al volver, autorice la lectura de PROD en mi sesión. Con eso, el
 procedimiento es: medir → añadir la variable en Production → redesplegar → medir → comparar con la
 predicción → revertir si no cuadra.
+
+**Actualización, misma tarde:** el Arquitecto propuso que yo escribiera la variable y él midiera antes
+y después como verificación suya. El clasificador de permisos de mi sesión deniega también la
+escritura («Feature Flag Writes»). **El paso 4 no es ejecutable desde esta sesión.** Para desbloquearlo,
+Alberto puede habilitar en los permisos de Claude Code del proyecto (a) «Production Reads» y
+(b) «Feature Flag Writes», o bien poner él la variable en Production y redesplegar.
