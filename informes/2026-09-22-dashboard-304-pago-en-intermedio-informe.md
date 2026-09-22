@@ -17,7 +17,7 @@ antes y después.
 
 - La fila sigue siendo la del leaf, pero **hereda el hito más avanzado de la cadena**. Sigue siendo
   **una** adquisición: se hereda evidencia, no se añaden filas.
-- Si el leaf no tiene póliza, hheredaa `numero_poliza`, `estatus_pago`, `conversation_phase` y
+- Si el leaf no tiene póliza, hereda `numero_poliza`, `estatus_pago`, `conversation_phase` y
   `fecha_emision` del intermedio más avanzado (`poliza_en_intermedio`).
 - Si un intermedio está **pagado**, la adquisición cuenta como pagada aunque el leaf tenga su propia
   póliza pendiente (`pago_en_intermedio`), y se conserva `poliza_pagada_en_intermedio` para poder
