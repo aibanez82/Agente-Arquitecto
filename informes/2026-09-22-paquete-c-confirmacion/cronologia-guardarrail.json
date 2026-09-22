@@ -1,0 +1,429 @@
+[
+ {
+  "inicio": "2026-09-22T21:06:28.641Z",
+  "exec_id": "58648",
+  "turno": "C1.1",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:07:31.894Z",
+  "exec_id": "58651",
+  "turno": "C2.1",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:08:05.609Z",
+  "exec_id": "58653",
+  "turno": "C4.1",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:08:35.008Z",
+  "exec_id": "58654",
+  "turno": "D2.1",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:09:33.941Z",
+  "exec_id": "58657",
+  "turno": "D3.1",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:10:12.729Z",
+  "exec_id": "58659",
+  "turno": "G1b.1",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:10:50.835Z",
+  "exec_id": "58661",
+  "turno": "C1.2",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:11:29.498Z",
+  "exec_id": "58663",
+  "turno": "C2.2",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:12:05.754Z",
+  "exec_id": "58665",
+  "turno": "C4.2",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:12:35.588Z",
+  "exec_id": "58666",
+  "turno": "D2.2",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:13:29.761Z",
+  "exec_id": "58669",
+  "turno": "D3.2",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:14:15.889Z",
+  "exec_id": "58671",
+  "turno": "G1b.2",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:14:54.212Z",
+  "exec_id": "58673",
+  "turno": "C1.3",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:15:35.275Z",
+  "exec_id": "58675",
+  "turno": "C2.3",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:16:09.822Z",
+  "exec_id": "58677",
+  "turno": "C4.3",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:16:42.465Z",
+  "exec_id": "58679",
+  "turno": "D2.3",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:17:35.854Z",
+  "exec_id": "58681",
+  "turno": "D3.3",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:18:18.924Z",
+  "exec_id": "58683",
+  "turno": "G1b.3",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:19:12.681Z",
+  "exec_id": "58685",
+  "turno": "C1.4",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:20:06.887Z",
+  "exec_id": "58688",
+  "turno": "C2.4",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:20:39.751Z",
+  "exec_id": "58690",
+  "turno": "C4.4",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:21:09.775Z",
+  "exec_id": "58691",
+  "turno": "D2.4",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:22:09.074Z",
+  "exec_id": "58698",
+  "turno": "D3.4",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:22:59.487Z",
+  "exec_id": "58699",
+  "turno": "G1b.4",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:24:06.403Z",
+  "exec_id": "58701",
+  "turno": "C1.5",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:25:02.275Z",
+  "exec_id": "58704",
+  "turno": "C2.5",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:25:42.260Z",
+  "exec_id": "58707",
+  "turno": "C4.5",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:26:20.136Z",
+  "exec_id": "58708",
+  "turno": "D2.5",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:27:39.396Z",
+  "exec_id": "58712",
+  "turno": "D3.5",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:29:13.228Z",
+  "exec_id": "58714",
+  "turno": "G1b.5",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:29:51.803Z",
+  "exec_id": "58716",
+  "turno": "C1.6",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:30:44.372Z",
+  "exec_id": "58719",
+  "turno": "C2.6",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:31:25.631Z",
+  "exec_id": "58720",
+  "turno": "C4.6",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:32:13.099Z",
+  "exec_id": "58722",
+  "turno": "D2.6",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:33:06.992Z",
+  "exec_id": "58725",
+  "turno": "D3.6",
+  "jailbreak": false,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:33:52.863Z",
+  "exec_id": "58727",
+  "turno": "G1b.6",
+  "jailbreak": true,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:34:21.925Z",
+  "exec_id": "58728",
+  "turno": "C1.7",
+  "jailbreak": true,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:35:04.688Z",
+  "exec_id": "58730",
+  "turno": "C2.7",
+  "jailbreak": true,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:35:35.934Z",
+  "exec_id": "58731",
+  "turno": "C4.7",
+  "jailbreak": true,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:36:08.392Z",
+  "exec_id": "58733",
+  "turno": "D2.7",
+  "jailbreak": true,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:36:51.406Z",
+  "exec_id": "58735",
+  "turno": "D3.7",
+  "jailbreak": true,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:37:25.854Z",
+  "exec_id": "58736",
+  "turno": "G1b.7",
+  "jailbreak": true,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:37:50.596Z",
+  "exec_id": "58738",
+  "turno": "C1.8",
+  "jailbreak": true,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:38:22.138Z",
+  "exec_id": "58739",
+  "turno": "C2.8",
+  "jailbreak": true,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:38:50.467Z",
+  "exec_id": "58741",
+  "turno": "C4.8",
+  "jailbreak": true,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:39:13.866Z",
+  "exec_id": "58742",
+  "turno": "D2.8",
+  "jailbreak": true,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:39:58.365Z",
+  "exec_id": "58744",
+  "turno": "D3.8",
+  "jailbreak": true,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:40:44.537Z",
+  "exec_id": "58746",
+  "turno": "G1b.8",
+  "jailbreak": true,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:41:11.496Z",
+  "exec_id": "58747",
+  "turno": "C1.9",
+  "jailbreak": true,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:41:40.031Z",
+  "exec_id": "58749",
+  "turno": "C2.9",
+  "jailbreak": true,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:42:05.124Z",
+  "exec_id": "58750",
+  "turno": "C4.9",
+  "jailbreak": true,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:42:26.613Z",
+  "exec_id": "58751",
+  "turno": "D2.9",
+  "jailbreak": true,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:43:07.145Z",
+  "exec_id": "58753",
+  "turno": "D3.9",
+  "jailbreak": true,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:43:39.830Z",
+  "exec_id": "58755",
+  "turno": "G1b.9",
+  "jailbreak": true,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:44:08.249Z",
+  "exec_id": "58756",
+  "turno": "C1.10",
+  "jailbreak": true,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:44:40.925Z",
+  "exec_id": "58758",
+  "turno": "C2.10",
+  "jailbreak": true,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:45:20.312Z",
+  "exec_id": "58759",
+  "turno": "C4.10",
+  "jailbreak": true,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:45:44.537Z",
+  "exec_id": "58761",
+  "turno": "D2.10",
+  "jailbreak": true,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:46:22.548Z",
+  "exec_id": "58762",
+  "turno": "D3.10",
+  "jailbreak": true,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:46:52.528Z",
+  "exec_id": "58764",
+  "turno": "G1b.10",
+  "jailbreak": true,
+  "ultimo_nodo": "Buffer Purge Done"
+ },
+ {
+  "inicio": "2026-09-22T21:49:18.053Z",
+  "exec_id": "58767",
+  "turno": "C1.1",
+  "jailbreak": true,
+  "ultimo_nodo": "Buffer Purge Done"
+ }
+]
