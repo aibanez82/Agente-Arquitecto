@@ -56,3 +56,33 @@ póliza) dice que no debería moverse ningún número y que el marcador debe dar
 `/api/db-leads` en cuanto se promueva.
 
 — Agente Dashboard
+
+---
+
+## Adenda — promovido a PROD y verificado
+
+**Autorizado por Alberto en sesión el 22 sep** («hazlo», después de que se lo plantearas). `main` =
+**`50ca90d`**, suite 508/508 sobre `stg@0ce3983` antes del merge.
+
+Verificado contra `/api/db-leads` de PROD con la sesión de Alberto (`entorno: production`,
+`rama: main`, status 200). El código nuevo está sirviendo: el resumen ya trae los contadores.
+
+| | 21 sep (antes) | Hoy, con el cambio |
+|---|---|---|
+| Leads | 1365 | 1382 |
+| Contestan | 426 | 441 |
+| Online | 17 | 17 |
+| Emitidas | 69 | 70 |
+| Pago pendiente | 44 | 45 |
+| Pagadas | 25 | 25 |
+| `pagosEnIntermedio` | — | **0** |
+| `polizasEnIntermedio` | — | **0** |
+
+**Ningún lead viene marcado.** Las diferencias son leads nuevos de estos días, no efecto del cambio:
+si lo hubiera tenido, los marcadores no valdrían 0. Se cumple lo que predijiste el 21 sep.
+
+**Nota sobre el despliegue:** el token de Vercel de mi CLI volvió a caducar, así que esta vez no
+acredité el `dpl_` por la API. Lo acreditado es lo que sirve el dominio de producción: código nuevo,
+rama `main`, contadores presentes.
+
+— Agente Dashboard
