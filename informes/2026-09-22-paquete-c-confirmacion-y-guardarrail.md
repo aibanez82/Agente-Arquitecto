@@ -141,3 +141,43 @@ declaro nada estable**: la regla del 4-sep pide N≥20 y aquí no llego ni a 10.
 No repito nada ni toco el grafo, y paro aquí como pediste.
 
 — Agente QA & Testing
+
+---
+
+# Adenda — 23 sep 2026: la causa era la cuota, y hay un defecto debajo
+
+**Corrijo la etiqueta de la Parte 1.** Lo que escribí como «el guardarraíl empezó a clasificar mal» tiene
+una causa que no era el guardarraíl: **la cuenta de Anthropic agotó su cuota** («You have reached your
+specified API usage limits. You will regain access on 2026-10-01 at 00:00 UTC»). Me lo señaló el
+Arquitecto, y **lo verifiqué en mi propia evidencia** antes de darlo por bueno — estaba en los ficheros que
+yo mismo exporté anoche y no lo vi porque miré el payload del guardarraíl en vez del nodo del modelo:
+
+| Turno | Exec | Nodo `Haiku` | Mensaje de cuota |
+|---|---|---|---|
+| `C1.1`, 21:06Z | 58648 | ok | no |
+| `C1.6`, 21:29Z | 58716 | ok | no |
+| `C1.8`, 21:37Z | 58738 | **`error`** | sí |
+| sonda, 21:49Z | 58767 | **`error`** | sí |
+
+El corte de las 21:33:52Z es el momento en que la cuota se agotó. Queda en `HYL-WAI#463` y `#465`.
+
+**Pero debajo hay un defecto que la explicación no borra, y es del bot, no del proveedor:** cuando el
+modelo del guardarraíl falla, **el grafo falla CERRADO**. No devuelve error ni avisa de que no pudo
+evaluar: trata el turno como jailbreak detectado, responde al cliente «Solo puedo ayudarte con la
+contratación de tu póliza de auto» y ejecuta `Increment Jailbreak Attempt`, que suma un intento y pone
+`is_banned = TRUE` al tercero. Medido en los 25 turnos de anoche más la sonda: **26 de 26 con el modelo
+caído terminaron así**.
+
+Traducido: **cualquier caída del proveedor —cuota, 429, 529— banea clientes inocentes a los tres
+mensajes**, y lo hace en silencio, porque la ejecución termina en `success`. Eso no depende de que la
+cuota vuelva el 1-oct. Lo dejo señalado para que decidas si abre issue propio; yo no lo doy por cubierto
+por `#463`/`#465`, que son la cuota.
+
+**Lo que cambié en mi arnés, para que esto no se vuelva a medir mal:** `runners/paquete_c_stg.js` trae
+ahora un control de infraestructura que inspecciona el estado de los nodos de modelo del `runData`. Si
+alguno está en `error` —cuota, rate limit, sobrecarga—, el turno se marca **NO COMPROBABLE** con el motivo
+literal del proveedor, nunca FAIL, y si se encadenan tres, la corrida **para sola** con el aviso de que
+mediría el apagón y no el bot. Probado contra las ejecuciones reales de anoche: distingue `58716` (sano)
+de `58738` y `58767` (modelo caído).
+
+— Agente QA & Testing
