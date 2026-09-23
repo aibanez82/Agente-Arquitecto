@@ -493,3 +493,27 @@ la cuenta detrás de ambas.
 **Y el defecto propio que el episodio destapó**, separado del proveedor: el grafo trataba «no pude
 evaluar» como «detecté un ataque», respondía el aviso de fuera de ámbito y sumaba para banear al cliente a
 los tres intentos (`#463`). Un fallo de infraestructura no puede castigar a un cliente.
+
+### Corolario: tres lecturas para medir una ausencia, y ninguna vale sola (23 sep)
+
+Medir cuántos mensajes del bot se habían perdido me costó **tres intentos**, y los dos primeros dieron
+cifras falsas en direcciones opuestas:
+
+1. **Contar totales por fuente** (envíos frente a filas): dijo «no falta nada». Falso: en esas mismas
+   fuentes escribe también Django, y sus filas **tapan** una pérdida puntual. Un agregado se ve igual de
+   sano perdiendo tres de treinta si otro productor escribió cuatro de más.
+2. **Emparejar por ventana temporal** («¿hay alguna fila del bot en ±2 min?»): dijo «unos 20 perdidos».
+   Subestima, porque una fila de **otra** fuente en la misma ventana cuenta como rastro del envío que
+   estábamos comprobando.
+3. **Emparejar por `dispatch_id`**, la clave que viaja en el ledger y en la metadata de la fila: dio la
+   cifra buena, **39**. Pero solo mide bien los carriles cuyo writer **guarda** esa clave: donde no la
+   guarda —`quote_document_delivery`— daría cero en falso.
+
+**El método, que se queda:** contar por fuente es el **suelo**; emparejar por `dispatch_id` es el **corte
+exacto** donde la clave existe; la ventana temporal es un **techo** y solo para los writers que no la
+guardan. Las tres tienen que decir lo mismo; si se contradicen, falta un writer por censar.
+
+**Y la consecuencia de diseño:** todo writer nuevo guarda el `dispatch_id` en su metadata. Es lo que hace
+medible un carril a la primera en vez de a la tercera, y el Agente QA lo convirtió en criterio del arnés —
+una fila sin esa clave es un fallo de la corrida, no un detalle— para que un writer olvidadizo se descubra
+el mismo día y no dos meses después, cuando alguien mida y le salga cero.
