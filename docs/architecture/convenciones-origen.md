@@ -448,3 +448,48 @@ objeto que limpiar.
 después (`REGLA DE GROUNDING ESTRICTA` 1→1, el fallback 2→2). Un diff de texto no distingue
 «reescrito en su sitio» de «perdido», y en el `#292` había 3.367 caracteres nuevos donde ese matiz lo
 era todo.
+
+---
+
+## Un `success` puede esconder un fallo, y la causa suele vivir en `description` (22-23 sep)
+
+Dos lecturas del mismo día fallaron por mirar la capa equivocada, y las dos costaron horas de diagnóstico
+en la dirección contraria.
+
+**Primera.** El Agente QA midió que el bot de STG trataba mensajes inocuos como intento de jailbreak: 25
+turnos seguidos. La ejecución terminaba en **`success`**, porque el grafo completa por la rama disparada.
+El payload del nodo decía `Guardrail validation failed: Bad request - please check your parameters`, que
+suena a error de parámetros, y así se investigó: como un defecto del guardarraíl.
+
+**Segunda.** Yo di por bueno que PROD y STG fallaban por causas distintas, porque en PROD el error traía
+«usage limits» y en STG «Bad request». Lo dije y lo escribí.
+
+**Las dos veces, la causa estaba una capa más abajo.** En n8n, el `message` del error es el resumen del
+transporte; la razón real va en el **`description`** del nodo que la originó:
+
+```
+nodo Haiku
+  message:     Bad request - please check your parameters
+  description: You have reached your specified API usage limits.
+               You will regain access on 2026-10-01 at 00:00 UTC.
+```
+
+Era la misma cuota en los dos entornos, con credenciales distintas: el límite no era de una clave, sino de
+la cuenta detrás de ambas.
+
+**Tres reglas:**
+
+1. **Un `success` no acredita que el turno se atendió.** Si un nodo de modelo está en error, el turno no
+   está medido ni atendido: está cerrado. Es el hermano de «una lectura que puede fallar en silencio no
+   acredita ausencia», aplicado a la ejecución entera.
+2. **Ante un error de nodo, leer siempre el `description`, no solo el `message`** — y leerlo en el nodo
+   que falló primero, no en el que lo arrastra.
+3. **Un arnés tiene que distinguir «el sistema no pudo responder» de «el sistema respondió mal».** El
+   Agente QA lo cableó el mismo día: si un nodo de modelo está en error, el turno se marca `NO
+   COMPROBABLE` con el motivo literal del proveedor, nunca `FAIL`, y la corrida para sola a los tres
+   seguidos. Sin ese control, una caída del proveedor se lee como un defecto del producto, que es
+   exactamente lo que pasó.
+
+**Y el defecto propio que el episodio destapó**, separado del proveedor: el grafo trataba «no pude
+evaluar» como «detecté un ataque», respondía el aviso de fuera de ámbito y sumaba para banear al cliente a
+los tres intentos (`#463`). Un fallo de infraestructura no puede castigar a un cliente.
