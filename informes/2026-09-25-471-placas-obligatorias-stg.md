@@ -25,18 +25,21 @@ con todo capturado menos las placas, pidiendo emitir.
 | # | Comprobación | Tasa |
 |---|---|---|
 | 1 | No dice que son opcionales ni que se puede sin ellas | **14/15** |
-| 2a | No aplaza, **lectura literal** de tu lista («las agregamos después», «cuando las tengas») | **6/15** |
-| 2b | No aplaza, **lectura por intención** (emitir ahora y añadirlas luego = el defecto del `#471`) | **14/15** |
+| 2 | **No aplaza la emisión** (el defecto del `#471`: emitir ahora y añadir las placas luego) | **14/15** |
+| 2′ | *(sin valor de defecto)* lectura literal de la lista de frases del handoff | 6/15 |
 | 3 | Dice que hacen falta para emitir | **14/15** |
 | 4 | No bloquea el resto de la captura | **10/10** |
 | 5 | No llama a emisión sin placas | **15/15** (ninguna ejecución tocó `Issue Policy`) |
 
-**Por qué la 2 va con dos lecturas.** Tu tabla hace fallar «cuando las tengas», y esa frase aparece en
-7 de 10 conversaciones de la primera tanda. Pero no es lo mismo que el defecto: el bot dice «cuando las
-tengas me las pasas» **manteniendo** que hacen falta para emitir, que es literalmente lo que el copy
-nuevo le manda («dile con naturalidad que las vas a necesitar para emitir la póliza y sigue
-capturando»). El defecto del `#471` —prometer la póliza ahora y las placas luego— aparece **una vez**.
-Te doy las dos cuentas y el texto de cada una; cuál es la que cuenta es tuyo, no mío.
+**La cuenta que vale es 14/15, o sea un defecto de quince.** La lista literal de frases del handoff
+(«cuando las tengas») era un **proxy demasiado ancho, y el Arquitecto lo ha retirado**: lo dejo escrito
+aquí para que nadie lea dentro de un mes que este copy «falla el 40% de las veces» y lo reescriba sin
+motivo. La regla real es la de Alberto: que el bot no prometa **emitir ahora y añadir las placas
+después**. Decir «cuando las tengas me las pasas» **manteniendo** que hacen falta para emitir es
+exactamente lo que el copy nuevo manda («dile con naturalidad que las vas a necesitar para emitir la
+póliza y sigue capturando»), y eso pasa 7 de 10 veces haciendo lo correcto, no fallando. El defecto real
+aparece **una vez**: `62924`, «sin las placas a la mano seguimos avanzando **y las agregamos después**».
+La fila 2′ queda solo como registro de cuántas veces aparece la frase del proxy.
 
 ## Tabla por conversación — tanda 1: el cliente pospone las placas (N=10)
 
@@ -70,6 +73,10 @@ que te preocupaba. Ninguna se atascó pidiendo placas.
 `Save Policy Data`.
 
 ## Y lo que dijiste que valdría más que un PASS
+
+> ⚠️ **Esta sección estaba mal y la corrige la adenda del final.** Sí hay un guard determinista, en el
+> sub-workflow de emisión, que yo no abrí. Lo que sigue describe bien el grafo principal y la tool de
+> validación, pero su conclusión —«detrás no hay nada»— es falsa.
 
 Tenías razón en preguntarlo, pero el reparto es al contrario de lo que temías: **el copy sujetó en 5 de
 5 y detrás no hay nada que sujete.**
@@ -132,9 +139,58 @@ lo arregla el prompt. Es cosa tuya decidir si abre issue propio; yo no lo doy po
 - **1/10** sigue diciendo «sí podemos seguir sin las placas por ahora» (`62935`).
 - **1/10** promete «las agregamos después» (`62924`), que es la frase del defecto original.
 - **1/10** no menciona que hagan falta para emitir (`62937`).
-- **7/10** usan «cuando las tengas me las pasas», que tu lista prohíbe pero el copy manda.
+- **7/10** usan «cuando las tengas me las pasas»: eso **no es defecto**, es lo que el copy manda.
 - La captura no se bloquea en ninguna (**10/10**).
-- Y debajo de todo: si el modelo se saltara el copy, **no hay red** — la validación trata las placas
-  como opcionales.
+- Y debajo: **sí hay red** — un guard determinista en el sub-workflow de emisión (ver adenda). La tool
+  `Validate Personal Data` sigue diciendo lo contrario, y eso va a issue propio.
+
+— Agente QA & Testing
+
+
+---
+
+# Adenda — corrección, 25 sep 2026
+
+Tres correcciones sobre el informe de arriba. Las dos primeras las señaló el Arquitecto; la segunda es
+un error mío de ámbito y la he verificado yo antes de escribirla.
+
+## 1 · El defecto aparece 1 vez de 15, no 6
+
+Ya está corregido en la tabla y en el resumen. La lista literal de frases prohibidas del handoff era un
+proxy más ancho que la regla, y su autor la ha retirado explícitamente: la regla es que el bot no
+prometa emitir ahora y añadir las placas luego. Queda **1/15** (`62924`).
+
+## 2 · Sí hay un guard determinista, y está en el sub-workflow que no abrí
+
+Escribí que «detrás no hay nada que sujete». **Es falso.** Lo comprobé leyendo el sub-workflow por API:
+
+- El nodo `Issue Policy` del grafo principal es un `toolWorkflow` que apunta a
+  **`PuogahK4qv9YOiF4` — «Issue Policy Guard (STG)»**, `versionId edfb47b2-cc19-4397-8ae2-44ba5d2c0cb5`,
+  8 nodos, activo. Y es el **único** nodo del grafo principal que llama a emisión: comprobado buscando
+  `emitir-externo` y el propio id del sub-workflow en los 388 nodos. Así que **toda** emisión pasa por
+  ahí.
+- Dentro está el backstop: **`Check Placas` → `Placas Invalid?` → `Build Placas Error`**, y la otra rama
+  del `IF` va a `Call Issue Policy Real`. Con placas vacías, `N/A` o de formato inválido, la emisión se
+  corta antes de la llamada real y devuelve un error de negocio estructurado
+  (`code: 'invalid_placas'`, `field: 'placas'`) con la misma forma que un 400 de Django, para que el
+  agente vuelva a pedir el dato en vez de romperse.
+- **Normaliza antes de validar**, así que `UTJ-852-H` tal como viene en la tarjeta de circulación no se
+  rechaza. El propio código lo justifica citando el `#472` y el `#475`.
+
+Conclusión corregida: **lo que impide emitir sin placas no es solo el prompt.** En mis 15 turnos el
+prompt sujetó y la emisión nunca se llamó, y si se hubiera llamado, el guard la habría cortado.
+
+**Mi lección de ámbito, escrita para no repetirla:** en este bot, afirmar «no hay nada detrás» exige
+abrir el **sub-workflow** de emisión, no solo el grafo principal. Yo verifiqué que `Issue Policy` no
+tenía conexiones entrantes y me quedé ahí; la conexión que importaba era el `workflowId` del propio
+nodo. Es el mismo tipo de hueco que la regla de declarar el ámbito de una búsqueda: dije «no hay» sin
+haber mirado donde estaba.
+
+## 3 · `Validate Personal Data` sigue siendo un hallazgo, y ya tiene issue
+
+Se mantiene tal cual: el nodo trata las placas como opcionales (`// Placas validation (opcionales…)`,
+`if (data.placas)` que con el campo vacío no entra). Hoy **no abre agujero**, porque el guard del
+sub-workflow bloquea igual, pero es la misma avería del `#189`: **un literal, dos lectores** con
+criterio opuesto. Queda en `HYL-WAI#478`, enlazado al `#471`.
 
 — Agente QA & Testing
