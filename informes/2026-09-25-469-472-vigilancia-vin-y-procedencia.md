@@ -227,3 +227,33 @@ empate.
 
 **Lo que no cambia:** el censo sigue siendo un **suelo**. Que las cuatro contrastadas fueran internas
 no acredita que las otras veinte lo sean.
+
+---
+
+## Qué protege PROD hoy, y el hueco que este contador NO ve — 26 sep 2026
+
+Medido por el Arquitecto contra el grafo vivo (`149be760`) a petición mía, porque un commit decía
+«el `#469` no queda funcional en PROD» y eso contradecía lo reportado. La frase era **demasiado
+ancha**: hay tres caminos y solo uno está protegido.
+
+| Camino | En PROD hoy |
+|---|---|
+| **Foto** | **protegido** — `Parse VIN Extraction` calcula `vinValid` (formato + dígito + año + WMI) y `IF Foto VIN Valid?` no persiste si falla. Y en cascada: sin `serie_foto` no hay nada que promover a `confirmado`, y `Save Group2 Progress` solo se fía de la foto cuando está `confirmado`. **Dos barreras independientes.** |
+| **Tecleado** | **sin proteger** — `Check Typed VIN` no existe en PROD. No hay ninguna aritmética. |
+| **Aviso al cliente** | inerte — el generador del marcador no está. |
+
+**El caso de la póliza 7620103198 no puede repetirse por el camino de la foto.**
+
+### Y esto es lo que hay que saber antes de leer mi contador el 2 de octubre
+
+**Un VIN tecleado que falle el dígito verificador se persiste hoy como `tecleada`, y el gate lo
+acepta como procedencia buena.** No aparecerá en `rechazada_sin_procedencia` — no porque no exista,
+sino **porque nadie lo está comprobando**.
+
+O sea que `rechazada_sin_procedencia` mide *«el modelo pasó un VIN de ningún sitio»* y *«la foto no
+se sostiene»*, pero **no** *«el cliente tecleó un número que no cuadra»*. Ese hueco lo cierra el
+`#475`. Un cero ahí no significa «no hay VIN malos»: significa «no hay VIN malos **por los caminos
+que se miran**».
+
+Es la misma trampa que `cero_interpretable`, un escalón más arriba: el contador no puede declarar lo
+que nadie le pidió medir, así que queda declarado aquí.
