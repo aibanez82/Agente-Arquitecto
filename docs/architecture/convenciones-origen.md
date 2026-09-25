@@ -553,3 +553,33 @@ sin ámbito no la puede refutar nadie.
 Yo verifiqué que el guard existe; el QA verificó además que **ningún otro nodo llama a emisión**, y
 eso convierte «hay un guard en el camino» en «toda emisión pasa por el guard». Cuando alguien
 corrija una ausencia, que no se quede en desmentirla: que mida el ámbito entero.
+
+## Un issue puede viajar en dos artefactos, y el orden no es indiferente (25 sep 2026)
+
+**La regla:** cuando un arreglo vive en **dos sitios que se promueven por separado**, el orden entre
+ellos **no es una preferencia**: **primero la pieza que protege, después la que actúa.** Y quien
+firma tiene que saber que son dos, o firmará medio arreglo creyendo que firma entero.
+
+**Salió dos veces el mismo día, en dos issues distintos y con la misma forma:**
+
+- **`#471` — guard antes que copy.** El arreglo eran el texto del `systemMessage` («las placas son
+  obligatorias») y una puerta en `Issue Policy Guard`, que es **otro workflow**. Promover el copy
+  primero habría dejado una ventana diciendo «obligatorias» **sin nada que lo impidiera** — el
+  estado exacto que el issue existe para evitar, y encima con apariencia de arreglado. Con el guard
+  primero, lo peor que hay es un instante de puerta con copy aún permisivo: seguro.
+- **`#469` — regla antes que generador.** La regla del marcador `[SERIE_SOSPECHOSA]` viajó al prompt
+  de PROD **inerte**, porque los nodos que lo emiten siguen en STG. Al revés habría sido peligroso:
+  el grafo inyectando un marcador que el prompt no conoce, con el riesgo medido de que el modelo lo
+  **lea en voz alta a un cliente**.
+
+**Cómo se documenta una pieza inerte, que es la mitad que se hace mal.** Escribirla como
+«inofensiva» invita a que alguien la quite por limpieza. Se escribe como **«la red va primero»**,
+que explica por qué está.
+
+**Y el corolario de la firma:** el `#471` se presentó a Alberto como «tres cambios de prompt». Faltó
+decir que uno de los tres **viajaba además en un segundo artefacto**. Si eso no se dice, se firma el
+prompt y la puerta se queda atrás.
+
+**Cómo se detecta antes de que muerda:** al preparar una promoción, preguntar por cada issue **en
+cuántos artefactos vive** — el grafo principal, un sub-workflow, el `systemMessage`, una config var,
+el código de Django. La respuesta no se deduce del issue: se mide contra los entornos.
