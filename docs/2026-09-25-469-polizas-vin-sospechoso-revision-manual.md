@@ -21,39 +21,44 @@ El VIN real se leyó de la propia tarjeta de circulación que viaja en la ejecuc
 todo: dígito verificador correcto, WMI `93Y` = Renault, posición 10 `C` = 2012. La titular está
 avisada por otro canal.
 
-## Las trece pendientes de pago
+## ⚠️ Corregido: eran trece, son **siete**
 
-Emitidas, sin cobrar. Ordenadas por número de señales.
+La primera versión de este documento listaba trece. **Seis de las catorce eran emisiones de prueba
+nuestras** —titulares «Prueba Primero», «Prueba Pruebo», «Pruebo Intento», «Juan Gomez», «Cliente
+Sintetico», con correos `juan.aguayo@aguayo.co`, `test@test.com` y `codex-smoke-…@example.…`—.
+
+**Se colaron porque filtré por el VIN y no por el titular.** El número de serie de una emisión de
+prueba puede parecer perfectamente normal; lo que la delata es quién figura como asegurado. Y
+explica por qué fallaban las comprobaciones: un VIN inventado a mano para una prueba no tiene por
+qué cumplir el dígito verificador ni pegar con la marca. No eran indicios; era ruido nuestro.
+
+## Las siete pendientes de pago
+
+Emitidas, sin cobrar, y **son clientes reales**.
 
 | # | Póliza | VIN emitido | Vehículo cotizado | Señal |
 |---|---|---|---|---|
-| 1 | 7620102772 | `3N1AB7AP7HY219404` | HYUNDAI ELANTRA 2024 | dígito (7≠0) **y** WMI Nissan |
-| 2 | 7620099714 | `3FA6P0H77HR103594` | TOYOTA C-HR 2022 | dígito (7≠8) **y** WMI Ford |
-| 3 | 7620099716 | `3G1BE5SM3JS114952` | FORD EDGE 2020 | dígito (3≠6) **y** WMI Chevrolet |
-| 4 | 7620098914 | `MB2C22AC6LM856961` | HYUNDAI CRETA 2020 | dígito (6≠9) |
-| 5 | 7620099526 | `3N1AB7AP8EY708126` | NISSAN APRIO 2008 | dígito (8≠6) |
-| 6 | 7620099709 | `MEX5A2669L1974968` | VW VENTO 2020 | dígito (9≠6) |
-| 7 | 7620102540 | `3HGCM5H5XHA000123` | CHEVROLET AVEO 2015 | dígito (X≠0) |
-| 8 | 7620102934 | `1FAFP42X64F165471` | VW JETTA 2016 | WMI Ford |
-| 9 | 7620102937 | `WBANV13548CZ54505` | AUDI Q5 2024 | WMI BMW |
-| 10 | 7620101467 | `1HGCG32601A007720` | AUDI Q3 2020 | WMI Honda |
-| 11 | 7620102689 | `1FTCR14A3VTA51719` | NISSAN MARCH 2018 | WMI Ford |
-| 12 | 7620098611 | `1FMPU15595LA45520` | KIA K3 2025 | WMI Ford |
-| 13 | (sin número) | `3N1BC1AS6BL477627` | TOYOTA RAV4 2024 | WMI Nissan |
+| 1 | 7620098611 | `1FMPU15595LA45520` | KIA K3 2025 | WMI Ford |
+| 2 | 7620098914 | `MB2C22AC6LM856961` | HYUNDAI CRETA 2020 | dígito (6≠9) |
+| 3 | 7620099526 | `3N1AB7AP8EY708126` | NISSAN APRIO 2008 | dígito (8≠6) |
+| 4 | 7620099709 | `MEX5A2669L1974968` | VW VENTO 2020 | dígito (9≠6) |
+| 5 | 7620102689 | `1FTCR14A3VTA51719` | NISSAN MARCH 2018 | WMI Ford |
+| 6 | 7620102934 | `1FAFP42X64F165471` | VW JETTA 2016 | WMI Ford |
+| 7 | 7620102937 | `WBANV13548CZ54505` | AUDI Q5 2024 | WMI BMW |
 
-**El nº 8 tiene una particularidad:** su dígito verificador **sí cuadra**, pero el WMI es Ford sobre
-una VW Jetta. Es el VIN de la conversación `waq_3613`/`waq_3608` del 21 sep, y su foto **está visible
-en el Dashboard**, así que es el único de los trece que se puede contrastar contra la imagen sin
-pedir nada a nadie. Por ahí empieza la revisión más barata.
+Las nº 6 y 7 comparten titular con otras pólizas del mismo nombre: conviene mirarlas juntas.
 
 ---
 
 ## Tres cosas que hay que saber antes de trabajar la lista
 
-**1. Es un suelo, no un techo.** La comparación de marca usa una tabla de WMI conocidos: si el WMI
+**1. Es un suelo, no un techo, y el suelo se midió sobre datos sucios.** La comparación de marca usa una tabla de WMI conocidos: si el WMI
 de un VIN no está en esa tabla, **no se señala nada**. Puede haber más de trece. El número que sí es
-cerrado es el del dígito verificador, que es aritmética y no depende de ninguna tabla: **ocho** de
-los catorce lo fallan.
+cerrado es el del dígito verificador, que es aritmética y no depende de ninguna tabla.
+
+**Y una advertencia que nació de equivocarme:** los datos de PROD **no distinguen lo real de lo de
+prueba** (`HYL-WAI#346`). Cualquier censo sobre pólizas arrastra nuestras emisiones QA. **Cruzar
+siempre con el asegurado y descartar por titular**, nunca por el aspecto del dato técnico.
 
 **2. Una señal no es una condena.** El dígito verificador es obligatorio en EE. UU. y Canadá; en
 vehículos de mercado mexicano se cumple casi siempre pero **no por norma**. Un VIN legítimo que no
