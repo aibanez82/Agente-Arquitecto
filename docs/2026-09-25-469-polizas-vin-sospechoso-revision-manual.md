@@ -21,32 +21,52 @@ El VIN real se leyó de la propia tarjeta de circulación que viaja en la ejecuc
 todo: dígito verificador correcto, WMI `93Y` = Renault, posición 10 `C` = 2012. La titular está
 avisada por otro canal.
 
-## ⚠️ Corregido: eran trece, son **siete**
+## ⚠️ Corregido dos veces: eran trece, luego siete, **y son tres**
 
-La primera versión de este documento listaba trece. **Seis de las catorce eran emisiones de prueba
-nuestras** —titulares «Prueba Primero», «Prueba Pruebo», «Pruebo Intento», «Juan Gomez», «Cliente
-Sintetico», con correos `juan.aguayo@aguayo.co`, `test@test.com` y `codex-smoke-…@example.…`—.
+Esta lista ha encogido dos veces el mismo día y las dos por el mismo motivo: **filtré por el campo
+equivocado.**
 
-**Se colaron porque filtré por el VIN y no por el titular.** El número de serie de una emisión de
-prueba puede parecer perfectamente normal; lo que la delata es quién figura como asegurado. Y
-explica por qué fallaban las comprobaciones: un VIN inventado a mano para una prueba no tiene por
-qué cumplir el dígito verificador ni pegar con la marca. No eran indicios; era ruido nuestro.
+**Primera corrección (13 → 7).** Seis eran emisiones de prueba nuestras. Se colaron porque filtré
+por el **VIN**, y el número de serie de una prueba puede parecer perfectamente normal.
 
-## Las siete pendientes de pago
+**Segunda corrección (7 → 3).** Otras cuatro también eran pruebas. Se colaron porque filtré por el
+**titular**, y miré si «parecía una persona real»: nombre corriente, correo de Gmail o Hotmail. Lo
+son. **Son las cuentas personales de quienes prueban el sistema.** Dos están en la lista interna por
+correo y dos por teléfono.
 
-Emitidas, sin cobrar, y **son clientes reales**.
+**La lección, que es la misma dos veces:** no se descarta una prueba por si el dato *parece* real, se
+descarta contra **el registro de quién es interno**. El Dashboard tiene esa puerta única
+(`esLeadInterno`, 17 correos y 14 teléfonos) y es la que manda. Yo estaba juzgando apariencias.
 
-| # | Póliza | VIN emitido | Vehículo cotizado | Señal |
-|---|---|---|---|---|
-| 1 | 7620098611 | `1FMPU15595LA45520` | KIA K3 2025 | WMI Ford |
-| 2 | 7620098914 | `MB2C22AC6LM856961` | HYUNDAI CRETA 2020 | dígito (6≠9) |
-| 3 | 7620099526 | `3N1AB7AP8EY708126` | NISSAN APRIO 2008 | dígito (8≠6) |
-| 4 | 7620099709 | `MEX5A2669L1974968` | VW VENTO 2020 | dígito (9≠6) |
-| 5 | 7620102689 | `1FTCR14A3VTA51719` | NISSAN MARCH 2018 | WMI Ford |
-| 6 | 7620102934 | `1FAFP42X64F165471` | VW JETTA 2016 | WMI Ford |
-| 7 | 7620102937 | `WBANV13548CZ54505` | AUDI Q5 2024 | WMI BMW |
+Y hay una confirmación independiente de que las cuatro eran pruebas: sus VIN codifican los años
+**2005, 2027, 2004 y 2008** contra cotizaciones de **2025, 2018, 2016 y 2024**. No son desviaciones
+de un carácter mal leído — son números que no tienen nada que ver con el coche.
 
-Las nº 6 y 7 comparten titular con otras pólizas del mismo nombre: conviene mirarlas juntas.
+## Las tres
+
+Emitidas, sin cobrar, **clientes reales**. Y no son el mismo problema, así que van separadas.
+
+### Una con un VIN que no cuadra
+
+| Póliza | VIN emitido | Vehículo cotizado | Señal |
+|---|---|---|---|
+| 7620099526 | `3N1AB7AP8EY708126` | NISSAN APRIO 2008 | dígito verificador **y** año |
+
+Dos señales independientes. Es el perfil de un VIN mal leído o mal tecleado.
+
+### Y dos que **no parecen VIN**
+
+| Póliza | VIN emitido | Vehículo cotizado | Señal |
+|---|---|---|---|
+| 7620099709 | `MEX5A2669L1974968` | VW VENTO 2020 | dígito · **empieza por `MEX`** |
+| 7620098914 | `MB2C22AC6LM856961` | HYUNDAI CRETA 2020 | dígito · **empieza por `MB2`** |
+
+Tienen 17 caracteres y pasan el formato, pero `MEX` y `MB2` **no son prefijo de ningún fabricante**.
+Parecen **marcadores de captura** colados donde va el número de serie.
+
+**Eso no se arregla pidiendo la foto otra vez.** Un VIN mal leído se corrige preguntando; un
+marcador en su sitio significa que **algo escribió ahí lo que no debía**, y hay que averiguar qué.
+Son las dos que primero miraría.
 
 ---
 
