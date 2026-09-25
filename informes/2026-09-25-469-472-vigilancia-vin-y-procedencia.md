@@ -3,6 +3,12 @@
 **De:** Agente Dashboard · **Para:** Arquitecto / Alberto · **25 sep 2026**
 **Encargo:** `Dashboard_seguroautoqualitas:handoffs/2026-09-25-469-472-vigilar-lo-que-acaba-de-entrar-en-prod.md` (`6abc8a7`)
 **Entregado en:** `Dashboard_seguroautoqualitas` `stg` = `b8a6838`, suite 611/611. **Sin promocionar a `main`.**
+> [!WARNING]
+> **Corregido el 25 sep 2026, después de publicar.** Dos de las seis pólizas que señalé eran
+> **falsos positivos míos**: `1C4` no es exclusivo de Dodge, cubre todo el grupo Chrysler, y acusé a
+> dos Jeep reales. **El censo queda en 4, y las cuatro fallan el dígito verificador.** Ver
+> «Corrección» al final. Las tablas de abajo conservan la versión errónea, tachada donde toca.
+
 **Ámbito:** todo lo de abajo medido contra **PROD** hoy, con el instrumento que se entrega. Solo lectura.
 
 ---
@@ -58,8 +64,8 @@ Medido hoy contra PROD:
 | 7620099709 | `MEX5A2669L1974968` | VOLKSWAGEN 2020 | dígito |
 | 7620099526 | `3N1AB7AP8EY708126` | NISSAN 2008 | dígito, año |
 | 7620098914 | `MB2C22AC6LM856961` | HYUNDAI 2020 | dígito |
-| 7620098789 | `1C4AJCCB5CD666154` | JEEP 2012 | marca |
-| 7620097487 | `1C4RJFAG6CC179859` | JEEP 2012 | marca |
+| ~~7620098789~~ | ~~`1C4AJCCB5CD666154`~~ | ~~JEEP 2012~~ | ~~marca~~ · **FALSO POSITIVO** |
+| ~~7620097487~~ | ~~`1C4RJFAG6CC179859`~~ | ~~JEEP 2012~~ | ~~marca~~ · **FALSO POSITIVO** |
 
 Dos merecen una mirada aparte por su forma, no por su aritmética: **`MEX5A2669L1974968`** y
 **`MB2C22AC6LM856961`**. Tienen 17 caracteres y pasan el formato, pero empiezan por `MEX` y `MB2`,
@@ -142,5 +148,59 @@ vigilada sigue siendo comparable** en vez de dar un salto. Y los motivos concret
 El endpoint está en `stg` y **no se ha promocionado a `main`**. Desde `stg` ya lee PROD, así que la
 vigilancia es utilizable hoy; promocionarlo solo la pone al alcance de quien entre por el dominio de
 producción.
+
+— Agente Dashboard
+
+---
+
+## Corrección — 25 sep 2026, después de publicar
+
+**Dos de las seis eran falsos positivos míos.** Lo cazó el Arquitecto.
+
+Mi tabla tenía **`'1C4': 'DODGE'`**, y `1C4` no es exclusivo de Dodge: cubre todo el grupo Chrysler.
+Las dos pólizas que señalé por marca son Jeep reales —`1C4RJFAG…` patrón de Grand Cherokee,
+`1C4AJCCB…` de Patriot/Compass—, así que **acusé a dos clientes de un error que no cometieron**.
+
+El argumento que lo cierra no es saber de coches: para que mi catálogo tuviera razón harían falta
+**dos clientes distintos** que hubieran puesto por su cuenta un VIN de Dodge en una cotización de
+Jeep. Dos errores idénticos y coincidentes son mucho menos probables que una entrada de catálogo
+demasiado estrecha.
+
+Y es exactamente lo que advertía el comentario de mi propio fichero: *«añadir un WMI dudoso convierte
+un `inconclusive` en un falso positivo, que es peor que no señalar»*. **La regla estaba bien; la
+entrada no.**
+
+**No se arregla ampliando.** Reasignar `1C4` a Jeep acusaría a los Dodge. Un prefijo compartido por
+varias marcas del mismo grupo **deja de opinar**: devuelve `inconclusive`, igual que uno desconocido.
+Hay un test que impide reasignarlo, porque «arreglarlo» así es justo lo que alguien intentaría.
+
+Del mismo defecto salieron otros: `LSG` lo tenía como MG y es SAIC-GM (Chevrolet, Buick); `KL1` es
+GM Corea; `JS2`, `JSA` y `MA3` son Suzuki rebadged como Chevrolet en varios mercados. Todos pasan a
+compartidos.
+
+### El censo corregido (`stg` = `c1b46c1`, medido contra PROD)
+
+| | antes | **ahora** |
+|---|---|---|
+| reales | 43 | 43 |
+| limpias | 37 | **39** |
+| **merecen revisión** | 6 | **4** |
+| de ellas, fallan el dígito | 4 | **4** |
+| pagadas | 1 | **1** |
+| señaladas sin excluir nada | 28 | **26** |
+
+| póliza | VIN | vehículo | señales |
+|---|---|---|---|
+| **7620103198** | `3N1AB7AP7EL609642` | RENAULT 2012 · **PAGADA** | dígito, año, marca |
+| 7620099709 | `MEX5A2669L1974968` | VOLKSWAGEN 2020 | dígito |
+| 7620099526 | `3N1AB7AP8EY708126` | NISSAN 2008 | dígito, año |
+| 7620098914 | `MB2C22AC6LM856961` | HYUNDAI 2020 | dígito |
+
+**Las cuatro fallan el dígito verificador**, que es la única señal que no depende de ningún catálogo.
+El censo es más corto y más firme que el de antes.
+
+**Lo que me llevo, más allá de las dos pólizas:** una señal basada en un catálogo hereda los errores
+del catálogo, y los hereda **en la dirección que acusa**. El dígito verificador no tiene ese defecto.
+Por eso se contaba aparte desde el principio, y por eso ahora es el que sostiene el resultado entero.
 
 — Agente Dashboard
