@@ -1,7 +1,13 @@
 # Monitores de sesión del Arquitecto — especificación para rearmarlos
 
 > Los monitores viven solo mientras la sesión está abierta. Al abrir sesión nueva durante trabajo
-> activo con Juan (etapas S1–S5), armar los **CINCO** con la herramienta Monitor (`persistent: true`).
+> activo con Juan (etapas S1–S5), armar los **CINCO** con la herramienta Monitor.
+>
+> **`persistent: true` ya no existe (medido el 25 sep 2026 en el esquema de la herramienta).** El
+> techo es `timeout_ms`, máximo **30 minutos**, y al expirar hay que rearmar. Consecuencia que hay
+> que tener presente: **si la sesión se queda sin turnos, los cinco se caen solos** — ya no
+> sobreviven a un `/clear` como en agosto, así que el residuo huérfano deja de ser el riesgo
+> principal y pasa a serlo el contrario, quedarse sin vigilancia sin enterarse.
 > Antes de armarlos: hacer el barrido de arranque (dudas/ pendientes, informes/, `gh issue list`
 > en HYL-WAI —tracker único desde el 19 ago— y comentarios nuevos en los issues vivos desde la
 > última actividad conocida) — los monitores solo cubren lo NUEVO a partir de su arranque.
@@ -194,8 +200,33 @@ tocar = huérfano. `ps` decía que estaba vivo; solo el id de sesión decía de 
 
 ## 4. Dudas de ejecutores
 
-Poll cada 60s de `git ls-tree origin/main -- dudas/` del repo Agente-Arquitecto: fichero sin su
-`-respuesta.md` = duda pendiente → emitir una línea. (Responder SIEMPRE por fichero.)
+Poll cada 60s de `git ls-tree origin/main -- dudas/` del repo Agente-Arquitecto: duda sin
+contestación → emitir una línea. (Responder SIEMPRE por fichero.)
+
+**v2 (25 sep 2026) — el sufijo del nombre no era la señal.** La v1 daba por contestación mía todo
+fichero acabado en `-respuesta.md`. Falló en los dos sentidos **a la vez**, y las dos averías
+estaban vivas el mismo día:
+
+- `2026-09-18-n8n-contadores-onerror-corta-respuesta.md` es una **duda** —su asunto es que el
+  contador corta la respuesta— y el filtro la descartó como contestación. **Siete días invisible.**
+- `2026-09-18-n8n-338-256-RESPUESTA.md` era contestación mía, pero el patrón es sensible a
+  mayúsculas y no la reconoció: la duda siguió marcada «pendiente» con la respuesta publicada al lado.
+
+**La dirección está escrita dentro del documento**, no en su nombre: `**De:** Agente n8n ·
+**Para:** Arquitecto` frente a `**De:** Arquitecto-IA-Quálitas`. Ahí es donde se lee ahora.
+
+El emparejamiento por nombre se conserva para el caso normal —es barato y no se equivoca cuando los
+dos ficheros existen—, pero **cuando no hay pareja, que es justo donde la v1 adivinaba, se abre el
+documento y se mira la firma**. Sin esa lectura, las **cuatro** contestaciones mías de agosto que
+responden a dudas llegadas por otra vía (informe, mensaje directo, aviso) y nunca ficheradas
+saldrían como pendientes **para siempre**: un canal con cuatro falsos permanentes enseña a no
+mirarlo, que es exactamente cómo se pierde un monitor sin que nadie lo apague.
+
+**Y se ejercita con fixtures, no mirando si la salida está vacía.** `m4-dudas.sh --clasificar` lee
+una lista por stdin y no toca ni red ni estado. Los tres controles que acreditan la v2 —y que la v1
+suspende— son: la duda difícil **sin** su respuesta debe SALIR; una contestación mía huérfana debe
+CALLAR; y un `-RESPUESTA.md` en mayúsculas debe emparejar igual. `bash -n` no ve ninguno de los
+tres.
 
 ## 5. Informes de ejecutores en `informes/` de este repo
 
