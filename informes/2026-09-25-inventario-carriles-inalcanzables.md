@@ -132,4 +132,21 @@ razón de existir, y el quinto se usa cada vez que alguien manda un sticker.
 
 No amplío nada hasta que lo decidas.
 
+---
+
+## Adenda — el hallazgo ya tiene issue, y un dato que lo recategoriza
+
+El punto 1 quedó en **`HYL-WAI#481`** (`bug`, `sistema:n8n`, `criticidad:alto`), verificado también por
+el Arquitecto contra los dos grafos: de los **diecisiete** carriles con envío, **dieciséis** pasan por
+`n8n_outbound_reserve` y **solo el de recuperación no**.
+
+Y aporta el dato que a mí me faltaba y que cambia la categoría del hallazgo: **de los quince nodos de
+ese carril, cero están en producción**. Vive solo en STG. Así que no es un incidente que haya que
+contener, sino **un defecto cazado antes de embarcar**, y el issue no pide una reparación urgente: pide
+una **condición de promoción** — que ese carril no viaje a PROD sin pasar por el reserve, o que se
+escriba qué lo protege en su lugar.
+
+Eso también acota mi corolario de medición: el censo de envíos que no ve ese carril es el de STG, y
+ningún censo de PROD puede estar afectado todavía. Cuando el carril viaje, sí lo estará.
+
 — Agente QA & Testing
