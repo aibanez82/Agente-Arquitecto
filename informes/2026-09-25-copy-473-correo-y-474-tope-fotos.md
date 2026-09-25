@@ -253,7 +253,7 @@ Ya no puedo revisar más fotos en esta conversación, así que esta no la vi. Es
 **I · No falta nada; póliza emitida o pago en curso** (es la foto 5 de `waq_3662`)
 
 ```
-Ya no puedo revisar más fotos en esta conversación, así que esta no la vi. Si es tu comprobante de pago, no necesitas mandármelo: el pago se valida automáticamente en cuanto la pasarela lo confirma. Si es otra cosa, cuéntamelo por texto y te ayudo.
+Ya no puedo revisar más fotos en esta conversación, así que esta no la vi. Si es tu comprobante de pago, no necesitas mandármelo: en cuanto tu pago quede confirmado, la documentación de tu póliza te llega a tu correo. Si es otra cosa, cuéntamelo por texto y te ayudo.
 ```
 
 Por qué la misma primera frase en las cuatro: es la parte que hoy falta (decir que no la vio) y conviene que sea siempre igual para reconocerla en el historial y medirla. «Así que esta no la vi» es lo que evita el «no pude leer bien» falso. La salida cambia porque cambia lo que falta, no por adivinar la foto.
@@ -317,5 +317,23 @@ Cuando tu pago quede confirmado, la documentación de tu póliza te llega a [cor
 Por qué «cuando tu pago quede confirmado» y no «cuando pagues»: el disparador es la confirmación (recibo pagado y conciliado), no el clic en la liga; si el cliente paga y mira el correo a los cinco minutos, la frase sigue siendo verdad. Con la guarda sin canónico, las tres se leen «…te llega a tu correo registrado…», que sigue siendo correcto.
 
 Sin cambios en detectores de hitos ni en la regla `CORREO Y TELÉFONO DEL CLIENTE` de §1.
+
+Agente: Mejoras Conversación
+
+---
+
+## Adenda 2 (25-sep): texto D sin afirmar el mecanismo
+
+Validados por el Arquitecto A, B, C, E y F–I. En D pidió quitar «se valida automáticamente en cuanto la pasarela lo confirma»: afirma un mecanismo (el poller de `first_receipt_polling.py`) cuya salud no está comprobada hoy, y el antecedente del scraper de conciliación muerto 19 días mientras los documentos decían «operativo» es reciente. El texto describe el efecto, no el mecanismo, y conserva el trozo que arregla el daño real de `waq_3662`.
+
+**D · Dice que ya pagó y pregunta por la póliza** (sustituye a la versión de la adenda 1)
+
+```
+En cuanto tu pago quede confirmado, la documentación de tu póliza te llega a [correo]. No necesitas mandarme nada más.
+```
+
+Nota para quien traduzca el cambio: la **regla 0 de FASE** del prompt vivo (`6c5f9c3b`, offset 65777) sigue diciendo «explícale que el pago se valida automáticamente en cuanto la pasarela lo confirme». El texto I del tope (§2) remite a esa regla. Si la afirmación del mecanismo no se quiere en boca del bot, esa regla y el texto I deben decir lo mismo que D («en cuanto tu pago quede confirmado»), no lo cambio yo porque la regla 0 no está en este encargo.
+
+Con esto queda cerrado por mi parte.
 
 Agente: Mejoras Conversación
