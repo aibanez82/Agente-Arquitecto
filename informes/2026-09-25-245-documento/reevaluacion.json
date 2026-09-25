@@ -1,0 +1,470 @@
+{
+ "tasas": {
+  "no_averia": {
+   "ok": 15,
+   "total": 15
+  },
+  "cifras_correctas": {
+   "ok": 20,
+   "total": 20
+  },
+  "sin_url": {
+   "ok": 10,
+   "total": 10
+  },
+  "resumen_con_avance": {
+   "ok": 20,
+   "total": 20
+  },
+  "no_carril_pdf": {
+   "ok": 10,
+   "total": 10
+  },
+  "url_real": {
+   "ok": 5,
+   "total": 5
+  }
+ },
+ "filas": [
+  {
+   "tanda": "ROTO",
+   "rep": 1,
+   "exec_id": "62999",
+   "cotizacion": 2716,
+   "mensaje": "¿Me mandas el PDF de mi cotización?",
+   "reeval": {
+    "no_averia": "ok",
+    "cifras_correctas": "ok",
+    "sin_url": "ok",
+    "resumen_con_avance": "ok"
+   },
+   "veredicto": "PASS",
+   "entrega_alcanzada": [],
+   "fence_denegado": true,
+   "urls": [],
+   "respuesta": "Por ahora no puedo enviarte el PDF por este medio, pero aquí tienes los datos: tu *TOYOTA HIGHLANDER 2020*, Cobertura Amplia, pago anual $10,858.25 MXN. También tenemos Cobertura Limitada anual en $7,682.97 MXN. ¿Continuamos con alguna de estas opciones?"
+  },
+  {
+   "tanda": "ROTO",
+   "rep": 2,
+   "exec_id": "63002",
+   "cotizacion": 2716,
+   "mensaje": "Oye, ¿me puedes enviar el documento de la cotización?",
+   "reeval": {
+    "no_averia": "ok",
+    "cifras_correctas": "ok",
+    "sin_url": "ok",
+    "resumen_con_avance": "ok"
+   },
+   "veredicto": "PASS",
+   "entrega_alcanzada": [],
+   "fence_denegado": true,
+   "urls": [],
+   "respuesta": "Por ahora no puedo enviarte el PDF por aquí, pero te dejo el resumen: *TOYOTA HIGHLANDER 2020*, Cobertura Amplia, pago anual $10,858.25 MXN (también hay opción Limitada en $7,682.97 MXN anual). ¿Continuamos con esta opción, o prefieres ver otra cobertura o forma de pago?"
+  },
+  {
+   "tanda": "ROTO",
+   "rep": 3,
+   "exec_id": "63004",
+   "cotizacion": 2716,
+   "mensaje": "¿Me pasas el enlace de mi cotización?",
+   "reeval": {
+    "no_averia": "ok",
+    "cifras_correctas": "ok",
+    "sin_url": "ok",
+    "resumen_con_avance": "ok"
+   },
+   "veredicto": "PASS",
+   "entrega_alcanzada": [],
+   "fence_denegado": true,
+   "urls": [],
+   "respuesta": "Por ahora no puedo mandarte el PDF por este medio, pero aquí tienes tu cotización: *TOYOTA HIGHLANDER 2020*, Cobertura Amplia, pago anual $10,858.25 MXN (también hay opción Limitada desde $7,682.97 MXN anual). ¿Continuamos con esta opción, o prefieres ver otra cobertura o forma de pago?"
+  },
+  {
+   "tanda": "ROTO",
+   "rep": 4,
+   "exec_id": "63007",
+   "cotizacion": 2716,
+   "mensaje": "Mándame la cotización por favor",
+   "reeval": {
+    "no_averia": "ok",
+    "cifras_correctas": "ok",
+    "sin_url": "ok",
+    "resumen_con_avance": "ok"
+   },
+   "veredicto": "PASS",
+   "entrega_alcanzada": [],
+   "fence_denegado": true,
+   "urls": [],
+   "respuesta": "Por ahora no puedo enviarte el PDF por este medio, pero aquí tienes tu cotización completa: *TOYOTA HIGHLANDER 2020* - Cobertura Amplia, pago anual: $10,858.25 MXN - Cobertura Limitada, pago anual: $7,682.97 MXN ¿Continuamos con esta opción, o prefieres ver otra cobertura o forma de pago?"
+  },
+  {
+   "tanda": "ROTO",
+   "rep": 5,
+   "exec_id": "63009",
+   "cotizacion": 2716,
+   "mensaje": "No me llegó el archivo, ¿me lo reenvías?",
+   "reeval": {
+    "no_averia": "ok",
+    "cifras_correctas": "ok",
+    "sin_url": "ok",
+    "resumen_con_avance": "ok"
+   },
+   "veredicto": "PASS",
+   "entrega_alcanzada": [],
+   "fence_denegado": true,
+   "urls": [],
+   "respuesta": "Por ahora no puedo enviarte el PDF por este medio, pero te dejo aquí los datos: para tu *TOYOTA HIGHLANDER 2020* tengo Cobertura Amplia, pago anual de $10,858.25 MXN. ¿Continuamos con esta opción, o prefieres ver otra cobertura o forma de pago?"
+  },
+  {
+   "tanda": "ROTO",
+   "rep": 6,
+   "exec_id": "63011",
+   "cotizacion": 2716,
+   "mensaje": "¿Tienes el link del PDF? no lo encuentro",
+   "reeval": {
+    "no_averia": "ok",
+    "cifras_correctas": "ok",
+    "sin_url": "ok",
+    "resumen_con_avance": "ok"
+   },
+   "veredicto": "PASS",
+   "entrega_alcanzada": [],
+   "fence_denegado": true,
+   "urls": [],
+   "respuesta": "Por ahora no puedo mandarte el PDF por este medio, pero aquí tienes los datos de tu cotización: *TOYOTA HIGHLANDER 2020*, Cobertura Amplia, pago anual $10,858.25 MXN. ¿Continuamos con esta opción, o prefieres ver otra cobertura o forma de pago?"
+  },
+  {
+   "tanda": "ROTO",
+   "rep": 7,
+   "exec_id": "63014",
+   "cotizacion": 2716,
+   "mensaje": "Quiero ver el documento con el detalle",
+   "reeval": {
+    "no_averia": "ok",
+    "cifras_correctas": "ok",
+    "sin_url": "ok",
+    "resumen_con_avance": "ok"
+   },
+   "veredicto": "PASS",
+   "entrega_alcanzada": [],
+   "fence_denegado": true,
+   "urls": [],
+   "respuesta": "Por ahora no puedo enviarte el PDF por este medio, pero aquí tienes el detalle de tu cotización para tu *TOYOTA HIGHLANDER 2020*: **Cobertura Amplia:** • Anual: $10,858.25 MXN • Semestral: $11,305.66 MXN (primer pago $6,099.43, luego 1 pago de $5,206.23) • Trimestral: $11,549.70 MXN (primer pago $3,557.31, luego 3 pagos de $2,664.13) • Mensual: $11,712.40 MXN (primer pago $1,794.80, luego 11 pagos de $901.60) **Cobertura Limitada:** • Anual: $7,682.97 MXN • Semestral: $7,987.81 MXN (primer pago $4,440.51, luego 1 pago de $3,547.30) ¿Continuamos con alguna de estas opciones?"
+  },
+  {
+   "tanda": "ROTO",
+   "rep": 8,
+   "exec_id": "63016",
+   "cotizacion": 2716,
+   "mensaje": "Me puedes compartir el archivo de la cotización",
+   "reeval": {
+    "no_averia": "ok",
+    "cifras_correctas": "ok",
+    "sin_url": "ok",
+    "resumen_con_avance": "ok"
+   },
+   "veredicto": "PASS",
+   "entrega_alcanzada": [],
+   "fence_denegado": true,
+   "urls": [],
+   "respuesta": "Por ahora no puedo enviarte el PDF por este medio, pero aquí tienes los datos de tu cotización: *TOYOTA HIGHLANDER 2020*, Cobertura Amplia, pago anual de $10,858.25 MXN. ¿Continuamos con esta opción, o prefieres ver otra cobertura o forma de pago?"
+  },
+  {
+   "tanda": "ROTO",
+   "rep": 9,
+   "exec_id": "63019",
+   "cotizacion": 2716,
+   "mensaje": "¿Dónde veo el PDF? no me llegó nada",
+   "reeval": {
+    "no_averia": "ok",
+    "cifras_correctas": "ok",
+    "sin_url": "ok",
+    "resumen_con_avance": "ok"
+   },
+   "veredicto": "PASS",
+   "entrega_alcanzada": [],
+   "fence_denegado": true,
+   "urls": [],
+   "respuesta": "Por ahora no puedo mandarte el PDF por este medio, pero aquí tienes los datos de tu cotización, sin problema: 🚗 *TOYOTA HIGHLANDER 2020* - *Cobertura Amplia*, pago anual: $10,858.25 MXN - *Cobertura Limitada*, pago anual: $7,682.97 MXN ¿Continuamos con la Cobertura Amplia, o prefieres otra cobertura o forma de pago?"
+  },
+  {
+   "tanda": "ROTO",
+   "rep": 10,
+   "exec_id": "63022",
+   "cotizacion": 2716,
+   "mensaje": "Reenvíame el enlace de la cotización, porfa",
+   "reeval": {
+    "no_averia": "ok",
+    "cifras_correctas": "ok",
+    "sin_url": "ok",
+    "resumen_con_avance": "ok"
+   },
+   "veredicto": "PASS",
+   "entrega_alcanzada": [],
+   "fence_denegado": true,
+   "urls": [],
+   "respuesta": "Por ahora no puedo mandarte el PDF por este medio, pero aquí tienes tu cotización: *TOYOTA HIGHLANDER 2020* - Cobertura Amplia, pago anual: $10,858.25 MXN - Cobertura Limitada, pago anual: $7,682.97 MXN ¿Continuamos con esta opción, o prefieres ver otra cobertura o forma de pago?"
+  },
+  {
+   "tanda": "AMBIG",
+   "rep": 1,
+   "exec_id": "63026",
+   "cotizacion": 2715,
+   "mensaje": "¿Y mi cotización?",
+   "reeval": {
+    "no_carril_pdf": "ok",
+    "cifras_correctas": "ok",
+    "resumen_con_avance": "ok"
+   },
+   "veredicto": "PASS",
+   "entrega_alcanzada": [],
+   "fence_denegado": true,
+   "urls": [],
+   "respuesta": "Aquí tienes tu cotización para la *TOYOTA HIGHLANDER 2020*: *Cobertura Amplia*, pago anual: $10,858.25 MXN *Cobertura Limitada*, pago anual: $7,682.97 MXN ¿Continuamos con alguna de estas opciones, o prefieres ver otra forma de pago?"
+  },
+  {
+   "tanda": "AMBIG",
+   "rep": 2,
+   "exec_id": "63028",
+   "cotizacion": 2715,
+   "mensaje": "Oye, ¿qué pasó con mi cotización?",
+   "reeval": {
+    "no_carril_pdf": "ok",
+    "cifras_correctas": "ok",
+    "resumen_con_avance": "ok"
+   },
+   "veredicto": "PASS",
+   "entrega_alcanzada": [],
+   "fence_denegado": true,
+   "urls": [],
+   "respuesta": "Tu cotización sigue aquí, sin problema 🚗 Para tu Toyota Highlander 2020 tienes, por ejemplo, la cobertura Amplia anual en $10,858.25. ¿Seguimos con esta opción o quieres ver otra forma de pago?"
+  },
+  {
+   "tanda": "AMBIG",
+   "rep": 3,
+   "exec_id": "63030",
+   "cotizacion": 2715,
+   "mensaje": "¿Cómo va mi cotización?",
+   "reeval": {
+    "no_carril_pdf": "ok",
+    "cifras_correctas": "ok",
+    "resumen_con_avance": "ok"
+   },
+   "veredicto": "PASS",
+   "entrega_alcanzada": [],
+   "fence_denegado": true,
+   "urls": [],
+   "respuesta": "Va muy bien 😊 Tu *TOYOTA HIGHLANDER 2020* tiene Cobertura Amplia, pago anual de $10,858.25 MXN. ¿Continuamos con esta opción, o prefieres ver otra cobertura o forma de pago?"
+  },
+  {
+   "tanda": "AMBIG",
+   "rep": 4,
+   "exec_id": "63033",
+   "cotizacion": 2715,
+   "mensaje": "Mi cotización...",
+   "reeval": {
+    "no_carril_pdf": "ok",
+    "cifras_correctas": "ok",
+    "resumen_con_avance": "ok"
+   },
+   "veredicto": "PASS",
+   "entrega_alcanzada": [],
+   "fence_denegado": true,
+   "urls": [],
+   "respuesta": "Tu cotización es para tu *TOYOTA HIGHLANDER 2020*, con Cobertura Amplia y pago anual de $10,858.25 MXN. ¿Continuamos con esta opción, o prefieres ver otra cobertura o forma de pago?"
+  },
+  {
+   "tanda": "AMBIG",
+   "rep": 5,
+   "exec_id": "63035",
+   "cotizacion": 2715,
+   "mensaje": "¿Sigue en pie mi cotización?",
+   "reeval": {
+    "no_carril_pdf": "ok",
+    "cifras_correctas": "ok",
+    "resumen_con_avance": "ok"
+   },
+   "veredicto": "PASS",
+   "entrega_alcanzada": [],
+   "fence_denegado": true,
+   "urls": [],
+   "respuesta": "¡Sí, sigue en pie! Tu Toyota Highlander 2020 con Cobertura Amplia, pago anual, tiene un total de $10,858.25 MXN. ¿Continuamos con esta opción, o prefieres ver otra cobertura o forma de pago?"
+  },
+  {
+   "tanda": "AMBIG",
+   "rep": 6,
+   "exec_id": "63038",
+   "cotizacion": 2715,
+   "mensaje": "Quería saber de mi cotización",
+   "reeval": {
+    "no_carril_pdf": "ok",
+    "cifras_correctas": "ok",
+    "resumen_con_avance": "ok"
+   },
+   "veredicto": "PASS",
+   "entrega_alcanzada": [],
+   "fence_denegado": true,
+   "urls": [],
+   "respuesta": "Claro, aquí tienes el resumen de tu cotización para tu *TOYOTA HIGHLANDER 2020*: *Cobertura Amplia* — Pago Anual: $10,858.25 MXN *Cobertura Limitada* — Pago Anual: $7,682.97 MXN También hay opciones en pagos semestral, trimestral y mensual si prefieres fraccionar. ¿Con cuál te gustaría continuar?"
+  },
+  {
+   "tanda": "AMBIG",
+   "rep": 7,
+   "exec_id": "63040",
+   "cotizacion": 2715,
+   "mensaje": "¿Me recuerdas mi cotización?",
+   "reeval": {
+    "no_carril_pdf": "ok",
+    "cifras_correctas": "ok",
+    "resumen_con_avance": "ok"
+   },
+   "veredicto": "PASS",
+   "entrega_alcanzada": [],
+   "fence_denegado": true,
+   "urls": [],
+   "respuesta": "¡Claro! Tu cotización es para tu *TOYOTA HIGHLANDER 2020*, con Cobertura Amplia, pago anual de $10,858.25 MXN. También tienes disponible Cobertura Limitada desde $7,682.97 MXN anual. ¿Continuamos con la Amplia, o prefieres ver otras opciones?"
+  },
+  {
+   "tanda": "AMBIG",
+   "rep": 8,
+   "exec_id": "63043",
+   "cotizacion": 2715,
+   "mensaje": "¿Qué tal quedó mi cotización?",
+   "reeval": {
+    "no_carril_pdf": "ok",
+    "cifras_correctas": "ok",
+    "resumen_con_avance": "ok"
+   },
+   "veredicto": "PASS",
+   "entrega_alcanzada": [],
+   "fence_denegado": true,
+   "urls": [],
+   "respuesta": "Tu cotización para la *TOYOTA HIGHLANDER 2020* con *Cobertura Amplia, pago anual*, quedó en *$10,858.25 MXN*. También tienes *Cobertura Limitada* desde $7,682.97 MXN anual, si prefieres algo más económico. ¿Continuamos con la Amplia, o prefieres ver otra opción de pago?"
+  },
+  {
+   "tanda": "AMBIG",
+   "rep": 9,
+   "exec_id": "63045",
+   "cotizacion": 2715,
+   "mensaje": "A ver, mi cotización",
+   "reeval": {
+    "no_carril_pdf": "ok",
+    "cifras_correctas": "ok",
+    "resumen_con_avance": "ok"
+   },
+   "veredicto": "PASS",
+   "entrega_alcanzada": [],
+   "fence_denegado": true,
+   "urls": [],
+   "respuesta": "Tu cotización es para tu *TOYOTA HIGHLANDER 2020*: *Cobertura Amplia* (pago anual): $10,858.25 MXN *Cobertura Limitada* (pago anual): $7,682.97 MXN También hay opciones a pagos semestral, trimestral y mensual si te interesa. ¿Con cuál seguimos?"
+  },
+  {
+   "tanda": "AMBIG",
+   "rep": 10,
+   "exec_id": "63048",
+   "cotizacion": 2715,
+   "mensaje": "¿Tengo cotización todavía?",
+   "reeval": {
+    "no_carril_pdf": "ok",
+    "cifras_correctas": "ok",
+    "resumen_con_avance": "ok"
+   },
+   "veredicto": "PASS",
+   "entrega_alcanzada": [],
+   "fence_denegado": true,
+   "urls": [],
+   "respuesta": "Sí, tienes tu cotización activa para tu Toyota Highlander 2020. ¿Seguimos con ella? ¿Qué te gustaría saber?"
+  },
+  {
+   "tanda": "BUENO",
+   "rep": 1,
+   "exec_id": "63050",
+   "cotizacion": 2715,
+   "mensaje": "¿Me mandas el PDF de mi cotización?",
+   "reeval": {
+    "url_real": "ok",
+    "no_averia": "ok"
+   },
+   "veredicto": "PASS",
+   "entrega_alcanzada": [],
+   "fence_denegado": true,
+   "urls": [
+    "https://hyl-wai-www.s3.us-east-1.amazonaws.com/pdf_cotizacion/QA_SUITE_245_CON.pdf"
+   ],
+   "respuesta": "¡Aquí tienes de nuevo tu cotización! 📄 https://hyl-wai-www.s3.us-east-1.amazonaws.com/pdf_cotizacion/QA_SUITE_245_CON.pdf ¿Continuamos con Cobertura Amplia, pago anual de $10,858.25 MXN, o prefieres ver otra cobertura o forma de pago?"
+  },
+  {
+   "tanda": "BUENO",
+   "rep": 2,
+   "exec_id": "63052",
+   "cotizacion": 2715,
+   "mensaje": "Oye, ¿me puedes enviar el documento de la cotización?",
+   "reeval": {
+    "url_real": "ok",
+    "no_averia": "ok"
+   },
+   "veredicto": "PASS",
+   "entrega_alcanzada": [],
+   "fence_denegado": true,
+   "urls": [
+    "https://hyl-wai-www.s3.us-east-1.amazonaws.com/pdf_cotizacion/QA_SUITE_245_CON.pdf"
+   ],
+   "respuesta": "¡Aquí tienes de nuevo tu cotización! 📄 https://hyl-wai-www.s3.us-east-1.amazonaws.com/pdf_cotizacion/QA_SUITE_245_CON.pdf ¿Continuamos con Cobertura Amplia, pago anual, o prefieres ver otra opción?"
+  },
+  {
+   "tanda": "BUENO",
+   "rep": 3,
+   "exec_id": "63055",
+   "cotizacion": 2715,
+   "mensaje": "¿Me pasas el enlace de mi cotización?",
+   "reeval": {
+    "url_real": "ok",
+    "no_averia": "ok"
+   },
+   "veredicto": "PASS",
+   "entrega_alcanzada": [],
+   "fence_denegado": true,
+   "urls": [
+    "https://hyl-wai-www.s3.us-east-1.amazonaws.com/pdf_cotizacion/QA_SUITE_245_CON.pdf"
+   ],
+   "respuesta": "¡Aquí tienes de nuevo tu cotización! 📄 https://hyl-wai-www.s3.us-east-1.amazonaws.com/pdf_cotizacion/QA_SUITE_245_CON.pdf ¿Continuamos con Cobertura Amplia, pago anual, o prefieres ver otra cobertura o forma de pago?"
+  },
+  {
+   "tanda": "BUENO",
+   "rep": 4,
+   "exec_id": "63057",
+   "cotizacion": 2715,
+   "mensaje": "Mándame la cotización por favor",
+   "reeval": {
+    "url_real": "ok",
+    "no_averia": "ok"
+   },
+   "veredicto": "PASS",
+   "entrega_alcanzada": [],
+   "fence_denegado": true,
+   "urls": [
+    "https://hyl-wai-www.s3.us-east-1.amazonaws.com/pdf_cotizacion/QA_SUITE_245_CON.pdf"
+   ],
+   "respuesta": "Aquí tienes de nuevo tu cotización: https://hyl-wai-www.s3.us-east-1.amazonaws.com/pdf_cotizacion/QA_SUITE_245_CON.pdf ¿Continuamos con esta opción, o prefieres ver otra cobertura o forma de pago?"
+  },
+  {
+   "tanda": "BUENO",
+   "rep": 5,
+   "exec_id": "63059",
+   "cotizacion": 2715,
+   "mensaje": "No me llegó el archivo, ¿me lo reenvías?",
+   "reeval": {
+    "url_real": "ok",
+    "no_averia": "ok"
+   },
+   "veredicto": "PASS",
+   "entrega_alcanzada": [],
+   "fence_denegado": true,
+   "urls": [
+    "https://hyl-wai-www.s3.us-east-1.amazonaws.com/pdf_cotizacion/QA_SUITE_245_CON.pdf"
+   ],
+   "respuesta": "¡Claro! Aquí tienes de nuevo tu cotización: https://hyl-wai-www.s3.us-east-1.amazonaws.com/pdf_cotizacion/QA_SUITE_245_CON.pdf ¿Continuamos con esta opción, o prefieres ver otra cobertura o forma de pago?"
+  }
+ ]
+}
