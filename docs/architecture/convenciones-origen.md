@@ -517,3 +517,39 @@ guardan. Las tres tienen que decir lo mismo; si se contradicen, falta un writer 
 medible un carril a la primera en vez de a la tercera, y el Agente QA lo convirtió en criterio del arnés —
 una fila sin esa clave es un fallo de la corrida, no un detalle— para que un writer olvidadizo se descubra
 el mismo día y no dos meses después, cuando alguien mida y le salga cero.
+
+## Las reglas duras viven fuera del grafo que se ve (25 sep 2026)
+
+**La regla:** antes de afirmar que «no hay nada detrás» de un nodo, o que un cambio «se queda en
+STG», hay que abrir lo que el grafo **no enseña**: el sub-workflow al que apunta un `toolWorkflow`,
+el trigger que escribe en la BD, el otro entorno. Son afirmaciones de **ausencia**, y una ausencia
+sin ámbito no la puede refutar nadie.
+
+**Cómo se comprueba, en dos pasos** (receta del Agente QA Test, que la escribió después de morder):
+
+1. **Por cada nodo `toolWorkflow`, abrir su destino por id**: `GET /api/v1/workflows/<workflowId>`
+   con el id que trae **el parámetro del propio nodo**, nunca por el nombre — el nombre puede mentir
+   y de hecho miente: el mismo nodo apunta a workflows distintos en STG y en PROD.
+2. **Y para decir «TODA la emisión pasa por X» no basta con mirar el nodo sospechoso**: hay que
+   buscar la URL real y el id del sub-workflow **en los parámetros de todos los nodos**. En el bot
+   fueron `emitir-externo` y `PuogahK4qv9YOiF4` sobre los 388; salió uno solo. Si llegan a salir
+   dos, la frase se cae — y ahí está la diferencia entre «hay un guard» y «todo pasa por el guard».
+
+**Mordió tres veces el mismo día, de tres formas distintas:**
+
+- **El Arquitecto.** El handoff de promoción clasificó `Insert Guard Turn History` como «se queda en
+  STG» porque lo agrupó **por issue**. El nodo llevaba meses en PROD con otra versión: pertenecía a
+  la lista de «mismo nombre, parámetros distintos», no a la de los nuevos. El recuento
+  `334 + 10 = 344` no podía detectarlo, porque cuadraba igual.
+- **El Agente n8n.** Al preparar esa misma promoción vio que `Issue Policy` apunta a
+  `SEKpp6E4gggaHj11` en PROD y a `PuogahK4qv9YOiF4` en STG. Copiar el nodo de STG habría **repuntado
+  la emisión de producción al sub-workflow equivocado** — un cambio de correo convertido en un
+  cambio de a quién se le pide emitir, sin un solo error visible.
+- **El Agente QA Test.** Comprobó que `Issue Policy` no tiene conexiones entrantes y concluyó que
+  «lo único que impide emitir sin placas es que el modelo obedezca el prompt». La conexión que
+  importaba no era una arista: era el `workflowId` del propio nodo, y dentro estaba el guard.
+
+**Corolario que vale más que la regla:** la comprobación correcta era más fuerte que la corrección.
+Yo verifiqué que el guard existe; el QA verificó además que **ningún otro nodo llama a emisión**, y
+eso convierte «hay un guard en el camino» en «toda emisión pasa por el guard». Cuando alguien
+corrija una ausencia, que no se quede en desmentirla: que mida el ámbito entero.
