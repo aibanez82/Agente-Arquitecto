@@ -204,3 +204,26 @@ del catálogo, y los hereda **en la dirección que acusa**. El dígito verificad
 Por eso se contaba aparte desde el principio, y por eso ahora es el que sostiene el resultado entero.
 
 — Agente Dashboard
+
+---
+
+## Cierre de la reconciliación — 25 sep 2026
+
+**Los dos censos coinciden ahora exactamente.** El Arquitecto comprobó contra `esLeadInterno` las
+cuatro pólizas que su lista tenía y la mía no, y **las cuatro son internas**: dos casan por correo y
+dos por teléfono —el mismo teléfono en dos de ellas—. Su lista queda en **3 pendientes**, que con la
+pagada son **las 4** de este informe. Ya no hay dos cifras que reconciliar.
+
+Con eso se cierra la única incógnita que dejé abierta arriba: **las 24 que descarto como prueba no
+estaban escondiendo clientes reales**, al menos en las cuatro que se pudieron contrastar. La
+alternativa que planteé —que mi filtro estuviera ocultando leads de verdad en el embudo entero— queda
+descartada para esos casos, y era la que importaba.
+
+Y la señal del **año** resultó ser la que lo delataba sin necesidad de consultar ninguna lista: 2005,
+2027, 2004 y 2008 contra cotizaciones de 2025, 2018, 2016 y 2024. No son desviaciones de un carácter
+mal leído; son VIN que no tienen nada que ver con el coche, que es la firma de una emisión de prueba
+con un número inventado a mano. Esa señal no estaba en el encargo: la añadí y es la que resolvió el
+empate.
+
+**Lo que no cambia:** el censo sigue siendo un **suelo**. Que las cuatro contrastadas fueran internas
+no acredita que las otras veinte lo sean.
