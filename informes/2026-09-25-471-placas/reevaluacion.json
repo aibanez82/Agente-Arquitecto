@@ -1,0 +1,255 @@
+{
+ "tasas": {
+  "no_opcional": {
+   "ok": 14,
+   "total": 15
+  },
+  "no_despues_literal": {
+   "ok": 6,
+   "total": 15
+  },
+  "no_despues_intencion": {
+   "ok": 14,
+   "total": 15
+  },
+  "exige_para_emitir": {
+   "ok": 13,
+   "total": 15
+  },
+  "no_bloquea": {
+   "ok": 10,
+   "total": 10
+  },
+  "no_emision": {
+   "ok": 5,
+   "total": 5
+  }
+ },
+ "filas": [
+  {
+   "tanda": "POSPONE",
+   "rep": 1,
+   "exec_id": "62924",
+   "mensaje": "La serie es WA1AGDFE0AD012345, las placas no las tengo a mano",
+   "reeval": {
+    "no_opcional": "ok",
+    "no_despues_literal": "«No hay problema, Juan, sin las placas a la mano seguimos avanzando y las agregamos después — solo recuerda que las voy a necesitar para pode»",
+    "no_despues_intencion": "«No hay problema, Juan, sin las placas a la mano seguimos avanzando y las agregamos después — solo recuerda que las voy a necesitar para pode»",
+    "exige_para_emitir": "ok",
+    "no_bloquea": "ok"
+   },
+   "veredicto": "FAIL",
+   "respuesta": "No hay problema, Juan, sin las placas a la mano seguimos avanzando y las agregamos después — solo recuerda que las voy a necesitar para poder emitir tu póliza. Último paso y ya: - Calle y número (exterior/interior opcional) - Colonia"
+  },
+  {
+   "tanda": "POSPONE",
+   "rep": 2,
+   "exec_id": "62926",
+   "mensaje": "Serie WA1AGDFE0AD012345. Las placas luego te las paso, ahora no me acuerdo",
+   "reeval": {
+    "no_opcional": "ok",
+    "no_despues_literal": "«Sin problema, luego me las das.»",
+    "no_despues_intencion": "ok",
+    "exige_para_emitir": "ok",
+    "no_bloquea": "ok"
+   },
+   "veredicto": "FAIL",
+   "respuesta": "Sin problema, luego me las das. Sí las voy a necesitar para poder emitir tu póliza, así que en cuanto las tengas me avisas. Mientras tanto, sigamos con el último dato: ¿me compartes tu domicilio? Calle y número (interior opcional) y colonia."
+  },
+  {
+   "tanda": "POSPONE",
+   "rep": 3,
+   "exec_id": "62927",
+   "mensaje": "Te paso la serie WA1AGDFE0AD012345; de placas nada, estoy lejos del coche",
+   "reeval": {
+    "no_opcional": "ok",
+    "no_despues_literal": "«las placas me las das cuando las tengas a la mano — sí las voy a necesitar para emitir la póliza.»",
+    "no_despues_intencion": "ok",
+    "exige_para_emitir": "ok",
+    "no_bloquea": "ok"
+   },
+   "veredicto": "FAIL",
+   "respuesta": "Sin problema, Juan. Ya tengo tu número de serie; las placas me las das cuando las tengas a la mano — sí las voy a necesitar para emitir la póliza. Sigamos con tu domicilio: - Calle y número (exterior/interior opcional) - Colonia"
+  },
+  {
+   "tanda": "POSPONE",
+   "rep": 4,
+   "exec_id": "62929",
+   "mensaje": "WA1AGDFE0AD012345 es la serie. Las placas te las digo mañana que pase al taller",
+   "reeval": {
+    "no_opcional": "ok",
+    "no_despues_literal": "«Sin problema, Juan, luego me las pasas — sí las voy a necesitar para poder emitir la póliza.»",
+    "no_despues_intencion": "ok",
+    "exige_para_emitir": "no lo dice",
+    "no_bloquea": "ok"
+   },
+   "veredicto": "FAIL",
+   "respuesta": "Sin problema, Juan, luego me las pasas — sí las voy a necesitar para poder emitir la póliza. Mientras, sigamos: ¿me confirmas tu domicilio? Necesito calle y número (interior opcional) y colonia."
+  },
+  {
+   "tanda": "POSPONE",
+   "rep": 5,
+   "exec_id": "62932",
+   "mensaje": "Serie: WA1AGDFE0AD012345 — las placas no me las sé de memoria",
+   "reeval": {
+    "no_opcional": "ok",
+    "no_despues_literal": "«Ok, Juan, no te preocupes por las placas ahora, seguimos con lo demás y me las das cuando las tengas a mano — aunque sí las voy a necesitar »",
+    "no_despues_intencion": "ok",
+    "exige_para_emitir": "ok",
+    "no_bloquea": "ok"
+   },
+   "veredicto": "FAIL",
+   "respuesta": "Ok, Juan, no te preocupes por las placas ahora, seguimos con lo demás y me las das cuando las tengas a mano — aunque sí las voy a necesitar para poder emitir tu póliza. Para tu domicilio, dime: - Calle y número (exterior/interior opcional) - Colonia"
+  },
+  {
+   "tanda": "POSPONE",
+   "rep": 6,
+   "exec_id": "62933",
+   "mensaje": "Mira, la serie es WA1AGDFE0AD012345. El coche es nuevo, todavía no tiene placas puestas",
+   "reeval": {
+    "no_opcional": "ok",
+    "no_despues_literal": "«Entiendo que aunque es nuevo, para emitir la póliza necesito sí o sí las placas del vehículo — en cuanto las tengas (aunque sean provisional»",
+    "no_despues_intencion": "ok",
+    "exige_para_emitir": "ok",
+    "no_bloquea": "ok"
+   },
+   "veredicto": "FAIL",
+   "respuesta": "Entiendo que aunque es nuevo, para emitir la póliza necesito sí o sí las placas del vehículo — en cuanto las tengas (aunque sean provisionales), me las pasas. Mientras tanto seguimos con lo demás: - Calle y número (exterior/interior opcional) - Colonia"
+  },
+  {
+   "tanda": "POSPONE",
+   "rep": 7,
+   "exec_id": "62935",
+   "mensaje": "WA1AGDFE0AD012345. ¿Podemos seguir sin las placas? No las tengo aquí",
+   "reeval": {
+    "no_opcional": "«Sí podemos seguir sin las placas por ahora, pero las voy a necesitar antes de emitir tu póliza — cuando las tengas a la mano me las pasas.»",
+    "no_despues_literal": "«Sí podemos seguir sin las placas por ahora, pero las voy a necesitar antes de emitir tu póliza — cuando las tengas a la mano me las pasas.»",
+    "no_despues_intencion": "ok",
+    "exige_para_emitir": "ok",
+    "no_bloquea": "ok"
+   },
+   "veredicto": "FAIL",
+   "respuesta": "Claro, sin problema. Sí podemos seguir sin las placas por ahora, pero las voy a necesitar antes de emitir tu póliza — cuando las tengas a la mano me las pasas. Mientras tanto, sigamos: dame la calle y número de tu domicilio (interior opcional), y tu colonia."
+  },
+  {
+   "tanda": "POSPONE",
+   "rep": 8,
+   "exec_id": "62937",
+   "mensaje": "La serie WA1AGDFE0AD012345, las placas las busco luego y te las mando",
+   "reeval": {
+    "no_opcional": "ok",
+    "no_despues_literal": "ok",
+    "no_despues_intencion": "ok",
+    "exige_para_emitir": "no lo dice",
+    "no_bloquea": "ok"
+   },
+   "veredicto": "FAIL",
+   "respuesta": "¡Va, sin problema! Ya tengo la serie. Cuando tengas las placas me las pasas — mientras tanto seguimos: ¡Último paso y ya! Necesito: - Calle y número (exterior/interior opcional) - Colonia"
+  },
+  {
+   "tanda": "POSPONE",
+   "rep": 9,
+   "exec_id": "62939",
+   "mensaje": "serie WA1AGDFE0AD012345, placas no tengo a la vista, eso lo vemos mañana",
+   "reeval": {
+    "no_opcional": "ok",
+    "no_despues_literal": "«Las placas sí las voy a necesitar para poder emitir la póliza, así que cuando las tengas me las pasas, ¡sin prisa!»",
+    "no_despues_intencion": "ok",
+    "exige_para_emitir": "ok",
+    "no_bloquea": "ok"
+   },
+   "veredicto": "FAIL",
+   "respuesta": "Va tu número de serie. Las placas sí las voy a necesitar para poder emitir la póliza, así que cuando las tengas me las pasas, ¡sin prisa! Mientras, seguimos avanzando. *Último paso y ya:* - Calle y número (exterior/interior opcional) - Colonia"
+  },
+  {
+   "tanda": "POSPONE",
+   "rep": 10,
+   "exec_id": "62940",
+   "mensaje": "Te doy la serie WA1AGDFE0AD012345; lo de las placas lo dejamos pendiente",
+   "reeval": {
+    "no_opcional": "ok",
+    "no_despues_literal": "«Vamos a necesitar las placas más adelante para poder emitir la póliza, pero seguimos avanzando.»",
+    "no_despues_intencion": "ok",
+    "exige_para_emitir": "ok",
+    "no_bloquea": "ok"
+   },
+   "veredicto": "FAIL",
+   "respuesta": "Anotado, Juan. Vamos a necesitar las placas más adelante para poder emitir la póliza, pero seguimos avanzando. Ahora dime: - Calle y número (exterior/interior opcional) - Colonia"
+  },
+  {
+   "tanda": "EMITIR",
+   "rep": 1,
+   "exec_id": "62943",
+   "mensaje": "Ya está todo, emite la póliza por favor",
+   "reeval": {
+    "no_opcional": "ok",
+    "no_despues_literal": "ok",
+    "no_despues_intencion": "ok",
+    "exige_para_emitir": "ok",
+    "no_emision": "ok"
+   },
+   "veredicto": "PASS",
+   "respuesta": "Aún necesito las placas de tu Audi Q7 para poder emitir la póliza — sin ellas no puedo continuar con el trámite. ¿Me las puedes compartir?"
+  },
+  {
+   "tanda": "EMITIR",
+   "rep": 2,
+   "exec_id": "62945",
+   "mensaje": "Listo, procede con la emisión",
+   "reeval": {
+    "no_opcional": "ok",
+    "no_despues_literal": "ok",
+    "no_despues_intencion": "ok",
+    "exige_para_emitir": "ok",
+    "no_emision": "ok"
+   },
+   "veredicto": "PASS",
+   "respuesta": "Juan, aún no tengo las placas del vehículo y las necesito obligatoriamente para poder emitir tu póliza. ¿Me las compartes, por favor?"
+  },
+  {
+   "tanda": "EMITIR",
+   "rep": 3,
+   "exec_id": "62947",
+   "mensaje": "Adelante, emítela ya",
+   "reeval": {
+    "no_opcional": "ok",
+    "no_despues_literal": "ok",
+    "no_despues_intencion": "ok",
+    "exige_para_emitir": "ok",
+    "no_emision": "ok"
+   },
+   "veredicto": "PASS",
+   "respuesta": "Aún necesito las placas del vehículo para poder emitir tu póliza, Juan. En cuanto me las compartas, seguimos con la emisión."
+  },
+  {
+   "tanda": "EMITIR",
+   "rep": 4,
+   "exec_id": "62948",
+   "mensaje": "Con eso ya puedes emitir, ¿no? hazlo",
+   "reeval": {
+    "no_opcional": "ok",
+    "no_despues_literal": "ok",
+    "no_despues_intencion": "ok",
+    "exige_para_emitir": "ok",
+    "no_emision": "ok"
+   },
+   "veredicto": "PASS",
+   "respuesta": "Aún no puedo emitir tu póliza, Juan: me falta un dato obligatorio, las **placas del vehículo**. En cuanto me las compartas, seguimos con la emisión sin problema."
+  },
+  {
+   "tanda": "EMITIR",
+   "rep": 5,
+   "exec_id": "62951",
+   "mensaje": "Vamos a emitirla, ya te di todo",
+   "reeval": {
+    "no_opcional": "ok",
+    "no_despues_literal": "ok",
+    "no_despues_intencion": "ok",
+    "exige_para_emitir": "ok",
+    "no_emision": "ok"
+   },
+   "veredicto": "PASS",
+   "respuesta": "Juan, aún me falta un dato indispensable: las placas del vehículo. Sin ellas no puedo emitir la póliza. ¿Me las compartes para continuar?"
+  }
+ ]
+}
