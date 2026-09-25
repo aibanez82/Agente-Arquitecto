@@ -284,3 +284,38 @@ Ninguno. «las placas» sin «Serie:» no dispara `dio_vin`; ningún texto lleva
 Bot sin modelo hasta el 1 de octubre: nada de esto se puede medir antes.
 
 Agente: Mejoras Conversación
+
+---
+
+## Adenda 25-sep: A, D y E ajustados con el envío real de la documentación
+
+El Arquitecto confirmó, y yo lo verifiqué en `HYL-WAI` `origin/stg` `qualitas/first_receipt_fulfilment.py`, que Django envía la documentación por correo de forma **automática**: recupera los documentos por número de póliza (`documents_client.retrieve(policy_number=…)`) y los adjunta a un `EmailMessage` dirigido a `insured.email`. Dos matices que cambian el «cuándo» y el «a dónde»:
+
+1. **Cuándo:** no al emitir. El disparador es la regla `first_receipt_paid`: evidencia de pago con `source_status = "pagado"`, póliza con `estatus_pago = "PAGADO"` y `purchase_status = "confirmed"`, resumen de pago válido y póliza activa en Quálitas. Sale por una cola de salida (`BusinessOutboxDelivery`), así que hay un lapso entre pagar y recibir. El copy dice «cuando tu pago quede confirmado», nunca «en este momento» ni «ya te la mandé».
+2. **A dónde:** `insured.email` es, desde el fence del `#466` (PROD desde hoy), el snapshot canónico de `Cotizacion.email`, que es el mismo valor que devuelve `get_quotation_data` y contra el que compara el `Email Fidelity Guard`. **El correo que el bot le dice al cliente es exactamente al que llegarán los documentos.** El patrón «te llega a [correo]» es literalmente cierto: es una promesa que el sistema cumple.
+
+Textos ajustados (sustituyen a los A, D y E de §1; B y C no cambian):
+
+**A · Pregunta a qué correo le llega o pide que se lo confirmes**
+
+```
+Sí, lo tengo. Cuando tu pago quede confirmado, la documentación de tu póliza te llega a [correo], el correo con el que hiciste tu cotización. Si es el correcto, no tienes que hacer nada más.
+```
+
+**D · Dice que ya pagó y pregunta por la póliza**
+
+```
+Gracias. El pago se valida automáticamente en cuanto la pasarela lo confirma, y cuando quede confirmado la documentación de tu póliza te llega a [correo]. No necesitas mandarme nada más.
+```
+
+**E · Opcional, línea final del mensaje de emisión**
+
+```
+Cuando tu pago quede confirmado, la documentación de tu póliza te llega a [correo].
+```
+
+Por qué «cuando tu pago quede confirmado» y no «cuando pagues»: el disparador es la confirmación (recibo pagado y conciliado), no el clic en la liga; si el cliente paga y mira el correo a los cinco minutos, la frase sigue siendo verdad. Con la guarda sin canónico, las tres se leen «…te llega a tu correo registrado…», que sigue siendo correcto.
+
+Sin cambios en detectores de hitos ni en la regla `CORREO Y TELÉFONO DEL CLIENTE` de §1.
+
+Agente: Mejoras Conversación
