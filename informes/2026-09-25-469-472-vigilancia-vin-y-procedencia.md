@@ -292,3 +292,53 @@ declara** en vez de enseñar un verde.
 
 Y el marcador `serie_tecleada_blocked` **sigue sin escribirse**, por diseño: el desempate entre las
 dos causas de `rechazada_sin_procedencia` queda inerte y su cero es el esperado. No es una avería.
+
+---
+
+## Los tres ceros del 2 de octubre, y el control positivo — 26 sep 2026
+
+`stg` = `fba60f9`, suite 625/625. Medido contra PROD ahora:
+
+| # | qué mide | valor | su denominador | ¿dice algo? |
+|---|---|---|---|---|
+| 1 | rechazos del carril **foto** | 0 | 0 sesiones con sello | **no** |
+| 2 | VIN **tecleado** que no cuadra | 0 | 0 comprobados | **no** |
+| 3 | **intentos** de serie sin comprobar | 0 | 0 sesiones con intento | **no** |
+
+**Los tres se leen por separado y no se suman nunca.** Sumar ceros de caminos distintos produce un
+cero que parece el doble de sólido y es el doble de ciego. Cada uno declara su propio estado:
+*comprobado y bien*, *comprobado y roto*, o **no comprobable todavía** — que es donde están los tres
+hoy, cada uno por su motivo.
+
+### El nº 3 es el control positivo del nº 2, y hacía falta
+
+`Detect Typed VIN` solo ve cadenas que **ya tienen 17 caracteres válidos**. Si el cliente escribe 15,
+o 18, o mete una `O`, el detector no dispara y **no se escribe nada**. Así que el denominador del
+nº 2 cuenta **«los que se comprobaron», no «los que intentaron escribir una serie»** — y la
+diferencia entre esas dos poblaciones es justo el caso que más se parece a un error de tecleo.
+
+**Si el nº 3 crece y el nº 2 no, el detector se está dejando fuera los errores de tecleo.** Esa es
+la lectura que hay que hacer el 2 de octubre, y no «hay cero fallos».
+
+**Es una heurística sobre texto libre y viaja declarada como tal** (`heuristica: true`). Validada
+**antes** de conectarla, contra Postgres y no de palabra:
+
+- sobre texto real de STG, **cero falsos positivos en 98 sesiones** con mensajes humanos: no casa
+  con bloques `CTX`, ni teléfonos, ni nombres de vehículo;
+- y contra ocho casos construidos, **8 de 8**: caza 16 caracteres, 18, un VIN con la `O` prohibida y
+  uno dentro de una frase; **no** caza un VIN de 17 bien formado —a ese lo ve el detector—, ni un
+  teléfono, ni texto normal, ni metadata.
+
+Un cero que sale de un detector que no detecta nada se ve igual que un cero bueno. Por eso el
+control del control va antes que la cifra.
+
+Puede contar de más (un número de póliza largo, un RFC) y de menos (quien parta la serie en dos
+mensajes). Acotado desde el **26 sep**, el día que el nodo entró: contar intentos anteriores
+compararía dos mundos distintos.
+
+### Ámbito de la medición de los 54, citado como toca
+
+Cuando arriba se dice que *«de los 9 con `wmiCheck: fail`, los 9 fallan además el dígito o el año»*,
+el ámbito es: **54 números de serie de 17 caracteres, medidos el 26 sep sobre
+`captured_data->grupo2->serie` en PROD**, mezclando carril de foto y tecleado porque a esa fecha no
+había forma de separarlos. **No es el universo de los tecleados**: es lo que había.
