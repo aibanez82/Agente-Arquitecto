@@ -1,0 +1,85 @@
+{
+  "system": "boton-documento-480",
+  "run_id": "20260926-1041-BTN",
+  "timestamp_mx": "2026-09-26 10:42 (GMT-6 MX)",
+  "triggered_by": "detección automática",
+  "results": [
+    {
+      "id": "QA-BTN-CONTROL",
+      "system": "boton-documento-480",
+      "description": "Control previo: el fence no autoriza esta terna",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "n8n_outbound_reserve con la terna de la sesión sintética",
+      "result": "puede_intentar=false · rechazo=control_contradictorio",
+      "expected": "puede_intentar=false",
+      "message": "la canónica del teléfono sintético es vacía, así que la reserva no puede autorizar red"
+    },
+    {
+      "id": "QA-BTN-ENTRADA",
+      "system": "boton-documento-480",
+      "description": "El turno entra por el carril del documento (evento de botón bien fabricado)",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "evento interactivo con payload qc:v2:cv:waq_2307_f9ea510a761e:l:954:c:2307:m:dc3295e77c23 · sessionResolved && buttonPayload.startsWith('qc:')",
+      "result": "quoteDocumentAction? → Validate Quote Payload",
+      "expected": "la rama verdadera de quoteDocumentAction?",
+      "message": "exec 64426 · wamid wamid.QA.SUITE.BTN.MUIMA99S.BD2FE5"
+    },
+    {
+      "id": "QA-BTN-CADENA",
+      "system": "boton-documento-480",
+      "description": "Los nodos intermedios no tiran el turno: llega a Claim Quote Document Outbound",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "cadena de 12 nodos desde quoteDocumentAction?",
+      "result": "llega al claim · deliveryOutcome=deliver",
+      "expected": "Claim Quote Document Outbound alcanzado con deliveryOutcome=deliver",
+      "message": "cadena completa"
+    },
+    {
+      "id": "QA-BTN-FENCE",
+      "system": "boton-documento-480",
+      "description": "El fence deniega y el flujo muere en Quote Document Fence Denied (nodo hoja)",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "IF Send Quote Document? exige puede_intentar === true",
+      "result": "puede_intentar=false · rechazo=control_contradictorio · fence: sí",
+      "expected": "puede_intentar=false y Quote Document Fence Denied en la traza",
+      "message": "dispatch_id=s1.quotedoc.4c7a1b093e04b36a369e2a7de6f967b315ea803db53d10c21e306184af00b3ad"
+    },
+    {
+      "id": "QA-BTN-SIN-ENVIO",
+      "system": "boton-documento-480",
+      "description": "Cero contacto con Meta: ningún nodo de envío aparece en la traza",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "19 nodos de envío buscados en runData (35 nodos ejecutados)",
+      "result": "ninguno",
+      "expected": "Send Quote Document ausente, y ningún otro nodo de envío",
+      "message": "el invariante del #474 aplicado aquí: la ausencia del nodo de envío es lo único que acredita que no salió nada"
+    },
+    {
+      "id": "QA-BTN-LIMPIEZA-DT",
+      "system": "boton-documento-480",
+      "description": "Data table de entregas limpiada por inbound_message_id",
+      "priority": "alta",
+      "status": "PASS",
+      "check": "data table bIxZXnNOotosIa5q · inbound_message_id = wamid.QA.SUITE.BTN.MUIMA99S.BD2FE5",
+      "result": "borradas 1 (ids 109) · quedan 0",
+      "expected": "0 filas tras limpiar",
+      "message": ""
+    },
+    {
+      "id": "QA-BTN-LIMPIEZA",
+      "system": "boton-documento-480",
+      "description": "Limpieza por IDs exactos",
+      "priority": "alta",
+      "status": "PASS",
+      "check": "session_id=QA-SUITE-BOTON-QDOC · lead 954 (eventos de la última hora)",
+      "result": "chat_histories 1 (ids 11225) · dispatch 0 (ninguno) · sesiones 1 · leadactionevent 0 (ids ninguno)",
+      "expected": "cero residuo",
+      "message": "wamid wamid.QA.SUITE.BTN.MUIMA99S.BD2FE5"
+    }
+  ]
+}

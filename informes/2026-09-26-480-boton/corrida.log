@@ -1,0 +1,10 @@
+[grafo] versionId=3167b2c8-745c-401c-a8b3-6c6c13bbe942 · 388 nodos
+[fixture] sesión QA-SUITE-BOTON-QDOC · conversation_id waq_2307_f9ea510a761e · chat_histories 11225
+[control previo] authority_epoch=0 · puede_intentar=false · rechazo=control_contradictorio
+[traza] exec 64426 · status success · último Buffer Mark Done · 35 nodos
+  entrada:ok cadena:ok fence:ok sin_envio:ok
+  rechazo=control_contradictorio · deliveryOutcome=deliver
+[limpieza] chat 1 · dispatch 0 · sesiones 1 · leadactionevent 0
+[boton-documento-480] 7 tests → PASS 7 · FAIL 0 · WARN 0 · SKIP 0
+[boton-documento-480] reporte: reports/20260926-1041-BTN/boton-documento-480.json
+[480] traza en reports/20260926-1041-BTN

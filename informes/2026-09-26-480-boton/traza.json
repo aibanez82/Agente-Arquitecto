@@ -1,0 +1,107 @@
+{
+  "run_id": "20260926-1041-BTN",
+  "version_inicio": "3167b2c8-745c-401c-a8b3-6c6c13bbe942",
+  "forma": "interactivo",
+  "payload": "qc:v2:cv:waq_2307_f9ea510a761e:l:954:c:2307:m:dc3295e77c23",
+  "sesion": {
+    "sid": "QA-SUITE-BOTON-QDOC",
+    "fono": "QA-SUITE-PHONE-BOTON",
+    "cid": "waq_2307_f9ea510a761e"
+  },
+  "cotizacion": 2307,
+  "lead": 954,
+  "chat_sembrado": [
+    "11225"
+  ],
+  "control_previo": {
+    "authority_epoch": 0,
+    "puede_intentar": false,
+    "rechazo": "control_contradictorio"
+  },
+  "wamid": "wamid.QA.SUITE.BTN.MUIMA99S.BD2FE5",
+  "mensaje": {
+    "from": "QA-SUITE-PHONE-BOTON",
+    "id": "wamid.QA.SUITE.BTN.MUIMA99S.BD2FE5",
+    "timestamp": "1790440901",
+    "type": "interactive",
+    "interactive": {
+      "type": "button_reply",
+      "button_reply": {
+        "id": "qc:v2:cv:waq_2307_f9ea510a761e:l:954:c:2307:m:dc3295e77c23",
+        "title": "Ver mi cotización"
+      }
+    }
+  },
+  "exec_id": "64426",
+  "exec_status": "success",
+  "ultimo_nodo": "Buffer Mark Done",
+  "nodos": [
+    "WhatsApp Message Trigger",
+    "Phone Number ID Guard",
+    "WA Config",
+    "IF Direct Lane?",
+    "Extract Quote Click",
+    "Persist Click Human Row",
+    "Restore Click Payload",
+    "Notify Quote Click",
+    "Extract Recovery Click",
+    "Discount Reply Intake",
+    "IF Discount Candidate?",
+    "Session Context Builder",
+    "Prepare Resolution Context",
+    "QC Terminal?",
+    "Recovery Terminal?",
+    "Resolve Session",
+    "Session Resolution",
+    "IF Discount Phase 2 Eligible?",
+    "Needs Affinity Update?",
+    "Apply Affinity Update",
+    "Check Affinity Result",
+    "quoteDocumentAction?",
+    "Validate Quote Payload",
+    "IF Payload Consistent?",
+    "Check Delivery Idempotency",
+    "IF Already Sent?",
+    "Claim Delivery Processing",
+    "Fetch Quotation Document",
+    "Interpret Document Response",
+    "IF Can Deliver?",
+    "Stash Quote Document Payload",
+    "Claim Quote Document Outbound",
+    "IF Send Quote Document?",
+    "Quote Document Fence Denied",
+    "Buffer Mark Done"
+  ],
+  "error_de_nodo": null,
+  "claim": {
+    "dispatch_id": "s1.quotedoc.4c7a1b093e04b36a369e2a7de6f967b315ea803db53d10c21e306184af00b3ad",
+    "session_id": "QA-SUITE-BOTON-QDOC",
+    "epoch": 0,
+    "request_hash": "fb83a7701941aed042968578a128a0c63ee29cf09e5c012efa7ce9562d3b0eb5",
+    "outcome": null,
+    "puede_intentar": false,
+    "rechazo": "control_contradictorio"
+  },
+  "fence": {
+    "fence": "denied",
+    "conector": "conector:whatsapp",
+    "dispatch_id": "s1.quotedoc.4c7a1b093e04b36a369e2a7de6f967b315ea803db53d10c21e306184af00b3ad",
+    "session_id": "QA-SUITE-BOTON-QDOC",
+    "outcome": null,
+    "rechazo": "control_contradictorio"
+  },
+  "delivery_outcome": "deliver",
+  "envios_alcanzados": [],
+  "data_table_filas": [
+    109
+  ],
+  "limpieza": {
+    "chat_ids": "11225",
+    "chat_borradas": 1,
+    "dispatch_ids": "",
+    "dispatch_borradas": 0,
+    "sesiones_borradas": 1,
+    "leadactionevent_ids": "",
+    "leadactionevent_borradas": 0
+  }
+}
