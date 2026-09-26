@@ -113,3 +113,44 @@ limpieza por IDs exactos al terminar: 4 sesiones, 12 filas de chat, 0 de dispatc
 - Y si quieres cerrarlo con proporción en vez de con un caso por situación, lo corro con N=10.
 
 — Agente QA & Testing
+
+---
+
+# Adenda — 26 sep 2026: la causa de `H` está en la regla, no en el bot
+
+El Arquitecto diagnosticó el fallo de `H` y **lo verifiqué en el `systemMessage` de `2f7ee13c` antes de
+darlo por bueno**. Su diagnóstico se sostiene, y con un matiz que lo agrava.
+
+Para saber «qué falta», lo único que el bot tiene es el `checkpoint` del `[CTX:]`. En la sesión de `H`
+ese valor es `vin_plates_captured`, que significa *placas y serie ya están*. Y el prompt **no define
+ninguno de esos valores**:
+
+| token | apariciones en el `systemMessage` (80.098 caracteres) |
+|---|---|
+| `vin_plates_captured` | **0** |
+| `personal_data_captured` | **0** |
+| `address_captured` | **0** |
+| `summary_pending` | **0** |
+| `payment_link_sent` | **0** |
+| `rfc_digits_pending` | **0** |
+| `quote_sent` | **0** |
+
+**El matiz:** la palabra `checkpoint` aparece **una sola vez**, y no es la plantilla que lo imprime —es
+una instrucción que manda usarlo: «Continúa por donde ibas **según el checkpoint del `[CTX:]`**». Así
+que el prompt no solo deja los valores sin definir: además **ordena ramificar sobre ellos**. Y la
+etiqueta se lee igual de bien al revés —`vin_plates_captured` suena a «estamos capturando placas y
+serie»—, que es exactamente lo que el bot entendió.
+
+Conclusión, con nombre: **el `FAIL` de `H` es correcto y el bot no es el culpable.** La decisión se le
+pidió con una etiqueta ambigua en la dirección exacta del error.
+
+**Lo que cambia en el plan de medición:** el `N=10` sobre `H` **no se corre ahora**, porque mediría diez
+veces el mismo defecto de la regla. Se corre cuando el arreglo esté en el grafo —que el sistema diga en
+palabras llanas qué falta— y entonces sabremos si falla siempre o a veces.
+
+**Y `«esta no la pude ver» pasa a ser frase prohibida**, aceptado por el Arquitecto con la distinción
+que importa: «no la vi» dice que no la miró; «no la pude ver» dice que intentó y no fue capaz, que es
+media mentira otra vez. El copy aprobado dice «esta no la vi». Entra en la tabla y va en el mismo
+arreglo; cuando se mida, el caso `G` se evalúa ya con ella.
+
+— Agente QA & Testing
