@@ -583,3 +583,50 @@ prompt y la puerta se queda atrás.
 **Cómo se detecta antes de que muerda:** al preparar una promoción, preguntar por cada issue **en
 cuántos artefactos vive** — el grafo principal, un sub-workflow, el `systemMessage`, una config var,
 el código de Django. La respuesta no se deduce del issue: se mide contra los entornos.
+
+## «No hay» contra «no pude mirar»: el día que tuvo una víctima concreta (26 sep 2026)
+
+La convención de que una lectura que puede fallar en silencio **no acredita una ausencia** llevaba meses
+escrita como cautela de diseño. El 26 sep dejó de ser abstracta.
+
+El Agente Dashboard sostenía que `n8n_inbound_media` tenía en PROD **tres filas sembradas a mano**, y
+sobre eso construyó una evaluación de riesgo: las burbujas de imagen solo existen para esas filas, las
+conversaciones nuevas traen pie de foto pero no burbuja, los conjuntos no se solapan, **nada se pierde
+hoy**. La conclusión operativa era que promover su arreglo era prudente pero no urgente.
+
+**La tabla tenía ocho filas, en cuatro sesiones, y tres de las cuatro eran de clientes reales** — con
+`wamid` de Meta auténticos y fechas del 22 al 25 de septiembre. `Register Inbound Media` estaba **activo**
+en producción. Así que el conjunto no estaba congelado: **crecía con cada foto que mandaba un cliente**, y
+el solapamiento no era un riesgo futuro sino el siguiente cliente que adjuntara una foto con un
+comentario. En producción, su regla vieja le habría borrado ese comentario al operador.
+
+### Lo que convierte esto en el ejemplo canónico
+
+Antes de escribir, **montó el contador y lo midió**. Devolvió:
+
+```
+leido: false, motivo: '42501'
+```
+
+Su rol —el de `CONCILIACION_DATABASE_URL`— no tiene `SELECT` sobre esa tabla, mientras lee sin problema
+`whatsapp_sessions` y `n8n_chat_histories`. Y en sus propias palabras:
+
+> Si hubiera devuelto **`0`**, me habría confirmado mi creencia equivocada **con autoridad de medición**.
+
+Ahí está el daño exacto. No es que un cero mal medido sea impreciso: es que **convierte una sospecha en un
+hecho**, y con más confianza que antes de medir. Habría escrito «medido: el nodo no está vivo» —lo
+contrario de la verdad— y nadie lo habría vuelto a cuestionar, porque **nadie revisa lo que ya salió
+medido**.
+
+### Y la causa es estructural, no un permiso olvidado
+
+Medido el mismo día: `readonly_leads` puede leer **12 de las 171** tablas de `public`; `dashboard_rw`,
+**109**. Y `pg_default_acl` tiene **una sola** entrada, para `dashboard_rw`.
+
+**Así que toda tabla nueva nace legible para `dashboard_rw` y ciega para `readonly_leads`**, sin que nadie
+decida nada. El punto ciego de ese rol **crece con cada migración de Django**, y cada vez que crece,
+cualquier instrumento que lo use puede devolver un cero que no significa cero.
+
+Por eso el arreglo no es conceder esta tabla: es decidir si ese rol debe tener privilegios por defecto, o
+aceptar explícitamente que su ámbito es una lista corta y que **todo «no hay» medido con él necesita
+distinguir el `42501`**.
