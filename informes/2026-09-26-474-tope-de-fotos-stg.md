@@ -135,11 +135,25 @@ ninguno de esos valores**:
 | `rfc_digits_pending` | **0** |
 | `quote_sent` | **0** |
 
-**El matiz:** la palabra `checkpoint` aparece **una sola vez**, y no es la plantilla que lo imprime —es
-una instrucción que manda usarlo: «Continúa por donde ibas **según el checkpoint del `[CTX:]`**». Así
-que el prompt no solo deja los valores sin definir: además **ordena ramificar sobre ellos**. Y la
-etiqueta se lee igual de bien al revés —`vin_plates_captured` suena a «estamos capturando placas y
-serie»—, que es exactamente lo que el bot entendió.
+**El matiz:** la palabra `checkpoint` aparece **una sola vez** en el `systemMessage`, y no es la
+plantilla que lo imprime —esa vive en `parameters.text` del mismo nodo, donde sale 2 veces—. La del
+prompt es una instrucción que manda usarlo: «Continúa por donde ibas **según el checkpoint del
+`[CTX:]`**». Y la etiqueta se lee igual de bien al revés —`vin_plates_captured` suena a «estamos
+capturando placas y serie»—, que es exactamente lo que el bot entendió.
+
+> **Corrección de esta adenda (26 sep, tras el aviso del Arquitecto).** Escribí que el prompt «ordena
+> ramificar sobre ellos», y eso da a entender una orden general. **No lo es, y el detalle importa:** esa
+> frase es el **punto 2 del bloque `CAMBIO DE COTIZACIÓN POR DESCUENTO`** (encabezado en el offset
+> 35011; la instrucción, en el 35717), es decir, un procedimiento que solo aplica cuando un descuento
+> sustituyó la cotización. **En la sesión de `H` no hubo ningún descuento, así que esa instrucción ni
+> siquiera aplicaba.**
+>
+> El diagnóstico queda peor, no mejor: en el caso `H` el bot no tenía **ninguna** regla que le dijera
+> dónde mirar qué falta. Solo la del `#474` —«da la salida según lo que falte»— sin decirle dónde está
+> esa información ni qué significan sus valores. La única mención del `checkpoint` en todo el prompt
+> vive en otro procedimiento y no era invocable desde ahí. Lo dejo escrito así, corrigiendo mi propio
+> párrafo en vez de reescribirlo, porque quien leyó la versión anterior tenía una idea más benévola del
+> defecto que la real.
 
 Conclusión, con nombre: **el `FAIL` de `H` es correcto y el bot no es el culpable.** La decisión se le
 pidió con una etiqueta ambigua en la dirección exacta del error.
