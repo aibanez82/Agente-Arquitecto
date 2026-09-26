@@ -257,3 +257,38 @@ que se miran**».
 
 Es la misma trampa que `cero_interpretable`, un escalón más arriba: el contador no puede declarar lo
 que nadie le pidió medir, así que queda declarado aquí.
+
+---
+
+## El punto ciego del camino tecleado, medido — 26 sep 2026
+
+La nota de arriba decía que un VIN tecleado que falle **no aparecería en ningún recuento**. Con el
+viaje de hoy (`98edabbe`, 346 nodos) eso deja de ser verdad, y la vigilancia lo recoge:
+`Check Typed VIN` escribe `captured_data->'serie_tecleada_checks'`, así que **hay dato aunque no
+haya bloqueo**.
+
+`GET /api/alertas/vin-polizas` publica ahora `vin_tecleado` (`stg` = `328c0b2`, suite 619/619):
+
+| campo | hoy en PROD |
+|---|---|
+| `comprobados` | **0** |
+| `falla_digito` / `falla_anio` / `falla_wmi` | 0 / 0 / 0 |
+| `bloquearia_2de3` | 0 |
+| `solo_wmi_sin_nada_mas` | 0 |
+| `cero_interpretable` | **false** |
+
+Cero porque nadie ha tecleado un VIN desde que el nodo entró hace minutos, y **el instrumento lo
+declara** en vez de enseñar un verde.
+
+**Tres cosas que quedan fijadas en el código y no solo aquí:**
+
+1. **Esto no son rechazos.** El modo es solo-avisa: un VIN tecleado que no cuadra **se guarda
+   igual**. `bloquearia_2de3` es calibración —lo que se habría bloqueado—, no una decisión tomada.
+2. **`serie_tecleada` se escribe siempre**, cuadre o no. Su presencia ya **no** implica un VIN
+   válido; quien lea ese campo dentro de seis meses necesita saberlo.
+3. **Un `wmiCheck: fail` a solas es raro** y se cuenta aparte. De los 54 VIN de PROD medidos por el
+   Arquitecto, los 9 que fallan WMI fallan **además** el dígito o el año. Uno solo merece mirarse en
+   vez de darse por normal.
+
+Y el marcador `serie_tecleada_blocked` **sigue sin escribirse**, por diseño: el desempate entre las
+dos causas de `rechazada_sin_procedencia` queda inerte y su cero es el esperado. No es una avería.
