@@ -11,6 +11,11 @@ PROD, VIN de 17 caracteres, medido el 25 sep 2026.
 
 ---
 
+> ⚠️ **Corrección del 26 sep 2026, antes de nada:** de las tres, **dos no eran «marcadores de
+> captura»** como escribí aquí el 25 sep. Salieron de la lectura de la foto y su prefijo es legítimo.
+> Y **ninguna de las tres se cobró nunca**. Detalle y medición más abajo. Si leíste la versión
+> anterior, lo que sacaste de ella sobre estas dos no vale.
+
 ## La que ya lleva Alberto
 
 | Póliza | Pago | VIN en la póliza | Vehículo cotizado | VIN real (de la foto) |
@@ -54,19 +59,79 @@ Emitidas, sin cobrar, **clientes reales**. Y no son el mismo problema, así que 
 
 Dos señales independientes. Es el perfil de un VIN mal leído o mal tecleado.
 
-### Y dos que **no parecen VIN**
+### Y dos que ~~no parecen VIN~~ — ❌ **esto era falso. Corregido el 26 sep**
 
 | Póliza | VIN emitido | Vehículo cotizado | Señal |
 |---|---|---|---|
-| 7620099709 | `MEX5A2669L1974968` | VW VENTO 2020 | dígito · **empieza por `MEX`** |
-| 7620098914 | `MB2C22AC6LM856961` | HYUNDAI CRETA 2020 | dígito · **empieza por `MB2`** |
+| 7620099709 | `MEX5A2669L1974968` | VW VENTO 2020 | dígito verificador |
+| 7620098914 | `MB2C22AC6LM856961` | HYUNDAI CRETA 2020 | dígito verificador |
 
-Tienen 17 caracteres y pasan el formato, pero `MEX` y `MB2` **no son prefijo de ningún fabricante**.
-Parecen **marcadores de captura** colados donde va el número de serie.
+> **Lo que escribí el 25 sep y no se sostiene:** «`MEX` y `MB2` no son prefijo de ningún fabricante»
+> y «parecen marcadores de captura colados donde va el número de serie». **Las dos afirmaciones son
+> mías y las dos son falsas.** Lo dejo tachado arriba en vez de borrarlo, porque quien leyó la
+> versión anterior salió con la idea de que había que buscar un bug de captura — y no hay tal.
 
-**Eso no se arregla pidiendo la foto otra vez.** Un VIN mal leído se corrige preguntando; un
-marcador en su sitio significa que **algo escribió ahí lo que no debía**, y hay que averiguar qué.
-Son las dos que primero miraría.
+**`MEX` es el WMI de Volkswagen de la India, y es el correcto.** Medido contra los propios datos de
+PROD: `MEX` aparece **dos veces**, en dos tarjetas de circulación independientes, y las dos son
+**VOLKSWAGEN** — un POLO 2015 y el VENTO 2020 de esta lista. Ni el Polo ni el Vento que se venden en
+México se fabrican aquí: vienen de la planta india. Dos coches distintos, dos clientes distintos, el
+mismo prefijo y la misma marca no es casualidad.
+
+**`MB2` encaja igual, y lo dejo sin cerrar.** `M**` es el bloque de la India en la ISO 3779, y el
+Creta que se vende en México también es de fabricación india. Pero esto lo he medido con **una sola
+póliza**, y no tengo aquí el registro autoritativo de WMI asignados. **Es coherente, no está
+acreditado** — y lo escribo así a propósito, porque la afirmación anterior sonaba igual de segura y
+era mentira.
+
+### De dónde salieron de verdad: de la foto
+
+Las tres cadenas están en `n8n_chat_histories` y las tres entran por el mismo sitio, con este texto
+literal:
+
+```
+[FOTO_VIN] El cliente adjuntó una foto de su tarjeta de circulación.
+número de serie detectado: MEX5A2669L1974968.
+```
+
+O sea: **las escribió el paso de visión leyendo la tarjeta del cliente.** No las inventó el agente
+conversacional y no las puso ningún marcador. El origen es la lectura de la imagen.
+
+### El regalo que trae el VENTO: la misma tarjeta, leída dos veces
+
+Esta es la pieza más útil de toda la lista. En la sesión `525549026018` la visión produjo **dos**
+lecturas de la misma tarjeta:
+
+| Lectura | Dígito verificador | Código de año | Qué pasó con ella |
+|---|---|---|---|
+| `MEX5A2609LT074968` | ✅ **cuadra** | ✅ `L` = 2020 | Quálitas la rechazó: «ya está registrada con otra póliza activa» |
+| `MEX5A2669L1974968` | ❌ falla (esperaba `6`, escribió `9`) | ✅ `L` = 2020 | **es la que llevó la póliza** |
+
+Tres caracteres de diferencia entre dos lecturas del mismo cartón. Y la que **sí** pasa la
+aritmética es justamente la que Quálitas reconoce como ya existente — es decir, con toda
+probabilidad **el VIN real de la clienta**, y la póliza se emitió con la corrupta.
+
+Esto no es un fallo del modelo conversacional: es **deriva del paso de visión**, y se mide sola
+porque tenemos las dos lecturas. Es el mejor caso de calibración que hay en el censo.
+
+### Y lo que cambia la urgencia: **ninguna de las tres se cobró nunca**
+
+| Póliza | `estatus_pago` | Recibos en la última observación válida | Pagados |
+|---|---|---|---|
+| 7620098914 | PENDIENTE | 2, **cancelados** | 0 |
+| 7620099526 | PENDIENTE | 5, **4 cancelados** | 0 |
+| 7620099709 | PENDIENTE | 2, **cancelados** | 0 |
+
+Última observación válida de las tres: **4 sep 2026, 21:5x CDMX** (`snapshot_status =
+valid_complete`). Cero pesos cobrados en las tres, y Quálitas ya había cancelado los recibos.
+
+**El ámbito de esa medición, que importa:** esas tres están en el grupo de **40 de las 73** pólizas
+cuyo último snapshot es el 4 sep CDMX; las otras 31 siguen observándose hasta el 25 sep. Así que ese
+corte **no dice nada sobre estas tres en particular** y no acredita su estado de hoy — pero un
+recibo cancelado no se descancela.
+
+**Consecuencia para la revisión manual: no hay nadie a quien llamar.** No son clientes con una
+póliza mala encima: son tres pólizas que murieron sin cobrar. Lo que queda no es atención al
+cliente, es **dato de calibración** — y de los tres, el del VENTO es el que vale.
 
 ---
 
