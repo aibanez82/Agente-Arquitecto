@@ -342,3 +342,43 @@ Cuando arriba se dice que *«de los 9 con `wmiCheck: fail`, los 9 fallan además
 el ámbito es: **54 números de serie de 17 caracteres, medidos el 26 sep sobre
 `captured_data->grupo2->serie` en PROD**, mezclando carril de foto y tecleado porque a esa fecha no
 había forma de separarlos. **No es el universo de los tecleados**: es lo que había.
+
+---
+
+## Corrección de un dato mío que sostenía una evaluación de riesgo — 26 sep 2026
+
+**Escribí y repetí durante dos días que `n8n_inbound_media` en PROD «solo tenía filas sembradas a
+mano» y que el nodo que las escribe «no estaba vivo». Es falso.**
+
+Medición del Arquitecto contra PROD, 26 sep: **8 filas en 4 sesiones**, con `wamid` y `media_id`
+reales de Meta y fechas del **22 al 25 de septiembre**. Tres de las cuatro sesiones son de clientes
+reales, cruzadas contra las dos listas de `esLeadInterno`. `Register Inbound Media` **está activo en
+PROD y lleva grabando desde el 22 sep**.
+
+**Yo no he podido reproducir esa medición**, y dejo dicho dónde se para mi intento: el rol que usa
+`queryProd` recibe **`42501` (permiso denegado)** sobre `public.n8n_inbound_media`, mientras lee sin
+problema `qualitas_polizaemitida`, `whatsapp_sessions` y `n8n_chat_histories`. Así que el número de
+arriba es suyo, no mío, y lo cito como tal.
+
+### Por qué importa, más allá del número
+
+Mi evaluación del riesgo del pie de foto se apoyaba en que **los dos conjuntos no podían solaparse**:
+las conversaciones nuevas traerían pie pero no burbuja, y las que tenían burbuja eran antiguas. Eso
+solo se sostiene si el conjunto de las que tienen burbuja **está congelado**. No lo está: crece con
+cada foto que manda un cliente.
+
+**Un conjunto que un sistema vivo alimenta no se puede tratar como cerrado.** El error no fue el
+dato —me lo habían dado así— sino tratarlo como una propiedad del mundo en vez de como una medición
+con fecha.
+
+### Lo que el instrumento sí hizo bien
+
+Al medirlo, `media_registrada` devolvió **`leido: false, motivo: '42501'`**, no un cero. Si hubiera
+devuelto `0`, habría **confirmado mi creencia equivocada** con la autoridad de una medición — y yo
+habría escrito «medido: el nodo no está vivo» en vez de «no pude mirar».
+
+Es exactamente la distinción que sostiene los otros tres contadores de este informe, y es la primera
+vez que me salva a mí de mí mismo.
+
+**Pendiente:** un `GRANT SELECT` sobre `public.n8n_inbound_media` al rol de `CONCILIACION_DATABASE_URL`
+dejaría este número medible desde el Dashboard, que es donde hace falta que se vuelva a medir solo.
