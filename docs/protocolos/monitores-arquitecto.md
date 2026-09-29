@@ -303,6 +303,17 @@ puede ver: los ejecutores no saben si les contesté tarde, y Alberto tampoco.
 manos de un ejecutor lo vigila el `m3`; lo que espera a Alberto entra, pero con su nombre en la columna
 «lo desbloquea». Sin ese filtro, en una semana es un segundo tablero de tareas y deja de leerse.
 
+**v2 (29 sep, mismo día): cuenta por QUIÉN desbloquea, no en un solo número.** La v1 decía «N cosas
+esperando una decisión mía» y metía en esa N las que esperan a Alberto — **justo la confusión que el
+fichero existe para deshacer**. Esa misma tarde la lista quedó en `0 mías · 6 de Alberto`, y la v1 lo
+habría anunciado como seis decisiones mías pendientes: un vigilante que me acusa de algo que no es mío
+se lee una vez y se ignora la siguiente.
+
+Ejercitado con fixture, no mirando si la salida cuadra: una fila de cada clase debe salir **1 y 1** con su
+marca, una fila de la sección `## Cerrado` **no debe contarse**, y sin fichero debe decir `NO COMPROBABLE`.
+Los tres, comprobados. El caso «mía» no se podía acreditar contra el documento real precisamente porque
+estaba a cero — *una salida vacía no acredita que el filtro funcione*.
+
 **Gotcha de nacimiento (29 sep):** bash no acepta identificadores con tilde. Un `que=` dentro del bucle
 daba `command not found` en cada fila; el recuento salía bien, así que el fallo **no se veía en el
 resultado** — solo en siete líneas de ruido antes. Un vigilante que imprime errores es el primero que se

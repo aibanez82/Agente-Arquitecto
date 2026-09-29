@@ -11,8 +11,12 @@ if [ ! -f "$DOC" ]; then
   exit 0
 fi
 
-pendientes=0
-# Filas de la sección "Abierto": empiezan por '| ' y no son cabecera ni separador
+mias=0
+albertos=0
+# Filas de la sección "Abierto": empiezan por '| ' y no son cabecera ni separador.
+# La columna 4 dice QUIÉN desbloquea: por eso se cuentan por separado. Un contador
+# único decía "N esperando una decisión mía" incluyendo las de Alberto, que es
+# justo la confusión que este fichero existe para deshacer.
 while IFS= read -r linea; do
   case "$linea" in
     '|---'*|'| Desde '*|'| Decidido '*) continue ;;
@@ -21,11 +25,18 @@ while IFS= read -r linea; do
   esac
   desde=$(printf '%s' "$linea" | awk -F'|' '{print $2}' | tr -d ' ')
   [ -z "$desde" ] && continue
-  pendientes=$((pendientes+1))
+  quien=$(printf '%s' "$linea" | awk -F'|' '{print $5}')
+  case "$quien" in
+    *Alberto*) albertos=$((albertos+1)) ;;
+    *) mias=$((mias+1)) ;;
+  esac
 done < <(sed -n '/^## Abierto/,/^## Cerrado/p' "$DOC")
 
-echo "m7: $pendientes cosas esperando una decisión mía · $DOC"
-if [ "$pendientes" -gt 0 ]; then
-  sed -n '/^## Abierto/,/^## Cerrado/p' "$DOC" | grep '^| ' | grep -v '^|---' | grep -v '^| Desde ' \
-    | awk -F'|' '{printf "   desde %s · %s\n", $2, substr($3,1,90)}'
+total=$((mias+albertos))
+if [ "$total" -eq 0 ]; then
+  echo "m7: nada esperando una decisión · $DOC"
+  exit 0
 fi
+echo "m7: $mias esperando una decisión MÍA · $albertos esperando a ALBERTO · $DOC"
+sed -n '/^## Abierto/,/^## Cerrado/p' "$DOC" | grep '^| ' | grep -v '^|---' | grep -v '^| Desde ' \
+  | awk -F'|' '{marca = ($5 ~ /Alberto/) ? "[ALBERTO]" : "[mía]   "; printf "   %s desde %s · %s\n", marca, $2, substr($3,1,80)}'
