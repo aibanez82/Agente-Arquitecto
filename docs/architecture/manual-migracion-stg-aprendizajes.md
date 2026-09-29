@@ -876,3 +876,42 @@ Alberto probando, no la estructura.
   `IF No Discount Available?`, en la línea principal, no rompía nada.
 - Y al dictar: **decir «colgando de X» cuando se quiere una rama lateral.** «Después de X» significa
   en serie, y en un nodo que transforma, en serie significa cortar el dato.
+
+## El número **por el que** sales no es el número **al que** escribes (29 sep 2026)
+
+Un gemelo de staging puede estar bien montado y aun así enviar por producción, si el componente
+**no fija** su identidad de salida sino que la **hereda del evento**.
+
+Medido en el grafo vivo, nodo `WA Config`:
+
+```js
+// STG  (dNqtM20ij6ecZYAX)
+item.waPhoneNumberId = item.metadata?.phone_number_id || "1259868760534397";
+// PROD (BtOaZm7WlZT-24V7hqCnF)
+item.waPhoneNumberId = "1028815256982638";
+```
+
+Los dos números son **distintos**, así que el principio de los gemelos se sostiene… mientras el evento
+sea real. **En una prueba, el evento lo fabrica quien prueba.** Un fixture copiado de una captura de
+producción lleva el `phone_number_id` de producción dentro, y entonces una prueba «de STG» sale por el
+número de la cuenta de WhatsApp real — superficie de Juan, y con efecto sobre la calidad de la cuenta.
+
+El literal de STG no protege: **es el respaldo, no la regla.** Solo actúa cuando el evento no trae nada.
+
+**Lo que hay que saber de aquí, y vale para cualquier componente, no solo para WhatsApp:** al preparar
+una prueba con efecto hacia fuera se cubren **dos** riesgos distintos, y es fácil cubrir solo el segundo:
+
+1. **Por dónde sale** — la identidad del emisor. Se hereda del evento fabricado.
+2. **A quién llega** — el destinatario. Se pone en el fixture y se ve enseguida.
+
+Un teléfono sintético no-entregable resuelve el (2) y **no toca el (1)**.
+
+**La comprobación que lo cierra** no es fijar el campo en el fixture: es **asertar el valor efectivo en el
+momento del envío**. Fijarlo acredita lo que escribiste; asertarlo acredita lo que el grafo resolvió, que
+es lo único que sale por el cable. Si no coincide, se aborta el control.
+
+Y no vale la mitigación de que «probablemente fallaría la credencial, porque el token de STG no puede
+hablar por el número de PROD». Puede ser cierto y **no está medido**; «probablemente falla» no es un
+control, es una esperanza con buena presentación.
+
+Agente: Arquitecto-IA-Qualitas
