@@ -36,6 +36,8 @@ es la primera.
 
 | Desde | Qué espera | Quién lo dejó listo | Lo desbloquea | Coste de esperar |
 |---|---|---|---|---|
+| 29 sep | **`#492` E2E** — el runner de emisión completa en STG, escrito y con control negativo montado | Agente QA (`29ed804`) | **Alberto**: su clasificador frenó la acción y solo un humano la levanta. **No la levanta un handoff mío** | el P0 del `#492` se cerró sin verificación E2E: el arreglo está en PROD acreditado por lectura del grafo, no por una emisión real |
+| 26 sep | **PRs #113–#117** de este repo, todos `docs/`, todos `MERGEABLE` | yo | **Alberto**: `main` es suyo. El `#117` es el que hace operativo este mismo fichero y su vigilante | el `m7` no se puede armar desde el clon: en `main` no existen ni el script ni este documento |
 | 26 sep | **`#479` residuo** — escribir en memoria el `cleanOutput` en vez del crudo, para que el agente no se relea sus marcadores | Agente n8n | yo: engancharlo a un paquete que toque `Detect API Failure`. **No hay ninguno previsto**, y por eso lleva aquí tres días sin moverse | ninguno medido (0 efecto en 14 casos); ocupa ventana de contexto |
 | 26 sep | **`#486`** — la lista final priorizada del análisis de coherencia | Agente n8n (inventario completo) | **Alberto**: decidir actuar | ninguno; no hay defecto vivo |
 | 29 sep | **`#477` → PROD** — el canon VIN v1, ya idéntico byte a byte en las dos copias de STG | Agente n8n | **Alberto**: firma. Toca el carril de emisión, así que no entra en la autorización permanente | bloquea el `#488` y el `#475`, que viajan detrás |
