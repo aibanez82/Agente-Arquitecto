@@ -41,13 +41,13 @@ es la primera.
 | 29 sep | **`#492` E2E** — el runner de emisión completa en STG, escrito y con control negativo montado | Agente QA (`29ed804`) | **Alberto**: su clasificador frenó la acción y solo un humano la levanta. **No la levanta un handoff mío** | el P0 del `#492` se cerró sin verificación E2E: el arreglo está en PROD acreditado por lectura del grafo, no por una emisión real |
 | 26 sep | **PRs #113–#117** de este repo, todos `docs/`, todos `MERGEABLE` | yo | **Alberto**: `main` es suyo. El `#117` es el que hace operativo este mismo fichero y su vigilante | el `m7` no se puede armar desde el clon: en `main` no existen ni el script ni este documento |
 | 26 sep | **`#486`** — la lista final priorizada del análisis de coherencia | Agente n8n (inventario completo) | **Alberto**: decidir actuar | ninguno; no hay defecto vivo |
-| 29 sep | **`#477` → PROD** — el canon VIN v1, ya idéntico byte a byte en las dos copias de STG | Agente n8n | **Alberto**: firma. Toca el carril de emisión, así que no entra en la autorización permanente | bloquea el `#488` y el `#475`, que viajan detrás |
-| 29 sep | **`#478` → PROD** — la validación previa de placas. **STG ya verde** (`249b33ac`, un solo nodo cambiado, `connections` idénticas, 4/4 con fail-first), medido por mí | Agente n8n | **Alberto**: firma. Toca emisión | el cliente sigue comiéndose el error al emitir, y el de guiones al capturar |
 
 ## Cerrado, para no repetir la discusión
 
 | Decidido | Qué era | Cuánto esperó |
 |---|---|---|
+| 29 sep | **`#477` → PROD** — firmado por Alberto. En PROD `7d142334`; equivalencia 59/59 (5 VIN de control + 54 series reales); canon idéntico byte a byte en los dos nodos. Cerrado | **mismo día** |
+| 29 sep | **`#478` → PROD** — firmado por Alberto. En PROD `681676e0`; efecto neto medido contra mi foto de `f104c3a8`: exactamente 3 nodos, `connections` idénticas. Cerrado | **mismo día** |
 | 29 sep | **`#479` residuo** — decidido: **no se hace, y no espera a nadie**. Efecto medido 0 en 14 casos; su único coste es ventana de contexto, y un viaje propio para eso no se justifica. **Vuelve a la mesa si aparece un caso real de un agente releyéndose sus marcadores, o si algún paquete toca `Detect API Failure` por otra causa** | **3 días** |
 | 29 sep | **`#481`** — decidido: *el carril de recuperación no viaja a PROD sin reserva de salida*. Y al medirlo, el fence **no se podía copiar**: `n8n_outbound_reserve` rechaza nulos en los cinco campos de identidad y Recovery nace frío. Handoff `f8c9dfa1` | **4 días** |
 | 29 sep | **`#478`** — decidido: manda el criterio de `Check Placas`, y el validador previo se alinea con él **en las dos direcciones** (exigir presencia, y normalizar guiones). Handoff `8f57f3bc` | **3 días** |
