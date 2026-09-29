@@ -583,3 +583,51 @@ prompt y la puerta se queda atrás.
 **Cómo se detecta antes de que muerda:** al preparar una promoción, preguntar por cada issue **en
 cuántos artefactos vive** — el grafo principal, un sub-workflow, el `systemMessage`, una config var,
 el código de Django. La respuesta no se deduce del issue: se mide contra los entornos.
+
+## Productor, transporte y consumidor: los cuatro días que producción no pudo emitir (29 sep 2026)
+
+El **25 de septiembre** ordené el viaje a PROD del `#466`, que hacía que el correo de emisión lo pusiera
+el grafo y no el modelo. La solución tenía **tres piezas**:
+
+1. `Resolve Session` — **produce**: `qc.email AS email_canonico`
+2. `Merge Session Data` — **transporta**: `emailCanonico: sessionRow.email_canonico ?? null`
+3. `Issue Policy.email` — **consume**: `{{ $('Merge Session Data').first().json.emailCanonico }}`
+
+**Viajaron la 2 y la 3. La 1 no.** Y el efecto fue exactamente el que el diseño hacía inevitable:
+`emailCanonico` valía `null` siempre, n8n omitía el campo, y Django rechazaba con
+`{"status":"error","msg":"Faltan campos: email"}`.
+
+**Producción estuvo del 24 al 29 de septiembre sin emitir una sola póliza.** Tres clientes confirmaron su
+compra y se quedaron sin nada. El fallo permaneció **latente cuatro días** porque nadie intentó emitir
+entre el despliegue y el primer intento real.
+
+### Lo que hace que esto sea una convención y no una anécdota
+
+**Ese día verifiqué el grafo de PROD nodo a nodo y salió verde.** No fue negligencia: comprobé
+puntualmente lo que había cambiado —los dos consumidores— y ambos estaban correctos. Lo que no comprobé
+es **lo que el cambio necesitaba para funcionar**.
+
+Y la herramienta lo permitió: **un recuento de nodos no ve una consulta SQL a la que le falta una
+columna**. El nodo estaba presente, el workflow tenía el número de nodos esperado, las conexiones estaban
+intactas. Todo lo que yo medía decía que sí.
+
+Lo dijo Juan en el `#492` con la frase exacta, y la adopto como el enunciado del error:
+
+> «Se comprobó el consumidor, pero no que `Resolve Session` produjera la clave.»
+
+### La regla
+
+**Cuando un cambio introduce un valor nuevo, la verificación tiene que recorrer los tres tramos —
+productor, transporte y consumidor — y acreditarlos con datos.**
+
+«Con datos» no es decorativo: el arreglo del 29 no se dio por bueno con ver la línea de SQL en su sitio.
+Se ejecutó la proyección arreglada contra la BD de producción y se comprobó que devolvía correo en
+**1.182 de 1.182** sesiones vivas con cotización. **El grafo reparado no es el dato llegando**, y esa
+distinción es la que costó cuatro días.
+
+### El corolario, que es más general
+
+Un cambio que solo **consume** algo es, por construcción, un cambio **incompleto** hasta que se acredita
+que existe quien lo produce. Y si el productor vive en otro nodo, otro workflow u otro sistema, **el viaje
+que lleva solo al consumidor no está a medias: está roto**, y lo estará en silencio hasta que alguien lo
+pise.
