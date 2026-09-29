@@ -36,9 +36,7 @@ es la primera.
 
 | Desde | Qué espera | Quién lo dejó listo | Lo desbloquea | Coste de esperar |
 |---|---|---|---|---|
-| 29 sep | **`#500` B a PROD** — la guarda revisa también los importes grandes; en STG `a1ea1880` | Agente n8n | **Alberto**: primero el E2E (un mensaje, «¿Cuánto costaba antes del descuento?», en `waq_2740`), luego la firma. Toca cifras al cliente: fuera de la autorización permanente | en PROD la guarda sigue sin revisar los importes de cinco cifras |
 | 29 sep | **`#499` a PROD** — aviso cuando el agente devuelve vacío; en STG `6023576f`, verificado | Agente n8n | **Alberto**, firma. **Ya sin condición**: el `#505` está en `main` del Dashboard desde el 30 sep (`f552f47`) | silencios del bot que nadie ve |
-| 29 sep | **`#504` a PROD** — `max_tokens` del AI Agent de 2.000 a 8.000 (el razonamiento se come el tope) | Agente n8n: en STG `2e7eeb8f`, verificado por mí (un parámetro). Falta un turno real, que entra como fila (g) del E2E de `waq_2740` | **Alberto**, firma: es la configuración del agente principal | respuestas vacías o cortadas a media palabra |
 | 29 sep | **`#495` · ¿se libera sola una conversación tomada por un humano?** En pausa por decisión de Alberto: Montserrat a veces entrega conversaciones a Metepec, y entonces la IA no debe retomarlas. Construido y acreditado en STG, reloj apagado | Agente Dashboard y Agente n8n | **Alberto**: decisión de negocio. Para tomarla hace falta poder apuntar «esta la atiende Metepec»: hoy una entrega y un olvido se ven igual | tomas que nunca terminan; y ahora sabemos que algunas pueden ser entregas a propósito |
 | 29 sep | **El «precio original» tachado del PDF (`#498`)**: un precio de referencia que nunca se le ofreció al cliente | medido por mí | **Alberto**: mirada comercial o legal. No es técnico | — |
 | 29 sep | **La rama de Juan del `#273`** (`Agente-n8n:feature/issue-273-direct-discount-quote`) — sin fusionar. Su builder choca *add/add* con el nuestro, que reconstruyó sobre el grafo vivo. Su migración SQL se versiona aparte en `stg`, byte a byte | Agente n8n | **Alberto** (y Juan): fusionarla, retirarla o dejar convivir los dos builders | ninguno inmediato: lo que corre ya está versionado. Pero mientras siga abierta, hay dos builders para el mismo carril |
@@ -51,6 +49,7 @@ es la primera.
 
 | Decidido | Qué era | Cuánto esperó |
 |---|---|---|
+| 30 sep | **`#500` B y `#504` a PROD** — firmados por Alberto en la sesión del Agente n8n; bot `7a0cb905`, verificado por mí contra mi foto de `0eeee085` | cerrado |
 | 30 sep | **Promoción del Dashboard, variante B** — fusionada por Alberto; `main` = `f552f47` (padres `db9fdf7` + `1425508`), verificado por mí contra GitHub; el `#495` no entró | cerrado |
 | 29 sep | **`#493` · los clientes que esperaban respuesta** — Alberto se lo pasó a Montserrat y a Rafa. Uno, el lead 2255, ya está liberado | **el mismo día** |
 | 29 sep | **`#477` → PROD** — firmado por Alberto. En PROD `7d142334`; equivalencia 59/59 (5 VIN de control + 54 series reales); canon idéntico byte a byte en los dos nodos. Cerrado | **mismo día** |
