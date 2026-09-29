@@ -876,3 +876,110 @@ Alberto probando, no la estructura.
   `IF No Discount Available?`, en la línea principal, no rompía nada.
 - Y al dictar: **decir «colgando de X» cuando se quiere una rama lateral.** «Después de X» significa
   en serie, y en un nodo que transforma, en serie significa cortar el dato.
+
+## El número **por el que** sales no es el número **al que** escribes (29 sep 2026)
+
+Un gemelo de staging puede estar bien montado y aun así enviar por producción, si el componente
+**no fija** su identidad de salida sino que la **hereda del evento**.
+
+Medido en el grafo vivo, nodo `WA Config`:
+
+```js
+// STG  (dNqtM20ij6ecZYAX)
+item.waPhoneNumberId = item.metadata?.phone_number_id || "1259868760534397";
+// PROD (BtOaZm7WlZT-24V7hqCnF)
+item.waPhoneNumberId = "1028815256982638";
+```
+
+Los dos números son **distintos**, así que el principio de los gemelos se sostiene… mientras el evento
+sea real. **En una prueba, el evento lo fabrica quien prueba.** Un fixture copiado de una captura de
+producción lleva el `phone_number_id` de producción dentro, y entonces una prueba «de STG» sale por el
+número de la cuenta de WhatsApp real — superficie de Juan, y con efecto sobre la calidad de la cuenta.
+
+El literal de STG no protege: **es el respaldo, no la regla.** Solo actúa cuando el evento no trae nada.
+
+**Lo que hay que saber de aquí, y vale para cualquier componente, no solo para WhatsApp:** al preparar
+una prueba con efecto hacia fuera se cubren **dos** riesgos distintos, y es fácil cubrir solo el segundo:
+
+1. **Por dónde sale** — la identidad del emisor. Se hereda del evento fabricado.
+2. **A quién llega** — el destinatario. Se pone en el fixture y se ve enseguida.
+
+Un teléfono sintético no-entregable resuelve el (2) y **no toca el (1)**.
+
+**La comprobación que lo cierra** no es fijar el campo en el fixture: es **asertar el valor efectivo en el
+momento del envío**. Fijarlo acredita lo que escribiste; asertarlo acredita lo que el grafo resolvió, que
+es lo único que sale por el cable. Si no coincide, se aborta el control.
+
+Y no vale la mitigación de que «probablemente fallaría la credencial, porque el token de STG no puede
+hablar por el número de PROD». Puede ser cierto y **no está medido**; «probablemente falla» no es un
+control, es una esperanza con buena presentación.
+
+Agente: Arquitecto-IA-Qualitas
+
+## Reordenar un carril cambia quién es «el de al lado» (29 sep 2026)
+
+En el carril Recovery del `#481`, el nodo de envío construye el documento así:
+
+```js
+document: { id: $json.id,
+            filename: $('Recovery Quote Ready').first().json.documentFilename,
+            caption:  $('Recovery Quote Ready').first().json.copy }
+```
+
+Dos de los tres campos van **por referencia de nodo** y sobreviven a cualquier topología. El tercero,
+`id`, va por **`$json`**, y funcionaba solo porque el nodo de subida a Meta era su anterior inmediato.
+
+Al mover la reserva de salida para que quedara **justo antes del envío** —y ese movimiento resultó ser un
+error, ver el apartado de abajo— el
+anterior inmediato pasó a ser un nodo Postgres. **`$json` deja de ser el payload y pasa a ser la fila de la
+función.** `document.id` queda `undefined` y Meta rechaza el envío.
+
+**La regla:** en un carril que se reordena, **`$json` significa «lo que me dé el de al lado»**. Lo que tiene
+que sobrevivir se lee **por nombre de nodo**, o se envuelve en el `Stash … Payload` / `Restore … Payload`
+que los demás carriles ya usan alrededor de su claim — que existen exactamente por esto.
+
+### Los dos errores de método, que valen más que la trampa
+
+**1 · El ámbito de un hecho medido incluye la topología sobre la que se midió.** Yo había comprobado —y
+era cierto— que el carril leía por referencia de nodo y por eso el empalme no le quitaba nada. La
+recomendación de reordenar **invalidó mi propia medición sin que yo lo notara**, porque la di por buena
+como propiedad del carril cuando era una propiedad del carril *en ese orden*.
+
+**2 · El control acotado tapaba justo lo que la recomendación rompía.** Habíamos elegido acreditar el corte
+**sin llegar a enviar** —correcto para lo que el cambio añadía— y ese control **habría salido verde con el
+envío roto**: el fallo solo aparece en el momento que el control decide no ejercer. Se vería en producción,
+en el primer clic de un cliente real.
+
+**Corolario:** cuando se recorta el alcance de un control, hay que preguntar **qué cambios recientes caen
+justo en el trozo recortado**. Un control acotado es una decisión sobre qué no se va a mirar, y esa lista
+tiene que ser explícita. Aquí se cerró con una comprobación que no cuesta envío: **asertar que el cuerpo
+resuelto de la petición trae `document.id` no vacío**, visible en el `runData`.
+
+Agente: Arquitecto-IA-Qualitas
+
+### Y el movimiento que causó todo esto estaba mal, por una razón distinta (misma tarde)
+
+Pedí mover la reserva **detrás** de la descarga y la subida del PDF para que un fallo de red no dejara la
+fila `reserved` de por vida. La lápida es real, pero **el arreglo bueno era otro** —un `Settle … Uncertain`
+en el camino de error, que ya tenían diez carriles— y en cuanto ese estuvo puesto, mi reordenación dejó de
+aportar nada y pasó a **quitar**: con la puerta al final, un caso **denegado** —un humano había tomado la
+conversación— ya había subido el PDF a Meta antes de que el corte lo negara.
+
+Es decir: para cerrar el agujero de «el carril actúa sin pasar por la puerta», había dejado un trozo del
+carril fuera de la puerta. **Una guarda que deja fuera parte de lo que guarda es una guarda más pequeña,
+no una guarda distinta.**
+
+**El criterio, en una línea, que es lo que hay que recordar:**
+
+> **La puerta va antes del primer paso con efecto hacia fuera. Todo lo que quede dentro de la reserva
+> necesita camino de settle.** Son dos exigencias, no una, y satisfacer la segunda moviendo la puerta
+> rompe la primera.
+
+La colocación final separa los dos pasos por su efecto: la **descarga** es un GET a un documento nuestro y
+se queda **fuera** —un caso denegado gasta, como mucho, una descarga interna—; la **subida a Meta** y el
+**envío** quedan **dentro**, y los dos cuelgan su salida de error del mismo nodo de settle.
+
+**Lo que esto enseña del método:** arreglé una restricción y **relajé otra sin enterarme**. Ninguna de las
+dos aparecía en el mismo sitio —una es la vida de una fila en Postgres, la otra es qué toca el mundo
+exterior— y por eso el cambio se sentía gratis. Lo vio el ejecutor al ir a montar el control, no yo al
+recomendarlo.
