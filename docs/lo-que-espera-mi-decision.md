@@ -42,7 +42,7 @@ es la primera.
 | 26 sep | **`#479` residuo** — escribir en memoria el `cleanOutput` en vez del crudo, para que el agente no se relea sus marcadores | Agente n8n | yo: engancharlo a un paquete que toque `Detect API Failure`. **No hay ninguno previsto**, y por eso lleva aquí tres días sin moverse | ninguno medido (0 efecto en 14 casos); ocupa ventana de contexto |
 | 26 sep | **`#486`** — la lista final priorizada del análisis de coherencia | Agente n8n (inventario completo) | **Alberto**: decidir actuar | ninguno; no hay defecto vivo |
 | 29 sep | **`#477` → PROD** — el canon VIN v1, ya idéntico byte a byte en las dos copias de STG | Agente n8n | **Alberto**: firma. Toca el carril de emisión, así que no entra en la autorización permanente | bloquea el `#488` y el `#475`, que viajan detrás |
-| 29 sep | **`#478` → PROD** — la validación previa de placas, cuando STG esté verde | Agente n8n (ordenado hoy) | **Alberto**: firma. Toca emisión | el cliente sigue comiéndose el error al emitir, y el de guiones al capturar |
+| 29 sep | **`#478` → PROD** — la validación previa de placas. **STG ya verde** (`249b33ac`, un solo nodo cambiado, `connections` idénticas, 4/4 con fail-first), medido por mí | Agente n8n | **Alberto**: firma. Toca emisión | el cliente sigue comiéndose el error al emitir, y el de guiones al capturar |
 
 ## Cerrado, para no repetir la discusión
 
