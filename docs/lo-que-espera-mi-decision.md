@@ -36,20 +36,31 @@ es la primera.
 
 | Desde | Qué espera | Quién lo dejó listo | Lo desbloquea | Coste de esperar |
 |---|---|---|---|---|
-| 26 sep | **`#478`** — que el validador previo exija las placas igual que la emisión. Una línea. | medido por mí | yo: engancharlo a un paquete que toque ese nodo | el cliente se come el error al final en vez de al capturar |
-| 26 sep | **`#475`** — que `Check Typed VIN` se niegue a construir el patch si `typedVin === '__NONE__'`, para que la guarda viaje con el nodo | Agente n8n | yo: mismo, engancharlo a un viaje del carril | ninguno hoy; la guarda de arriba filtra |
-| 26 sep | **`#479` residuo** — escribir en memoria el `cleanOutput` en vez del crudo, para que el agente no se relea sus marcadores | Agente n8n | yo: engancharlo a un paquete que toque `Detect API Failure` | ninguno medido (0 efecto en 14 casos); ocupa ventana de contexto |
-| 25 sep | **`#481`** — el carril de recuperación envía **sin pasar por el fence de salida**. Ninguno de sus 15 nodos está en PROD | Agente QA | yo: ordenar el arreglo **antes** de que viaje | ninguno hoy, porque no está en producción. Si viaja sin fence, enviaría con la conversación tomada por un humano |
-| 26 sep | **`#488`** — añadir a la tabla de WMI los cuatro prefijos con ≥2 observaciones (`LZW`, `93C`, `MEX`, `ZFA`) | medido por mí | **depende del `#477` en PROD**; después, orden mía con `v2` del canon | el check de marca no trabaja en casi la mitad del parque |
-| 29 sep | **`#460`** — el E2E conversacional en STG, y luego el viaje | Agente n8n (arreglo listo desde el 23 sep) | yo: secuenciar cuando el QA libere STG | **se pierde la fila del bot en el 100 % de los turnos del guard** |
+| 26 sep | **`#479` residuo** — escribir en memoria el `cleanOutput` en vez del crudo, para que el agente no se relea sus marcadores | Agente n8n | yo: engancharlo a un paquete que toque `Detect API Failure`. **No hay ninguno previsto**, y por eso lleva aquí tres días sin moverse | ninguno medido (0 efecto en 14 casos); ocupa ventana de contexto |
 | 26 sep | **`#486`** — la lista final priorizada del análisis de coherencia | Agente n8n (inventario completo) | **Alberto**: decidir actuar | ninguno; no hay defecto vivo |
+| 29 sep | **`#477` → PROD** — el canon VIN v1, ya idéntico byte a byte en las dos copias de STG | Agente n8n | **Alberto**: firma. Toca el carril de emisión, así que no entra en la autorización permanente | bloquea el `#488` y el `#475`, que viajan detrás |
+| 29 sep | **`#478` → PROD** — la validación previa de placas, cuando STG esté verde | Agente n8n (ordenado hoy) | **Alberto**: firma. Toca emisión | el cliente sigue comiéndose el error al emitir, y el de guiones al capturar |
 
 ## Cerrado, para no repetir la discusión
 
 | Decidido | Qué era | Cuánto esperó |
 |---|---|---|
+| 29 sep | **`#481`** — decidido: *el carril de recuperación no viaja a PROD sin reserva de salida*. Y al medirlo, el fence **no se podía copiar**: `n8n_outbound_reserve` rechaza nulos en los cinco campos de identidad y Recovery nace frío. Handoff `f8c9dfa1` | **4 días** |
+| 29 sep | **`#478`** — decidido: manda el criterio de `Check Placas`, y el validador previo se alinea con él **en las dos direcciones** (exigir presencia, y normalizar guiones). Handoff `8f57f3bc` | **3 días** |
+| 29 sep | **`#488`** — decidido: la lista entra con el viaje del `#477`, y **son CINCO, no cuatro**: `LZW`, `5YF`, `93C`, `MB2`, `MEX`. `ZFA` sale — era un solo coche contado dos veces | **3 días** |
+| 29 sep | **`#475`** — decidido: viaja enganchado al `#477`, que es el único paquete que toca `Check Typed VIN`. No necesita viaje propio | **3 días** |
 | 29 sep | **`#460`** — «insertar solo la fila `ai`», confirmado | **4 días** |
 | 29 sep | **`#477`** — canonicalizar + contrato, descartado el sub-workflow | mismo día |
 | 29 sep | **`#463`** — no se hace la sonda ni la mitigación: PROD limpio en 75 sesiones | 7 días sin mirarse |
+
+## Lo que NO está aquí, y por qué — el `#460`
+
+El `#460` figuró en esta lista el 29 sep por la mañana. **Lo he quitado el mismo día**: no espera una
+decisión mía, espera la **medición del Agente n8n** que le pedí en el handoff `c51d5733` de las 03:14 CDMX.
+
+La distinción no es cosmética y es la razón de ser de este fichero: si aquí entra todo lo que no avanza, en
+una semana es un segundo tablero de tareas y deja de leerse. **Aquí solo entra lo que está parado porque
+falta que yo hable.** Lo que está en manos de un ejecutor lo vigila el `m3`; lo que espera a Alberto lleva
+su nombre en la columna «lo desbloquea».
 
 Agente: Arquitecto-IA-Qualitas
