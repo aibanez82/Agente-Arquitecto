@@ -929,8 +929,8 @@ document: { id: $json.id,
 Dos de los tres campos van **por referencia de nodo** y sobreviven a cualquier topología. El tercero,
 `id`, va por **`$json`**, y funcionaba solo porque el nodo de subida a Meta era su anterior inmediato.
 
-Al mover la reserva de salida para que quedara **justo antes del envío** —buena idea por sí misma: así la
-reserva cubre exactamente lo que dice cubrir y un fallo de red no deja la fila `reserved` de por vida— el
+Al mover la reserva de salida para que quedara **justo antes del envío** —y ese movimiento resultó ser un
+error, ver el apartado de abajo— el
 anterior inmediato pasó a ser un nodo Postgres. **`$json` deja de ser el payload y pasa a ser la fila de la
 función.** `document.id` queda `undefined` y Meta rechaza el envío.
 
@@ -956,3 +956,30 @@ tiene que ser explícita. Aquí se cerró con una comprobación que no cuesta en
 resuelto de la petición trae `document.id` no vacío**, visible en el `runData`.
 
 Agente: Arquitecto-IA-Qualitas
+
+### Y el movimiento que causó todo esto estaba mal, por una razón distinta (misma tarde)
+
+Pedí mover la reserva **detrás** de la descarga y la subida del PDF para que un fallo de red no dejara la
+fila `reserved` de por vida. La lápida es real, pero **el arreglo bueno era otro** —un `Settle … Uncertain`
+en el camino de error, que ya tenían diez carriles— y en cuanto ese estuvo puesto, mi reordenación dejó de
+aportar nada y pasó a **quitar**: con la puerta al final, un caso **denegado** —un humano había tomado la
+conversación— ya había subido el PDF a Meta antes de que el corte lo negara.
+
+Es decir: para cerrar el agujero de «el carril actúa sin pasar por la puerta», había dejado un trozo del
+carril fuera de la puerta. **Una guarda que deja fuera parte de lo que guarda es una guarda más pequeña,
+no una guarda distinta.**
+
+**El criterio, en una línea, que es lo que hay que recordar:**
+
+> **La puerta va antes del primer paso con efecto hacia fuera. Todo lo que quede dentro de la reserva
+> necesita camino de settle.** Son dos exigencias, no una, y satisfacer la segunda moviendo la puerta
+> rompe la primera.
+
+La colocación final separa los dos pasos por su efecto: la **descarga** es un GET a un documento nuestro y
+se queda **fuera** —un caso denegado gasta, como mucho, una descarga interna—; la **subida a Meta** y el
+**envío** quedan **dentro**, y los dos cuelgan su salida de error del mismo nodo de settle.
+
+**Lo que esto enseña del método:** arreglé una restricción y **relajé otra sin enterarme**. Ninguna de las
+dos aparecía en el mismo sitio —una es la vida de una fila en Postgres, la otra es qué toca el mundo
+exterior— y por eso el cambio se sentía gratis. Lo vio el ejecutor al ir a montar el control, no yo al
+recomendarlo.
