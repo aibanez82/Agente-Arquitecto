@@ -915,3 +915,44 @@ hablar por el número de PROD». Puede ser cierto y **no está medido**; «proba
 control, es una esperanza con buena presentación.
 
 Agente: Arquitecto-IA-Qualitas
+
+## Reordenar un carril cambia quién es «el de al lado» (29 sep 2026)
+
+En el carril Recovery del `#481`, el nodo de envío construye el documento así:
+
+```js
+document: { id: $json.id,
+            filename: $('Recovery Quote Ready').first().json.documentFilename,
+            caption:  $('Recovery Quote Ready').first().json.copy }
+```
+
+Dos de los tres campos van **por referencia de nodo** y sobreviven a cualquier topología. El tercero,
+`id`, va por **`$json`**, y funcionaba solo porque el nodo de subida a Meta era su anterior inmediato.
+
+Al mover la reserva de salida para que quedara **justo antes del envío** —buena idea por sí misma: así la
+reserva cubre exactamente lo que dice cubrir y un fallo de red no deja la fila `reserved` de por vida— el
+anterior inmediato pasó a ser un nodo Postgres. **`$json` deja de ser el payload y pasa a ser la fila de la
+función.** `document.id` queda `undefined` y Meta rechaza el envío.
+
+**La regla:** en un carril que se reordena, **`$json` significa «lo que me dé el de al lado»**. Lo que tiene
+que sobrevivir se lee **por nombre de nodo**, o se envuelve en el `Stash … Payload` / `Restore … Payload`
+que los demás carriles ya usan alrededor de su claim — que existen exactamente por esto.
+
+### Los dos errores de método, que valen más que la trampa
+
+**1 · El ámbito de un hecho medido incluye la topología sobre la que se midió.** Yo había comprobado —y
+era cierto— que el carril leía por referencia de nodo y por eso el empalme no le quitaba nada. La
+recomendación de reordenar **invalidó mi propia medición sin que yo lo notara**, porque la di por buena
+como propiedad del carril cuando era una propiedad del carril *en ese orden*.
+
+**2 · El control acotado tapaba justo lo que la recomendación rompía.** Habíamos elegido acreditar el corte
+**sin llegar a enviar** —correcto para lo que el cambio añadía— y ese control **habría salido verde con el
+envío roto**: el fallo solo aparece en el momento que el control decide no ejercer. Se vería en producción,
+en el primer clic de un cliente real.
+
+**Corolario:** cuando se recorta el alcance de un control, hay que preguntar **qué cambios recientes caen
+justo en el trozo recortado**. Un control acotado es una decisión sobre qué no se va a mirar, y esa lista
+tiene que ser explícita. Aquí se cerró con una comprobación que no cuesta envío: **asertar que el cuerpo
+resuelto de la petición trae `document.id` no vacío**, visible en el `runData`.
+
+Agente: Arquitecto-IA-Qualitas
