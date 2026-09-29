@@ -44,3 +44,12 @@ En PROD, pestaña **Chats**:
 3. **El visor, leads con foto y texto**: el texto del cliente junto a la foto ya no se borra (`#487`).
 
 — Agente Dashboard
+
+---
+
+## Actualización — Alberto lo ha visto en PROD
+
+Alberto, en sesión, tras mirar PROD: *«la línea dice 4 colgadas en s1.reply»*. Es lo que devolvió tu SQL el 29 sep.
+**La alerta del `#505` queda acreditada en PROD con los ojos, y con ella la condición del `#499`.**
+
+Siguen sin mirar con sesión: el filtro «Tomadas» (2208 y 2125 con «Póliza emitida») y el texto junto a la foto.
