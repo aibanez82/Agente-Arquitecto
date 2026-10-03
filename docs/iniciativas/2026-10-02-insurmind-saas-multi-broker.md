@@ -187,7 +187,78 @@ construcción y el número sigue al cliente. **A verificar con Meta** antes de d
 tecnológico y alta de clientes. Hoy la cuenta de Meta y el número de Hylant están en la cartera de **Juan**: mover el número de
 Hylant a su WABA es parte del piloto, y lo ejecuta Juan.
 
-## 6. Siguiente paso propuesto
+## 6. Configuración por capas: qué cambia entre clientes y dónde va (3 oct 2026)
+
+**Premisa de Alberto (3 oct):** la IA de cada cliente contesta distinto — condiciones de póliza, descuentos sí/no, lógica de
+negocio (las placas son obligatorias en Quálitas y quizá no en AXA). **AXA puede entrar como aseguradora de Hylant o sola como
+cliente de Insurmind.**
+
+### 6.1 Aseguradora y tenant son tablas distintas, aunque sean la misma empresa
+
+| Tabla | Qué es | AXA aparece como |
+|---|---|---|
+| Aseguradoras y productos | Quien asegura el riesgo. Catálogo global de Insurmind, un adaptador por aseguradora | `axa` → `axa-autos` |
+| Tenants | Quien es dueño de la relación con el cliente final: marca, número, leads | `axa-directo` |
+
+Un producto lo usan varios tenants. **Los precios no se configuran:** los devuelve la API de la aseguradora según la credencial del
+tenant que cotiza.
+
+### 6.2 Tres capas
+
+| Capa | Contiene | Ejemplo |
+|---|---|---|
+| Producto (aseguradora × ramo) | coberturas, condiciones, **campos obligatorios para emitir**, base de conocimiento | placas obligatorias en `qualitas-autos` |
+| Tenant | marca, tono, número, productos que vende, política comercial | `descuentos: no` |
+| Tenant × producto | excepciones | Hylant descuenta en Quálitas y no en AXA |
+
+```yaml
+producto: qualitas-autos
+  campos_emision: [nombre, rfc, vin, placas, domicilio]
+  conocimiento: kb/qualitas-autos
+producto: axa-autos
+  campos_emision: [nombre, rfc, vin, domicilio]
+  conocimiento: kb/axa-autos
+tenant: hylant
+  marca: Hylant · tono: cercano, tú
+  productos: [qualitas-autos, axa-autos]
+  descuentos: { qualitas-autos: hasta 15%, axa-autos: no }
+tenant: axa-directo
+  marca: AXA · tono: formal, usted
+  productos: [axa-autos]
+  descuentos: no
+```
+
+### 6.3 El prompt lleva conocimiento, nunca reglas
+
+Medido el 5 sep: si el dato es exacto o la prohibición es dura, lo garantiza el grafo, no el modelo.
+
+- **Condiciones de póliza** → conocimiento: base por producto, consultada por la IA.
+- **Sin descuentos** → se **retira la herramienta** (clasificador y aplicación de descuentos), no se instruye al modelo.
+- **Campos obligatorios** → lista por producto validada por el grafo (`Quotation Data Guard`) antes de emitir.
+- **Prompt compuesto:** base común (conversación, seguridad, jailbreak) + tono y marca del tenant + conocimiento del producto +
+  herramientas habilitadas.
+
+**Límite:** un *dato* que cambia (campo, sí/no, porcentaje, texto) es configuración; un *comportamiento* que cambia (paso nuevo,
+otro orden, inspección con fotos) es código en el adaptador de la aseguradora. Una configuración con condiciones y pasos es un
+lenguaje de programación peor que el código.
+
+**Trabajo de fondo que esto destapa:** el `systemMessage` del AI Agent (~82 000 caracteres, §2) mezcla conocimiento de Quálitas,
+reglas y tono de Hylant. Hay que separarlo en esas tres capas.
+
+### 6.4 AXA directo compite con Hylant: los leads son de quien los capta
+
+- El tenant `axa-directo` no ve leads ni ventas de Hylant, aunque coticen o emitan con AXA.
+- Lo que AXA aseguradora recibe de las ventas de Hylant viaja por el adaptador, como hoy con Quálitas, no por su tenant.
+- Garantía verificable: `tenant_id` + Row Level Security, auditoría de accesos, y contrato de encargado del tratamiento con cada
+  tenant por separado. Diseñado desde el principio es un argumento de venta; añadido después, una objeción.
+
+### 6.5 Abierto: quién mantiene el conocimiento de un producto
+
+Si un tenant (AXA directo) edita `axa-autos`, sus cambios llegan a las conversaciones de otro (Hylant). **Recomendación del
+Arquitecto:** el catálogo de productos lo cura Insurmind desde la documentación oficial de cada aseguradora; los tenants solo
+personalizan su capa.
+
+## 7. Siguiente paso propuesto
 
 1. Alberto + Juan: acordar el traslado a la org `insurmind` — orden, fecha y qué cuentas (Heroku, Meta, Vercel, n8n) pasan a
    Insurmind.
@@ -196,9 +267,10 @@ Hylant a su WABA es parte del piloto, y lo ejecuta Juan.
    n8n y el Dashboard, con el segundo tenant ficticio de STG como criterio de aceptación.
 4. Alberto: primera conversación con los programas de partners de la nube donde estén sus compradores (§4).
 
-## 7. Estado
+## 8. Estado
 
 - **2 oct 2026 — registrada.** Consultiva. Ninguna fase autorizada.
 - **3 oct 2026 — decisiones de Alberto** (§5): org común, Hylant de piloto, un número por broker. Sigue sin fase autorizada.
+- **3 oct 2026 — configuración por capas** (§6): AXA como aseguradora y como tenant; reglas en el grafo, no en el prompt.
 
 Agente: Arquitecto-IA-Qualitas
