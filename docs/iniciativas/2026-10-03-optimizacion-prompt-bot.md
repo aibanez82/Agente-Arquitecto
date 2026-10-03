@@ -60,7 +60,7 @@ Estimación, no medición: 25 000-30 000 caracteres por turno.
 | # | Etapa | Aceptación | Riesgo |
 |---|---|---|---|
 | **1** | **La emisión toma los datos del registro** (§4) | §4.4 | medio · toca emisión |
-| 2 | Quitar duplicados AI Agent ↔ RAG a una sola fuente | prompt del AI Agent idéntico byte a byte; en el RAG solo cambia «Acompañamiento» (decide Alberto la versión) | bajo |
+| 2 | Quitar duplicados AI Agent ↔ RAG a una sola fuente (§5) | prompt del AI Agent idéntico byte a byte; en el RAG solo cambia «Acompañamiento» (versión del AI Agent, decidido) | bajo |
 | 3 | Persona como variables | el prompt montado para Hylant idéntico al de hoy, carácter a carácter | casi nulo |
 | 4 | Reglas críticas al grafo (tarjeta/CVV/OTP, «sin intereses») | cada guarda con un caso que bloquea y otro que pasa | medio |
 | 5 | Solo el bloque de la fase actual | N ≥ 20 conversaciones en STG sin empeorar; frases de detectores intactas | medio |
@@ -128,9 +128,46 @@ los detectores intactas; diff de parámetros contra el respaldo limitado a los n
 - `HYL-WAI#534` (Juan, XML: teléfono por TipoRegla 70 y correo por TipoRegla 31) toca el XML, no el cuerpo que manda n8n:
   no colisiona, pero conviene no promover las dos a PROD el mismo día.
 
-## 5. Estado
+## 5. Etapa 2 — una sola fuente para lo que comparten AI Agent y RAG
+
+**Decisión de Alberto (3 oct):** «Acompañamiento» se queda con la versión del **AI Agent**.
+
+### 5.1 Medido (STG `e4d36d73`, igual en PROD `b041a6d8`)
+
+Dos agentes contestan al mismo cliente: `AI Agent` (intents `contracting`, `renovacion`, `policy_status`) y `RAG IA Agent` (el resto,
+salvo fuera de tema o presupuesto de KB agotado). Secciones `=== … ===` presentes en los dos:
+
+| Sección | AI | RAG | Estado |
+|---|---|---|---|
+| CAMBIO DE COTIZACIÓN (el cliente quiere ver otra suya) | 3 153 | 3 153 | idéntica |
+| QUÉ COTIZACIÓN ESTÁ ACTIVA | 879 | 879 | idéntica |
+| UN HECHO REGISTRADO NO SE DESMIENTE | 841 | 841 | idéntica |
+| LA LIMITADA NO SE OFRECE SOLA (#206) | 1 265 | 1 265 | idéntica |
+| TRADUCE LO QUE PIDE A LO QUE EXISTE (#334) | 1 576 | 1 575 | idéntica salvo el salto de línea final |
+| ACOMPAÑAMIENTO AL PEDIR DATOS (#316) | 1 473 | 703 | **divergió**: el RAG no tiene la regla de género neutro ni la del «gracias», y su ejemplo dice «Tranquilo, …» — justo lo que la regla de género prohíbe |
+
+`Merge Session Data` es ancestro de los dos agentes; los dos `systemMessage` ya son expresiones (`=`).
+
+### 5.2 El cambio (para el handoff, que se publica cuando la etapa 1 quede acreditada en STG)
+
+- Un nodo de código en el tronco común (tras `Merge Session Data`) con los seis bloques como única fuente.
+- Los dos `systemMessage` insertan cada bloque por expresión en el sitio exacto donde hoy está su copia.
+- El bloque «Acompañamiento» es el del AI Agent.
+
+### 5.3 Aceptación
+
+1. `systemMessage` resuelto del AI Agent **byte-idéntico** al anterior.
+2. `systemMessage` resuelto del RAG idéntico salvo «Acompañamiento» (texto del AI Agent) y, si cae ahí, el salto de línea de «Traduce».
+3. STG: una pregunta que lleve al RAG a enumerar los datos para contratar → sin adjetivos con género antes de conocerlo.
+4. Diff de parámetros solo en los dos agentes y el nodo nuevo; detectores intactos.
+
+**No ahorra tokens:** cada agente recibe el mismo texto. Gana que no puedan volver a divergir y deja el prompt listo para componerse.
+
+## 6. Estado
 
 - **3 oct 2026 — abierta.** Etapa 1 ordenada por Alberto para STG; handoff publicado.
 - **3 oct 2026 — corrección:** la tool tiene 24 campos (21 por `$fromAI`), no 25/22; salen 20. Adenda en el handoff (`5c5e19df`) y comentario en `#536`. Apuntado para Juan: `DatosEmisionForm` exige `apellido_materno`.
+- **3 oct 2026 — etapa 1 aplicada en STG** (bot `00382130`, guard `c0b8a798`; informe `Agente-n8n@22d3abf5`), re-medida por el Arquitecto. Falta el E2E por WhatsApp (aceptaciones 1 y 2), pendiente del sí de Alberto.
+- **3 oct 2026 — etapa 2:** Alberto elige «Acompañamiento» del AI Agent. Diseño en §5; handoff tras acreditar la etapa 1.
 
 Agente: Arquitecto-IA-Qualitas
