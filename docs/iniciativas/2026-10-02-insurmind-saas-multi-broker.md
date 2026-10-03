@@ -129,15 +129,76 @@ Criterios para elegir, por orden:
 natural es que **el núcleo nuevo** nazca ya en la nube elegida y el resto migre por partes. Hablar con los programas de partners sí
 puede empezar ya: es gestión comercial, no técnica.
 
-## 5. Siguiente paso propuesto
+## 5. Decisiones de Alberto (3 oct 2026)
 
-1. Alberto: conversación con Juan sobre propiedad del código (§3.3.1). Es el bloqueante.
-2. Alberto: identificar el primer broker candidato y su calendario. Decide si hace falta la etapa puente.
-3. Arquitecto: con el broker identificado, diseño de la tabla de tenants y del mapa «qué es de cada broker» contra el sistema real.
-4. Alberto: primera conversación con los programas de partners de la nube donde estén sus compradores.
+| Pregunta de §3.3 | Respuesta de Alberto |
+|---|---|
+| Propiedad del código | Juan entiende que el código debe vivir donde haga falta para el SaaS. **Todo** —su repo y los de Alberto (n8n, Dashboard…)— va a un sitio **común** |
+| Primer broker | **Hylant.** El piloto se hace con ellos |
+| WhatsApp | **Un número por broker**, para que un baneo de Meta no tumbe a todos. **Por definir** si la línea la pone el broker o Insurmind |
 
-## 6. Estado
+### 5.1 Lo común: la org `insurmind`, no un monorepo
+
+Medido el 3 oct: la org de GitHub **`insurmind` ya existe** (creada el 2 ago), Alberto es `admin`, plan `free`, con 4 repos
+(`insurmind_landing`, `MCP_Server`, `insurmind_playbook`, `engineering-operating-system`). Es el destino natural.
+
+- **Transferir, no copiar.** Una transferencia de repo conserva historia, issues, PRs y redirige las URLs viejas. Copiar parte la
+  historia y deja dos orígenes.
+- **Una org común, repos separados por componente.** Juntar todo en un monorepo es otra decisión, no hace falta para el SaaS y
+  rompe los monitores y handoffs que hoy apuntan a cada repo.
+- **El código es la parte fácil; lo que pesa es lo que cuelga del repo:** la integración GitHub de Heroku y la de Vercel, el
+  GitHub Project `aguayo-co/projects/2` (vive en la org de Juan y **no viaja con el repo**: hay que comprobar qué pasa con sus
+  ítems), los monitores de los ejecutores, las rutas en `CLAUDE.md` y en los protocolos.
+- **La propiedad no es solo del código:** la app Heroku de PROD (según `CLAUDE.md` Alberto es *member*, no dueño — sin medir hoy:
+  la CLI no tenía sesión), la cuenta de Meta (de Juan), la instancia n8n de Hostinger y el proyecto de Vercel. Un SaaS de
+  Insurmind necesita que **todas** esas cuentas sean de Insurmind.
+- **Plan `free`:** en repos privados no permite reglas de protección de rama. Revisar con GitHub antes de mover HYL-WAI si el
+  gitflow depende de ellas.
+- **Cuándo:** la transferencia de HYL-WAI la hace Juan, como dueño de `aguayo-co`, y le cambia el remoto a él. Se acuerda la
+  fecha con él; no durante una ventana Contract-First abierta.
+
+### 5.2 Hylant de piloto: necesario, pero no prueba nada solo
+
+Con un único tenant, cualquier código que use «el tenant por defecto» pasa todas las pruebas: **una tenencia con un solo cliente
+no distingue entre estar bien separada y no estarlo.**
+
+- **El piloto es una refactorización sin cambio visible:** todo lo que hoy dice «Hylant» (variables de entorno, literales, prompt,
+  `phone_number_id`) pasa a la fila de Hylant en la tabla de tenants. Criterio de éxito: Hylant no nota nada.
+- **El control positivo es un segundo tenant ficticio en STG,** con otra marca, otro dominio y otro número. Si una conversación de
+  ese tenant enseña algo de Hylant (nombre, precio, comisión, un lead en su Dashboard), la separación está rota. Sin ese segundo
+  tenant, el piloto no acredita la tenencia.
+- **Riesgo conocido:** las abstracciones se diseñan pensando en Hylant. Se mitiga dejando el diseño abierto hasta que haya un
+  segundo broker real delante, y diseñando sobre lo que de verdad cambia entre clientes.
+
+### 5.3 WhatsApp: el aislamiento depende de la cuenta, no solo del número
+
+Tener un número por broker no basta si todos cuelgan de **la misma** cuenta de empresa de Meta: hay sanciones que se aplican a la
+cuenta de WhatsApp Business (WABA) o a la cartera de empresa, no al número. El aislamiento real es **una WABA por broker**.
+
+| | La línea la pone el broker | La línea la pone Insurmind |
+|---|---|---|
+| Dueño de la WABA | el broker, en su cartera de Meta | Insurmind |
+| Cómo opera Insurmind | como proveedor tecnológico de Meta, con acceso concedido por el broker en el alta | directamente |
+| Si el broker se va | se lleva su número y su historial | el número es de Insurmind: hay que migrarlo o perderlo |
+| Si Meta sanciona | afecta solo a ese broker | depende de que cada broker tenga una WABA distinta |
+
+**Inclinación del Arquitecto:** que la línea sea del broker y que Insurmind opere como proveedor tecnológico. Aísla por
+construcción y el número sigue al cliente. **A verificar con Meta** antes de decidir: requisitos del programa de proveedor
+tecnológico y alta de clientes. Hoy la cuenta de Meta y el número de Hylant están en la cartera de **Juan**: mover el número de
+Hylant a su WABA es parte del piloto, y lo ejecuta Juan.
+
+## 6. Siguiente paso propuesto
+
+1. Alberto + Juan: acordar el traslado a la org `insurmind` — orden, fecha y qué cuentas (Heroku, Meta, Vercel, n8n) pasan a
+   Insurmind.
+2. Alberto: decidir quién pone la línea de WhatsApp (§5.3), tras consultar a Meta.
+3. Arquitecto: diseño del piloto Hylant — la tabla de tenants y el inventario medido de «todo lo que hoy dice Hylant» en Django,
+   n8n y el Dashboard, con el segundo tenant ficticio de STG como criterio de aceptación.
+4. Alberto: primera conversación con los programas de partners de la nube donde estén sus compradores (§4).
+
+## 7. Estado
 
 - **2 oct 2026 — registrada.** Consultiva. Ninguna fase autorizada.
+- **3 oct 2026 — decisiones de Alberto** (§5): org común, Hylant de piloto, un número por broker. Sigue sin fase autorizada.
 
 Agente: Arquitecto-IA-Qualitas
