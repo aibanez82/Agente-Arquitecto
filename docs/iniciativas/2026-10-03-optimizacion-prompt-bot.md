@@ -28,7 +28,7 @@ El de STG (`dNqtM20ij6ecZYAX` `e4d36d73`) mide 82 374 y **no es igual** al de PR
 
 Problemas, por gravedad:
 
-1. **Datos de emisión escritos por el modelo.** `Issue Policy` recibe 22 de 25 campos por `$fromAI`; lo guardado con
+1. **Datos de emisión escritos por el modelo.** `Issue Policy` recibe 21 de sus 24 campos por `$fromAI` (corregido el 3 oct: decía «22 de 25»); lo guardado con
    `Save Group1/2/3 Progress` no se usa para emitir. Detalle y mediciones en `HYL-WAI#536`. → **Etapa 1.**
 2. **Unas 15 reglas duras solo en el prompt**, sin nodo que las imponga: no pedir tarjeta/CVV/OTP, no «sin intereses» para
    fraccionado, no «la más barata», escalar importados, no renovaciones, Limitada (solo observada), no mostrar email/teléfono…
@@ -76,7 +76,7 @@ lleva orden de Alberto. STG se alcanza sin preguntar. Todo hunk de prompt entra 
 
 ```
 Bot ── Save Group1/2/3 Progress ──► whatsapp_sessions.captured_data   (no se usa para emitir)
-Bot ── Issue Policy (22 campos $fromAI) ──► Issue Policy Guard
+Bot ── Issue Policy (21 de 24 campos $fromAI) ──► Issue Policy Guard
         [30 días · placas · email presente] ──► POST /api/emitir-externo/
 Django ── email vs cotización · paquete/forma vs cotización (solo con selección) · Sepomex · VIN · form
         ──► QualitasService (XML, CP del cuerpo) ──► Quálitas (SOAP)
@@ -131,5 +131,6 @@ los detectores intactas; diff de parámetros contra el respaldo limitado a los n
 ## 5. Estado
 
 - **3 oct 2026 — abierta.** Etapa 1 ordenada por Alberto para STG; handoff publicado.
+- **3 oct 2026 — corrección:** la tool tiene 24 campos (21 por `$fromAI`), no 25/22; salen 20. Adenda en el handoff (`5c5e19df`) y comentario en `#536`. Apuntado para Juan: `DatosEmisionForm` exige `apellido_materno`.
 
 Agente: Arquitecto-IA-Qualitas
