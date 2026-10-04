@@ -1,0 +1,107 @@
+{
+  "system": "e2e-emision-registro-536",
+  "run_id": "20261004-0628-536",
+  "timestamp_mx": "2026-10-04 06:32 (GMT-6 MX)",
+  "triggered_by": "detección automática",
+  "results": [
+    {
+      "id": "QA-536-T1",
+      "system": "e2e-emision-registro-536",
+      "description": "Turno 1 · «Continuamos con…» y selección guardada en la cotización",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 75845 · qualitas_cotizacion 2905",
+      "result": "paquete=1 forma_pago=C · «Continuamos con»: sí",
+      "expected": "selección no vacía y la frase del detector",
+      "message": ""
+    },
+    {
+      "id": "QA-536-T2",
+      "system": "e2e-emision-registro-536",
+      "description": "Turno 2 · Save Group1 Progress",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 75848",
+      "result": "corrió",
+      "expected": "corre",
+      "message": ""
+    },
+    {
+      "id": "QA-536-T3",
+      "system": "e2e-emision-registro-536",
+      "description": "Turno 3 · Save Group2 Progress",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 75849",
+      "result": "corrió",
+      "expected": "corre",
+      "message": ""
+    },
+    {
+      "id": "QA-536-T4",
+      "system": "e2e-emision-registro-536",
+      "description": "Turno 4 · Save Group3 Progress con numero_exterior=222 y numero_interior=4B",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 75851 · whatsapp_sessions.captured_data.grupo3",
+      "result": "{\"calle\":\"Roble\",\"ciudad\":\"Monterrey\",\"estado\":\"Nuevo León\",\"numero\":\"222 interior 4B\",\"colonia\":\"Colinas del Valle\",\"codigo_postal\":\"64650\",\"numero_exterior\":\"222\",\"numero_interior\":\"4B\"}",
+      "expected": "calle Roble, numero_exterior 222, numero_interior 4B",
+      "message": ""
+    },
+    {
+      "id": "QA-536-T5-RESUMEN",
+      "system": "e2e-emision-registro-536",
+      "description": "Turno 5 · primer resumen vía Get Emission Record con «*Domicilio:*» Roble 222, Int. 4B",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 75853 · guard 75854",
+      "result": "Get Emission Record: sí · Roble 222 / Int. 4B / *Domicilio:*: sí",
+      "expected": "las dos cosas",
+      "message": ""
+    },
+    {
+      "id": "QA-536-T6",
+      "system": "e2e-emision-registro-536",
+      "description": "Turno 6 · Save Group3 Progress otra vez, con Fresno / 150 / interior vacío",
+      "priority": "critica",
+      "status": "FAIL",
+      "check": "exec 75855 · captured_data.grupo3",
+      "result": "{\"calle\":\"Fresno\",\"ciudad\":\"Monterrey\",\"estado\":\"Nuevo León\",\"numero\":\"150\",\"colonia\":\"Colinas del Valle\",\"codigo_postal\":\"64650\",\"numero_exterior\":\"150\",\"numero_interior\":\"N/A\"}",
+      "expected": "calle Fresno, numero_exterior 150, numero_interior vacío",
+      "message": ""
+    },
+    {
+      "id": "QA-536-T7-RESUMEN",
+      "system": "e2e-emision-registro-536",
+      "description": "Turno 7 · el resumen nuevo dice Fresno 150, sin interior",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 75855",
+      "result": "Fresno 150 sin interior, sin Roble",
+      "expected": "Fresno 150, sin interior",
+      "message": ""
+    },
+    {
+      "id": "QA-536-PARO-T7",
+      "system": "e2e-emision-registro-536",
+      "description": "La corrección no quedó en el registro o el resumen nuevo no la refleja",
+      "priority": "critica",
+      "status": "FAIL",
+      "check": "",
+      "result": "{\"calle\":\"Fresno\",\"ciudad\":\"Monterrey\",\"estado\":\"Nuevo León\",\"numero\":\"150\",\"colonia\":\"Colinas del Valle\",\"codigo_postal\":\"64650\",\"numero_exterior\":\"150\",\"numero_interior\":\"N/A\"}",
+      "expected": "Fresno/150/vacío",
+      "message": "PARO ANTES DE EMITIR: la precondición no consta, así que no se manda «Sí, confirmo»"
+    },
+    {
+      "id": "QA-536-LIMPIEZA",
+      "system": "e2e-emision-registro-536",
+      "description": "Limpieza por IDs exactos, en orden de FK descubierto del catálogo",
+      "priority": "alta",
+      "status": "PASS",
+      "check": "cotización clonada 2905 · lead 1551 · sesión QA-SUITE-REGISTRO-EMITE",
+      "result": "n8n_chat_histories:32 · whatsapp_sessions:1 · qualitas_lead:1 · qualitas_cotizacionrespuestaxml:1 · qualitas_cotizacion:1",
+      "expected": "cero residuo en STG (lo creado en el QA de Quálitas no es borrable desde aquí y se declara aparte)",
+      "message": "sin residuo en STG"
+    }
+  ]
+}

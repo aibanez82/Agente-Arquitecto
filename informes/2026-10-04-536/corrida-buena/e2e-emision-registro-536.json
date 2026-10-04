@@ -1,0 +1,151 @@
+{
+  "system": "e2e-emision-registro-536",
+  "run_id": "20261004-0633-536",
+  "timestamp_mx": "2026-10-04 06:38 (GMT-6 MX)",
+  "triggered_by": "detección automática",
+  "results": [
+    {
+      "id": "QA-536-T1",
+      "system": "e2e-emision-registro-536",
+      "description": "Turno 1 · «Continuamos con…» y selección guardada en la cotización",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 75862 · qualitas_cotizacion 2906",
+      "result": "paquete=1 forma_pago=C · «Continuamos con»: sí",
+      "expected": "selección no vacía y la frase del detector",
+      "message": ""
+    },
+    {
+      "id": "QA-536-T2",
+      "system": "e2e-emision-registro-536",
+      "description": "Turno 2 · Save Group1 Progress",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 75864",
+      "result": "corrió",
+      "expected": "corre",
+      "message": ""
+    },
+    {
+      "id": "QA-536-T3",
+      "system": "e2e-emision-registro-536",
+      "description": "Turno 3 · Save Group2 Progress",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 75865",
+      "result": "corrió",
+      "expected": "corre",
+      "message": ""
+    },
+    {
+      "id": "QA-536-T4",
+      "system": "e2e-emision-registro-536",
+      "description": "Turno 4 · Save Group3 Progress con numero_exterior=222 y numero_interior=4B",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 75868 · whatsapp_sessions.captured_data.grupo3",
+      "result": "{\"calle\":\"Roble\",\"ciudad\":\"Monterrey\",\"estado\":\"Nuevo León\",\"numero\":\"222 interior 4B\",\"colonia\":\"Colinas del Valle\",\"codigo_postal\":\"64650\",\"numero_exterior\":\"222\",\"numero_interior\":\"4B\"}",
+      "expected": "calle Roble, numero_exterior 222, numero_interior 4B",
+      "message": ""
+    },
+    {
+      "id": "QA-536-T5-RESUMEN",
+      "system": "e2e-emision-registro-536",
+      "description": "Turno 5 · primer resumen vía Get Emission Record con «*Domicilio:*» Roble 222, Int. 4B",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 75869 · guard 75871",
+      "result": "Get Emission Record: sí · Roble 222 / Int. 4B / *Domicilio:*: sí",
+      "expected": "las dos cosas",
+      "message": ""
+    },
+    {
+      "id": "QA-536-T6",
+      "system": "e2e-emision-registro-536",
+      "description": "Turno 6 · Save Group3 Progress otra vez, con Fresno / 150 / interior vacío",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 75872 · captured_data.grupo3",
+      "result": "{\"calle\":\"Fresno\",\"ciudad\":\"Monterrey\",\"estado\":\"Nuevo León\",\"numero\":\"150\",\"colonia\":\"Colinas del Valle\",\"codigo_postal\":\"64650\",\"numero_exterior\":\"150\",\"numero_interior\":\"N/A\"}",
+      "expected": "calle Fresno, numero_exterior 150, numero_interior vacío ('' o placeholder: el criterio de limpio() del guard)",
+      "message": ""
+    },
+    {
+      "id": "QA-536-T7-RESUMEN",
+      "system": "e2e-emision-registro-536",
+      "description": "Turno 7 · el resumen nuevo dice Fresno 150, sin interior",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 75872",
+      "result": "Fresno 150 sin interior, sin Roble",
+      "expected": "Fresno 150, sin interior",
+      "message": ""
+    },
+    {
+      "id": "QA-536-A3-SIN-TELEFONO",
+      "system": "e2e-emision-registro-536",
+      "description": "Aceptación 3 · ningún resumen enseña el teléfono",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "2 resúmenes · busca 1000000536 y cualquier secuencia de 10 dígitos",
+      "result": "en ninguno",
+      "expected": "en ninguno",
+      "message": ""
+    },
+    {
+      "id": "QA-536-A1-CUERPO",
+      "system": "e2e-emision-registro-536",
+      "description": "Aceptación 1 · el cuerpo de Call Issue Policy Real lleva Fresno / 150 / interior vacío, y CP, teléfono, paquete y forma de pago idénticos a la cotización",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "guard exec 75875 · entrada de Call Issue Policy Real (salida de Email Missing?, cuyos campos el nodo mapea 1:1)",
+      "result": "calle=\"Fresno\" · numero_exterior=\"150\" · numero_interior=\"\" · codigo_postal=\"64650\" · telefono=\"1000000536\" · paquete=\"1\" · forma_pago=\"C\"",
+      "expected": "todos idénticos",
+      "message": ""
+    },
+    {
+      "id": "QA-536-A2-CORRECCION",
+      "system": "e2e-emision-registro-536",
+      "description": "Aceptación 2 · el primer resumen mostró Roble 222 / 4B y el cuerpo NO lleva Roble",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "resumen del turno 5 (exec 75869) frente al cuerpo de la emisión",
+      "result": "primer resumen Roble: sí · cuerpo con Roble: no",
+      "expected": "sí / no",
+      "message": ""
+    },
+    {
+      "id": "QA-536-A4-POLIZA",
+      "system": "e2e-emision-registro-536",
+      "description": "Aceptación 4 · póliza creada en el QA de Quálitas",
+      "priority": "critica",
+      "status": "FAIL",
+      "check": "respuesta de Django (guard exec 75875) y qualitas_polizaemitida",
+      "result": "respuesta: sin número · BD: ninguna · Django: {\"status\":\"error\",\"code\":\"qualitas_business_error\",\"msg\":\"El RFC no es válido.\",\"details\":{\"qualitas_code\":\"239\"}}",
+      "expected": "número de póliza",
+      "message": ""
+    },
+    {
+      "id": "QA-536-A5-DETECTORES",
+      "system": "e2e-emision-registro-536",
+      "description": "Aceptación 5 · frases de los detectores presentes",
+      "priority": "alta",
+      "status": "FAIL",
+      "check": "",
+      "result": "«Continuamos con»: sí · «*Domicilio:*»: sí · «emitida exitosamente»: NO",
+      "expected": "las tres",
+      "message": ""
+    },
+    {
+      "id": "QA-536-LIMPIEZA",
+      "system": "e2e-emision-registro-536",
+      "description": "Limpieza por IDs exactos, en orden de FK descubierto del catálogo",
+      "priority": "alta",
+      "status": "WARN",
+      "check": "cotización clonada 2906 · lead 1552 · sesión QA-SUITE-REGISTRO-EMITE",
+      "result": "n8n_chat_histories:34 · whatsapp_sessions:1 · qualitas_leadactionevent:3 · qualitas_cotizacionrespuestaxml:1",
+      "expected": "cero residuo en STG (lo creado en el QA de Quálitas no es borrable desde aquí y se declara aparte)",
+      "message": "RESIDUO DECLARADO (no se fuerza): qualitas_leadfunnelevent(731,732) ERROR: ERROR:  LeadFunnelEvent is append-only | qualitas_lead(1552) ERROR: ERROR:  update or delete on table \"qualitas_lead\" violates foreign key constraint \"qualitas_leadfunnelevent_lead_id_80be022d_fk_qualitas_lead_id\" on table \"qual | qualitas_leadfunnelevent(731,732) ERROR: ERROR:  LeadFunnelEvent is append-only | qualitas_lead(1552) ERROR: ERROR:  update or delete on table \"qualitas_lead\" violates foreign key constraint \"qualitas_leadfunnelevent_lead_id_80be022d_fk_qualitas_lead_id\" on table \"qual | qualitas_asegurado(1948) ERROR: ERROR:  update or delete on table \"qualitas_asegurado\" violates foreign key constraint \"qualitas_lead_asegurado_id_3cd23f20_fk_qualitas_asegurado_id\" on table \" | qualitas_leadfunnelevent(731,732) ERROR: ERROR:  LeadFunnelEvent is append-only | qualitas_cotizacion(2906) ERROR: ERROR:  update or delete on table \"qualitas_cotizacion\" violates foreign key constraint \"qualitas_asegurado_cotizacion_id_3a1f41d5_fk_qualitas_\" on table \"quali"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+[versiones] bot 00382130-b60a-494b-8338-86fb20e4b961 (414) · guard c0b8a798-3f7a-42de-9d11-1c145fb28123 (17)
+[fixture] cotización 2905 (clon de 2683) · lead 1551 · CP 64650 · tel 1000000536
+  [0-saludo] exec 75843 · 85 nodos · guard: —
+      cliente: «Hola, quiero contratar el seguro de mi Toyota Highlander»
+      bot:     «¡Hola! Soy Carla, de Quálitas 😊 Ya tengo tu cotización para tu *Toyota Highlander 2020*. Tenemos dos opciones de cobertura: *Amplia:* • Anual: $10,858.25 MXN • Semestral: $11,305.66 MXN (primer pago $6,099.43, luego 1 pago de $5,206.23) • Trimestral: $11,549.»
+  [1-seleccion] exec 75845 · 83 nodos · guard: —
+      cliente: «Me quedo con la cobertura Amplia, pago de contado»
+      bot:     «¡Perfecto! Continuamos con *Cobertura Amplia, pago anual de $10,858.25 MXN*. *Para continuar necesito:* - Tu nombre completo - Fecha de nacimiento (DD/MM/AAAA) - Género (M/F) No te preocupes, no hace falta que me des todo de golpe — vamos paso a paso.»
+  [2-grupo1] exec 75848 · 83 nodos · guard: —
+      cliente: «Ana Prueba Quality, nací el 01/01/1990, soy mujer»
+      bot:     «Perfecto, Ana. Ahora necesito: - Placas del vehículo - Número de serie (NIV/VIN): 17 caracteres, sin las letras I, O ni Q *Si tienes una foto de tu tarjeta de circulación, mándamela y trato de leer los datos.*»
+  [3-grupo2] exec 75849 · 85 nodos · guard: —
+      cliente: «Placas QAA536B y número de serie 5TDDZRFH6LS005360»
+      bot:     «¡Perfecto, estamos a nada! 🙌 Último paso y ya: - Calle, número exterior e interior (si tiene) - Colonia»
+  [4-grupo3] exec 75850 · 83 nodos · guard: —
+      cliente: «Calle Roble 222, interior 4B»
+      bot:     «Gracias, Ana. ¿Cuál de estas es tu colonia para el CP 64650? 1. Colinas del Valle 2. Cooperativa Cuauhtémoc 3. Cumbres del Valle 4. Rincón de Santa María 5. Santa María»
+  [4b-colonia] exec 75851 · 83 nodos · guard: —
+      cliente: «Colinas del Valle»
+      bot:     «¿Requieres factura? (SÍ/NO)»
+  [5-factura-resumen] exec 75853 · 85 nodos · guard: 75854/resumen
+      cliente: «No»
+      bot:     «¡Listo! Ya tenemos todo 🎉 Ana, confírmame que todo está bien y procedemos a la emisión: Vehículo: TOYOTA HIGHLANDER 2020 Cobertura: Cobertura Amplia Pago: Pago Anual (Contado) Monto total: $10,858.25 MXN *Datos del contratante:* Ana Prueba Quality Nacimiento:»
+  [6-correccion] exec 75855 · 84 nodos · guard: 75856/resumen
+      cliente: «Perdona, la dirección está mal: es Calle Fresno 150, sin interior»
+      bot:     «¡Corregido! Ya tenemos todo 🎉 Ana, confírmame que todo está bien y procedemos a la emisión: Vehículo: TOYOTA HIGHLANDER 2020 Cobertura: Cobertura Amplia Pago: Pago Anual (Contado) Monto total: $10,858.25 MXN *Datos del contratante:* Ana Prueba Quality Nacimie»
+[PARO] QA-536-PARO-T7: {"calle":"Fresno","ciudad":"Monterrey","estado":"Nuevo León","numero":"150","colonia":"Colinas del Valle","codigo_postal":"64650","numero_exterior":"150","numero_interior":"N/A"}
+[limpieza] n8n_chat_histories:32 · whatsapp_sessions:1 · qualitas_lead:1 · qualitas_cotizacionrespuestaxml:1 · qualitas_cotizacion:1
+[e2e-emision-registro-536] 9 tests → PASS 7 · FAIL 2 · WARN 0 · SKIP 0
+[e2e-emision-registro-536] reporte: reports/20261004-0628-536/e2e-emision-registro-536.json
+[536] traza en reports/20261004-0628-536
+exit=0
