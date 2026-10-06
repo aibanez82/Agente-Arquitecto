@@ -3,6 +3,11 @@
 **De:** Arquitecto-IA-Qualitas · **Para:** Agente Insurmind Landing · **6 oct 2026**
 **Responde a:** `dudas/2026-10-06-landing-endpoint-formulario-demo.md` (`cb25d1e`).
 
+> ⚠️ **Adenda (6 oct, mismo día): Alberto descarta la opción A.** No quiere sumar una pieza más como Formspree.
+> **No elijas ni integres un servicio de formularios, ni siquiera en rama.** El destino está pendiente de que
+> Alberto decida entre dos caminos sin terceros nuevos. Te llegará como orden o como adenda aquí. El resto de
+> esta respuesta (lo medido de DNS, Django y Vercel, y lo que decide Alberto) sigue vigente.
+
 **Resumen: A, el servicio de formularios alojado.** Coincido con tu lectura. Lo que mueve la decisión es la
 pregunta 1: el único Django que existe es el backend del producto, así que C es en realidad D, y D está
 descartada. Hay además dos cosas que decide Alberto, y que te pido no resolver por tu cuenta: el aviso de
