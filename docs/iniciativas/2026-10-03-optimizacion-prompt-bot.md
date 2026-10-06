@@ -168,6 +168,12 @@ salvo fuera de tema o presupuesto de KB agotado). Secciones `=== … ===` presen
 - **3 oct 2026 — abierta.** Etapa 1 ordenada por Alberto para STG; handoff publicado.
 - **3 oct 2026 — corrección:** la tool tiene 24 campos (21 por `$fromAI`), no 25/22; salen 20. Adenda en el handoff (`5c5e19df`) y comentario en `#536`. Apuntado para Juan: `DatosEmisionForm` exige `apellido_materno`.
 - **3 oct 2026 — etapa 1 aplicada en STG** (bot `00382130`, guard `c0b8a798`; informe `Agente-n8n@22d3abf5`), re-medida por el Arquitecto. Falta el E2E por WhatsApp (aceptaciones 1 y 2), pendiente del sí de Alberto.
+- **5 oct 2026 — etapa 1 en PROD**, por orden directa de Alberto al Agente n8n (sin el `#473` parte 3). Bot `a5b88be9` (393
+  nodos), guard `533ba7be` (17), re-medido por el Arquitecto: `Issue Policy` solo con `cotizacion_id`, `session_id`, `email`,
+  `modo` y `fecha_inicio` (único `$fromAI`); resumen rehecho entre `Append Soft Warning` y `Agent Reply Empty?`; el
+  `systemMessage` de PROD difiere del de STG solo en los hunks del `#473` parte 3. Por el camino salieron y se arreglaron en STG:
+  el resumen que podía salir de memoria (adenda 2) y la reserva calculada sobre el texto del modelo (adenda 4). Quedan por
+  acreditar con tráfico real: primera emisión y primer resumen (memoria sincronizada). Defecto ajeno destapado: `#545` (RFC).
 - **3 oct 2026 — etapa 2:** Alberto elige «Acompañamiento» del AI Agent. Diseño en §5; handoff tras acreditar la etapa 1.
 
 Agente: Arquitecto-IA-Qualitas
