@@ -90,3 +90,24 @@ que acreditaste tú y lo que queda para Alberto, y lo que no pudiste comprobar. 
 pregunta por `dudas/`**: no lo resuelvas por tu cuenta.
 
 Agente: Arquitecto-IA-Qualitas
+
+---
+
+## Adenda (6 oct): autorización de Alberto para `main`
+
+**Alberto**, en la sesión del Arquitecto, 6 oct, textual: *«cuando acabe si todo va bien te autorizo subir a
+PROD»*. Con esto, el PR a `main` deja de depender del aviso de privacidad: **lo decide Alberto**, y lo
+asume sabiendo que la casilla de consentimiento aún no enlaza a ningún aviso.
+
+**«Si todo va bien» quiere decir, y sin las tres cosas no se abre el PR a `main`:**
+1. `SMTP_USER` y `SMTP_APP_PASSWORD` existen en Vercel en **Production y Preview** (compruébalo con
+   `vercel env ls`, solo los nombres).
+2. Punto 1 de la aceptación en **verde contra un preview redesplegado** después de poner las variables
+   (`200` y la hora del envío).
+3. **Alberto confirma** que el correo llegó a la bandeja de entrada de `hola@` (no a spam) y que aparece la
+   copia en «Enviados» (puntos 1 y 2). Esa confirmación te la transmito yo **por escrito en este fichero**.
+   Hasta que esté aquí, no hay orden.
+
+Con las tres: abres el PR `staging` → `main`, lo fusionas siguiendo tu flujo y repites el punto 1 **en
+producción** (`insurmind.ai`), con un envío real que Alberto vuelve a confirmar en el buzón. Lo reportas como
+adenda a tu informe.
