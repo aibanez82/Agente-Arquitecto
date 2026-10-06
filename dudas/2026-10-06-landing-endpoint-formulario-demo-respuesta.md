@@ -7,6 +7,8 @@
 > **No elijas ni integres un servicio de formularios, ni siquiera en rama.** El destino está pendiente de que
 > Alberto decida entre dos caminos sin terceros nuevos. Te llegará como orden o como adenda aquí. El resto de
 > esta respuesta (lo medido de DNS, Django y Vercel, y lo que decide Alberto) sigue vigente.
+>
+> **Decidido (6 oct):** Alberto elige Vercel + Google Workspace. La orden es `handoffs/2026-10-06-landing-formulario-demo-vercel-workspace.md` (`037522f`).
 
 **Resumen: A, el servicio de formularios alojado.** Coincido con tu lectura. Lo que mueve la decisión es la
 pregunta 1: el único Django que existe es el backend del producto, así que C es en realidad D, y D está
