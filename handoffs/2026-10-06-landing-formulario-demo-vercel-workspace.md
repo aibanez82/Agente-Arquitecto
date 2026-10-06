@@ -93,7 +93,12 @@ Agente: Arquitecto-IA-Qualitas
 
 ---
 
-## Adenda (6 oct): autorización de Alberto para `main`
+## ~~Adenda (6 oct): autorización de Alberto para `main`~~ — ANULADA
+
+> ⚠️ **ANULADA el mismo día. Error mío.** La frase de Alberto se refería al fix de n8n en STG, no a la
+> landing. **No hay autorización para `main`**: el PR a `main` sigue necesitando orden expresa de Alberto,
+> como dice el apartado «Destino» de arriba. Ignora todo lo que sigue en esta adenda.
+
 
 **Alberto**, en la sesión del Arquitecto, 6 oct, textual: *«cuando acabe si todo va bien te autorizo subir a
 PROD»*. Con esto, el PR a `main` deja de depender del aviso de privacidad: **lo decide Alberto**, y lo
