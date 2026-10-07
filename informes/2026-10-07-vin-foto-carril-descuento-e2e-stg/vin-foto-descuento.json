@@ -1,0 +1,74 @@
+{
+  "system": "vin-foto-descuento",
+  "run_id": "20261007-0655-VINFOTO",
+  "timestamp_mx": "2026-10-07 07:14 (GMT-6 MX)",
+  "triggered_by": "detección automática",
+  "results": [
+    {
+      "id": "QA-VF-C1",
+      "system": "vin-foto-descuento",
+      "description": "Caso 1: «Es correcto» con serie_foto propuesto",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "",
+      "result": "✓ no pide el VIN · ✓ Route → vin 5TDDZRFH4LS007401 (foto_confirmada_ahora) · ✓ Provide Required Data corre · ✓ motivo vin_registrado · ✓ discount_serie = VIN de la foto · ✓ serie_foto confirmado · ✓ la aplicación sale de pending_data (fila) · ✓ Django guardó el VIN en el lead (fila)",
+      "expected": "todas ✓",
+      "message": "exec 80296 · app 662: pending_data → processing"
+    },
+    {
+      "id": "QA-VF-C2",
+      "system": "vin-foto-descuento",
+      "description": "Caso 2: «no, está mal» con serie_foto propuesto",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "",
+      "result": "✓ pide el VIN (ASK_VIN) · ✓ Route → copy + descartar · ✓ Django no recibe nada (Provide Required Data no corre) · ✓ serie_foto descartado · ✓ la aplicación sigue en pending_data (fila) · ✓ el lead sigue sin VIN (fila)",
+      "expected": "todas ✓",
+      "message": "exec 80302 · app 663: pending_data → pending_data"
+    },
+    {
+      "id": "QA-VF-C3",
+      "system": "vin-foto-descuento",
+      "description": "Caso 3: «El número de serie es 5TDDZRFH6LS007402» con serie_foto propuesto",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "",
+      "result": "✓ Route → vin 5TDDZRFH6LS007402 (el del texto) · ✓ Provide Required Data corre · ✓ Django guardó B en el lead (fila) · ✓ Django lo aceptó → serie_foto descartado",
+      "expected": "todas ✓",
+      "message": "exec 80307 · app 664: pending_data → queued"
+    },
+    {
+      "id": "QA-VF-C4",
+      "system": "vin-foto-descuento",
+      "description": "Caso 4: «hola, ¿cómo va?» con serie_foto ausente",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "",
+      "result": "✓ pide el VIN (ASK_VIN), como hoy · ✓ Django no recibe nada · ✓ sin serie_foto · ✓ la aplicación sigue en pending_data (fila)",
+      "expected": "todas ✓",
+      "message": "exec 80313 · app 665: pending_data → pending_data"
+    },
+    {
+      "id": "QA-VF-C5",
+      "system": "vin-foto-descuento",
+      "description": "Caso 5: «ok» con serie_foto confirmado",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "",
+      "result": "✓ no pide el VIN · ✓ Route → vin 5TDDZRFH4LS007401 (foto) · ✓ Provide Required Data corre · ✓ motivo vin_registrado · ✓ discount_serie = el confirmado · ✓ serie_foto sigue confirmado · ✓ la aplicación sale de pending_data (fila) · ✓ Django guardó el VIN en el lead (fila)",
+      "expected": "todas ✓",
+      "message": "exec 80319 · app 666: pending_data → queued"
+    },
+    {
+      "id": "QA-VF-C6",
+      "system": "vin-foto-descuento",
+      "description": "Caso 6: VIN de foto que Django rechace con invalid_vin",
+      "priority": "alta",
+      "status": "NO COMPROBABLE",
+      "check": "",
+      "result": "no ejecutado",
+      "expected": "rechazo de Django y serie_foto descartado",
+      "message": "En el carril del descuento Django solo valida [A-HJ-NPR-Z0-9]{17} y Route Normal Guard aplica ese mismo patrón a serie_foto antes de enviarlo: ningún VIN de foto llega a Django para ser rechazado"
+    }
+  ]
+}

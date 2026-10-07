@@ -1,0 +1,2572 @@
+{
+  "run_id": "20261007-0655-VINFOTO",
+  "bot": "9481dc31-3317-4d05-b1bc-4a5342325e2f",
+  "vin_a": "5TDDZRFH4LS007401",
+  "vin_b": "5TDDZRFH6LS007402",
+  "objecion": "¿Tienen alguna promoción? Se me hace caro",
+  "casos": [
+    {
+      "caso": 1,
+      "fixture": {
+        "SID": "waq_2974_0a0a0a0a1de1",
+        "CID": "waq_2974_0a0a0a0a1de1",
+        "cot": 2974,
+        "lead": 1621
+      },
+      "mensaje": "Es correcto",
+      "foto_sembrada": {
+        "value": "5TDDZRFH4LS007401",
+        "status": "propuesto"
+      },
+      "turno_objecion": {
+        "etiqueta": "C1-OBJ",
+        "texto": "¿Tienen alguna promoción? Se me hace caro",
+        "wamid": "wamid.QA.SUITE.VFC1OBJ.MUY41FLJ.162B62",
+        "exec_id": "80293",
+        "status": "success",
+        "ejecutados": 70,
+        "nodos": {
+          "Discount Phase 2 Claim": {
+            "turn_key": "d156.p2.d2cd502de8ff5f1f522447c2d45b011078d66c1e",
+            "session_id": "waq_2974_0a0a0a0a1de1",
+            "lead_id": "1621",
+            "quotation_id": "2974",
+            "conversation_id": "waq_2974_0a0a0a0a1de1",
+            "authority_epoch": 0,
+            "request_hash": "d2cd502de8ff5f1f522447c2d45b011078d66c1ef671f65f42073a9250422384",
+            "etapa": "catalog_reserved",
+            "puede_clasificar": true,
+            "continuar_normal": false,
+            "rechazo": null
+          },
+          "Parse Discount Classification": {
+            "intent": "PRICE_OBJECTION",
+            "signal": "price",
+            "output_shape": "bare",
+            "veto": null
+          },
+          "Build Offer Notice Copy": {
+            "hay_vivo": false,
+            "remite_copy": "",
+            "notice_copy": "Déjame checar tu cotización para buscarte el mejor precio posible. Ahorita te cuento."
+          },
+          "Create Direct Discount Application": {
+            "schema_version": 1,
+            "authority_epoch": 0,
+            "offer": {
+              "schema_version": 1,
+              "offer_id": "8dbfc36e-a757-48c1-9c5e-752ca2a456ba",
+              "state": "accepted",
+              "source": {
+                "lead_id": "1621",
+                "quote_id": "2974",
+                "session_id": "waq_2974_0a0a0a0a1de1",
+                "conversation_id": "waq_2974_0a0a0a0a1de1"
+              },
+              "root_quote_id": "2974",
+              "maximum_discounts_snapshot": 1,
+              "program": {
+                "code": "POR_VIN_40",
+                "name": "Descuento por Vin 40%",
+                "qualitas_percentage": 40,
+                "vin_required": true
+              },
+              "reason_code": "price_objection",
+              "interactions": {
+                "accept": "dsc:v1:o:8dbfc36e-a757-48c1-9c5e-752ca2a456ba:accept",
+                "decline": "dsc:v1:o:8dbfc36e-a757-48c1-9c5e-752ca2a456ba:decline"
+              },
+              "copy": {
+                "offered": "Si me das tu VIN, y eres elegible, te puedo dar un descuento adicional.",
+                "accepted": "Aceptaste el descuento. Prepararemos una nueva cotización.",
+                "declined": "Conservaremos tu cotización actual sin cambios."
+              },
+              "created_at": "2026-10-07T12:56:43.347879Z",
+              "expires_at": "2026-10-07T13:26:43.330468Z"
+            },
+            "application": {
+              "schema_version": 1,
+              "application_id": "662",
+              "offer_id": "8dbfc36e-a757-48c1-9c5e-752ca2a456ba",
+              "snapshot": {
+                "pricing_source": "CATALOG",
+                "program_code": "POR_VIN_40",
+                "qualitas_percentage": 40,
+                "vin_required": true,
+                "maximum_discounts_snapshot": 1,
+                "source_application_id": null
+              },
+              "root": {
+                "lead_id": "1621",
+                "quote_id": "2974"
+              },
+              "source": {
+                "lead_id": "1621",
+                "quote_id": "2974",
+                "session_id": "waq_2974_0a0a0a0a1de1",
+                "conversation_id": "waq_2974_0a0a0a0a1de1"
+              },
+              "result": null,
+              "state": "pending_data",
+              "stage": "validation",
+              "slot": {
+                "number": null,
+                "status": "not_reserved",
+                "maximum_discounts_snapshot": 1
+              },
+              "next_action": "await_required_data",
+              "conversation": {
+                "proposed_session_id": null,
+                "proposed_conversation_id": null,
+                "status": "not_started",
+                "history_inheritance": {
+                  "status": "not_started",
+                  "cutover_at": null,
+                  "source_logical_count": null,
+                  "inherited_count": null,
+                  "source_fingerprint_sha256": null,
+                  "result_fingerprint_sha256": null
+                }
+              },
+              "document": {
+                "status": "not_started",
+                "quote_id": null,
+                "sha256": null,
+                "content_length": null
+              },
+              "delivery": {
+                "status": "not_requested",
+                "attempt_id": null,
+                "reported_at": null
+              },
+              "error": {
+                "code": null,
+                "message": null
+              },
+              "copy": {
+                "status": "Perfecto! Déjame que arme tu nueva cotización!"
+              },
+              "timestamps": {
+                "created_at": "2026-10-07T12:56:43.418908Z",
+                "updated_at": "2026-10-07T12:56:43.418917Z",
+                "completed_at": null
+              }
+            }
+          },
+          "Validate Direct Discount Application": {
+            "direct_application_valid": true,
+            "direct_application_safe": {
+              "schema_version": 1,
+              "authority_epoch": 0,
+              "offer": {
+                "offer_id": "8dbfc36e-a757-48c1-9c5e-752ca2a456ba",
+                "state": "accepted",
+                "source": {
+                  "lead_id": "1621",
+                  "quote_id": "2974",
+                  "session_id": "waq_2974_0a0a0a0a1de1",
+                  "conversation_id": "waq_2974_0a0a0a0a1de1"
+                },
+                "program_code": "POR_VIN_40",
+                "reason_code": "price_objection",
+                "offered_copy": "Si me das tu VIN, y eres elegible, te puedo dar un descuento adicional.",
+                "interaction_accept": "dsc:v1:o:8dbfc36e-a757-48c1-9c5e-752ca2a456ba:accept",
+                "interaction_decline": "dsc:v1:o:8dbfc36e-a757-48c1-9c5e-752ca2a456ba:decline",
+                "expires_at": "2026-10-07T13:26:43.330468Z"
+              },
+              "application": {
+                "application_id": "662",
+                "offer_id": "8dbfc36e-a757-48c1-9c5e-752ca2a456ba",
+                "source": {
+                  "lead_id": "1621",
+                  "quote_id": "2974",
+                  "session_id": "waq_2974_0a0a0a0a1de1",
+                  "conversation_id": "waq_2974_0a0a0a0a1de1"
+                },
+                "program_code": "POR_VIN_40",
+                "state": "pending_data",
+                "stage": "validation",
+                "slot_number": null,
+                "slot_status": "not_reserved",
+                "next_action": "await_required_data",
+                "response_copy": "¡Perfecto! Para aplicar tu descuento necesito el número de serie (VIN) de tu vehículo: son 17 letras y números y viene en tu tarjeta de circulación o en la factura. ¿Me lo compartes?"
+              }
+            },
+            "direct_application_reject_reason": null
+          }
+        },
+        "salientes": [
+          {
+            "t": "2026-10-07T12:55:27.992989+00:00",
+            "texto": "Déjame checar tu cotización para buscarte el mejor precio posible. Ahorita te cuento.",
+            "source": "discount_direct_review_notice_v1",
+            "motivo": null
+          },
+          {
+            "t": "2026-10-07T12:56:44.262001+00:00",
+            "texto": "Para dejar tu descuento aplicado me falta un dato tuyo. ¿Me lo compartes y lo cerramos?",
+            "source": "direct_discount_notice_v1",
+            "motivo": null
+          }
+        ],
+        "dispatch": [
+          {
+            "id": "s1.d202.p2.notice.52badbbaa20972246be62e46a8afacceead04b10ae5b8fe66cf57dc4c8506fc3",
+            "outcome": "sent",
+            "wamid_meta": true,
+            "at": "2026-10-07T12:55:27.214666+00:00"
+          },
+          {
+            "id": "d156.p2.d2cd502de8ff5f1f522447c2d45b011078d66c1e.application.reply",
+            "outcome": "sent",
+            "wamid_meta": true,
+            "at": "2026-10-07T12:56:43.527309+00:00"
+          }
+        ]
+      },
+      "app_tras_objecion": {
+        "id": 662,
+        "state": "pending_data",
+        "stage": "validation",
+        "program_code": "POR_VIN_40",
+        "vin_required": true,
+        "offer_id": "8dbfc36e-a757-48c1-9c5e-752ca2a456ba",
+        "error_code": "",
+        "source_lead_id": 1621,
+        "source_quote_id": 2974,
+        "result_quote_id": null,
+        "created_at": "2026-10-07T12:56:43.418908+00:00",
+        "updated_at": "2026-10-07T12:56:43.418917+00:00"
+      },
+      "captured_antes": {
+        "serie_foto": {
+          "value": "5TDDZRFH4LS007401",
+          "status": "propuesto"
+        },
+        "discount_unavailable": false
+      },
+      "vin_lead_antes": "",
+      "turno": {
+        "etiqueta": "C1",
+        "texto": "Es correcto",
+        "wamid": "wamid.QA.SUITE.VFC1.MUY43JTZ.B34434",
+        "exec_id": "80296",
+        "status": "success",
+        "ejecutados": 58,
+        "nodos": {
+          "Discount Phase 2 Claim": {
+            "turn_key": "d156.p2.877536b3c4f6ea8b844fdfe66aadd1d3a192a487",
+            "session_id": "waq_2974_0a0a0a0a1de1",
+            "lead_id": "1621",
+            "quotation_id": "2974",
+            "conversation_id": "waq_2974_0a0a0a0a1de1",
+            "authority_epoch": 0,
+            "request_hash": "877536b3c4f6ea8b844fdfe66aadd1d3a192a487c3d3154fcde9f3089b90f08b",
+            "etapa": "catalog_reserved",
+            "puede_clasificar": true,
+            "continuar_normal": false,
+            "rechazo": null
+          },
+          "Parse Discount Classification": {
+            "intent": "no_match",
+            "signal": null,
+            "output_shape": "bare",
+            "veto": null
+          },
+          "Discount Normal Guard": {
+            "application_id": "662",
+            "state": "pending_data",
+            "processing_copy": "Perfecto! Déjame que arme tu nueva cotización!",
+            "offer_id": "8dbfc36e-a757-48c1-9c5e-752ca2a456ba",
+            "aviso_en_vuelo": false,
+            "acuses_seguidos": 0,
+            "preguntas_previas": 0,
+            "serie_foto_value": "5TDDZRFH4LS007401",
+            "serie_foto_status": "propuesto"
+          },
+          "Route Normal Guard": {
+            "ruta": "vin",
+            "vin": "5TDDZRFH4LS007401",
+            "vin_origen": "foto_confirmada_ahora",
+            "offer_id": "8dbfc36e-a757-48c1-9c5e-752ca2a456ba",
+            "application_id": "662"
+          },
+          "IF Guard Has VIN?": {
+            "ruta": "vin",
+            "vin": "5TDDZRFH4LS007401",
+            "vin_origen": "foto_confirmada_ahora",
+            "offer_id": "8dbfc36e-a757-48c1-9c5e-752ca2a456ba",
+            "application_id": "662"
+          },
+          "Provide Required Data": {
+            "body": {
+              "schema_version": 1,
+              "application_id": "662",
+              "offer_id": "8dbfc36e-a757-48c1-9c5e-752ca2a456ba",
+              "snapshot": {
+                "pricing_source": "CATALOG",
+                "program_code": "POR_VIN_40",
+                "qualitas_percentage": 40,
+                "vin_required": true,
+                "maximum_discounts_snapshot": 1,
+                "source_application_id": null
+              },
+              "root": {
+                "lead_id": "1621",
+                "quote_id": "2974"
+              },
+              "source": {
+                "lead_id": "1621",
+                "quote_id": "2974",
+                "session_id": "waq_2974_0a0a0a0a1de1",
+                "conversation_id": "waq_2974_0a0a0a0a1de1"
+              },
+              "result": null,
+              "state": "queued",
+              "stage": "validation",
+              "slot": {
+                "number": 1,
+                "status": "reserved",
+                "maximum_discounts_snapshot": 1
+              },
+              "next_action": "worker",
+              "conversation": {
+                "proposed_session_id": null,
+                "proposed_conversation_id": null,
+                "status": "not_started",
+                "history_inheritance": {
+                  "status": "not_started",
+                  "cutover_at": null,
+                  "source_logical_count": null,
+                  "inherited_count": null,
+                  "source_fingerprint_sha256": null,
+                  "result_fingerprint_sha256": null
+                }
+              },
+              "document": {
+                "status": "not_started",
+                "quote_id": null,
+                "sha256": null,
+                "content_length": null
+              },
+              "delivery": {
+                "status": "not_requested",
+                "attempt_id": null,
+                "reported_at": null
+              },
+              "error": {
+                "code": null,
+                "message": null
+              },
+              "copy": {
+                "status": "Perfecto! Déjame que arme tu nueva cotización!"
+              },
+              "timestamps": {
+                "created_at": "2026-10-07T12:56:43.418908Z",
+                "updated_at": "2026-10-07T12:57:06.280119Z",
+                "completed_at": null
+              }
+            },
+            "headers": {
+              "content-length": "1358",
+              "content-type": "application/json",
+              "cross-origin-opener-policy": "same-origin",
+              "date": "Wed, 07 Oct 2026 12:57:06 GMT",
+              "nel": "{\"report_to\":\"heroku-nel\",\"response_headers\":[\"Via\"],\"max_age\":3600,\"success_fraction\":0.01,\"failure_fraction\":0.1}",
+              "referrer-policy": "same-origin",
+              "report-to": "{\"group\":\"heroku-nel\",\"endpoints\":[{\"url\":\"https://nel.heroku.com/reports?s=pqD8DDg2GYtzDkyLsd1l1H4Jq8lotyVNnmYJ3kADNP0%3D\\u0026sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add\\u0026ts=1791377826\"}],\"max_age\":3600}",
+              "reporting-endpoints": "heroku-nel=\"https://nel.heroku.com/reports?s=pqD8DDg2GYtzDkyLsd1l1H4Jq8lotyVNnmYJ3kADNP0%3D&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&ts=1791377826\"",
+              "server": "Heroku",
+              "via": "1.1 heroku-router",
+              "x-content-type-options": "nosniff",
+              "x-frame-options": "DENY",
+              "connection": "close"
+            },
+            "statusCode": 202,
+            "statusMessage": "Accepted"
+          },
+          "Normal Guard Copy": {
+            "copy": "Perfecto! Déjame que arme tu nueva cotización!",
+            "motivo": "vin_registrado"
+          },
+          "Persist Guard VIN": {
+            "serie_guardada": "5TDDZRFH4LS007401"
+          },
+          "Persist Guard Foto VIN": {
+            "serie_foto": {
+              "value": "5TDDZRFH4LS007401",
+              "status": "confirmado"
+            }
+          }
+        },
+        "salientes": [
+          {
+            "t": "2026-10-07T12:57:07.193869+00:00",
+            "texto": "Perfecto! Déjame que arme tu nueva cotización!",
+            "source": "discount_normal_guard_v1",
+            "motivo": "vin_registrado"
+          }
+        ],
+        "dispatch": [
+          {
+            "id": "s1.d243.p2.guard.6c9cc8fac6ef9c437911dd2e8dd57a3f7f5a3df4c2896d14414cd2a83f0a9dfd",
+            "outcome": "sent",
+            "wamid_meta": true,
+            "at": "2026-10-07T12:57:06.443973+00:00"
+          }
+        ]
+      },
+      "captured_despues": {
+        "serie_foto": {
+          "value": "5TDDZRFH4LS007401",
+          "status": "confirmado"
+        },
+        "discount_serie": "5TDDZRFH4LS007401",
+        "discount_unavailable": false
+      },
+      "app_despues": {
+        "id": 662,
+        "state": "processing",
+        "stage": "qualitas",
+        "program_code": "POR_VIN_40",
+        "vin_required": true,
+        "offer_id": "8dbfc36e-a757-48c1-9c5e-752ca2a456ba",
+        "error_code": "",
+        "source_lead_id": 1621,
+        "source_quote_id": 2974,
+        "result_quote_id": null,
+        "created_at": "2026-10-07T12:56:43.418908+00:00",
+        "updated_at": "2026-10-07T12:57:21.672273+00:00"
+      },
+      "vin_lead_despues": "5TDDZRFH4LS007401",
+      "checks": [
+        [
+          true,
+          "no pide el VIN"
+        ],
+        [
+          true,
+          "Route → vin 5TDDZRFH4LS007401 (foto_confirmada_ahora)"
+        ],
+        [
+          true,
+          "Provide Required Data corre"
+        ],
+        [
+          true,
+          "motivo vin_registrado"
+        ],
+        [
+          true,
+          "discount_serie = VIN de la foto"
+        ],
+        [
+          true,
+          "serie_foto confirmado"
+        ],
+        [
+          true,
+          "la aplicación sale de pending_data (fila)"
+        ],
+        [
+          true,
+          "Django guardó el VIN en el lead (fila)"
+        ]
+      ],
+      "cierre": "closed\nUPDATE 1",
+      "dispatch_total": [
+        {
+          "id": "s1.d202.p2.notice.52badbbaa20972246be62e46a8afacceead04b10ae5b8fe66cf57dc4c8506fc3",
+          "outcome": "sent",
+          "at": "2026-10-07T12:55:27.214666+00:00"
+        },
+        {
+          "id": "d156.p2.d2cd502de8ff5f1f522447c2d45b011078d66c1e.application.reply",
+          "outcome": "sent",
+          "at": "2026-10-07T12:56:43.527309+00:00"
+        },
+        {
+          "id": "s1.d243.p2.guard.6c9cc8fac6ef9c437911dd2e8dd57a3f7f5a3df4c2896d14414cd2a83f0a9dfd",
+          "outcome": "sent",
+          "at": "2026-10-07T12:57:06.443973+00:00"
+        }
+      ],
+      "seguimientos": "0",
+      "limpieza": [
+        {
+          "tabla": "n8n_chat_histories",
+          "ids": "waq_2974_0a0a0a0a1de1",
+          "borradas": 5
+        },
+        {
+          "tabla": "n8n_discount_phase2_attempt",
+          "ids": "waq_2974_0a0a0a0a1de1",
+          "borradas": 2
+        },
+        {
+          "tabla": "n8n_discount_resolution_attempt",
+          "ids": "waq_2974_0a0a0a0a1de1",
+          "borradas": 1
+        },
+        {
+          "tabla": "n8n_outbound_dispatch",
+          "ids": "waq_2974_0a0a0a0a1de1",
+          "borradas": 3
+        },
+        {
+          "tabla": "whatsapp_sessions",
+          "ids": "waq_2974_0a0a0a0a1de1",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_leadoperationalinfo",
+          "ids": "727",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_discountresolutionrequest",
+          "ids": "663,662",
+          "borradas": 2
+        },
+        {
+          "tabla": "qualitas_discountapplicationscenario",
+          "ids": "529,530,531,532",
+          "borradas": 4
+        },
+        {
+          "tabla": "qualitas_discountapplication",
+          "ids": "662",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_discountapimutation",
+          "ids": "530",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_discountoffer",
+          "ids": "8dbfc36e-a757-48c1-9c5e-752ca2a456ba",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_lead",
+          "ids": "1621",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_cotizacionrespuestaxml",
+          "ids": "1390",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_lead",
+          "ids": "1621",
+          "borradas": 0
+        },
+        {
+          "tabla": "qualitas_cotizacion",
+          "ids": "2974",
+          "borradas": 1
+        }
+      ]
+    },
+    {
+      "caso": 2,
+      "fixture": {
+        "SID": "waq_2975_0a0a0a0a258d",
+        "CID": "waq_2975_0a0a0a0a258d",
+        "cot": 2975,
+        "lead": 1622
+      },
+      "mensaje": "no, está mal",
+      "foto_sembrada": {
+        "value": "5TDDZRFH4LS007401",
+        "status": "propuesto"
+      },
+      "turno_objecion": {
+        "etiqueta": "C2-OBJ",
+        "texto": "¿Tienen alguna promoción? Se me hace caro",
+        "wamid": "wamid.QA.SUITE.VFC2OBJ.MUY46AL4.CBB9C1",
+        "exec_id": "80299",
+        "status": "success",
+        "ejecutados": 70,
+        "nodos": {
+          "Discount Phase 2 Claim": {
+            "turn_key": "d156.p2.9a96870ae83d3f567dcb079eb513c8f49d53fab7",
+            "session_id": "waq_2975_0a0a0a0a258d",
+            "lead_id": "1622",
+            "quotation_id": "2975",
+            "conversation_id": "waq_2975_0a0a0a0a258d",
+            "authority_epoch": 0,
+            "request_hash": "9a96870ae83d3f567dcb079eb513c8f49d53fab7f4f4cc4e2f770a2685d91d2a",
+            "etapa": "catalog_reserved",
+            "puede_clasificar": true,
+            "continuar_normal": false,
+            "rechazo": null
+          },
+          "Parse Discount Classification": {
+            "intent": "PRICE_OBJECTION",
+            "signal": "price",
+            "output_shape": "bare",
+            "veto": null
+          },
+          "Build Offer Notice Copy": {
+            "hay_vivo": false,
+            "remite_copy": "",
+            "notice_copy": "Déjame checar tu cotización para buscarte el mejor precio posible. Ahorita te cuento."
+          },
+          "Create Direct Discount Application": {
+            "schema_version": 1,
+            "authority_epoch": 0,
+            "offer": {
+              "schema_version": 1,
+              "offer_id": "66e552ec-1596-4b57-a165-93e4e0e7f827",
+              "state": "accepted",
+              "source": {
+                "lead_id": "1622",
+                "quote_id": "2975",
+                "session_id": "waq_2975_0a0a0a0a258d",
+                "conversation_id": "waq_2975_0a0a0a0a258d"
+              },
+              "root_quote_id": "2975",
+              "maximum_discounts_snapshot": 1,
+              "program": {
+                "code": "POR_VIN_40",
+                "name": "Descuento por Vin 40%",
+                "qualitas_percentage": 40,
+                "vin_required": true
+              },
+              "reason_code": "price_objection",
+              "interactions": {
+                "accept": "dsc:v1:o:66e552ec-1596-4b57-a165-93e4e0e7f827:accept",
+                "decline": "dsc:v1:o:66e552ec-1596-4b57-a165-93e4e0e7f827:decline"
+              },
+              "copy": {
+                "offered": "Si me das tu VIN, y eres elegible, te puedo dar un descuento adicional.",
+                "accepted": "Aceptaste el descuento. Prepararemos una nueva cotización.",
+                "declined": "Conservaremos tu cotización actual sin cambios."
+              },
+              "created_at": "2026-10-07T13:00:30.571141Z",
+              "expires_at": "2026-10-07T13:30:30.491753Z"
+            },
+            "application": {
+              "schema_version": 1,
+              "application_id": "663",
+              "offer_id": "66e552ec-1596-4b57-a165-93e4e0e7f827",
+              "snapshot": {
+                "pricing_source": "CATALOG",
+                "program_code": "POR_VIN_40",
+                "qualitas_percentage": 40,
+                "vin_required": true,
+                "maximum_discounts_snapshot": 1,
+                "source_application_id": null
+              },
+              "root": {
+                "lead_id": "1622",
+                "quote_id": "2975"
+              },
+              "source": {
+                "lead_id": "1622",
+                "quote_id": "2975",
+                "session_id": "waq_2975_0a0a0a0a258d",
+                "conversation_id": "waq_2975_0a0a0a0a258d"
+              },
+              "result": null,
+              "state": "pending_data",
+              "stage": "validation",
+              "slot": {
+                "number": null,
+                "status": "not_reserved",
+                "maximum_discounts_snapshot": 1
+              },
+              "next_action": "await_required_data",
+              "conversation": {
+                "proposed_session_id": null,
+                "proposed_conversation_id": null,
+                "status": "not_started",
+                "history_inheritance": {
+                  "status": "not_started",
+                  "cutover_at": null,
+                  "source_logical_count": null,
+                  "inherited_count": null,
+                  "source_fingerprint_sha256": null,
+                  "result_fingerprint_sha256": null
+                }
+              },
+              "document": {
+                "status": "not_started",
+                "quote_id": null,
+                "sha256": null,
+                "content_length": null
+              },
+              "delivery": {
+                "status": "not_requested",
+                "attempt_id": null,
+                "reported_at": null
+              },
+              "error": {
+                "code": null,
+                "message": null
+              },
+              "copy": {
+                "status": "Perfecto! Déjame que arme tu nueva cotización!"
+              },
+              "timestamps": {
+                "created_at": "2026-10-07T13:00:30.743691Z",
+                "updated_at": "2026-10-07T13:00:30.743703Z",
+                "completed_at": null
+              }
+            }
+          },
+          "Validate Direct Discount Application": {
+            "direct_application_valid": true,
+            "direct_application_safe": {
+              "schema_version": 1,
+              "authority_epoch": 0,
+              "offer": {
+                "offer_id": "66e552ec-1596-4b57-a165-93e4e0e7f827",
+                "state": "accepted",
+                "source": {
+                  "lead_id": "1622",
+                  "quote_id": "2975",
+                  "session_id": "waq_2975_0a0a0a0a258d",
+                  "conversation_id": "waq_2975_0a0a0a0a258d"
+                },
+                "program_code": "POR_VIN_40",
+                "reason_code": "price_objection",
+                "offered_copy": "Si me das tu VIN, y eres elegible, te puedo dar un descuento adicional.",
+                "interaction_accept": "dsc:v1:o:66e552ec-1596-4b57-a165-93e4e0e7f827:accept",
+                "interaction_decline": "dsc:v1:o:66e552ec-1596-4b57-a165-93e4e0e7f827:decline",
+                "expires_at": "2026-10-07T13:30:30.491753Z"
+              },
+              "application": {
+                "application_id": "663",
+                "offer_id": "66e552ec-1596-4b57-a165-93e4e0e7f827",
+                "source": {
+                  "lead_id": "1622",
+                  "quote_id": "2975",
+                  "session_id": "waq_2975_0a0a0a0a258d",
+                  "conversation_id": "waq_2975_0a0a0a0a258d"
+                },
+                "program_code": "POR_VIN_40",
+                "state": "pending_data",
+                "stage": "validation",
+                "slot_number": null,
+                "slot_status": "not_reserved",
+                "next_action": "await_required_data",
+                "response_copy": "¡Perfecto! Para aplicar tu descuento necesito el número de serie (VIN) de tu vehículo: son 17 letras y números y viene en tu tarjeta de circulación o en la factura. ¿Me lo compartes?"
+              }
+            },
+            "direct_application_reject_reason": null
+          }
+        },
+        "salientes": [
+          {
+            "t": "2026-10-07T12:59:15.022843+00:00",
+            "texto": "Déjame checar tu cotización para buscarte el mejor precio posible. Ahorita te cuento.",
+            "source": "discount_direct_review_notice_v1",
+            "motivo": null
+          },
+          {
+            "t": "2026-10-07T13:00:31.645607+00:00",
+            "texto": "Para dejar tu descuento aplicado me falta un dato tuyo. ¿Me lo compartes y lo cerramos?",
+            "source": "direct_discount_notice_v1",
+            "motivo": null
+          }
+        ],
+        "dispatch": [
+          {
+            "id": "s1.d202.p2.notice.4e85c23dc1a73816bd5cda21d35d734633049e84e3550070e4cc9ca071d25c73",
+            "outcome": "sent",
+            "wamid_meta": true,
+            "at": "2026-10-07T12:59:14.079862+00:00"
+          },
+          {
+            "id": "d156.p2.9a96870ae83d3f567dcb079eb513c8f49d53fab7.application.reply",
+            "outcome": "sent",
+            "wamid_meta": true,
+            "at": "2026-10-07T13:00:30.890018+00:00"
+          }
+        ]
+      },
+      "app_tras_objecion": {
+        "id": 663,
+        "state": "pending_data",
+        "stage": "validation",
+        "program_code": "POR_VIN_40",
+        "vin_required": true,
+        "offer_id": "66e552ec-1596-4b57-a165-93e4e0e7f827",
+        "error_code": "",
+        "source_lead_id": 1622,
+        "source_quote_id": 2975,
+        "result_quote_id": null,
+        "created_at": "2026-10-07T13:00:30.743691+00:00",
+        "updated_at": "2026-10-07T13:00:30.743703+00:00"
+      },
+      "captured_antes": {
+        "serie_foto": {
+          "value": "5TDDZRFH4LS007401",
+          "status": "propuesto"
+        },
+        "discount_unavailable": false
+      },
+      "vin_lead_antes": "",
+      "turno": {
+        "etiqueta": "C2",
+        "texto": "no, está mal",
+        "wamid": "wamid.QA.SUITE.VFC2.MUY48EYE.64F4D1",
+        "exec_id": "80302",
+        "status": "success",
+        "ejecutados": 57,
+        "nodos": {
+          "Discount Phase 2 Claim": {
+            "turn_key": "d156.p2.1b99a6fb48a724228a0035bf766664fc67170cb0",
+            "session_id": "waq_2975_0a0a0a0a258d",
+            "lead_id": "1622",
+            "quotation_id": "2975",
+            "conversation_id": "waq_2975_0a0a0a0a258d",
+            "authority_epoch": 0,
+            "request_hash": "1b99a6fb48a724228a0035bf766664fc67170cb044d6b9d6c0b737519d8501bc",
+            "etapa": "catalog_reserved",
+            "puede_clasificar": true,
+            "continuar_normal": false,
+            "rechazo": null
+          },
+          "Parse Discount Classification": {
+            "intent": "no_match",
+            "signal": null,
+            "output_shape": "bare",
+            "veto": null
+          },
+          "Discount Normal Guard": {
+            "application_id": "663",
+            "state": "pending_data",
+            "processing_copy": "Perfecto! Déjame que arme tu nueva cotización!",
+            "offer_id": "66e552ec-1596-4b57-a165-93e4e0e7f827",
+            "aviso_en_vuelo": false,
+            "acuses_seguidos": 0,
+            "preguntas_previas": 0,
+            "serie_foto_value": "5TDDZRFH4LS007401",
+            "serie_foto_status": "propuesto"
+          },
+          "Route Normal Guard": {
+            "ruta": "copy",
+            "guard_copy": "¡Perfecto! Para aplicar tu descuento necesito el número de serie (VIN) de tu vehículo: son 17 letras y números y viene en tu tarjeta de circulación o en la factura. ¿Me lo compartes?",
+            "motivo": "pending_data_sin_vin",
+            "serie_foto_accion": "descartar"
+          },
+          "IF Guard Has VIN?": {
+            "ruta": "copy",
+            "guard_copy": "¡Perfecto! Para aplicar tu descuento necesito el número de serie (VIN) de tu vehículo: son 17 letras y números y viene en tu tarjeta de circulación o en la factura. ¿Me lo compartes?",
+            "motivo": "pending_data_sin_vin",
+            "serie_foto_accion": "descartar"
+          },
+          "Normal Guard Copy": {
+            "copy": "¡Perfecto! Para aplicar tu descuento necesito el número de serie (VIN) de tu vehículo: son 17 letras y números y viene en tu tarjeta de circulación o en la factura. ¿Me lo compartes?",
+            "motivo": "pending_data_sin_vin"
+          },
+          "Persist Guard VIN": {
+            "success": true
+          },
+          "Persist Guard Foto VIN": {
+            "serie_foto": {
+              "value": "5TDDZRFH4LS007401",
+              "status": "descartado"
+            }
+          }
+        },
+        "salientes": [
+          {
+            "t": "2026-10-07T13:00:53.716435+00:00",
+            "texto": "¡Perfecto! Para aplicar tu descuento necesito el número de serie (VIN) de tu vehículo: son 17 letras y números y viene en tu tarjeta de circulación o en la factura. ¿Me lo compartes?",
+            "source": "discount_normal_guard_v1",
+            "motivo": "pending_data_sin_vin"
+          }
+        ],
+        "dispatch": [
+          {
+            "id": "s1.d243.p2.guard.2d566d2fc3030fb602b1ba6ad52702447be682e8cf6da02e94baf90fb5e2e577",
+            "outcome": "sent",
+            "wamid_meta": true,
+            "at": "2026-10-07T13:00:52.673028+00:00"
+          }
+        ]
+      },
+      "captured_despues": {
+        "serie_foto": {
+          "value": "5TDDZRFH4LS007401",
+          "status": "descartado"
+        },
+        "discount_unavailable": false
+      },
+      "app_despues": {
+        "id": 663,
+        "state": "pending_data",
+        "stage": "validation",
+        "program_code": "POR_VIN_40",
+        "vin_required": true,
+        "offer_id": "66e552ec-1596-4b57-a165-93e4e0e7f827",
+        "error_code": "",
+        "source_lead_id": 1622,
+        "source_quote_id": 2975,
+        "result_quote_id": null,
+        "created_at": "2026-10-07T13:00:30.743691+00:00",
+        "updated_at": "2026-10-07T13:00:30.743703+00:00"
+      },
+      "vin_lead_despues": "",
+      "checks": [
+        [
+          true,
+          "pide el VIN (ASK_VIN)"
+        ],
+        [
+          true,
+          "Route → copy + descartar"
+        ],
+        [
+          true,
+          "Django no recibe nada (Provide Required Data no corre)"
+        ],
+        [
+          true,
+          "serie_foto descartado"
+        ],
+        [
+          true,
+          "la aplicación sigue en pending_data (fila)"
+        ],
+        [
+          true,
+          "el lead sigue sin VIN (fila)"
+        ]
+      ],
+      "cierre": "closed\nUPDATE 1",
+      "dispatch_total": [
+        {
+          "id": "s1.d202.p2.notice.4e85c23dc1a73816bd5cda21d35d734633049e84e3550070e4cc9ca071d25c73",
+          "outcome": "sent",
+          "at": "2026-10-07T12:59:14.079862+00:00"
+        },
+        {
+          "id": "d156.p2.9a96870ae83d3f567dcb079eb513c8f49d53fab7.application.reply",
+          "outcome": "sent",
+          "at": "2026-10-07T13:00:30.890018+00:00"
+        },
+        {
+          "id": "s1.d243.p2.guard.2d566d2fc3030fb602b1ba6ad52702447be682e8cf6da02e94baf90fb5e2e577",
+          "outcome": "sent",
+          "at": "2026-10-07T13:00:52.673028+00:00"
+        }
+      ],
+      "seguimientos": "0",
+      "limpieza": [
+        {
+          "tabla": "n8n_chat_histories",
+          "ids": "waq_2975_0a0a0a0a258d",
+          "borradas": 5
+        },
+        {
+          "tabla": "n8n_discount_phase2_attempt",
+          "ids": "waq_2975_0a0a0a0a258d",
+          "borradas": 2
+        },
+        {
+          "tabla": "n8n_discount_resolution_attempt",
+          "ids": "waq_2975_0a0a0a0a258d",
+          "borradas": 1
+        },
+        {
+          "tabla": "n8n_outbound_dispatch",
+          "ids": "waq_2975_0a0a0a0a258d",
+          "borradas": 3
+        },
+        {
+          "tabla": "whatsapp_sessions",
+          "ids": "waq_2975_0a0a0a0a258d",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_discountresolutionrequest",
+          "ids": "664",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_discountapplication",
+          "ids": "663",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_discountapimutation",
+          "ids": "531",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_discountoffer",
+          "ids": "66e552ec-1596-4b57-a165-93e4e0e7f827",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_lead",
+          "ids": "1622",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_cotizacionrespuestaxml",
+          "ids": "1391",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_lead",
+          "ids": "1622",
+          "borradas": 0
+        },
+        {
+          "tabla": "qualitas_cotizacion",
+          "ids": "2975",
+          "borradas": 1
+        }
+      ]
+    },
+    {
+      "caso": 3,
+      "fixture": {
+        "SID": "waq_2976_0a0a0a0a3087",
+        "CID": "waq_2976_0a0a0a0a3087",
+        "cot": 2976,
+        "lead": 1623
+      },
+      "mensaje": "El número de serie es 5TDDZRFH6LS007402",
+      "foto_sembrada": {
+        "value": "5TDDZRFH4LS007401",
+        "status": "propuesto"
+      },
+      "turno_objecion": {
+        "etiqueta": "C3-OBJ",
+        "texto": "¿Tienen alguna promoción? Se me hace caro",
+        "wamid": "wamid.QA.SUITE.VFC3OBJ.MUY4B6QG.3D243B",
+        "exec_id": "80305",
+        "status": "success",
+        "ejecutados": 70,
+        "nodos": {
+          "Discount Phase 2 Claim": {
+            "turn_key": "d156.p2.1d879d2b5e657a74b09c0fc91c05bf85cf62c600",
+            "session_id": "waq_2976_0a0a0a0a3087",
+            "lead_id": "1623",
+            "quotation_id": "2976",
+            "conversation_id": "waq_2976_0a0a0a0a3087",
+            "authority_epoch": 0,
+            "request_hash": "1d879d2b5e657a74b09c0fc91c05bf85cf62c600e67a7a244909170167813c30",
+            "etapa": "catalog_reserved",
+            "puede_clasificar": true,
+            "continuar_normal": false,
+            "rechazo": null
+          },
+          "Parse Discount Classification": {
+            "intent": "PRICE_OBJECTION",
+            "signal": "price",
+            "output_shape": "bare",
+            "veto": null
+          },
+          "Build Offer Notice Copy": {
+            "hay_vivo": false,
+            "remite_copy": "",
+            "notice_copy": "Déjame checar tu cotización para buscarte el mejor precio posible. Ahorita te cuento."
+          },
+          "Create Direct Discount Application": {
+            "schema_version": 1,
+            "authority_epoch": 0,
+            "offer": {
+              "schema_version": 1,
+              "offer_id": "6ba63e0c-4ed9-46c6-9402-6c345ca87804",
+              "state": "accepted",
+              "source": {
+                "lead_id": "1623",
+                "quote_id": "2976",
+                "session_id": "waq_2976_0a0a0a0a3087",
+                "conversation_id": "waq_2976_0a0a0a0a3087"
+              },
+              "root_quote_id": "2976",
+              "maximum_discounts_snapshot": 1,
+              "program": {
+                "code": "POR_VIN_40",
+                "name": "Descuento por Vin 40%",
+                "qualitas_percentage": 40,
+                "vin_required": true
+              },
+              "reason_code": "price_objection",
+              "interactions": {
+                "accept": "dsc:v1:o:6ba63e0c-4ed9-46c6-9402-6c345ca87804:accept",
+                "decline": "dsc:v1:o:6ba63e0c-4ed9-46c6-9402-6c345ca87804:decline"
+              },
+              "copy": {
+                "offered": "Si me das tu VIN, y eres elegible, te puedo dar un descuento adicional.",
+                "accepted": "Aceptaste el descuento. Prepararemos una nueva cotización.",
+                "declined": "Conservaremos tu cotización actual sin cambios."
+              },
+              "created_at": "2026-10-07T13:04:19.151063Z",
+              "expires_at": "2026-10-07T13:34:19.132073Z"
+            },
+            "application": {
+              "schema_version": 1,
+              "application_id": "664",
+              "offer_id": "6ba63e0c-4ed9-46c6-9402-6c345ca87804",
+              "snapshot": {
+                "pricing_source": "CATALOG",
+                "program_code": "POR_VIN_40",
+                "qualitas_percentage": 40,
+                "vin_required": true,
+                "maximum_discounts_snapshot": 1,
+                "source_application_id": null
+              },
+              "root": {
+                "lead_id": "1623",
+                "quote_id": "2976"
+              },
+              "source": {
+                "lead_id": "1623",
+                "quote_id": "2976",
+                "session_id": "waq_2976_0a0a0a0a3087",
+                "conversation_id": "waq_2976_0a0a0a0a3087"
+              },
+              "result": null,
+              "state": "pending_data",
+              "stage": "validation",
+              "slot": {
+                "number": null,
+                "status": "not_reserved",
+                "maximum_discounts_snapshot": 1
+              },
+              "next_action": "await_required_data",
+              "conversation": {
+                "proposed_session_id": null,
+                "proposed_conversation_id": null,
+                "status": "not_started",
+                "history_inheritance": {
+                  "status": "not_started",
+                  "cutover_at": null,
+                  "source_logical_count": null,
+                  "inherited_count": null,
+                  "source_fingerprint_sha256": null,
+                  "result_fingerprint_sha256": null
+                }
+              },
+              "document": {
+                "status": "not_started",
+                "quote_id": null,
+                "sha256": null,
+                "content_length": null
+              },
+              "delivery": {
+                "status": "not_requested",
+                "attempt_id": null,
+                "reported_at": null
+              },
+              "error": {
+                "code": null,
+                "message": null
+              },
+              "copy": {
+                "status": "Perfecto! Déjame que arme tu nueva cotización!"
+              },
+              "timestamps": {
+                "created_at": "2026-10-07T13:04:19.227767Z",
+                "updated_at": "2026-10-07T13:04:19.227782Z",
+                "completed_at": null
+              }
+            }
+          },
+          "Validate Direct Discount Application": {
+            "direct_application_valid": true,
+            "direct_application_safe": {
+              "schema_version": 1,
+              "authority_epoch": 0,
+              "offer": {
+                "offer_id": "6ba63e0c-4ed9-46c6-9402-6c345ca87804",
+                "state": "accepted",
+                "source": {
+                  "lead_id": "1623",
+                  "quote_id": "2976",
+                  "session_id": "waq_2976_0a0a0a0a3087",
+                  "conversation_id": "waq_2976_0a0a0a0a3087"
+                },
+                "program_code": "POR_VIN_40",
+                "reason_code": "price_objection",
+                "offered_copy": "Si me das tu VIN, y eres elegible, te puedo dar un descuento adicional.",
+                "interaction_accept": "dsc:v1:o:6ba63e0c-4ed9-46c6-9402-6c345ca87804:accept",
+                "interaction_decline": "dsc:v1:o:6ba63e0c-4ed9-46c6-9402-6c345ca87804:decline",
+                "expires_at": "2026-10-07T13:34:19.132073Z"
+              },
+              "application": {
+                "application_id": "664",
+                "offer_id": "6ba63e0c-4ed9-46c6-9402-6c345ca87804",
+                "source": {
+                  "lead_id": "1623",
+                  "quote_id": "2976",
+                  "session_id": "waq_2976_0a0a0a0a3087",
+                  "conversation_id": "waq_2976_0a0a0a0a3087"
+                },
+                "program_code": "POR_VIN_40",
+                "state": "pending_data",
+                "stage": "validation",
+                "slot_number": null,
+                "slot_status": "not_reserved",
+                "next_action": "await_required_data",
+                "response_copy": "¡Perfecto! Para aplicar tu descuento necesito el número de serie (VIN) de tu vehículo: son 17 letras y números y viene en tu tarjeta de circulación o en la factura. ¿Me lo compartes?"
+              }
+            },
+            "direct_application_reject_reason": null
+          }
+        },
+        "salientes": [
+          {
+            "t": "2026-10-07T13:03:03.608562+00:00",
+            "texto": "Déjame checar tu cotización para buscarte el mejor precio posible. Ahorita te cuento.",
+            "source": "discount_direct_review_notice_v1",
+            "motivo": null
+          },
+          {
+            "t": "2026-10-07T13:04:20.04956+00:00",
+            "texto": "Para dejar tu descuento aplicado me falta un dato tuyo. ¿Me lo compartes y lo cerramos?",
+            "source": "direct_discount_notice_v1",
+            "motivo": null
+          }
+        ],
+        "dispatch": [
+          {
+            "id": "s1.d202.p2.notice.5bc74bdd550c815bf676a4d98c41b83ae3f29e68068a22b5fb1a050e10cef896",
+            "outcome": "sent",
+            "wamid_meta": true,
+            "at": "2026-10-07T13:03:02.956584+00:00"
+          },
+          {
+            "id": "d156.p2.1d879d2b5e657a74b09c0fc91c05bf85cf62c600.application.reply",
+            "outcome": "sent",
+            "wamid_meta": true,
+            "at": "2026-10-07T13:04:19.344638+00:00"
+          }
+        ]
+      },
+      "app_tras_objecion": {
+        "id": 664,
+        "state": "pending_data",
+        "stage": "validation",
+        "program_code": "POR_VIN_40",
+        "vin_required": true,
+        "offer_id": "6ba63e0c-4ed9-46c6-9402-6c345ca87804",
+        "error_code": "",
+        "source_lead_id": 1623,
+        "source_quote_id": 2976,
+        "result_quote_id": null,
+        "created_at": "2026-10-07T13:04:19.227767+00:00",
+        "updated_at": "2026-10-07T13:04:19.227782+00:00"
+      },
+      "captured_antes": {
+        "serie_foto": {
+          "value": "5TDDZRFH4LS007401",
+          "status": "propuesto"
+        },
+        "discount_unavailable": false
+      },
+      "vin_lead_antes": "",
+      "turno": {
+        "etiqueta": "C3",
+        "texto": "El número de serie es 5TDDZRFH6LS007402",
+        "wamid": "wamid.QA.SUITE.VFC3.MUY4DAX5.3994B1",
+        "exec_id": "80307",
+        "status": "success",
+        "ejecutados": 58,
+        "nodos": {
+          "Discount Phase 2 Claim": {
+            "turn_key": "d156.p2.f839e8dd5d9c2ea8d819a9586de9be139c22ffe3",
+            "session_id": "waq_2976_0a0a0a0a3087",
+            "lead_id": "1623",
+            "quotation_id": "2976",
+            "conversation_id": "waq_2976_0a0a0a0a3087",
+            "authority_epoch": 0,
+            "request_hash": "f839e8dd5d9c2ea8d819a9586de9be139c22ffe31e962ab497bfc8bcd0cf751f",
+            "etapa": "catalog_reserved",
+            "puede_clasificar": true,
+            "continuar_normal": false,
+            "rechazo": null
+          },
+          "Parse Discount Classification": {
+            "intent": "no_match",
+            "signal": null,
+            "output_shape": "bare",
+            "veto": null
+          },
+          "Discount Normal Guard": {
+            "application_id": "664",
+            "state": "pending_data",
+            "processing_copy": "Perfecto! Déjame que arme tu nueva cotización!",
+            "offer_id": "6ba63e0c-4ed9-46c6-9402-6c345ca87804",
+            "aviso_en_vuelo": false,
+            "acuses_seguidos": 0,
+            "preguntas_previas": 0,
+            "serie_foto_value": "5TDDZRFH4LS007401",
+            "serie_foto_status": "propuesto"
+          },
+          "Route Normal Guard": {
+            "ruta": "vin",
+            "vin": "5TDDZRFH6LS007402",
+            "offer_id": "6ba63e0c-4ed9-46c6-9402-6c345ca87804",
+            "application_id": "664"
+          },
+          "IF Guard Has VIN?": {
+            "ruta": "vin",
+            "vin": "5TDDZRFH6LS007402",
+            "offer_id": "6ba63e0c-4ed9-46c6-9402-6c345ca87804",
+            "application_id": "664"
+          },
+          "Provide Required Data": {
+            "body": {
+              "schema_version": 1,
+              "application_id": "664",
+              "offer_id": "6ba63e0c-4ed9-46c6-9402-6c345ca87804",
+              "snapshot": {
+                "pricing_source": "CATALOG",
+                "program_code": "POR_VIN_40",
+                "qualitas_percentage": 40,
+                "vin_required": true,
+                "maximum_discounts_snapshot": 1,
+                "source_application_id": null
+              },
+              "root": {
+                "lead_id": "1623",
+                "quote_id": "2976"
+              },
+              "source": {
+                "lead_id": "1623",
+                "quote_id": "2976",
+                "session_id": "waq_2976_0a0a0a0a3087",
+                "conversation_id": "waq_2976_0a0a0a0a3087"
+              },
+              "result": null,
+              "state": "queued",
+              "stage": "validation",
+              "slot": {
+                "number": 1,
+                "status": "reserved",
+                "maximum_discounts_snapshot": 1
+              },
+              "next_action": "worker",
+              "conversation": {
+                "proposed_session_id": null,
+                "proposed_conversation_id": null,
+                "status": "not_started",
+                "history_inheritance": {
+                  "status": "not_started",
+                  "cutover_at": null,
+                  "source_logical_count": null,
+                  "inherited_count": null,
+                  "source_fingerprint_sha256": null,
+                  "result_fingerprint_sha256": null
+                }
+              },
+              "document": {
+                "status": "not_started",
+                "quote_id": null,
+                "sha256": null,
+                "content_length": null
+              },
+              "delivery": {
+                "status": "not_requested",
+                "attempt_id": null,
+                "reported_at": null
+              },
+              "error": {
+                "code": null,
+                "message": null
+              },
+              "copy": {
+                "status": "Perfecto! Déjame que arme tu nueva cotización!"
+              },
+              "timestamps": {
+                "created_at": "2026-10-07T13:04:19.227767Z",
+                "updated_at": "2026-10-07T13:04:41.328543Z",
+                "completed_at": null
+              }
+            },
+            "headers": {
+              "content-length": "1358",
+              "content-type": "application/json",
+              "cross-origin-opener-policy": "same-origin",
+              "date": "Wed, 07 Oct 2026 13:04:41 GMT",
+              "nel": "{\"report_to\":\"heroku-nel\",\"response_headers\":[\"Via\"],\"max_age\":3600,\"success_fraction\":0.01,\"failure_fraction\":0.1}",
+              "referrer-policy": "same-origin",
+              "report-to": "{\"group\":\"heroku-nel\",\"endpoints\":[{\"url\":\"https://nel.heroku.com/reports?s=j1OJ75bLE8nwOMh5K9fXk7s5gXlGLGDxV3NTS0%2FaZY4%3D\\u0026sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add\\u0026ts=1791378281\"}],\"max_age\":3600}",
+              "reporting-endpoints": "heroku-nel=\"https://nel.heroku.com/reports?s=j1OJ75bLE8nwOMh5K9fXk7s5gXlGLGDxV3NTS0%2FaZY4%3D&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&ts=1791378281\"",
+              "server": "Heroku",
+              "via": "1.1 heroku-router",
+              "x-content-type-options": "nosniff",
+              "x-frame-options": "DENY",
+              "connection": "close"
+            },
+            "statusCode": 202,
+            "statusMessage": "Accepted"
+          },
+          "Normal Guard Copy": {
+            "copy": "Perfecto! Déjame que arme tu nueva cotización!",
+            "motivo": "vin_registrado"
+          },
+          "Persist Guard VIN": {
+            "serie_guardada": "5TDDZRFH6LS007402"
+          },
+          "Persist Guard Foto VIN": {
+            "serie_foto": {
+              "value": "5TDDZRFH4LS007401",
+              "status": "descartado"
+            }
+          }
+        },
+        "salientes": [
+          {
+            "t": "2026-10-07T13:04:42.349101+00:00",
+            "texto": "Perfecto! Déjame que arme tu nueva cotización!",
+            "source": "discount_normal_guard_v1",
+            "motivo": "vin_registrado"
+          }
+        ],
+        "dispatch": [
+          {
+            "id": "s1.d243.p2.guard.1d51a5cee599b825c4c1f5a771653cadb295342f6c0bdb37dd0e29f0c241b051",
+            "outcome": "sent",
+            "wamid_meta": true,
+            "at": "2026-10-07T13:04:41.477962+00:00"
+          }
+        ]
+      },
+      "captured_despues": {
+        "serie_foto": {
+          "value": "5TDDZRFH4LS007401",
+          "status": "descartado"
+        },
+        "discount_serie": "5TDDZRFH6LS007402",
+        "discount_unavailable": false
+      },
+      "app_despues": {
+        "id": 664,
+        "state": "queued",
+        "stage": "validation",
+        "program_code": "POR_VIN_40",
+        "vin_required": true,
+        "offer_id": "6ba63e0c-4ed9-46c6-9402-6c345ca87804",
+        "error_code": "",
+        "source_lead_id": 1623,
+        "source_quote_id": 2976,
+        "result_quote_id": null,
+        "created_at": "2026-10-07T13:04:19.227767+00:00",
+        "updated_at": "2026-10-07T13:04:41.328543+00:00"
+      },
+      "vin_lead_despues": "5TDDZRFH6LS007402",
+      "checks": [
+        [
+          true,
+          "Route → vin 5TDDZRFH6LS007402 (el del texto)"
+        ],
+        [
+          true,
+          "Provide Required Data corre"
+        ],
+        [
+          true,
+          "Django guardó B en el lead (fila)"
+        ],
+        [
+          true,
+          "Django lo aceptó → serie_foto descartado"
+        ]
+      ],
+      "cierre": "closed\nUPDATE 1",
+      "dispatch_total": [
+        {
+          "id": "s1.d202.p2.notice.5bc74bdd550c815bf676a4d98c41b83ae3f29e68068a22b5fb1a050e10cef896",
+          "outcome": "sent",
+          "at": "2026-10-07T13:03:02.956584+00:00"
+        },
+        {
+          "id": "d156.p2.1d879d2b5e657a74b09c0fc91c05bf85cf62c600.application.reply",
+          "outcome": "sent",
+          "at": "2026-10-07T13:04:19.344638+00:00"
+        },
+        {
+          "id": "s1.d243.p2.guard.1d51a5cee599b825c4c1f5a771653cadb295342f6c0bdb37dd0e29f0c241b051",
+          "outcome": "sent",
+          "at": "2026-10-07T13:04:41.477962+00:00"
+        }
+      ],
+      "seguimientos": "0",
+      "limpieza": [
+        {
+          "tabla": "n8n_chat_histories",
+          "ids": "waq_2976_0a0a0a0a3087",
+          "borradas": 5
+        },
+        {
+          "tabla": "n8n_discount_phase2_attempt",
+          "ids": "waq_2976_0a0a0a0a3087",
+          "borradas": 2
+        },
+        {
+          "tabla": "n8n_discount_resolution_attempt",
+          "ids": "waq_2976_0a0a0a0a3087",
+          "borradas": 1
+        },
+        {
+          "tabla": "n8n_outbound_dispatch",
+          "ids": "waq_2976_0a0a0a0a3087",
+          "borradas": 3
+        },
+        {
+          "tabla": "whatsapp_sessions",
+          "ids": "waq_2976_0a0a0a0a3087",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_leadoperationalinfo",
+          "ids": "728",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_discountresolutionrequest",
+          "ids": "665,666",
+          "borradas": 2
+        },
+        {
+          "tabla": "qualitas_discountapplication",
+          "ids": "664",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_discountapimutation",
+          "ids": "532",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_discountoffer",
+          "ids": "6ba63e0c-4ed9-46c6-9402-6c345ca87804",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_lead",
+          "ids": "1623",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_cotizacionrespuestaxml",
+          "ids": "1392",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_lead",
+          "ids": "1623",
+          "borradas": 0
+        },
+        {
+          "tabla": "qualitas_cotizacion",
+          "ids": "2976",
+          "borradas": 1
+        }
+      ]
+    },
+    {
+      "caso": 4,
+      "fixture": {
+        "SID": "waq_2977_0a0a0a0a457c",
+        "CID": "waq_2977_0a0a0a0a457c",
+        "cot": 2977,
+        "lead": 1624
+      },
+      "mensaje": "hola, ¿cómo va?",
+      "foto_sembrada": null,
+      "turno_objecion": {
+        "etiqueta": "C4-OBJ",
+        "texto": "¿Tienen alguna promoción? Se me hace caro",
+        "wamid": "wamid.QA.SUITE.VFC4OBJ.MUY4FZSP.D2DD37",
+        "exec_id": "80310",
+        "status": "success",
+        "ejecutados": 70,
+        "nodos": {
+          "Discount Phase 2 Claim": {
+            "turn_key": "d156.p2.18684eed31d544d8fbd7d94ebeeabcbd512dd8fb",
+            "session_id": "waq_2977_0a0a0a0a457c",
+            "lead_id": "1624",
+            "quotation_id": "2977",
+            "conversation_id": "waq_2977_0a0a0a0a457c",
+            "authority_epoch": 0,
+            "request_hash": "18684eed31d544d8fbd7d94ebeeabcbd512dd8fb9a04015f78b8fb2546817b9d",
+            "etapa": "catalog_reserved",
+            "puede_clasificar": true,
+            "continuar_normal": false,
+            "rechazo": null
+          },
+          "Parse Discount Classification": {
+            "intent": "PRICE_OBJECTION",
+            "signal": "price",
+            "output_shape": "bare",
+            "veto": null
+          },
+          "Build Offer Notice Copy": {
+            "hay_vivo": false,
+            "remite_copy": "",
+            "notice_copy": "Déjame checar tu cotización para buscarte el mejor precio posible. Ahorita te cuento."
+          },
+          "Create Direct Discount Application": {
+            "schema_version": 1,
+            "authority_epoch": 0,
+            "offer": {
+              "schema_version": 1,
+              "offer_id": "54c2966f-77a1-4479-a227-266c697aa50a",
+              "state": "accepted",
+              "source": {
+                "lead_id": "1624",
+                "quote_id": "2977",
+                "session_id": "waq_2977_0a0a0a0a457c",
+                "conversation_id": "waq_2977_0a0a0a0a457c"
+              },
+              "root_quote_id": "2977",
+              "maximum_discounts_snapshot": 1,
+              "program": {
+                "code": "POR_VIN_40",
+                "name": "Descuento por Vin 40%",
+                "qualitas_percentage": 40,
+                "vin_required": true
+              },
+              "reason_code": "price_objection",
+              "interactions": {
+                "accept": "dsc:v1:o:54c2966f-77a1-4479-a227-266c697aa50a:accept",
+                "decline": "dsc:v1:o:54c2966f-77a1-4479-a227-266c697aa50a:decline"
+              },
+              "copy": {
+                "offered": "Si me das tu VIN, y eres elegible, te puedo dar un descuento adicional.",
+                "accepted": "Aceptaste el descuento. Prepararemos una nueva cotización.",
+                "declined": "Conservaremos tu cotización actual sin cambios."
+              },
+              "created_at": "2026-10-07T13:08:02.510085Z",
+              "expires_at": "2026-10-07T13:38:02.490487Z"
+            },
+            "application": {
+              "schema_version": 1,
+              "application_id": "665",
+              "offer_id": "54c2966f-77a1-4479-a227-266c697aa50a",
+              "snapshot": {
+                "pricing_source": "CATALOG",
+                "program_code": "POR_VIN_40",
+                "qualitas_percentage": 40,
+                "vin_required": true,
+                "maximum_discounts_snapshot": 1,
+                "source_application_id": null
+              },
+              "root": {
+                "lead_id": "1624",
+                "quote_id": "2977"
+              },
+              "source": {
+                "lead_id": "1624",
+                "quote_id": "2977",
+                "session_id": "waq_2977_0a0a0a0a457c",
+                "conversation_id": "waq_2977_0a0a0a0a457c"
+              },
+              "result": null,
+              "state": "pending_data",
+              "stage": "validation",
+              "slot": {
+                "number": null,
+                "status": "not_reserved",
+                "maximum_discounts_snapshot": 1
+              },
+              "next_action": "await_required_data",
+              "conversation": {
+                "proposed_session_id": null,
+                "proposed_conversation_id": null,
+                "status": "not_started",
+                "history_inheritance": {
+                  "status": "not_started",
+                  "cutover_at": null,
+                  "source_logical_count": null,
+                  "inherited_count": null,
+                  "source_fingerprint_sha256": null,
+                  "result_fingerprint_sha256": null
+                }
+              },
+              "document": {
+                "status": "not_started",
+                "quote_id": null,
+                "sha256": null,
+                "content_length": null
+              },
+              "delivery": {
+                "status": "not_requested",
+                "attempt_id": null,
+                "reported_at": null
+              },
+              "error": {
+                "code": null,
+                "message": null
+              },
+              "copy": {
+                "status": "Perfecto! Déjame que arme tu nueva cotización!"
+              },
+              "timestamps": {
+                "created_at": "2026-10-07T13:08:02.606708Z",
+                "updated_at": "2026-10-07T13:08:02.606717Z",
+                "completed_at": null
+              }
+            }
+          },
+          "Validate Direct Discount Application": {
+            "direct_application_valid": true,
+            "direct_application_safe": {
+              "schema_version": 1,
+              "authority_epoch": 0,
+              "offer": {
+                "offer_id": "54c2966f-77a1-4479-a227-266c697aa50a",
+                "state": "accepted",
+                "source": {
+                  "lead_id": "1624",
+                  "quote_id": "2977",
+                  "session_id": "waq_2977_0a0a0a0a457c",
+                  "conversation_id": "waq_2977_0a0a0a0a457c"
+                },
+                "program_code": "POR_VIN_40",
+                "reason_code": "price_objection",
+                "offered_copy": "Si me das tu VIN, y eres elegible, te puedo dar un descuento adicional.",
+                "interaction_accept": "dsc:v1:o:54c2966f-77a1-4479-a227-266c697aa50a:accept",
+                "interaction_decline": "dsc:v1:o:54c2966f-77a1-4479-a227-266c697aa50a:decline",
+                "expires_at": "2026-10-07T13:38:02.490487Z"
+              },
+              "application": {
+                "application_id": "665",
+                "offer_id": "54c2966f-77a1-4479-a227-266c697aa50a",
+                "source": {
+                  "lead_id": "1624",
+                  "quote_id": "2977",
+                  "session_id": "waq_2977_0a0a0a0a457c",
+                  "conversation_id": "waq_2977_0a0a0a0a457c"
+                },
+                "program_code": "POR_VIN_40",
+                "state": "pending_data",
+                "stage": "validation",
+                "slot_number": null,
+                "slot_status": "not_reserved",
+                "next_action": "await_required_data",
+                "response_copy": "¡Perfecto! Para aplicar tu descuento necesito el número de serie (VIN) de tu vehículo: son 17 letras y números y viene en tu tarjeta de circulación o en la factura. ¿Me lo compartes?"
+              }
+            },
+            "direct_application_reject_reason": null
+          }
+        },
+        "salientes": [
+          {
+            "t": "2026-10-07T13:06:47.065893+00:00",
+            "texto": "Déjame checar tu cotización para buscarte el mejor precio posible. Ahorita te cuento.",
+            "source": "discount_direct_review_notice_v1",
+            "motivo": null
+          },
+          {
+            "t": "2026-10-07T13:08:03.579998+00:00",
+            "texto": "Para dejar tu descuento aplicado me falta un dato tuyo. ¿Me lo compartes y lo cerramos?",
+            "source": "direct_discount_notice_v1",
+            "motivo": null
+          }
+        ],
+        "dispatch": [
+          {
+            "id": "s1.d202.p2.notice.7a4dbea151e45d1ec6851ed806c17adca0ccd29e19eae1b3c372836caa36c259",
+            "outcome": "sent",
+            "wamid_meta": true,
+            "at": "2026-10-07T13:06:46.318675+00:00"
+          },
+          {
+            "id": "d156.p2.18684eed31d544d8fbd7d94ebeeabcbd512dd8fb.application.reply",
+            "outcome": "sent",
+            "wamid_meta": true,
+            "at": "2026-10-07T13:08:02.729768+00:00"
+          }
+        ]
+      },
+      "app_tras_objecion": {
+        "id": 665,
+        "state": "pending_data",
+        "stage": "validation",
+        "program_code": "POR_VIN_40",
+        "vin_required": true,
+        "offer_id": "54c2966f-77a1-4479-a227-266c697aa50a",
+        "error_code": "",
+        "source_lead_id": 1624,
+        "source_quote_id": 2977,
+        "result_quote_id": null,
+        "created_at": "2026-10-07T13:08:02.606708+00:00",
+        "updated_at": "2026-10-07T13:08:02.606717+00:00"
+      },
+      "captured_antes": {
+        "discount_unavailable": false
+      },
+      "vin_lead_antes": "",
+      "turno": {
+        "etiqueta": "C4",
+        "texto": "hola, ¿cómo va?",
+        "wamid": "wamid.QA.SUITE.VFC4.MUY4I3M6.75D762",
+        "exec_id": "80313",
+        "status": "success",
+        "ejecutados": 57,
+        "nodos": {
+          "Discount Phase 2 Claim": {
+            "turn_key": "d156.p2.18db430a76d0be8a1730d5522e14e32339b8e502",
+            "session_id": "waq_2977_0a0a0a0a457c",
+            "lead_id": "1624",
+            "quotation_id": "2977",
+            "conversation_id": "waq_2977_0a0a0a0a457c",
+            "authority_epoch": 0,
+            "request_hash": "18db430a76d0be8a1730d5522e14e32339b8e5022704515f8fea22c4f3ffc9c3",
+            "etapa": "catalog_reserved",
+            "puede_clasificar": true,
+            "continuar_normal": false,
+            "rechazo": null
+          },
+          "Parse Discount Classification": {
+            "intent": "no_match",
+            "signal": null,
+            "output_shape": "bare",
+            "veto": null
+          },
+          "Discount Normal Guard": {
+            "application_id": "665",
+            "state": "pending_data",
+            "processing_copy": "Perfecto! Déjame que arme tu nueva cotización!",
+            "offer_id": "54c2966f-77a1-4479-a227-266c697aa50a",
+            "aviso_en_vuelo": false,
+            "acuses_seguidos": 0,
+            "preguntas_previas": 0,
+            "serie_foto_value": null,
+            "serie_foto_status": null
+          },
+          "Route Normal Guard": {
+            "ruta": "copy",
+            "guard_copy": "¡Perfecto! Para aplicar tu descuento necesito el número de serie (VIN) de tu vehículo: son 17 letras y números y viene en tu tarjeta de circulación o en la factura. ¿Me lo compartes?",
+            "motivo": "pending_data_sin_vin"
+          },
+          "IF Guard Has VIN?": {
+            "ruta": "copy",
+            "guard_copy": "¡Perfecto! Para aplicar tu descuento necesito el número de serie (VIN) de tu vehículo: son 17 letras y números y viene en tu tarjeta de circulación o en la factura. ¿Me lo compartes?",
+            "motivo": "pending_data_sin_vin"
+          },
+          "Normal Guard Copy": {
+            "copy": "¡Perfecto! Para aplicar tu descuento necesito el número de serie (VIN) de tu vehículo: son 17 letras y números y viene en tu tarjeta de circulación o en la factura. ¿Me lo compartes?",
+            "motivo": "pending_data_sin_vin"
+          },
+          "Persist Guard VIN": {
+            "success": true
+          },
+          "Persist Guard Foto VIN": {
+            "success": true
+          }
+        },
+        "salientes": [
+          {
+            "t": "2026-10-07T13:08:25.16748+00:00",
+            "texto": "¡Perfecto! Para aplicar tu descuento necesito el número de serie (VIN) de tu vehículo: son 17 letras y números y viene en tu tarjeta de circulación o en la factura. ¿Me lo compartes?",
+            "source": "discount_normal_guard_v1",
+            "motivo": "pending_data_sin_vin"
+          }
+        ],
+        "dispatch": [
+          {
+            "id": "s1.d243.p2.guard.fbc7c6166550c7b58ce44e3daefa9d8b4986ea2bb8769f7c70c2d0c7a2ca1c5b",
+            "outcome": "sent",
+            "wamid_meta": true,
+            "at": "2026-10-07T13:08:24.372846+00:00"
+          }
+        ]
+      },
+      "captured_despues": {
+        "discount_unavailable": false
+      },
+      "app_despues": {
+        "id": 665,
+        "state": "pending_data",
+        "stage": "validation",
+        "program_code": "POR_VIN_40",
+        "vin_required": true,
+        "offer_id": "54c2966f-77a1-4479-a227-266c697aa50a",
+        "error_code": "",
+        "source_lead_id": 1624,
+        "source_quote_id": 2977,
+        "result_quote_id": null,
+        "created_at": "2026-10-07T13:08:02.606708+00:00",
+        "updated_at": "2026-10-07T13:08:02.606717+00:00"
+      },
+      "vin_lead_despues": "",
+      "checks": [
+        [
+          true,
+          "pide el VIN (ASK_VIN), como hoy"
+        ],
+        [
+          true,
+          "Django no recibe nada"
+        ],
+        [
+          true,
+          "sin serie_foto"
+        ],
+        [
+          true,
+          "la aplicación sigue en pending_data (fila)"
+        ]
+      ],
+      "cierre": "closed\nUPDATE 1",
+      "dispatch_total": [
+        {
+          "id": "s1.d202.p2.notice.7a4dbea151e45d1ec6851ed806c17adca0ccd29e19eae1b3c372836caa36c259",
+          "outcome": "sent",
+          "at": "2026-10-07T13:06:46.318675+00:00"
+        },
+        {
+          "id": "d156.p2.18684eed31d544d8fbd7d94ebeeabcbd512dd8fb.application.reply",
+          "outcome": "sent",
+          "at": "2026-10-07T13:08:02.729768+00:00"
+        },
+        {
+          "id": "s1.d243.p2.guard.fbc7c6166550c7b58ce44e3daefa9d8b4986ea2bb8769f7c70c2d0c7a2ca1c5b",
+          "outcome": "sent",
+          "at": "2026-10-07T13:08:24.372846+00:00"
+        }
+      ],
+      "seguimientos": "0",
+      "limpieza": [
+        {
+          "tabla": "n8n_chat_histories",
+          "ids": "waq_2977_0a0a0a0a457c",
+          "borradas": 5
+        },
+        {
+          "tabla": "n8n_discount_phase2_attempt",
+          "ids": "waq_2977_0a0a0a0a457c",
+          "borradas": 2
+        },
+        {
+          "tabla": "n8n_discount_resolution_attempt",
+          "ids": "waq_2977_0a0a0a0a457c",
+          "borradas": 1
+        },
+        {
+          "tabla": "n8n_outbound_dispatch",
+          "ids": "waq_2977_0a0a0a0a457c",
+          "borradas": 3
+        },
+        {
+          "tabla": "whatsapp_sessions",
+          "ids": "waq_2977_0a0a0a0a457c",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_discountresolutionrequest",
+          "ids": "667",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_discountapplication",
+          "ids": "665",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_discountapimutation",
+          "ids": "533",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_discountoffer",
+          "ids": "54c2966f-77a1-4479-a227-266c697aa50a",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_lead",
+          "ids": "1624",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_cotizacionrespuestaxml",
+          "ids": "1393",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_lead",
+          "ids": "1624",
+          "borradas": 0
+        },
+        {
+          "tabla": "qualitas_cotizacion",
+          "ids": "2977",
+          "borradas": 1
+        }
+      ]
+    },
+    {
+      "caso": 5,
+      "fixture": {
+        "SID": "waq_2978_0a0a0a0a50ab",
+        "CID": "waq_2978_0a0a0a0a50ab",
+        "cot": 2978,
+        "lead": 1625
+      },
+      "mensaje": "ok",
+      "foto_sembrada": {
+        "value": "5TDDZRFH4LS007401",
+        "status": "confirmado"
+      },
+      "turno_objecion": {
+        "etiqueta": "C5-OBJ",
+        "texto": "¿Tienen alguna promoción? Se me hace caro",
+        "wamid": "wamid.QA.SUITE.VFC5OBJ.MUY4KRI2.2068DB",
+        "exec_id": "80316",
+        "status": "success",
+        "ejecutados": 70,
+        "nodos": {
+          "Discount Phase 2 Claim": {
+            "turn_key": "d156.p2.dd2c09f42701e2eb2bd4dcaa633baeb7ef9a2670",
+            "session_id": "waq_2978_0a0a0a0a50ab",
+            "lead_id": "1625",
+            "quotation_id": "2978",
+            "conversation_id": "waq_2978_0a0a0a0a50ab",
+            "authority_epoch": 0,
+            "request_hash": "dd2c09f42701e2eb2bd4dcaa633baeb7ef9a2670a1394480ea2995324c8d6c42",
+            "etapa": "catalog_reserved",
+            "puede_clasificar": true,
+            "continuar_normal": false,
+            "rechazo": null
+          },
+          "Parse Discount Classification": {
+            "intent": "PRICE_OBJECTION",
+            "signal": "price",
+            "output_shape": "bare",
+            "veto": null
+          },
+          "Build Offer Notice Copy": {
+            "hay_vivo": false,
+            "remite_copy": "",
+            "notice_copy": "Déjame checar tu cotización para buscarte el mejor precio posible. Ahorita te cuento."
+          },
+          "Create Direct Discount Application": {
+            "schema_version": 1,
+            "authority_epoch": 0,
+            "offer": {
+              "schema_version": 1,
+              "offer_id": "9afb484e-124e-4f72-bb0b-d29d704807ea",
+              "state": "accepted",
+              "source": {
+                "lead_id": "1625",
+                "quote_id": "2978",
+                "session_id": "waq_2978_0a0a0a0a50ab",
+                "conversation_id": "waq_2978_0a0a0a0a50ab"
+              },
+              "root_quote_id": "2978",
+              "maximum_discounts_snapshot": 1,
+              "program": {
+                "code": "POR_VIN_40",
+                "name": "Descuento por Vin 40%",
+                "qualitas_percentage": 40,
+                "vin_required": true
+              },
+              "reason_code": "price_objection",
+              "interactions": {
+                "accept": "dsc:v1:o:9afb484e-124e-4f72-bb0b-d29d704807ea:accept",
+                "decline": "dsc:v1:o:9afb484e-124e-4f72-bb0b-d29d704807ea:decline"
+              },
+              "copy": {
+                "offered": "Si me das tu VIN, y eres elegible, te puedo dar un descuento adicional.",
+                "accepted": "Aceptaste el descuento. Prepararemos una nueva cotización.",
+                "declined": "Conservaremos tu cotización actual sin cambios."
+              },
+              "created_at": "2026-10-07T13:11:45.465521Z",
+              "expires_at": "2026-10-07T13:41:45.443504Z"
+            },
+            "application": {
+              "schema_version": 1,
+              "application_id": "666",
+              "offer_id": "9afb484e-124e-4f72-bb0b-d29d704807ea",
+              "snapshot": {
+                "pricing_source": "CATALOG",
+                "program_code": "POR_VIN_40",
+                "qualitas_percentage": 40,
+                "vin_required": true,
+                "maximum_discounts_snapshot": 1,
+                "source_application_id": null
+              },
+              "root": {
+                "lead_id": "1625",
+                "quote_id": "2978"
+              },
+              "source": {
+                "lead_id": "1625",
+                "quote_id": "2978",
+                "session_id": "waq_2978_0a0a0a0a50ab",
+                "conversation_id": "waq_2978_0a0a0a0a50ab"
+              },
+              "result": null,
+              "state": "pending_data",
+              "stage": "validation",
+              "slot": {
+                "number": null,
+                "status": "not_reserved",
+                "maximum_discounts_snapshot": 1
+              },
+              "next_action": "await_required_data",
+              "conversation": {
+                "proposed_session_id": null,
+                "proposed_conversation_id": null,
+                "status": "not_started",
+                "history_inheritance": {
+                  "status": "not_started",
+                  "cutover_at": null,
+                  "source_logical_count": null,
+                  "inherited_count": null,
+                  "source_fingerprint_sha256": null,
+                  "result_fingerprint_sha256": null
+                }
+              },
+              "document": {
+                "status": "not_started",
+                "quote_id": null,
+                "sha256": null,
+                "content_length": null
+              },
+              "delivery": {
+                "status": "not_requested",
+                "attempt_id": null,
+                "reported_at": null
+              },
+              "error": {
+                "code": null,
+                "message": null
+              },
+              "copy": {
+                "status": "Perfecto! Déjame que arme tu nueva cotización!"
+              },
+              "timestamps": {
+                "created_at": "2026-10-07T13:11:45.579454Z",
+                "updated_at": "2026-10-07T13:11:45.579465Z",
+                "completed_at": null
+              }
+            }
+          },
+          "Validate Direct Discount Application": {
+            "direct_application_valid": true,
+            "direct_application_safe": {
+              "schema_version": 1,
+              "authority_epoch": 0,
+              "offer": {
+                "offer_id": "9afb484e-124e-4f72-bb0b-d29d704807ea",
+                "state": "accepted",
+                "source": {
+                  "lead_id": "1625",
+                  "quote_id": "2978",
+                  "session_id": "waq_2978_0a0a0a0a50ab",
+                  "conversation_id": "waq_2978_0a0a0a0a50ab"
+                },
+                "program_code": "POR_VIN_40",
+                "reason_code": "price_objection",
+                "offered_copy": "Si me das tu VIN, y eres elegible, te puedo dar un descuento adicional.",
+                "interaction_accept": "dsc:v1:o:9afb484e-124e-4f72-bb0b-d29d704807ea:accept",
+                "interaction_decline": "dsc:v1:o:9afb484e-124e-4f72-bb0b-d29d704807ea:decline",
+                "expires_at": "2026-10-07T13:41:45.443504Z"
+              },
+              "application": {
+                "application_id": "666",
+                "offer_id": "9afb484e-124e-4f72-bb0b-d29d704807ea",
+                "source": {
+                  "lead_id": "1625",
+                  "quote_id": "2978",
+                  "session_id": "waq_2978_0a0a0a0a50ab",
+                  "conversation_id": "waq_2978_0a0a0a0a50ab"
+                },
+                "program_code": "POR_VIN_40",
+                "state": "pending_data",
+                "stage": "validation",
+                "slot_number": null,
+                "slot_status": "not_reserved",
+                "next_action": "await_required_data",
+                "response_copy": "¡Perfecto! Para aplicar tu descuento necesito el número de serie (VIN) de tu vehículo: son 17 letras y números y viene en tu tarjeta de circulación o en la factura. ¿Me lo compartes?"
+              }
+            },
+            "direct_application_reject_reason": null
+          }
+        },
+        "salientes": [
+          {
+            "t": "2026-10-07T13:10:30.198517+00:00",
+            "texto": "Déjame checar tu cotización para buscarte el mejor precio posible. Ahorita te cuento.",
+            "source": "discount_direct_review_notice_v1",
+            "motivo": null
+          },
+          {
+            "t": "2026-10-07T13:11:46.542583+00:00",
+            "texto": "Para dejar tu descuento aplicado me falta un dato tuyo. ¿Me lo compartes y lo cerramos?",
+            "source": "direct_discount_notice_v1",
+            "motivo": null
+          }
+        ],
+        "dispatch": [
+          {
+            "id": "s1.d202.p2.notice.862b9f7e0cfccbf1f4fcab4dac6c9e39457baecde20e226c5c562e3c294b5255",
+            "outcome": "sent",
+            "wamid_meta": true,
+            "at": "2026-10-07T13:10:29.314575+00:00"
+          },
+          {
+            "id": "d156.p2.dd2c09f42701e2eb2bd4dcaa633baeb7ef9a2670.application.reply",
+            "outcome": "sent",
+            "wamid_meta": true,
+            "at": "2026-10-07T13:11:45.822133+00:00"
+          }
+        ]
+      },
+      "app_tras_objecion": {
+        "id": 666,
+        "state": "pending_data",
+        "stage": "validation",
+        "program_code": "POR_VIN_40",
+        "vin_required": true,
+        "offer_id": "9afb484e-124e-4f72-bb0b-d29d704807ea",
+        "error_code": "",
+        "source_lead_id": 1625,
+        "source_quote_id": 2978,
+        "result_quote_id": null,
+        "created_at": "2026-10-07T13:11:45.579454+00:00",
+        "updated_at": "2026-10-07T13:11:45.579465+00:00"
+      },
+      "captured_antes": {
+        "serie_foto": {
+          "value": "5TDDZRFH4LS007401",
+          "status": "confirmado"
+        },
+        "discount_unavailable": false
+      },
+      "vin_lead_antes": "",
+      "turno": {
+        "etiqueta": "C5",
+        "texto": "ok",
+        "wamid": "wamid.QA.SUITE.VFC5.MUY4MWHR.116F58",
+        "exec_id": "80319",
+        "status": "success",
+        "ejecutados": 58,
+        "nodos": {
+          "Discount Phase 2 Claim": {
+            "turn_key": "d156.p2.18c08250d7f17363b31d0cbb7b38856830792a29",
+            "session_id": "waq_2978_0a0a0a0a50ab",
+            "lead_id": "1625",
+            "quotation_id": "2978",
+            "conversation_id": "waq_2978_0a0a0a0a50ab",
+            "authority_epoch": 0,
+            "request_hash": "18c08250d7f17363b31d0cbb7b38856830792a290e73bc52a361139312e1f9e1",
+            "etapa": "catalog_reserved",
+            "puede_clasificar": true,
+            "continuar_normal": false,
+            "rechazo": null
+          },
+          "Parse Discount Classification": {
+            "intent": "no_match",
+            "signal": null,
+            "output_shape": "bare",
+            "veto": null
+          },
+          "Discount Normal Guard": {
+            "application_id": "666",
+            "state": "pending_data",
+            "processing_copy": "Perfecto! Déjame que arme tu nueva cotización!",
+            "offer_id": "9afb484e-124e-4f72-bb0b-d29d704807ea",
+            "aviso_en_vuelo": false,
+            "acuses_seguidos": 0,
+            "preguntas_previas": 0,
+            "serie_foto_value": "5TDDZRFH4LS007401",
+            "serie_foto_status": "confirmado"
+          },
+          "Route Normal Guard": {
+            "ruta": "vin",
+            "vin": "5TDDZRFH4LS007401",
+            "vin_origen": "foto",
+            "offer_id": "9afb484e-124e-4f72-bb0b-d29d704807ea",
+            "application_id": "666"
+          },
+          "IF Guard Has VIN?": {
+            "ruta": "vin",
+            "vin": "5TDDZRFH4LS007401",
+            "vin_origen": "foto",
+            "offer_id": "9afb484e-124e-4f72-bb0b-d29d704807ea",
+            "application_id": "666"
+          },
+          "Provide Required Data": {
+            "body": {
+              "schema_version": 1,
+              "application_id": "666",
+              "offer_id": "9afb484e-124e-4f72-bb0b-d29d704807ea",
+              "snapshot": {
+                "pricing_source": "CATALOG",
+                "program_code": "POR_VIN_40",
+                "qualitas_percentage": 40,
+                "vin_required": true,
+                "maximum_discounts_snapshot": 1,
+                "source_application_id": null
+              },
+              "root": {
+                "lead_id": "1625",
+                "quote_id": "2978"
+              },
+              "source": {
+                "lead_id": "1625",
+                "quote_id": "2978",
+                "session_id": "waq_2978_0a0a0a0a50ab",
+                "conversation_id": "waq_2978_0a0a0a0a50ab"
+              },
+              "result": null,
+              "state": "queued",
+              "stage": "validation",
+              "slot": {
+                "number": 1,
+                "status": "reserved",
+                "maximum_discounts_snapshot": 1
+              },
+              "next_action": "worker",
+              "conversation": {
+                "proposed_session_id": null,
+                "proposed_conversation_id": null,
+                "status": "not_started",
+                "history_inheritance": {
+                  "status": "not_started",
+                  "cutover_at": null,
+                  "source_logical_count": null,
+                  "inherited_count": null,
+                  "source_fingerprint_sha256": null,
+                  "result_fingerprint_sha256": null
+                }
+              },
+              "document": {
+                "status": "not_started",
+                "quote_id": null,
+                "sha256": null,
+                "content_length": null
+              },
+              "delivery": {
+                "status": "not_requested",
+                "attempt_id": null,
+                "reported_at": null
+              },
+              "error": {
+                "code": null,
+                "message": null
+              },
+              "copy": {
+                "status": "Perfecto! Déjame que arme tu nueva cotización!"
+              },
+              "timestamps": {
+                "created_at": "2026-10-07T13:11:45.579454Z",
+                "updated_at": "2026-10-07T13:12:08.878810Z",
+                "completed_at": null
+              }
+            },
+            "headers": {
+              "content-length": "1358",
+              "content-type": "application/json",
+              "cross-origin-opener-policy": "same-origin",
+              "date": "Wed, 07 Oct 2026 13:12:08 GMT",
+              "nel": "{\"report_to\":\"heroku-nel\",\"response_headers\":[\"Via\"],\"max_age\":3600,\"success_fraction\":0.01,\"failure_fraction\":0.1}",
+              "referrer-policy": "same-origin",
+              "report-to": "{\"group\":\"heroku-nel\",\"endpoints\":[{\"url\":\"https://nel.heroku.com/reports?s=SUV1c4%2BRnjORUsZNUF6DmBnCPUlSFqm8EBcwpmBXUec%3D\\u0026sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add\\u0026ts=1791378728\"}],\"max_age\":3600}",
+              "reporting-endpoints": "heroku-nel=\"https://nel.heroku.com/reports?s=SUV1c4%2BRnjORUsZNUF6DmBnCPUlSFqm8EBcwpmBXUec%3D&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&ts=1791378728\"",
+              "server": "Heroku",
+              "via": "1.1 heroku-router",
+              "x-content-type-options": "nosniff",
+              "x-frame-options": "DENY",
+              "connection": "close"
+            },
+            "statusCode": 202,
+            "statusMessage": "Accepted"
+          },
+          "Normal Guard Copy": {
+            "copy": "Perfecto! Déjame que arme tu nueva cotización!",
+            "motivo": "vin_registrado"
+          },
+          "Persist Guard VIN": {
+            "serie_guardada": "5TDDZRFH4LS007401"
+          },
+          "Persist Guard Foto VIN": {
+            "success": true
+          }
+        },
+        "salientes": [
+          {
+            "t": "2026-10-07T13:12:09.786605+00:00",
+            "texto": "Perfecto! Déjame que arme tu nueva cotización!",
+            "source": "discount_normal_guard_v1",
+            "motivo": "vin_registrado"
+          }
+        ],
+        "dispatch": [
+          {
+            "id": "s1.d243.p2.guard.36477e37d553f72677c376f4ae3ef20a242017ca8e04b27bf4fc92eb3d14a9ba",
+            "outcome": "sent",
+            "wamid_meta": true,
+            "at": "2026-10-07T13:12:09.021012+00:00"
+          }
+        ]
+      },
+      "captured_despues": {
+        "serie_foto": {
+          "value": "5TDDZRFH4LS007401",
+          "status": "confirmado"
+        },
+        "discount_serie": "5TDDZRFH4LS007401",
+        "discount_unavailable": false
+      },
+      "app_despues": {
+        "id": 666,
+        "state": "queued",
+        "stage": "validation",
+        "program_code": "POR_VIN_40",
+        "vin_required": true,
+        "offer_id": "9afb484e-124e-4f72-bb0b-d29d704807ea",
+        "error_code": "",
+        "source_lead_id": 1625,
+        "source_quote_id": 2978,
+        "result_quote_id": null,
+        "created_at": "2026-10-07T13:11:45.579454+00:00",
+        "updated_at": "2026-10-07T13:12:08.87881+00:00"
+      },
+      "vin_lead_despues": "5TDDZRFH4LS007401",
+      "checks": [
+        [
+          true,
+          "no pide el VIN"
+        ],
+        [
+          true,
+          "Route → vin 5TDDZRFH4LS007401 (foto)"
+        ],
+        [
+          true,
+          "Provide Required Data corre"
+        ],
+        [
+          true,
+          "motivo vin_registrado"
+        ],
+        [
+          true,
+          "discount_serie = el confirmado"
+        ],
+        [
+          true,
+          "serie_foto sigue confirmado"
+        ],
+        [
+          true,
+          "la aplicación sale de pending_data (fila)"
+        ],
+        [
+          true,
+          "Django guardó el VIN en el lead (fila)"
+        ]
+      ],
+      "cierre": "closed\nUPDATE 1",
+      "dispatch_total": [
+        {
+          "id": "s1.d202.p2.notice.862b9f7e0cfccbf1f4fcab4dac6c9e39457baecde20e226c5c562e3c294b5255",
+          "outcome": "sent",
+          "at": "2026-10-07T13:10:29.314575+00:00"
+        },
+        {
+          "id": "d156.p2.dd2c09f42701e2eb2bd4dcaa633baeb7ef9a2670.application.reply",
+          "outcome": "sent",
+          "at": "2026-10-07T13:11:45.822133+00:00"
+        },
+        {
+          "id": "s1.d243.p2.guard.36477e37d553f72677c376f4ae3ef20a242017ca8e04b27bf4fc92eb3d14a9ba",
+          "outcome": "sent",
+          "at": "2026-10-07T13:12:09.021012+00:00"
+        }
+      ],
+      "seguimientos": "0",
+      "limpieza": [
+        {
+          "tabla": "n8n_chat_histories",
+          "ids": "waq_2978_0a0a0a0a50ab",
+          "borradas": 5
+        },
+        {
+          "tabla": "n8n_discount_phase2_attempt",
+          "ids": "waq_2978_0a0a0a0a50ab",
+          "borradas": 2
+        },
+        {
+          "tabla": "n8n_discount_resolution_attempt",
+          "ids": "waq_2978_0a0a0a0a50ab",
+          "borradas": 1
+        },
+        {
+          "tabla": "n8n_outbound_dispatch",
+          "ids": "waq_2978_0a0a0a0a50ab",
+          "borradas": 3
+        },
+        {
+          "tabla": "whatsapp_sessions",
+          "ids": "waq_2978_0a0a0a0a50ab",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_leadoperationalinfo",
+          "ids": "729",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_discountresolutionrequest",
+          "ids": "669,668",
+          "borradas": 2
+        },
+        {
+          "tabla": "qualitas_discountapplicationscenario",
+          "ids": "533",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_discountapplication",
+          "ids": "666",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_discountapimutation",
+          "ids": "534",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_discountoffer",
+          "ids": "9afb484e-124e-4f72-bb0b-d29d704807ea",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_lead",
+          "ids": "1625",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_cotizacionrespuestaxml",
+          "ids": "1394",
+          "borradas": 1
+        },
+        {
+          "tabla": "qualitas_lead",
+          "ids": "1625",
+          "borradas": 0
+        },
+        {
+          "tabla": "qualitas_cotizacion",
+          "ids": "2978",
+          "borradas": 1
+        }
+      ]
+    }
+  ],
+  "programas": [
+    "34: inactive (antes inactive)",
+    "67: active (antes active)"
+  ]
+}

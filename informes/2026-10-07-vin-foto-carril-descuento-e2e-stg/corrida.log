@@ -1,0 +1,83 @@
+[versión] bot 9481dc31-3317-4d05-b1bc-4a5342325e2f (418 nodos) · VIN A 5TDDZRFH4LS007401 · VIN B 5TDDZRFH6LS007402 · casos 1,2,3,4,5
+[programa] 34	POR_VIN_40	active
+[programa] 67	POR_PRECIO_ALTO_PARA_IA_40	inactive
+
+── caso 1 ──
+  [C1-OBJ] exec 80293 (success) · cliente: «¿Tienen alguna promoción? Se me hace caro»
+      → «Déjame checar tu cotización para buscarte el mejor precio posible. Ahorita te cuento.» (discount_direct_review_notice_v1/-)
+      → «Para dejar tu descuento aplicado me falta un dato tuyo. ¿Me lo compartes y lo cerramos?» (direct_discount_notice_v1/-)
+      dispatch: s1.d202.p2.notice.52badbbaa20972246be62e46a8afacceead04b10ae5b8fe66cf57dc4c8506fc3:sent, d156.p2.d2cd502de8ff5f1f522447c2d45b011078d66c1e.application.reply:sent
+  [precondición] aplicación 662 pending_data POR_VIN_40 vin_required=true
+  [C1] exec 80296 (success) · cliente: «Es correcto»
+      → «Perfecto! Déjame que arme tu nueva cotización!» (discount_normal_guard_v1/vin_registrado)
+      dispatch: s1.d243.p2.guard.6c9cc8fac6ef9c437911dd2e8dd57a3f7f5a3df4c2896d14414cd2a83f0a9dfd:sent
+  [caso 1] ✓ no pide el VIN · ✓ Route → vin 5TDDZRFH4LS007401 (foto_confirmada_ahora) · ✓ Provide Required Data corre · ✓ motivo vin_registrado · ✓ discount_serie = VIN de la foto · ✓ serie_foto confirmado · ✓ la aplicación sale de pending_data (fila) · ✓ Django guardó el VIN en el lead (fila)
+  [estado] serie_foto {"value":"5TDDZRFH4LS007401","status":"confirmado"} · discount_serie 5TDDZRFH4LS007401 · app processing · VIN lead 5TDDZRFH4LS007401
+  [cierre] closed
+UPDATE 1 · seguimientos 0 · limpieza: n8n_chat_histories:5 n8n_discount_phase2_attempt:2 n8n_discount_resolution_attempt:1 n8n_outbound_dispatch:3 whatsapp_sessions:1 qualitas_leadoperationalinfo:1 qualitas_discountresolutionrequest:2 qualitas_discountapplicationscenario:4 qualitas_discountapplication:1 qualitas_discountapimutation:1 qualitas_discountoffer:1 qualitas_lead:1 qualitas_cotizacionrespuestaxml:1 qualitas_cotizacion:1
+  [RESIDUO] qualitas_lead(1621)
+
+── caso 2 ──
+  [C2-OBJ] exec 80299 (success) · cliente: «¿Tienen alguna promoción? Se me hace caro»
+      → «Déjame checar tu cotización para buscarte el mejor precio posible. Ahorita te cuento.» (discount_direct_review_notice_v1/-)
+      → «Para dejar tu descuento aplicado me falta un dato tuyo. ¿Me lo compartes y lo cerramos?» (direct_discount_notice_v1/-)
+      dispatch: s1.d202.p2.notice.4e85c23dc1a73816bd5cda21d35d734633049e84e3550070e4cc9ca071d25c73:sent, d156.p2.9a96870ae83d3f567dcb079eb513c8f49d53fab7.application.reply:sent
+  [precondición] aplicación 663 pending_data POR_VIN_40 vin_required=true
+  [C2] exec 80302 (success) · cliente: «no, está mal»
+      → «¡Perfecto! Para aplicar tu descuento necesito el número de serie (VIN) de tu vehículo: son 17 letras y números y viene en tu tarjeta de circulación o en la factura. ¿Me lo compartes?» (discount_normal_guard_v1/pending_data_sin_vin)
+      dispatch: s1.d243.p2.guard.2d566d2fc3030fb602b1ba6ad52702447be682e8cf6da02e94baf90fb5e2e577:sent
+  [caso 2] ✓ pide el VIN (ASK_VIN) · ✓ Route → copy + descartar · ✓ Django no recibe nada (Provide Required Data no corre) · ✓ serie_foto descartado · ✓ la aplicación sigue en pending_data (fila) · ✓ el lead sigue sin VIN (fila)
+  [estado] serie_foto {"value":"5TDDZRFH4LS007401","status":"descartado"} · discount_serie — · app pending_data · VIN lead —
+  [cierre] closed
+UPDATE 1 · seguimientos 0 · limpieza: n8n_chat_histories:5 n8n_discount_phase2_attempt:2 n8n_discount_resolution_attempt:1 n8n_outbound_dispatch:3 whatsapp_sessions:1 qualitas_discountresolutionrequest:1 qualitas_discountapplication:1 qualitas_discountapimutation:1 qualitas_discountoffer:1 qualitas_lead:1 qualitas_cotizacionrespuestaxml:1 qualitas_cotizacion:1
+  [RESIDUO] qualitas_lead(1622)
+
+── caso 3 ──
+  [C3-OBJ] exec 80305 (success) · cliente: «¿Tienen alguna promoción? Se me hace caro»
+      → «Déjame checar tu cotización para buscarte el mejor precio posible. Ahorita te cuento.» (discount_direct_review_notice_v1/-)
+      → «Para dejar tu descuento aplicado me falta un dato tuyo. ¿Me lo compartes y lo cerramos?» (direct_discount_notice_v1/-)
+      dispatch: s1.d202.p2.notice.5bc74bdd550c815bf676a4d98c41b83ae3f29e68068a22b5fb1a050e10cef896:sent, d156.p2.1d879d2b5e657a74b09c0fc91c05bf85cf62c600.application.reply:sent
+  [precondición] aplicación 664 pending_data POR_VIN_40 vin_required=true
+  [C3] exec 80307 (success) · cliente: «El número de serie es 5TDDZRFH6LS007402»
+      → «Perfecto! Déjame que arme tu nueva cotización!» (discount_normal_guard_v1/vin_registrado)
+      dispatch: s1.d243.p2.guard.1d51a5cee599b825c4c1f5a771653cadb295342f6c0bdb37dd0e29f0c241b051:sent
+  [caso 3] ✓ Route → vin 5TDDZRFH6LS007402 (el del texto) · ✓ Provide Required Data corre · ✓ Django guardó B en el lead (fila) · ✓ Django lo aceptó → serie_foto descartado
+  [estado] serie_foto {"value":"5TDDZRFH4LS007401","status":"descartado"} · discount_serie 5TDDZRFH6LS007402 · app queued · VIN lead 5TDDZRFH6LS007402
+  [cierre] closed
+UPDATE 1 · seguimientos 0 · limpieza: n8n_chat_histories:5 n8n_discount_phase2_attempt:2 n8n_discount_resolution_attempt:1 n8n_outbound_dispatch:3 whatsapp_sessions:1 qualitas_leadoperationalinfo:1 qualitas_discountresolutionrequest:2 qualitas_discountapplication:1 qualitas_discountapimutation:1 qualitas_discountoffer:1 qualitas_lead:1 qualitas_cotizacionrespuestaxml:1 qualitas_cotizacion:1
+  [RESIDUO] qualitas_lead(1623)
+
+── caso 4 ──
+  [C4-OBJ] exec 80310 (success) · cliente: «¿Tienen alguna promoción? Se me hace caro»
+      → «Déjame checar tu cotización para buscarte el mejor precio posible. Ahorita te cuento.» (discount_direct_review_notice_v1/-)
+      → «Para dejar tu descuento aplicado me falta un dato tuyo. ¿Me lo compartes y lo cerramos?» (direct_discount_notice_v1/-)
+      dispatch: s1.d202.p2.notice.7a4dbea151e45d1ec6851ed806c17adca0ccd29e19eae1b3c372836caa36c259:sent, d156.p2.18684eed31d544d8fbd7d94ebeeabcbd512dd8fb.application.reply:sent
+  [precondición] aplicación 665 pending_data POR_VIN_40 vin_required=true
+  [C4] exec 80313 (success) · cliente: «hola, ¿cómo va?»
+      → «¡Perfecto! Para aplicar tu descuento necesito el número de serie (VIN) de tu vehículo: son 17 letras y números y viene en tu tarjeta de circulación o en la factura. ¿Me lo compartes?» (discount_normal_guard_v1/pending_data_sin_vin)
+      dispatch: s1.d243.p2.guard.fbc7c6166550c7b58ce44e3daefa9d8b4986ea2bb8769f7c70c2d0c7a2ca1c5b:sent
+  [caso 4] ✓ pide el VIN (ASK_VIN), como hoy · ✓ Django no recibe nada · ✓ sin serie_foto · ✓ la aplicación sigue en pending_data (fila)
+  [estado] serie_foto null · discount_serie — · app pending_data · VIN lead —
+  [cierre] closed
+UPDATE 1 · seguimientos 0 · limpieza: n8n_chat_histories:5 n8n_discount_phase2_attempt:2 n8n_discount_resolution_attempt:1 n8n_outbound_dispatch:3 whatsapp_sessions:1 qualitas_discountresolutionrequest:1 qualitas_discountapplication:1 qualitas_discountapimutation:1 qualitas_discountoffer:1 qualitas_lead:1 qualitas_cotizacionrespuestaxml:1 qualitas_cotizacion:1
+  [RESIDUO] qualitas_lead(1624)
+
+── caso 5 ──
+  [C5-OBJ] exec 80316 (success) · cliente: «¿Tienen alguna promoción? Se me hace caro»
+      → «Déjame checar tu cotización para buscarte el mejor precio posible. Ahorita te cuento.» (discount_direct_review_notice_v1/-)
+      → «Para dejar tu descuento aplicado me falta un dato tuyo. ¿Me lo compartes y lo cerramos?» (direct_discount_notice_v1/-)
+      dispatch: s1.d202.p2.notice.862b9f7e0cfccbf1f4fcab4dac6c9e39457baecde20e226c5c562e3c294b5255:sent, d156.p2.dd2c09f42701e2eb2bd4dcaa633baeb7ef9a2670.application.reply:sent
+  [precondición] aplicación 666 pending_data POR_VIN_40 vin_required=true
+  [C5] exec 80319 (success) · cliente: «ok»
+      → «Perfecto! Déjame que arme tu nueva cotización!» (discount_normal_guard_v1/vin_registrado)
+      dispatch: s1.d243.p2.guard.36477e37d553f72677c376f4ae3ef20a242017ca8e04b27bf4fc92eb3d14a9ba:sent
+  [caso 5] ✓ no pide el VIN · ✓ Route → vin 5TDDZRFH4LS007401 (foto) · ✓ Provide Required Data corre · ✓ motivo vin_registrado · ✓ discount_serie = el confirmado · ✓ serie_foto sigue confirmado · ✓ la aplicación sale de pending_data (fila) · ✓ Django guardó el VIN en el lead (fila)
+  [estado] serie_foto {"value":"5TDDZRFH4LS007401","status":"confirmado"} · discount_serie 5TDDZRFH4LS007401 · app queued · VIN lead 5TDDZRFH4LS007401
+  [cierre] closed
+UPDATE 1 · seguimientos 0 · limpieza: n8n_chat_histories:5 n8n_discount_phase2_attempt:2 n8n_discount_resolution_attempt:1 n8n_outbound_dispatch:3 whatsapp_sessions:1 qualitas_leadoperationalinfo:1 qualitas_discountresolutionrequest:2 qualitas_discountapplicationscenario:1 qualitas_discountapplication:1 qualitas_discountapimutation:1 qualitas_discountoffer:1 qualitas_lead:1 qualitas_cotizacionrespuestaxml:1 qualitas_cotizacion:1
+  [RESIDUO] qualitas_lead(1625)
+[programas restaurados] 34: inactive (antes inactive) · 67: active (antes active)
+[vin-foto-descuento] 6 tests → PASS 5 · FAIL 0 · WARN 0 · SKIP 0
+[vin-foto-descuento] reporte: reports/20261007-0655-VINFOTO/vin-foto-descuento.json
+[traza] /Users/AIP/claude-projects/Agente_QATest_Qualitas/reports/20261007-0655-VINFOTO
+exit=0
