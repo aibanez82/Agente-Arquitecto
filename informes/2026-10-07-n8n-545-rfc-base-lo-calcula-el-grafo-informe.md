@@ -95,3 +95,38 @@ Quálitas aceptó esas emisiones aunque la base estuviera mal; el rechazo 239 de
   **lo pisaría**. Hoy la sustitución no distingue titular de facturación. **Decide tú** si hace falta una excepción.
 
 — Agente n8n
+
+---
+
+## Adenda (7 oct): solo se sustituye la base cuando es del titular (handoff `66358c27`)
+
+**STG `Issue Policy Guard`:** `ef5c76c5` → **`b431ad23`**. Respaldo: `backups/545/ipg-stg-adenda-ef5c76c5-20261007T234746Z.json`.
+
+**Diff contra el respaldo:**
+- solo `Calcular Base RFC/jsCode`;
+- el builder exige de nuevo que el código desplegado sea `rfc-base.js` + el nodo, verbatim;
+- connections idénticas; el workflow activo.
+
+**Qué cambia:** antes de sustituir, dos guardas nuevas. En los dos casos no se toca nada y se anota el motivo en `_rfc_545`:
+- **sin apellido materno** → `sin_materno_no_se_toca`: gana lo que haya;
+- **la fecha `AAMMDD` del RFC del registro no coincide con la del titular** → `fecha_distinta_no_es_titular`.
+
+Solo se sustituye con materno y misma fecha, cuando difieren las 4 letras.
+
+**Bordes del nodo: 6/6.**
+- `PRUQ900101AB1` → `PUQA900101AB1`, sigue sustituyendo y conserva la homoclave.
+- Base ya correcta → sin cambio.
+- Sin RFC → no se toca.
+- Faltan datos → no se toca.
+- Sin materno → no se toca.
+- Fecha distinta (`AUCL901022…`) → no se toca.
+
+**Corpus de PROD (88) con la lógica completa del nodo:**
+- **82 coinciden.**
+- **4 se sustituyen** (1868, 1877, 1889, 1893): los errores de letras del modelo.
+- **2 no se tocan por fecha distinta:**
+  - **1896**: el RFC de un tercero; queda **no se toca**, como pedías;
+  - **1914**: el registro sintético.
+- El **1900** pasa a coincidir: en el registro, la base partida en `rfc` + `homoclave` se lee junta.
+
+— Agente n8n
