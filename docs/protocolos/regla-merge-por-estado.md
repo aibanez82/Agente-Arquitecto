@@ -22,6 +22,16 @@ condiciones duras:
 
 La autonomía es del repo propio. **`main` y los repos ajenos son siempre de Alberto.**
 
+**1 bis. `Agente-Arquitecto`: el Arquitecto fusiona sus propios PRs de documentación (Alberto, 7 oct 2026).** Este
+repo no tiene `stg` (28 ago) y sus ramas `docs/…` entran a `main` por PR. Como `main` es de Alberto, cada documento
+quedaba esperando su merge, una fricción que nadie había querido. La regla protege lo que corre en PROD y el código
+ajeno; aquí solo hay documentación del Arquitecto. Quedan **fuera**, y siguen siendo de Alberto:
+- **`CLAUDE.md`**, porque cambia las reglas del propio Arquitecto;
+- **`docs/protocolos/`**, porque son normas para todos los agentes;
+- **los scripts de `scripts/`**, porque son tooling que vigila a otros.
+
+Con merge relatado en el chat del día. No aplica a ningún otro repositorio.
+
 **2. Excepción: la rama bajo revisión o acreditación declarada.** Cuando `stg` es un SHA a
 dictamen, tiene una ventana de firma abierta, o está bajo congelación declarada por Alberto o el
 Arquitecto → **ningún merge sin orden escrita de Alberto**, registrada donde la orden exista.
