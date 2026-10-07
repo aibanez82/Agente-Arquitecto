@@ -11,15 +11,16 @@ el Arquitecto** y listo para su OK.
 |---|---|---|---|---|
 | 563 | El carril del descuento ya no vuelve a pedir el VIN que el cliente acaba de confirmar por foto | ✅ E2E del QA 5/5 (ejecuciones 80296-80319), verificado por el Arquitecto | Descuento | Orden de import publicada (`7f169ff`), parada en la capa de permisos del Agente n8n. **Viajar junto con el `#472`**, porque los dos tocan la misma regla de afirmación |
 | 463 | Si el guardarraíl no puede evaluar (cuota, error del proveedor), el cliente recibe una respuesta segura y **no suma para el baneo** | ✅ STG `289c4070`, verificado por el Arquitecto: grafo y ejecuciones 80939/80940/80942 (acuse `91989ca`) | No | **Tiene que llevar las piezas del `#325`** (`onError: continueErrorOutput` y `Guardrail Error Safe Reply`), que PROD no tiene |
+| 472 | La confirmación del VIN de foto se reconoce bien («Si el num de serie esta bien», «Son correctas»…) y, si la serie no se guarda, el bot lo sabe en vez de decir «ya tengo tus datos». **Cierra el riesgo de emisión bloqueada desde el 6 oct** | ✅ STG bot `1b55efa8`, verificado por el Arquitecto: regla idéntica en los dos nodos y 14/14 casos decididos | **Emisión** | **Viaja junto con el `#563`** (misma regla). Falta acreditar la parte conversacional con **una foto real tuya a STG** |
+| 545 | La base del RFC la calcula el grafo con el algoritmo del SAT. Solo corrige cuando es seguro que es del titular | ✅ Issue Policy Guard STG `b431ad23`, verificado: corpus real 81/88 sin fallos del algoritmo | **Emisión** | Sub-workflow `Issue Policy Guard`, no el bot. La línea contradictoria del prompt va aparte, a tu firma |
+| 289 | Si la póliza ya está pagada, el bot lo dice en vez de «no hay liga» | ✅ STG bot `4b1bf2f4`, verificado: solo los dos consumidores, prompt intacto | Pagos (solo lectura de estado) | Caso «pagada» no comprobable en STG (Django STG da 503); se acredita con la primera pagada real de PROD |
 | 565 | El mensaje de emisión ya no dice «El link expira en 24 horas» | ✅ Medido: 0 apariciones en STG `85837dbf`; 1 en PROD `a5b88be9` | Texto del mensaje de emisión | Cambio de una frase |
 
 ## En curso en STG (todavía no listos)
 
 | # | Qué | Estado |
 |---|---|---|
-| 472 | La confirmación del VIN de foto se reconoce bien; si la serie no se guarda, el bot lo sabe | En curso (handoff `2c0f97a5`). **Riesgo:** desde el 6 oct, un VIN de foto descartado bloquea la emisión |
-| 545 | La base del RFC la calcula el grafo con el algoritmo del SAT | En cola (handoff `f9d39ebd`) |
-| 289 | «Ya está pagada» deja de verse como «no hay liga» | En cola (handoff `5e610b68`); el PR #109 está desfasado y se rehace |
+| — | Nada en curso en este momento | — |
 
 ## Necesitan tu firma de texto
 
