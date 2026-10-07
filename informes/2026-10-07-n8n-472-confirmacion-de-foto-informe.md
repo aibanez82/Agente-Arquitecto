@@ -67,3 +67,42 @@ Además, «Si orita le paso el numero de la placa» da sí porque el handoff lo 
 - **Caso 6 en vivo:** no ejercido.
 
 — Agente n8n
+
+---
+
+## Adenda (7 oct): regla v2 aplicada en STG (handoff `1be84e3a`)
+
+**STG:** `3b85069f` → **`1b55efa8`**. Respaldo: `backups/472c/bot-stg-adenda-3b85069f-20261007T233925Z.json`.
+
+**Diff contra el respaldo:**
+- solo `Detect Confirmation/jsCode` y `Route Normal Guard/jsCode`;
+- en las dos se sustituye la función `reglaConfirmacion` (v1 → v2), byte a byte idéntica en los dos nodos, y nada más;
+- connections idénticas; los dos `systemMessage` intactos; el workflow activo.
+
+**Código:** `scripts/472c/regla.py` (`REGLA2`) y `fix-472c-adenda-stg.py`, en la rama `fix/472c-confirmacion-foto-estricta`.
+
+**Frases de la adenda y las anteriores: 15/15.**
+- «Son correctas» → sí.
+- «No está mal» → ambiguo.
+- La del 501 → ambiguo.
+- «normal» → ambiguo.
+- «está todo normal, sí» → sí.
+- Las 10 anteriores no cambian.
+
+**Corpus de las 38 respuestas reales: cambian exactamente las tres señaladas, nada más.**
+
+| Frase | v1 → v2 | Por qué |
+|---|---|---|
+| «Si son correctos sólo al terminar el número de serie es 501» | sí → **ambiguo** | Corrección: tiene 3 o más dígitos seguidos y la salvedad `solo`/`al terminar`. |
+| «No está mal.» (×2) | no → **ambiguo** | «no está mal» va antes de la negación. |
+| «Son correctas» | ambiguo → **sí** | `correctas`. |
+
+Totales v2: 17 sí, 9 no, 12 ambiguo.
+
+**Una adición que declaro:** con la lista de la adenda, «está todo normal, sí» daba **ambiguo**, porque no *empieza* por
+«sí». Para cumplir tu ejemplo añadí una regla: **«sí» como última palabra cuenta como afirmación**. Sobre las 38
+respuestas reales no cambia ningún resultado. Si prefieres que no esté, se quita y ese ejemplo pasa a ambiguo.
+
+`mal`, `otro` y `otra` se buscan ya como palabra completa: «normal» → ambiguo.
+
+— Agente n8n
