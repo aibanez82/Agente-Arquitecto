@@ -54,7 +54,7 @@ produjo el aviso «Déjame checar tu cotización para buscarte el mejor precio p
 después, «Para dejar tu descuento aplicado me falta un dato tuyo. ¿Me lo compartes y lo cerramos?». Todos los
 `dispatch` salieron con `outcome: sent`.
 
-**Capturas del WhatsApp de Alberto:** PENDIENTES. Se las he pedido y van en una adenda.
+**Capturas del WhatsApp de Alberto:** en la adenda del final. Cuadran mensaje a mensaje.
 
 ## Caso 6: NO COMPROBABLE, y por qué
 
@@ -123,5 +123,39 @@ mías se borraron todas, así que no hubo ninguna ajena.
 - **Los casos 1, 3 y 5 hasta el final del descuento.** Su aplicación salió de `pending_data` (a `processing` o
   `queued`) y la borré en ese estado. No mido que el worker rehaga la cotización ni que el PDF llegue: está fuera del
   arreglo y le habría mandado más mensajes a Alberto.
+
+Agente: QA & Testing
+
+---
+
+## Adenda — 7 oct: capturas del WhatsApp de Alberto
+
+Alberto me las pasó en mi sesión a las 09:25: `captura-1-whatsapp-alberto.png` y `captura-2-whatsapp-alberto.png`.
+Cubren desde su «Hola» de las 06:48 hasta el final de la corrida. **Coinciden mensaje a mensaje y en orden** con lo
+que n8n persistió y despachó con `sent`:
+
+| Hora (CDMX) | Recibido por Alberto | Bloque |
+|---|---|---|
+| 06:48 → 06:49 | su «Hola» → «Encontré 5 cotizaciones activas para este número…» | apertura de la ventana de 24 h (desambiguación, fuera de la prueba) |
+| 06:49 · 06:51 | «Déjame checar…» · «¡Lo conseguí! 🎉 Hay un descuento aprobado…» | intento 1, el que se paró por el 67 |
+| 06:55 · 06:56 · **06:57** | aviso · «…me falta un dato tuyo…» · **«Perfecto! Déjame que arme tu nueva cotización!»** | caso 1: no pide el VIN |
+| 06:59 · 07:00 · **07:00** | aviso · «…me falta un dato tuyo…» · **«¡Perfecto! Para aplicar tu descuento necesito el número de serie (VIN)…»** | caso 2: `ASK_VIN` |
+| 07:03 · 07:04 · **07:04** | aviso · «…me falta un dato tuyo…» · **«Perfecto! Déjame que arme tu nueva cotización!»** | caso 3: VIN del texto |
+| 07:06 · 07:08 · **07:08** | aviso · «…me falta un dato tuyo…» · **`ASK_VIN`** | caso 4: sin regresión |
+| 07:10 · 07:11 · **07:12** | aviso · «…me falta un dato tuyo…» · **«Perfecto! Déjame que arme tu nueva cotización!»** | caso 5: no pide el VIN |
+
+Son **17 mensajes de la prueba**, los mismos que los `dispatch` en `sent`. **Después de las 07:12 no llegó nada**: ni
+un PDF, ni un seguimiento, ni la cotización de los casos 1, 3 y 5, cuyas aplicaciones se borraron. Las capturas se
+hicieron a las 09:25. Con esto, lo que «salió hacia el cliente» queda comprobado también del lado de Meta, no solo en n8n.
+
+**Dos observaciones de copy, fuera del alcance del arreglo (no se tocó el copy, y así debía ser):**
+1. Al entrar en `pending_data`, el cliente recibe «Para dejar tu descuento aplicado me falta un dato tuyo. ¿Me lo
+   compartes y lo cerramos?», que **no dice qué dato es**. En la conversación real del defecto (PROD, ejecución 79613)
+   el cliente acababa de mandar la foto, así que puede no saber que se le pide el VIN hasta el siguiente turno.
+2. En el intento 1 (programa 67), el mensaje «¡Lo conseguí!…» termina con «Logré un descuento especial si contratas
+   hoy conmigo», que repite la frase anterior. Solo aparece en el carril sin VIN.
+
+Las dejo para que decidas si merecen un issue. No las he abierto: `aguayo-co/HYL-WAI` sigue devolviendo «Repository
+not found» a mi cuenta, igual que a la tuya.
 
 Agente: QA & Testing
