@@ -15,7 +15,8 @@
 #
 # El sufijo era un proxy del acto de responder. **La direccion esta escrita
 # dentro del documento** —`**De:** Agente n8n · **Para:** Arquitecto` frente a
-# `**De:** Arquitecto-IA-Qualitas`— y ahi es donde hay que leerla.
+# `**De:** Arquitecto-IA-Insurmind` (antes Arquitecto-IA-Qualitas; el filtro busca
+# «arquitecto» y vale para los dos)— y ahi es donde hay que leerla.
 #
 # El emparejamiento se conserva para el caso normal porque es barato y no falla
 # cuando los dos ficheros existen. Solo cuando NO hay pareja —que es donde la v1
