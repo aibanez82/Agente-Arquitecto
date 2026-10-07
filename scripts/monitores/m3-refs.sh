@@ -46,7 +46,9 @@ while true; do
     # prefijos quedan solo como red para los commits viejos que no lo llevan.
     cuerpo=$(git -C "$repo" log -1 --format=%B "$sha" 2>/dev/null)
     case "$cuerpo" in
-      *"Agente: Arquitecto-IA-Qualitas"*)
+      # 7 oct: Alberto me renombra a Arquitecto-IA-Insurmind. Se aceptan los dos trailers: los commits
+      # viejos llevan el antiguo, y sin esta linea el monitor me devolveria mis propios commits.
+      *"Agente: Arquitecto-IA-Qualitas"*|*"Agente: Arquitecto-IA-Insurmind"*)
         continue ;;
     esac
     asunto=$(git -C "$repo" log -1 --format=%s "$sha" 2>/dev/null)

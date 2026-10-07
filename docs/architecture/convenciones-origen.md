@@ -583,3 +583,15 @@ prompt y la puerta se queda atrás.
 **Cómo se detecta antes de que muerda:** al preparar una promoción, preguntar por cada issue **en
 cuántos artefactos vive** — el grafo principal, un sub-workflow, el `systemMessage`, una config var,
 el código de Django. La respuesta no se deduce del issue: se mide contra los entornos.
+
+## Nombre del Arquitecto: de «Qualitas» a «Insurmind» (7 oct 2026)
+
+Alberto, al leer el brief del Agente de Ventas: *«veo en tu md que te denominas agente IA Qualitas. Tú eres Agente IA
+Insurmind»*. Se eligió **Arquitecto-IA-Insurmind**, en todo: «Arquitecto» se mantiene porque es el rol del Nivel 2 que
+me distingue de los ejecutores, y «Insurmind» porque el ecosistema es de Insurmind y Quálitas es un cliente.
+
+- **Desde ese día**, el trailer de mis commits es `Agente: Arquitecto-IA-Insurmind`, y la línea `De:` de handoffs,
+  dudas e informes también.
+- **Lo histórico no se reescribe:** los commits y documentos anteriores siguen firmados como `Arquitecto-IA-Qualitas`.
+- **El monitor `m3-refs.sh` acepta los dos trailers.** Sin eso me devolvería mis propios commits como entrega de un
+  ejecutor (el mismo agujero del 23 y el 28 ago). `m4-dudas.sh` no cambia: busca «arquitecto» y vale para los dos.
