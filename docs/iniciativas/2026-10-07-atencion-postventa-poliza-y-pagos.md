@@ -40,31 +40,55 @@ pagar. Hoy le ofrecemos cotizar.
 
 ## Propuesta de diseño (a validar)
 
-1. **Detección determinista, no por intención sola.** Al entrar un mensaje, n8n pregunta a Django si **ese teléfono
-   tiene alguna póliza emitida vigente**. Si la tiene y el mensaje no es claramente una cotización nueva, el turno va
-   al **carril postventa**. Un clasificador (Haiku) solo desempata entre «postventa» y «quiere otra cotización», y
-   solo cuando hay póliza.
-2. **Django: endpoint de consulta por teléfono** (autenticado con el Bearer de n8n, solo lectura). Por cada póliza
-   vigente del teléfono canónico devuelve:
-   - número, vehículo, cobertura y vigencia;
-   - forma de pago;
-   - recibos del **ledger v2**: número, vencimiento, importe y estado vigente;
-   - enlaces a documentos y, si existe, la liga de pago del recibo pendiente (`qualitas_receiptpaymentlink`).
+### Dónde vive cada cosa (decidido con Alberto, 7 oct)
 
-   **Contrato versionado**, como el de Recovery.
-3. **n8n: carril/sub-workflow «Atención postventa»**, separado del de cotización y emisión.
-   - Agente con prompt propio y tools solo de consulta: resumen de póliza y recibos, reenvío de documentos y liga de
-     pago.
-   - **Sin** tools de cotizar ni de emitir.
-   - Las cifras las pone el grafo, no el modelo (la lección del #341/#324: fidelidad de dígito).
-4. **Escalado:**
-   - lo que el bot no puede resolver (cambio de forma de pago, aclaraciones de cobro, cancelación) va al contact
-     center de Metepec (`metepecaten@qualitas.com.mx`, WhatsApp `55 3751 1678`);
-   - los siniestros, al `800 800 2880` o Quali Bot.
+**Restricción que manda:** solo hay un disparador de WhatsApp por app de Meta, el del bot principal
+(`WhatsApp Insurance Quotation Bot`). Todo mensaje entra por ahí. Django no está en el camino de entrada (Meta → n8n
+directo). Así que **el punto de reparto tiene que estar en el bot principal**, pero **la lógica no**: ese workflow
+tiene 418 nodos y viaja entero en cada cambio (el `#551` tuvo que esperar el 7 oct porque cualquier import cambia
+su versión bajo otras pruebas).
 
-   Son los datos de contacto que fijó el #554.
-5. **Lo que no hace:** no cambia la forma de pago, no cancela y no promete nada sobre el cobro que no esté en el
-   ledger.
+Tres piezas:
+
+1. **Bot principal: solo dos nodos, que se tocan una vez.** Una llamada a sub-workflow y un desvío. Van **después
+   de `Session Resolution`**, que ya dejó el teléfono canónico, la sesión y el estado de toma humana (si la hay,
+   manda la persona y no se desvía nada). Van **antes del carril del descuento y del `Intent Router`**, para que un
+   cliente que ya pagó no caiga en el flujo de cotizar. Y van **después del buffer**: una consulta por ráfaga, no por
+   mensaje suelto.
+2. **Sub-workflow «Router de Cliente».** Llama a Django («¿este teléfono tiene póliza vigente?»). Si no la tiene,
+   devuelve `cotizacion` y el bot sigue como hoy. Si la tiene, un clasificador (Haiku) desempata solo entre
+   «pregunta por su póliza o sus pagos» y «quiere otra cotización». Devuelve `cotizacion` o `postventa`. **Se ajusta
+   e importa sin tocar el bot principal.**
+3. **Sub-workflow «Atención Postventa».** Consulta a Django el detalle, responde con agente y prompt propios y solo
+   tools de consulta, y escala lo que no puede resolver.
+
+**Descartado:**
+- **Marcar al cliente en la sesión** en vez de preguntar a Django: falla con el caso origen, que compró por la web
+  y cuya sesión de WhatsApp nunca pasó por el pago. Además, `whatsapp_sessions` es de n8n, y la verdad sobre quién
+  pagó la tiene Django.
+- **Partir ya el bot principal en una puerta de entrada fina con dos workflows hijos:** es la arquitectura buena a
+  largo plazo, pero supone rehacer el bot con el `#551` y el VIN de foto en vuelo. El Router en sub-workflow es el
+  primer paso hacia ella sin ese riesgo.
+
+### Django: endpoint de consulta por teléfono
+
+Autenticado con el Bearer de n8n y solo lectura, en dos niveles:
+- **existencia** para el Router: sí o no, y cuántas pólizas;
+- **detalle** para Postventa: por cada póliza vigente del teléfono canónico, número, vehículo, cobertura, vigencia,
+  forma de pago, los recibos del **ledger v2** (número, vencimiento, importe y estado vigente), los enlaces a
+  documentos y, si existe, la liga de pago del recibo pendiente (`qualitas_receiptpaymentlink`).
+
+**Contrato versionado**, como el de Recovery.
+
+### Atención Postventa: reglas
+
+- **Sin** tools de cotizar ni de emitir. Las cifras las pone el grafo, no el modelo (la lección del #341/#324:
+  fidelidad de dígito).
+- **Escalado:** lo que el bot no puede resolver (cambio de forma de pago, aclaraciones de cobro, cancelación) va al
+  contact center de Metepec (`metepecaten@qualitas.com.mx`, WhatsApp `55 3751 1678`). Los siniestros, al
+  `800 800 2880` o Quali Bot. Son los datos de contacto que fijó el #554.
+- **Lo que no hace:** no cambia la forma de pago, no cancela y no promete nada sobre el cobro que no esté en el
+  ledger.
 
 ## Decisiones abiertas (de Alberto)
 
@@ -84,3 +108,6 @@ pagar. Hoy le ofrecemos cotizar.
   = reemitido).
 - **Interacción con `Session Resolution`:** con sesiones legacy, varias `open` o ninguna `active`.
 - **Que los seguimientos de cotización no le escriban a un cliente que ya pagó.**
+- **Latencia de la consulta de existencia por ráfaga.** Si se nota, el Router solo llama a Django cuando la sesión no
+  tiene una cotización en curso.
+- **`Payment Confirmation`:** hoy pone la sesión en `completed`. Desde ese momento debería ir a postventa.
