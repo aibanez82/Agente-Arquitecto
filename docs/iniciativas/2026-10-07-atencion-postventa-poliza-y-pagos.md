@@ -1,6 +1,6 @@
 # Iniciativa — Atención postventa: el cliente que ya compró pregunta por su póliza o sus pagos
 
-**Abierta:** 7 oct 2026, por encargo de Alberto. **Estado:** diseño cerrado con Alberto (7 oct). Tracker: ver «Decisiones».
+**Abierta:** 7 oct 2026, por encargo de Alberto. **Estado:** diseño cerrado con Alberto (7 oct). **Tracker: `HYL-WAI#566`.**
 **Dueños previstos:** Django (Juan), endpoint de consulta · n8n (Agente n8n), carril nuevo · Arquitecto, diseño y
 contrato.
 
