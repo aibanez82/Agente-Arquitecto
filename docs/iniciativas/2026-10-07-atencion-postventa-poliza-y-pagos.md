@@ -1,6 +1,6 @@
 # Iniciativa — Atención postventa: el cliente que ya compró pregunta por su póliza o sus pagos
 
-**Abierta:** 7 oct 2026, por encargo de Alberto. **Estado:** registrada; diseño propuesto; decisiones abiertas abajo.
+**Abierta:** 7 oct 2026, por encargo de Alberto. **Estado:** diseño cerrado con Alberto (7 oct). Tracker: ver «Decisiones».
 **Dueños previstos:** Django (Juan), endpoint de consulta · n8n (Agente n8n), carril nuevo · Arquitecto, diseño y
 contrato.
 
@@ -117,16 +117,17 @@ Autenticado con el Bearer de n8n y solo lectura, en dos niveles:
 - **Lo que no hace:** no cambia la forma de pago, no cancela y no promete nada sobre el cobro que no esté en el
   ledger.
 
-## Decisiones abiertas (de Alberto)
+## Decisiones de Alberto (7 oct)
 
-1. **Verificación de identidad.** Identificamos solo por teléfono: el mensaje llega desde ese número, pero puede
-   haber teléfonos compartidos o varias pólizas por teléfono. ¿Basta el teléfono para dar el resumen? ¿O pedimos un
-   segundo dato (placas, o nombre del asegurado) antes de dar importes y estados de pago?
-2. **Alcance de la v1:** ¿solo consulta (póliza, recibos y documentos), o también la acción de mandar la liga de
-   pago del recibo pendiente?
-3. **«Domiciliado»:** el ledger no tiene un campo que lo diga. Hay indicios (pago en la fecha exacta, sin tarjeta),
-   pero un indicio no es un dato. ¿Lo contestamos solo si Django/Quálitas lo expone, o se escala?
-4. **Prioridad y tracker:** abro el issue en `HYL-WAI` (Django + n8n) cuando lo decidas.
+1. **Identidad: basta el teléfono.** Es solo lectura y el mensaje llega desde ese número. Si hay varias pólizas, el
+   bot pregunta de qué coche se trata. Nunca hay datos de tarjeta.
+2. **Alcance de la v1: consulta + liga de pago.** Resumen de póliza y recibos, reenvío de documentos y la liga del
+   recibo pendiente (`qualitas_receiptpaymentlink`). La liga ataca directamente la cancelación por impago.
+3. **«¿Tengo pago domiciliado?»: hechos + contact center.** El bot no lo afirma. Dice lo que sí consta en el ledger
+   (qué recibos se cobraron y en qué fecha, y cuándo vence el siguiente) y deriva a Metepec para confirmar la
+   domiciliación.
+4. **Prioridad: el issue ya; el carril n8n después del GO del `#551`**, para no pisar el bot de STG. El endpoint de
+   Django puede empezar en paralelo.
 
 ## Por medir antes del diseño final
 
