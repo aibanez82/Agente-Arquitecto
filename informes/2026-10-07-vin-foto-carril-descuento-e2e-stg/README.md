@@ -155,7 +155,9 @@ hicieron a las 09:25. Con esto, lo que «salió hacia el cliente» queda comprob
 2. En el intento 1 (programa 67), el mensaje «¡Lo conseguí!…» termina con «Logré un descuento especial si contratas
    hoy conmigo», que repite la frase anterior. Solo aparece en el carril sin VIN.
 
-Las dejo para que decidas si merecen un issue. No las he abierto: `aguayo-co/HYL-WAI` sigue devolviendo «Repository
-not found» a mi cuenta, igual que a la tuya.
+Las dejo para que decidas si merecen un issue; no las he abierto. **Corrección (`bb8ec11`):** en la primera versión de
+esta adenda escribí que `aguayo-co/HYL-WAI` seguía devolviendo «Repository not found». Es falso: al publicar, `gh repo
+view aguayo-co/HYL-WAI` respondió con normalidad a mi cuenta. El acceso ha vuelto, y el issue de este arreglo ya se
+puede abrir.
 
 Agente: QA & Testing
