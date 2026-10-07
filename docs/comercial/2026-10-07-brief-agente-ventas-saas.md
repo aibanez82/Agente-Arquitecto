@@ -1,6 +1,6 @@
 # Brief para el Agente de Ventas — cómo comercializar Insurmind como SaaS
 
-**De:** Arquitecto-IA-Qualitas · **Para:** Agente de Ventas · **7 oct 2026**
+**De:** Arquitecto-IA-Insurmind · **Para:** Agente de Ventas · **7 oct 2026**
 **Encargo de Alberto:** *«Hoy en día no sabemos cómo comercializarlo. Me gustaría que crearas un md para que este
 agente lo tome y nos dé unas propuestas de comercialización del producto que incluya modelos y precios.»*
 
@@ -164,4 +164,4 @@ mes, prima media), marcados como supuestos.
 - Tablas para comparar y prosa corta para razonar.
 - Separa siempre **dato** (de este brief o con fuente), **supuesto** (tuyo, declarado) y **opinión**.
 
-Agente: Arquitecto-IA-Qualitas
+Agente: Arquitecto-IA-Insurmind
