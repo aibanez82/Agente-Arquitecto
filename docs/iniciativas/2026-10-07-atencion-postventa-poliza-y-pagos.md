@@ -32,6 +32,33 @@ forma de pago mensual (12 recibos).
 - **Aparte:** el Dashboard marca la conversación con `identity_contradiction`, coherente con una sesión legacy sin
   `conversation_id` en modo `dual`.
 
+## Segundo caso, del mismo día (medido en PROD, 7 oct)
+
+Teléfono `524641184076`. Póliza **`7620103892`** (Jetta, VIN `3VWBV09M4CM039303`), emitida el 5 oct a las 10:41
+CDMX, `PAGADO`, de contado.
+
+- Ese mismo día y el siguiente, el cliente abrió **tres cotizaciones más** (`4316`, `4318` y `4321`).
+- En la `4321` llegó hasta emitir. `Issue_Policy` contestó que **ese VIN ya tenía póliza**, y el bot le respondió
+  *«En este momento solo emitimos pólizas nuevas, no renovaciones de pólizas Quálitas existentes»*. Es falso para
+  este cliente: la póliza es **nuestra** y tiene un día.
+- Después el cliente pidió «el link para pagar» y lo atendió una persona.
+- No tengo capturado el VIN de la sesión `4321`. Que sea el mismo coche es la lectura obvia (mismo cliente, mismo
+  modelo), pero no está medido.
+
+**Lo que enseña:** el cliente que vuelve no siempre pregunta; a veces **vuelve a empezar a cotizar**. Sin el Router,
+el bot intenta venderle una segunda póliza del mismo coche y, cuando Quálitas lo para, le da una explicación falsa.
+
+## Cuántos casos hay: no se puede medir con fiabilidad desde la BD
+
+Dos mediciones fallaron su control positivo, porque ninguna recoge el caso origen:
+- `whatsapp_sessions.last_activity` **no se actualiza** en sesiones legacy: la del caso origen sigue en el 6 jul
+  aunque el cliente escribió el 6 oct;
+- `n8n_outbound_dispatch` **no registra** las respuestas del carril legacy/fallback: el caso origen no tiene ni una
+  fila.
+
+Con lo que sí se ve, hay **2 casos en dos días** (5-6 oct) entre 30 pólizas `PAGADO`. **Propuesta:** que el propio
+Router cuente cada desvío a postventa, para que el volumen se mida desde el primer día y no se reconstruya después.
+
 ## Por qué importa
 
 El embudo falla al cobrar recibos, no al emitir: de 46 pólizas reales, 20 las canceló Quálitas por recibos
@@ -103,9 +130,9 @@ Autenticado con el Bearer de n8n y solo lectura, en dos niveles:
 
 ## Por medir antes del diseño final
 
-- **Cuántos casos hay:** mensajes entrantes de teléfonos con póliza `PAGADO` posteriores a su pago, en 30 días.
-- **Vocabulario de `promesa_de_pago`** y del resto de estados (ver la referencia de vocabulario de recibos: «rechazado»
-  = reemitido).
+- **Vocabulario de recibos**, ya medido el 14 sep: `promesa_de_pago` aparece **después de generarse una liga de
+  pago**; `rechazado` es un recibo **reemitido**, no un cobro fallido. Para el estado vigente se toma la última
+  observación por `receipt_identity_id`.
 - **Interacción con `Session Resolution`:** con sesiones legacy, varias `open` o ninguna `active`.
 - **Que los seguimientos de cotización no le escriban a un cliente que ya pagó.**
 - **Latencia de la consulta de existencia por ráfaga.** Si se nota, el Router solo llama a Django cuando la sesión no
