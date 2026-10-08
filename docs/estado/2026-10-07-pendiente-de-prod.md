@@ -15,13 +15,14 @@ el Arquitecto** y listo para su OK.
 | 545 | La base del RFC la calcula el grafo con el algoritmo del SAT. Solo corrige cuando es seguro que es del titular | ✅ Issue Policy Guard STG `b431ad23`, verificado: corpus real 81/88 sin fallos del algoritmo | **Emisión** | Sub-workflow `Issue Policy Guard`, no el bot. La línea contradictoria del prompt va aparte, a tu firma |
 | 289 | Si la póliza ya está pagada, el bot lo dice en vez de «no hay liga» | ✅ STG bot `4b1bf2f4`, verificado: solo los dos consumidores, prompt intacto | Pagos (solo lectura de estado) | Caso «pagada» no comprobable en STG (Django STG da 503); se acredita con la primera pagada real de PROD |
 | 552 | Si el cliente pide la liga antes de tener póliza, el bot responde tu texto («Aún me faltan algunos datos tuyos para poder emitir, y después te genero el link de pago.») y sigue, en vez de «No hay una liga disponible» | ✅ STG bot `3ca60723`, verificado: ejecución 80987 con el carril completo y memoria; el turno siguiente retoma la selección | No (texto tuyo literal, ya decidido) | Carril calcado del guard del descuento (13 nodos). Reconoce también las formas de usted |
+| 479 | El detector de jailbreak escanea solo lo que escribe el cliente (no los marcadores del sistema); una foto sin texto no pasa por él | ✅ STG bot `b31b71a6`, verificado: controles positivos en vivo (jailbreak en texto y como pie de foto saltan; foto sin pie llega al agente) | No (control de seguridad) | **Depende del `#463`** (y este del `#325`): viajan juntos |
 | 565 | El mensaje de emisión ya no dice «El link expira en 24 horas» | ✅ Medido: 0 apariciones en STG `85837dbf`; 1 en PROD `a5b88be9` | Texto del mensaje de emisión | Cambio de una frase |
 
 ## En curso en STG (todavía no listos)
 
 | # | Qué | Estado |
 |---|---|---|
-| 479 | El detector de jailbreak escanea solo lo que escribe el cliente; una foto sin texto no pasa por él | En curso (handoff `025df6ee` + respuesta a duda `d8f8f18`) |
+| — | Nada en curso en este momento | — |
 
 ## Necesitan tu firma de texto
 
