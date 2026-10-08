@@ -16,6 +16,8 @@ el Arquitecto** y listo para su OK.
 | 289 | Si la póliza ya está pagada, el bot lo dice en vez de «no hay liga» | ✅ STG bot `4b1bf2f4`, verificado: solo los dos consumidores, prompt intacto | Pagos (solo lectura de estado) | Caso «pagada» no comprobable en STG (Django STG da 503); se acredita con la primera pagada real de PROD |
 | 552 | Si el cliente pide la liga antes de tener póliza, el bot responde tu texto («Aún me faltan algunos datos tuyos para poder emitir, y después te genero el link de pago.») y sigue, en vez de «No hay una liga disponible» | ✅ STG bot `3ca60723`, verificado: ejecución 80987 con el carril completo y memoria; el turno siguiente retoma la selección | No (texto tuyo literal, ya decidido) | Carril calcado del guard del descuento (13 nodos). Reconoce también las formas de usted |
 | 479 | El detector de jailbreak escanea solo lo que escribe el cliente (no los marcadores del sistema); una foto sin texto no pasa por él | ✅ STG bot `b31b71a6`, verificado: controles positivos en vivo (jailbreak en texto y como pie de foto saltan; foto sin pie llega al agente) | No (control de seguridad) | **Depende del `#463`** (y este del `#325`): viajan juntos |
+| 570 | Los turnos que contesta el guardarraíl quedan en la memoria del modelo (mensaje del cliente y respuesta) | ✅ STG bot `12bdbba8`, verificado en BD: filas 11665/11666; el turno siguiente responde con esa memoria | No | **Viaja con `#463`/`#479`/`#325`** (mismo tramo) |
+| 496 | La observación de la Limitada guarda los textos completos (antes se cortaban en la primera coma y desplazaban campos) | ✅ STG bot `faa1da51`, verificado: `queryReplacement` en array (gotcha 40) | No | Las 13 filas históricas no sirven: la observación empieza de cero en PROD |
 | 565 | El mensaje de emisión ya no dice «El link expira en 24 horas» | ✅ Medido: 0 apariciones en STG `85837dbf`; 1 en PROD `a5b88be9` | Texto del mensaje de emisión | Cambio de una frase |
 
 ## En curso en STG (todavía no listos)
@@ -39,6 +41,12 @@ Arquitecto contra el prompt vivo, acuse `91989ca`):
 
 **`#553`** (oferta de la competencia): texto entregado el 5 oct; falta **tu decisión sobre el C9** (el bot dijo «no
 estás obligada, puedes cancelar» con seguros de agencia o financiamiento).
+
+## Aparcados, con su motivo
+
+| # | Qué | Por qué está parado |
+|---|---|---|
+| 497 | El `wamid` de las entregas del PDF con descuento | Arreglarlo deshace una decisión explícita del `#156` (contrato con Juan). Le pregunté el porqué en el issue. Solo afecta a trazabilidad |
 
 ## Necesitan tu orden aunque no sean de n8n
 
