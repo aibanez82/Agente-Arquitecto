@@ -5,6 +5,11 @@
 (`docs/estado/2026-10-07-autonomia-mientras-alberto-fuera.md`). Aquí queda cada paquete **verificado en STG por
 el Arquitecto** y listo para su OK.
 
+> ⏸️ **PAUSA DE PROD (Alberto, 8 oct):** «no quiero ir a PROD si no funciona en STG lo de la foto», confirmado en la
+> sesión del Arquitecto para **todos** los viajes. **Hecho:** viaje 2 (`#552` + `#289`) en PROD `fe9c5213`, verificado.
+> **Parados hasta que el lector de tarjetas (`#348`) lea bien la foto girada en STG:** viajes 1, 3, 4 y 5. El viaje 3
+> tiene la prueba en seco limpia contra `fe9c5213` (406 → 415 nodos).
+
 ## Paquetes listos para tu OK
 
 | # | Qué cambia para el cliente | Verificado en STG | Toca emisión/dinero/prompt | Notas para el viaje |
