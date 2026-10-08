@@ -14,13 +14,14 @@ el Arquitecto** y listo para su OK.
 | 472 | La confirmación del VIN de foto se reconoce bien («Si el num de serie esta bien», «Son correctas»…) y, si la serie no se guarda, el bot lo sabe en vez de decir «ya tengo tus datos». **Cierra el riesgo de emisión bloqueada desde el 6 oct** | ✅ STG bot `1b55efa8`, verificado por el Arquitecto: regla idéntica en los dos nodos y 14/14 casos decididos | **Emisión** | **Viaja junto con el `#563`** (misma regla). Falta acreditar la parte conversacional con **una foto real tuya a STG** |
 | 545 | La base del RFC la calcula el grafo con el algoritmo del SAT. Solo corrige cuando es seguro que es del titular | ✅ Issue Policy Guard STG `b431ad23`, verificado: corpus real 81/88 sin fallos del algoritmo | **Emisión** | Sub-workflow `Issue Policy Guard`, no el bot. La línea contradictoria del prompt va aparte, a tu firma |
 | 289 | Si la póliza ya está pagada, el bot lo dice en vez de «no hay liga» | ✅ STG bot `4b1bf2f4`, verificado: solo los dos consumidores, prompt intacto | Pagos (solo lectura de estado) | Caso «pagada» no comprobable en STG (Django STG da 503); se acredita con la primera pagada real de PROD |
+| 552 | Si el cliente pide la liga antes de tener póliza, el bot responde tu texto («Aún me faltan algunos datos tuyos para poder emitir, y después te genero el link de pago.») y sigue, en vez de «No hay una liga disponible» | ✅ STG bot `3ca60723`, verificado: ejecución 80987 con el carril completo y memoria; el turno siguiente retoma la selección | No (texto tuyo literal, ya decidido) | Carril calcado del guard del descuento (13 nodos). Reconoce también las formas de usted |
 | 565 | El mensaje de emisión ya no dice «El link expira en 24 horas» | ✅ Medido: 0 apariciones en STG `85837dbf`; 1 en PROD `a5b88be9` | Texto del mensaje de emisión | Cambio de una frase |
 
 ## En curso en STG (todavía no listos)
 
 | # | Qué | Estado |
 |---|---|---|
-| — | Nada en curso en este momento | — |
+| 479 | El detector de jailbreak escanea solo lo que escribe el cliente; una foto sin texto no pasa por él | En curso (handoff `025df6ee` + respuesta a duda `d8f8f18`) |
 
 ## Necesitan tu firma de texto
 
