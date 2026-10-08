@@ -19,6 +19,7 @@ el Arquitecto** y listo para su OK.
 | 570 | Los turnos que contesta el guardarraíl quedan en la memoria del modelo (mensaje del cliente y respuesta) | ✅ STG bot `12bdbba8`, verificado en BD: filas 11665/11666; el turno siguiente responde con esa memoria | No | **Viaja con `#463`/`#479`/`#325`** (mismo tramo) |
 | 496 | La observación de la Limitada guarda los textos completos (antes se cortaban en la primera coma y desplazaban campos) | ✅ STG bot `faa1da51`, verificado: `queryReplacement` en array (gotcha 40) | No | Las 13 filas históricas no sirven: la observación empieza de cero en PROD |
 | 261 | Ninguna URL inventada llega al cliente: solo salen las que vienen de una tool de la sesión, el PDF de su cotización o la lista fija | ✅ STG bot `affd10b4`, verificado: regresión con las 59 URLs reales de PROD intactas; la inventada del caso y una de otra sesión, quitadas | Texto de respaldo (U4 + «¿Continuamos con la contratación?») | **El texto de respaldo va a tu firma** junto con el resto del `#261` |
+| 257 | El número de atención humana vive en un solo sitio (`WA Config`) con un interruptor «hay atención humana» (hoy sí). Retirarlo será cambiar un valor, no editar 11 sitios | ✅ STG bot `f2c599f1`, verificado: 0 apariciones escritas a mano, render idéntico 10/10, mismo número que PROD | **Prompt** (los dos `systemMessage` cambian de forma, no de texto) | El texto «sin humano» queda como hueco marcado, para que lo redacte Mejoras y lo firmes |
 | 565 | El mensaje de emisión ya no dice «El link expira en 24 horas» | ✅ Medido: 0 apariciones en STG `85837dbf`; 1 en PROD `a5b88be9` | Texto del mensaje de emisión | Cambio de una frase |
 
 ## En curso en STG (todavía no listos)
@@ -39,6 +40,10 @@ Arquitecto contra el prompt vivo, acuse `91989ca`):
 | 261 | La regla «solo URLs que devuelva una tool» va en el grafo. Texto honesto cuando no hay documento; el deducible se responde con el dato |
 | 543 | Tres casos cuando «el VIN ya tiene póliza»: nuestra vigente (postventa), vencida (emitir nueva) o de otra agencia. b2 y c2 dependen de una prueba con Quálitas |
 | 340 | Segunda mitad: reconocer la corrección del cliente y no discutir (K1, K3, K4) |
+
+**Contradicción en el prompt vigente (hallazgo del 7 oct):** en `RENOVACIÓN DE PÓLIZA`, el prompt prohíbe ofrecer «el
+WhatsApp de renovaciones antiguo (5537511678)», que es **el mismo número** que el bot da como atención humana en 11 sitios.
+Hay que redactar de nuevo esa línea.
 
 **`#553`** (oferta de la competencia): texto entregado el 5 oct; falta **tu decisión sobre el C9** (el bot dijo «no
 estás obligada, puedes cancelar» con seguros de agencia o financiamiento).
