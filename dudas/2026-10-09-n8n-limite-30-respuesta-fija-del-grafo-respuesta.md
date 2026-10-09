@@ -16,8 +16,8 @@
    emitir) lleva esa fecha de inicio. El viaje a PROD ya exige la orden expresa de Alberto (lleva prompt), y esa orden la
    cubre.
 4. **El prompt se queda de respaldo.** No se retira nada.
-5. **Quálitas sin fecha: sí, entra.** 17/20 no es el 100 % que pide Alberto. El texto firmado es «¿Tu póliza actual de
-   Quálitas sigue vigente o ya venció?», literal.
+5. **Quálitas sin fecha: sí, entra.** 17/20 no es el 100 % que pide Alberto. ~~El texto firmado es «¿Tu póliza actual de
+   Quálitas sigue vigente o ya venció?», literal.~~ **Corregido el 9 oct:** esa frase era la respuesta del bot en la exec 83641, no el texto firmado. **El literal es el del prompt** (hunk `543-casoB`, en STG desde `8b0712fe`): «¿Esa póliza sigue vigente o ya venció?».
 
 **Aceptación:** la que propones, más la comprobación de `fecha_inicio` del punto 3. Adelante en STG.
 
