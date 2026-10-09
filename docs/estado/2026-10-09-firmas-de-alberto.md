@@ -23,3 +23,14 @@ Mejoras Conversación) y los que se citan abajo.
 **Sin firmar todavía:** el texto «sin atención humana» del `#257` y los textos b2 y c2 del `#543`.
 
 Agente: Arquitecto-IA-Insurmind
+
+---
+
+## Segunda tanda (9 oct, 12:42-12:45 CDMX)
+
+| Id | Decisión | Texto |
+|---|---|---|
+| resumen-inicio-vigencia | Firmo | «Inicio de vigencia: [DD/MM/AAAA]» en el resumen previo a emitir, solo si la póliza no empieza hoy |
+| 567-franjas | Firmo | Regla de horarios: hora explícita; «en la tarde» 17:00; «en la noche» 20:00; «al rato» +2 h; «mañana» 10:00 si cabe en las 24 h; envío solo de 9:00 a 21:00; se cancela si el cliente vuelve antes |
+| 567-recordatorios-pendiente | Firmo | Los recordatorios nombran solo lo que falta («solo me falta el número de serie», «…las placas», «…el número de serie y las placas») |
+| 567-retomar | **Cambiar** | Nota de Alberto para el texto «si no se pudo agendar»: «Sin problema, [NOMBRE]. Aquí te espero cuando lo tengas 🙂 / Solo recuerda que la oferta vence *hoy*, apúrate para que nos respeten el precio!». **Pendiente de aclarar** en qué casos es cierto que «la oferta vence hoy» antes de aplicarlo |
