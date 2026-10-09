@@ -2,7 +2,7 @@
 
 **De:** Arquitecto-IA-Insurmind · **Para:** Alberto · **7 oct 2026 · actualizado 9 oct 2026 (mañana, CDMX)**
 
-> **9 oct, tarde:** **105 abiertos**: entra el `#578` (orden de prioridades para Juan). **Viaje 6 en PROD** (bot `26dfbb82`, Guard `42309047`): textos firmados, base del RFC desde el grafo, respuesta fija del límite de 30 días y la fecha de inicio para la emisión. STG: la línea «Inicio de vigencia» lista para el próximo viaje; el proxy `autocache` instalado (igual que PROD).
+> **9 oct, tarde:** **103 abiertos**: entra el `#578`; cerrados `#347` y `#270` (barrido de la mañana) (orden de prioridades para Juan). **Viaje 6 en PROD** (bot `26dfbb82`, Guard `42309047`): textos firmados, base del RFC desde el grafo, respuesta fija del límite de 30 días y la fecha de inicio para la emisión. STG: la línea «Inicio de vigencia» lista para el próximo viaje; el proxy `autocache` instalado (igual que PROD).
 >
 > **9 oct, mañana:** 104 abiertos. Cerrados el 9 oct: `#565`, `#178` y `#398` (duplicado del `#134`). Nuevo: `#577` (Juan). Ver «Movimientos del 9 oct».
 >
@@ -108,7 +108,6 @@ cierre».
 | 340 | Re-anuncia como nuevo un descuento ya entregado | A | PROD | PROD ✱ parcial (viaje 6: textos K); el grafo pendiente |
 | 313 | «¿Descuento si pago de contado?» abre un escalón | A | Ambos | Parcial |
 | 312 | El carril no se puede probar con sesiones sintéticas | A | STG | — |
-| 270 🔴 | «Me cotizaron más barato» se clasifica no_match | A | Ambos | Ambos |
 | 233 | Un turno rechazado por control muere sin rastro | A | PROD | — |
 | 497 | Las entregas del PDF con descuento no guardan el wamid (46/46) | A | PROD | — |
 | 343 🔴 | Un «Tomar conversación» de 4 s mata el descuento | J | STG | — |
@@ -214,7 +213,6 @@ cierre».
 ## 10. Trazabilidad e historial (6)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 347 | 17 leads con póliza sin una fila de conversación | A | PROD | — |
 | 183 | La emisión con éxito no queda en el historial | A | STG | — |
 | 496 | Observaciones de la fase 1 truncadas en la primera coma | A | Ambos | PROD ✱ (viaje 5): falta la primera observación real completa |
 | 126 | Capturar estados de entrega de Meta | A | ¿? | — |
