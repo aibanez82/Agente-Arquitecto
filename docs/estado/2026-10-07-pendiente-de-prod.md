@@ -7,7 +7,8 @@ el Arquitecto** y listo para su OK.
 
 > ⏸️ **PAUSA DE PROD (Alberto, 8 oct):** «no quiero ir a PROD si no funciona en STG lo de la foto», confirmado en la
 > sesión del Arquitecto para **todos** los viajes. **Hecho:** viaje 2 (`#552` + `#289`) en PROD `fe9c5213`, verificado.
-> **Parados hasta que el lector de tarjetas (`#348`) lea bien la foto girada en STG:** viajes 1, 3, 4 y 5. El viaje 3
+> **La foto girada ya funciona en STG** (`18073441`, ejecuciones 82479/82482: lee `MA6CB6AD8HT043524`/`LSY412A`, «son correctos» → `confirmado` → `grupo2.serie`).
+> **Viaje 1 (`#563` + `#472` + `#348`) ordenado por Alberto** («ok, viaje 1 a PROD», 8 oct): orden `Agente-n8n` `16518f28`. Siguen parados hasta su OK los viajes 3, 4 y 5. El viaje 3
 > tiene la prueba en seco limpia contra `fe9c5213` (406 → 415 nodos).
 
 ## Paquetes listos para tu OK
