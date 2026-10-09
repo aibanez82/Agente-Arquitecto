@@ -32,10 +32,9 @@ cierre».
 
 | Responsable | Issues |
 |---|---|
-| Alberto | 51 |
+| Alberto | 52 |
 | Juan | 50 |
 | Compartido | 2 |
-| Sin asignar | 1 |
 
 | Problema en | Issues |
 |---|---|
@@ -57,7 +56,6 @@ cierre».
 | Alberto | 54 |
 | Juan | 49 |
 | Compartido | 2 |
-| Sin asignar | 1 |
 
 | Problema en | Issues |
 |---|---|
@@ -187,7 +185,7 @@ cierre».
 | 285 🔴 | Teléfono sin sesión viva → cliente sin respuesta | A | Ambos | STG ✱ (bot `03b09269`), **en pausa**: Juan propone una solución más sencilla |
 | 542 | Tras declinar o derivar, el seguimiento insiste | A | PROD | — |
 | 464 | Tras derivar por VIN con póliza, los checkpoints siguen | A | PROD | — (espera la decisión de Juan en el `#577`) |
-| 567 | «Te lo mando en la tarde» y los recordatorios insisten a los 30 min | sin asignar | PROD | — |
+| 567 | «Te lo mando en la tarde» y los recordatorios insisten a los 30 min | A | PROD | — |
 | 223 | Iniciativa: hablarle en la fecha que pide | J | ¿? | — |
 | 163 | Invalidar seguimientos de la cotización origen | J | STG | STG |
 | 124 | `quote_followup_15m` para mensuales y anuales | J | PROD | — |
@@ -392,7 +390,7 @@ Se midieron en vivo los 35 issues con algún arreglo declarado. Estos siguen abi
 
 ## Para limpiar el tracker (estado tras los cierres)
 
-- **`#567`** no tiene responsable (`#568` lo cerró Juan el 8 oct).
+- ~~`#567` sin responsable~~ → asignado a Alberto el 8 oct (`#568` lo cerró Juan).
 - ~~`#206` y `#461` son el mismo problema~~ → `#206` cerrado como duplicado.
 - ~~`#405`~~ → cerrado como superado por el `#551`.
 - ~~`#554`~~ → cerrado el 8 oct.
