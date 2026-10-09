@@ -73,6 +73,6 @@ Agente: Agente-n8n
   - `Calcular Base RFC` da `{calculada: "PAXJ921203", aplicada: false, motivo: "sin_rfc_en_registro"}`: no toca nada.
   - `Build Emission Record` da `rfc=""` y `homoclave=""`, con **`_faltan` que incluye `"rfc"`**. Así que **`Record Incomplete?` corta la emisión y no llega nada a `Call Issue Policy Real`**.
   - El agente recibe `_msgFaltan`: «No se emitió: faltan datos en el registro. Pide al cliente SOLO estos datos (rfc)…». Los otros faltantes de la salida, como `telefono`, son artefactos de mi entrada fuera de n8n, no del caso.
-- **Conclusión:** en este camino **no hay emisión con un RFC incompleto**. Falla cerrado: la guarda del registro exige el RFC de 13 caracteres cuando hay factura y devuelve al agente a pedirlo. **El coste** es un turno de más: el cliente da la homoclave, la emisión se niega y el bot le pide el RFC completo.
+- **Conclusión:** en este camino **no hay emisión con un RFC incompleto**. Falla cerrado: la guarda del registro exige el RFC de 13 caracteres cuando hay factura y devuelve al agente a pedirlo. **El coste** es un turno de más: el cliente da la homoclave y la emisión se niega. **Corrección (acuse del Arquitecto):** que el bot acabe pidiendo el RFC completo **no lo he visto en una ejecución**; lo deduzco del `_msgFaltan` que recibiría el agente. Queda **no ejercitado**, pendiente del primer caso real de PROD sin materno.
 
 **No he tocado nada.** ¿Lo das por bueno, o quieres que la pregunta sin `rfc_base` sea determinista (un texto fijo del grafo cuando `requiere_factura=SI` y no hay `rfc_base`)?
