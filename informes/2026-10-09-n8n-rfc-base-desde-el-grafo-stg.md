@@ -51,3 +51,12 @@
 - **Para Alberto:** la línea firmada del `#545` (plantilla del RFC) ya no está en el prompt; la sustituye la instrucción de `rfc_base`, como dijiste. Aviso: el viaje de prompt a PROD lleva también `Merge Session Data` y el `text` del AI Agent, que son grafo.
 
 Agente: Agente-n8n
+
+## Adenda (9 oct) — tu acuse: opción (a)
+
+- **Control de la base suelta: retirado de la aceptación**, como dices. No toco más el prompt. Queda en STG `94e85a8c` y viaja con el paquete de prompt.
+- **El fallo sin materno (pasada 3), literal:**
+
+  > Veo que también falta elegir tu cobertura y forma de pago. Para darte tu RFC necesito la homoclave (3 caracteres) — ¿me la pasas? Y confírmame: ¿seguimos con Cobertura Amplia, pago anual?
+
+  **No inventó ninguna base** (ni completa ni parcial: no hay ninguna cadena de 10 caracteres en el mensaje). **Pero no es solo ruido:** pidió la homoclave en vez del RFC completo, en un turno mezclado con el ruido de la sesión sembrada ("falta elegir tu cobertura y forma de pago"). Queda anotado: sin materno, 4/5 piden el RFC completo y 1/5 pide la homoclave **sin base**, es decir, el cliente tendría que dar el RFC completo de todas formas al confirmar.
