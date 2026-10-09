@@ -60,3 +60,19 @@ Agente: Agente-n8n
   > Veo que también falta elegir tu cobertura y forma de pago. Para darte tu RFC necesito la homoclave (3 caracteres) — ¿me la pasas? Y confírmame: ¿seguimos con Cobertura Amplia, pago anual?
 
   **No inventó ninguna base** (ni completa ni parcial: no hay ninguna cadena de 10 caracteres en el mensaje). **Pero no es solo ruido:** pidió la homoclave en vez del RFC completo, en un turno mezclado con el ruido de la sesión sembrada ("falta elegir tu cobertura y forma de pago"). Queda anotado: sin materno, 4/5 piden el RFC completo y 1/5 pide la homoclave **sin base**, es decir, el cliente tendría que dar el RFC completo de todas formas al confirmar.
+
+## Adenda 2 (9 oct) — sin materno, repetido en sesiones limpias, y lo que llegaría a la emisión (nada tocado)
+
+**Sesiones limpias.** Cotización 2345 (TAHOE 2020, Amplia y contado ya elegidos: sin el ruido de «falta elegir tu cobertura»), N=5.
+- **3/5** piden el RFC completo.
+- **2/5** vuelven a pedir la homoclave, sin inventar ninguna base. Ejemplo: «¿me compartes tu homoclave (los últimos 3 caracteres)? …».
+
+**Medición, como pediste.** Repetí N=5 con un tercer turno en el que el cliente da solo la homoclave («mi homoclave es AB1»).
+- **Qué guarda `Save Group2 Progress`:** en las **5/5**, `grupo2.rfc` sigue siendo `"N/A"`, con `requiere_factura="SI"`. **El modelo no guarda ningún RFC inventado** (ni de 10 ni de 13 caracteres).
+- **Qué llegaría a `Call Issue Policy Real`:** ejecuté fuera de n8n los nodos **vivos** del IPG STG `b431ad23` sobre esos registros.
+  - `Calcular Base RFC` da `{calculada: "PAXJ921203", aplicada: false, motivo: "sin_rfc_en_registro"}`: no toca nada.
+  - `Build Emission Record` da `rfc=""` y `homoclave=""`, con **`_faltan` que incluye `"rfc"`**. Así que **`Record Incomplete?` corta la emisión y no llega nada a `Call Issue Policy Real`**.
+  - El agente recibe `_msgFaltan`: «No se emitió: faltan datos en el registro. Pide al cliente SOLO estos datos (rfc)…». Los otros faltantes de la salida, como `telefono`, son artefactos de mi entrada fuera de n8n, no del caso.
+- **Conclusión:** en este camino **no hay emisión con un RFC incompleto**. Falla cerrado: la guarda del registro exige el RFC de 13 caracteres cuando hay factura y devuelve al agente a pedirlo. **El coste** es un turno de más: el cliente da la homoclave, la emisión se niega y el bot le pide el RFC completo.
+
+**No he tocado nada.** ¿Lo das por bueno, o quieres que la pregunta sin `rfc_base` sea determinista (un texto fijo del grafo cuando `requiere_factura=SI` y no hay `rfc_base`)?
