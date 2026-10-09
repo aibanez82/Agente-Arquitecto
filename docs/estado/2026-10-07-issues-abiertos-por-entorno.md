@@ -1,8 +1,10 @@
-# Issues abiertos de HYL-WAI por caso de uso y entorno — foto del 7 oct 2026, actualizada el 8 oct
+# Issues abiertos de HYL-WAI por caso de uso y entorno — foto del 7 oct 2026, actualizada el 9 oct
 
-**De:** Arquitecto-IA-Insurmind · **Para:** Alberto · **7 oct 2026 · actualizado 8 oct 2026 (noche, CDMX)**
+**De:** Arquitecto-IA-Insurmind · **Para:** Alberto · **7 oct 2026 · actualizado 9 oct 2026 (mañana, CDMX)**
 
-> **8 oct:** **106 abiertos**. Han entrado `#570`, `#571` y `#574`; se han cerrado `#554` y `#568` (Juan). Los viajes 1 a 5
+> **9 oct:** **104 abiertos**. Cerrados el 9 oct: `#565`, `#178` y `#398` (duplicado del `#134`). Nuevo: `#577` (Juan). Ver «Movimientos del 9 oct».
+>
+> **8 oct:** 106 abiertos. Han entrado `#570`, `#571` y `#574`; se han cerrado `#554` y `#568` (Juan). Los viajes 1 a 5
 > están en PROD, verificados en vivo por el Arquitecto, y sus issues pasan a `PROD ✱` a la espera del caso real. Ver
 > «Movimientos del 8 oct» y el **plan** al final.
 **Fuente:** `aguayo-co/HYL-WAI`. Foto inicial: **120** issues abiertos (7 oct por la tarde). **Tras los cierres del
@@ -26,10 +28,32 @@ cierre».
   - `Parcial`.
 - 🔴 = criticidad crítica por label o por título.
 
-## Totales (8 oct: 106)
+## Totales (9 oct: 104)
 
 | Responsable | Issues |
 |---|---|
+| Alberto | 51 |
+| Juan | 50 |
+| Compartido | 2 |
+| Sin asignar | 1 |
+
+| Problema en | Issues |
+|---|---|
+| PROD | 43 |
+| Ambos | 25 |
+| No consta | 23 |
+| STG | 13 |
+
+| Arreglo | Issues |
+|---|---|
+| Sin arreglo | 58 |
+| Parcial | 16 |
+| Solo PROD (falta caso real) | 13 |
+| Solo STG | 9 |
+| En los dos entornos (falta acreditar) | 5 |
+| Firmado, en curso | 3 |
+
+---|---|
 | Alberto | 54 |
 | Juan | 49 |
 | Compartido | 2 |
@@ -77,11 +101,11 @@ cierre».
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
 | 563 | El carril vuelve a pedir el VIN confirmado por foto | A | PROD | PROD ✱ (viaje 1, bot `b7caf68b`); falta la primera foto real |
-| 553 | Oferta de la competencia: pedir precio y cobertura | A | PROD | — |
+| 553 | Oferta de la competencia: pedir precio y cobertura | A | PROD | Firmado el C9; en el prompt de STG |
 | 494 | Un «Sí» para emitir dispara un descuento no pedido | A | ¿? | Ambos |
-| 462 | Aplica el descuento y no dice la cifra | A | PROD | Parcial |
+| 462 | Aplica el descuento y no dice la cifra | A | PROD | Parcial ✱: «PRECIO ORIGINAL» en `main` (Juan); pedido que sea fijo. La cifra en el chat no es defecto (decisión de Alberto). Queda la respuesta a la protesta |
 | 456 | Convenio ISSFAM/gubernamental → carril de descuentos | A | Ambos | Parcial |
-| 340 | Re-anuncia como nuevo un descuento ya entregado | A | PROD | Parcial |
+| 340 | Re-anuncia como nuevo un descuento ya entregado | A | PROD | Firmado; textos K en el prompt de STG; el grafo (flag de descuento comunicado) pendiente |
 | 313 | «¿Descuento si pago de contado?» abre un escalón | A | Ambos | Parcial |
 | 312 | El carril no se puede probar con sesiones sintéticas | A | STG | — |
 | 270 🔴 | «Me cotizaron más barato» se clasifica no_match | A | Ambos | Ambos |
@@ -105,19 +129,18 @@ cierre».
 |---|---|---|---|---|
 | 472 🔴 | Persiste datos del vehículo no confirmados y pasan a la póliza | A | ¿? | PROD ✱ (viaje 1: regla sí/no/ambiguo y `aviso_serie`); falta N≥20 y revisar los 3 rechazos falsos |
 | 469 🔴 | VIN de foto mal leído y nadie lo comprueba | A | PROD | PROD ✱ (viaje 1: lector `claude-sonnet-5` sobre la guarda determinista); falta el caso real |
-| 545 | La regla del RFC calcula RFC inválidos (dos consonantes) | A | Ambos | Parcial ✱: la base la calcula el grafo (Issue Policy Guard PROD `9aa96337`, viaje 4); la línea contradictoria del prompt espera tu firma |
+| 545 | La regla del RFC calcula RFC inválidos (dos consonantes) | A | Ambos | PROD ✱ (grafo de emisión) + STG ✱ (la base del RFC llega al bot, 5/5); el prompt viaja con el paquete |
 | 475 | Rechaza VINs válidos inventando errores | A | ¿? | Parcial |
-| 543 | Póliza vencida tratada como renovación | A | PROD | — |
+| 543 | Póliza vencida tratada como renovación | A | PROD | STG ✱ parcial (R0/b1/c1 firmados; a1/a2 esperan el `#566`; b2/c2 esperan la prueba con Quálitas) |
 | 348 | Extract VIN Vision en un modelo de hace una generación | A | Ambos | PROD ✱ (viaje 1). Acreditado en STG con la foto girada de Alberto (ejecuciones 82479/82482); falta la primera foto real de PROD |
 | 534 | TipoRegla 70/31 en el XML de Quálitas | J | Ambos | Parcial |
 | 307 🔴 | La barrera del estado de póliza depende del Intent Router | J | Ambos | — |
 | 280 | Emisión web en STG no completa | J | STG | — |
 
-## 3. Cobro: liga de pago, recibos y recordatorios (9)
+## 3. Cobro: liga de pago, recibos y recordatorios (8)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
 | 552 | «Mándame la liga» antes de emitir deja sin camino | A | Ambos | PROD ✱ (viaje 2, `fe9c5213`); falta el caso real |
-| 565 | Quitar «El link expira en 24 horas» | A | Ambos | PROD ✱ (viaje 5, `9c813fc3`): la frase aparece 0 veces. **Cerrable** |
 | 289 | `payment-link/ensure` no distingue «sin liga» de «pagada» | A | Ambos | PROD ✱ (viaje 2); el caso «ya pagada» se acredita con la primera póliza pagada real |
 | 329 | El cron de ligas no reintenta (costó una venta) | J | PROD | — |
 | 364 | Recuperación cross-day de Payment Links | J | PROD | — |
@@ -147,27 +170,28 @@ cierre».
 ## 6. Qué dice el bot: contenido, cifras y respuestas (10)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 261 🔴 | Fabrica la URL de un documento que no existe | A | STG | — |
-| 461 | Ofrece Cobertura Limitada sin que la pidan (67/81) | A | PROD | — |
-| 544 | La KB dice que la RC cubre en EUA/Canadá | A | PROD | — |
+| 261 🔴 | Fabrica la URL de un documento que no existe | A | STG | STG ✱ (guarda + textos firmados en el prompt); PROD cuando STG esté al 100 % |
+| 461 | Ofrece Cobertura Limitada sin que la pidan (67/81) | A | PROD | STG ✱ (paquete de prompt firmado, bot `94e85a8c`); PROD cuando STG esté al 100 % |
+| 544 | La KB dice que la RC cubre en EUA/Canadá | A | PROD | PROD ✱ (9 oct, KB 113/43/114, validado por Alberto en STG exec 83209); falta la primera pregunta real |
 | 499 | Salida vacía del agente: mensaje sin contestar | A | ¿? | Ambos |
-| 473 | Se niega a decir el correo registrado | A | PROD | Parcial |
-| 418 | No reconoce la despedida y re-oferta | A | PROD | — |
+| 473 | Se niega a decir el correo registrado | A | PROD | STG ✱ (firmado); viaja con el paquete de prompt |
+| 418 | No reconoce la despedida y re-oferta | A | PROD | Firmado; grafo (despedida determinista) pendiente en STG |
 | 245 | «No pude recuperar tu cotización» con la cotización devuelta | A | Ambos | Ambos |
 | 486 | Análisis de coherencia del system prompt (informe) | A | ¿? | — |
 | 333 | La KB excluye conducir sin licencia (solo aplica a Chofer APP) | J | Ambos | — |
 | 337 | Exponer el valor convenido para contestarlo | J | Ambos | Parcial |
 
-## 7. Seguimientos y cierre de conversación (7)
+## 7. Seguimientos y cierre de conversación (8)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 285 🔴 | Teléfono sin sesión viva → cliente sin respuesta | A | Ambos | — |
+| 285 🔴 | Teléfono sin sesión viva → cliente sin respuesta | A | Ambos | STG ✱ (bot `03b09269`), **en pausa**: Juan propone una solución más sencilla |
 | 542 | Tras declinar o derivar, el seguimiento insiste | A | PROD | — |
-| 464 | Tras derivar por VIN con póliza, los checkpoints siguen | A | PROD | — |
+| 464 | Tras derivar por VIN con póliza, los checkpoints siguen | A | PROD | — (espera la decisión de Juan en el `#577`) |
 | 567 | «Te lo mando en la tarde» y los recordatorios insisten a los 30 min | sin asignar | PROD | — |
 | 223 | Iniciativa: hablarle en la fecha que pide | J | ¿? | — |
 | 163 | Invalidar seguimientos de la cotización origen | J | STG | STG |
 | 124 | `quote_followup_15m` para mensuales y anuales | J | PROD | — |
+| 577 | Dejar de mandar checkpoints cuando el bot ya dijo que no se puede emitir y derivó (nuevo, 9 oct) | J | PROD | — |
 
 ## 8. Guardarraíl antijailbreak (4)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
@@ -197,14 +221,12 @@ cierre».
 | 127 | Persistir y mostrar estados de entrega | J | ¿? | — |
 | 276 | `fecha_actualizacion` deja de registrar cambios | J | STG | — |
 
-## 11. Infraestructura, seguridad y arquitectura (13)
+## 11. Infraestructura, seguridad y arquitectura (11)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 398 | n8n se conecta a PROD como owner | A | PROD | — |
 | 134 | Aislar n8n del owner | A | PROD | — |
 | 238 | Desacoplar n8n de Postgres | A | Ambos | — |
 | 257 | Número de atención humana escrito a mano en 8 nodos | A | Ambos | — |
-| 178 | Docs divergentes entre stg y main | A | ¿? | Parcial |
 | 526 | PDF de cotización públicos y con nombre predecible | J | PROD | — |
 | 406 | Autenticar `/api/emitir-externo/` | J | PROD | — |
 | 130 | `N8N_TOKEN` por defecto: rotar | J | PROD | — |
@@ -230,6 +252,26 @@ cierre».
 | 441 | Logo de Quálitas en blanco en el PDF | J | ¿? | — |
 | 560 | Reorganizar el detalle de Lead en Wagtail | J | ¿? | Parcial (PR #569 a `stg`) |
 | 571 | Wagtail: seguimientos, Recovery y recordatorios en el perfil del Lead (nuevo) | J | ¿? | — |
+
+---
+
+## Movimientos del 9 oct
+
+**A PROD, verificado por el Arquitecto:** `#544` (base de conocimiento sobre EUA y Canadá: el 113 reescrito con la RC por
+el endoso de bienvenida, el 43 retirado y el 114 con la excepción). Validado por Alberto desde su teléfono en STG.
+
+**Firmas de Alberto:** las diez propuestas firmadas (`docs/estado/2026-10-09-firmas-de-alberto.md`). El paquete de prompt
+está en STG (bot `94e85a8c`), con la base del RFC calculada por el grafo. **No viaja a PROD hasta que esté al 100 % en
+STG** (decisión de Alberto). Quedan dos defectos previos por arreglar en STG: la pregunta repetida sobre la aseguradora
+y que el bot enseña al cliente su cálculo del límite de 30 días.
+
+**Cerrados:** `#565` (frase de las 24 h fuera del bot en PROD), `#178` (paridad de docs en Agente-n8n, PR #110) y `#398`
+(duplicado del `#134`).
+**En pausa:** `#285`, completo en STG, a la espera de la propuesta de Juan.
+**Nuevo:** `#577` (Juan), dejar de mandar checkpoints tras una derivación. El `#464` espera su decisión.
+**Pedido a Juan en el `#462`:** que el «PRECIO ORIGINAL» del PDF sea fijo (sale de la primera cotización, no se recalcula).
+**Firmas:** la página [Firmas del bot](https://claude.ai/artifact/G4D8psUfUYCYFbSMeheHs9) queda como bandeja permanente:
+cada propuesta nueva entra allí, con su caso real.
 
 ---
 
@@ -330,14 +372,13 @@ Se midieron en vivo los 35 issues con algún arreglo declarado. Estos siguen abi
 | 475 | El marcador `[SERIE_FORMATO]` no existe ni en STG ni en PROD |
 | 473, 462 | El cambio principal sigue solo en STG |
 | 344 | Falta el dictamen de diseño: el guard sigue tumbando la respuesta entera |
-| 340 | La segunda mitad (insistir cuando el cliente corrige) no tiene arreglo |
+| 340 | Firmado; textos K en el prompt de STG; el grafo (flag de descuento comunicado) pendiente |
 | 337 | Persistir la suma asegurada al emitir: hacerlo o descartarlo por escrito |
 | 304 | Los leads resultado siguen naciendo en `LEAD_CREADO`; no existe `CommercialLead` |
 | 301 | En PROD solo está la regla 4. Siguen activos el 30 %, el VIN obligatorio para el 40 % y el tope 3 |
 | 290 | `GET /api/v1/dashboard/funnel` no existe |
 | 289 | PROD ✱ (viaje 2); el caso «ya pagada» se acredita con la primera póliza pagada real |
 | 205 | Solo hay red en n8n; falta la regla en Django |
-| 178 | `gotchas-n8n.md` diverge entre `main` y `stg` |
 | 534 | No comprobable: falta que Quálitas confirme reportes y PDF |
 | 128 | Superado en la práctica, pero es el tracker C7 de Juan (`#140`): acordarlo con él |
 
