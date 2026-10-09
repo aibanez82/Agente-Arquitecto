@@ -7,9 +7,7 @@ el Arquitecto** y listo para su OK.
 
 > ⏸️ **PAUSA DE PROD (Alberto, 8 oct):** «no quiero ir a PROD si no funciona en STG lo de la foto», confirmado en la
 > sesión del Arquitecto para **todos** los viajes. **Hecho:** viaje 2 (`#552` + `#289`) en PROD `fe9c5213`, verificado.
-> **La foto girada ya funciona en STG** (`18073441`, ejecuciones 82479/82482: lee `MA6CB6AD8HT043524`/`LSY412A`, «son correctos» → `confirmado` → `grupo2.serie`).
-> **Viaje 1 (`#563` + `#472` + `#348`) ordenado por Alberto** («ok, viaje 1 a PROD», 8 oct): orden `Agente-n8n` `16518f28`. Siguen parados hasta su OK los viajes 3, 4 y 5. El viaje 3
-> tiene la prueba en seco limpia contra `fe9c5213` (406 → 415 nodos).
+> **Viajes 1 a 5 en PROD (8 oct, verificados en vivo por el Arquitecto):** viaje 2 → bot `fe9c5213`; viaje 1 (`#563`+`#472`+`#348`) → `b7caf68b`; viaje 3 (`#325`+`#463`+`#479`+`#570`) → `458024c6`; viaje 4 (`#545`) → Issue Policy Guard `9aa96337`; viaje 5 (`#496`+`#565`) → bot **`9c813fc3`**. Acuses en `informes/2026-10-09-n8n-prod-viaje-*-acuse.md`. **Pendiente:** lo que necesita firma de texto (`#261`, `#257` y los de la sesión de firmas).
 
 ## Paquetes listos para tu OK
 
