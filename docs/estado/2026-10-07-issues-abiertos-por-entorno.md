@@ -2,7 +2,9 @@
 
 **De:** Arquitecto-IA-Insurmind · **Para:** Alberto · **7 oct 2026 · actualizado 9 oct 2026 (mañana, CDMX)**
 
-> **9 oct:** **104 abiertos**. Cerrados el 9 oct: `#565`, `#178` y `#398` (duplicado del `#134`). Nuevo: `#577` (Juan). Ver «Movimientos del 9 oct».
+> **9 oct, tarde:** **105 abiertos**: entra el `#578` (orden de prioridades para Juan). **Viaje 6 en PROD** (bot `26dfbb82`, Guard `42309047`): textos firmados, base del RFC desde el grafo, respuesta fija del límite de 30 días y la fecha de inicio para la emisión. STG: la línea «Inicio de vigencia» lista para el próximo viaje; el proxy `autocache` instalado (igual que PROD).
+>
+> **9 oct, mañana:** 104 abiertos. Cerrados el 9 oct: `#565`, `#178` y `#398` (duplicado del `#134`). Nuevo: `#577` (Juan). Ver «Movimientos del 9 oct».
 >
 > **8 oct:** 106 abiertos. Han entrado `#570`, `#571` y `#574`; se han cerrado `#554` y `#568` (Juan). Los viajes 1 a 5
 > están en PROD, verificados en vivo por el Arquitecto, y sus issues pasan a `PROD ✱` a la espera del caso real. Ver
@@ -99,11 +101,11 @@ cierre».
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
 | 563 | El carril vuelve a pedir el VIN confirmado por foto | A | PROD | PROD ✱ (viaje 1, bot `b7caf68b`); falta la primera foto real |
-| 553 | Oferta de la competencia: pedir precio y cobertura | A | PROD | Firmado el C9; en el prompt de STG |
+| 553 | Oferta de la competencia: pedir precio y cobertura | A | PROD | PROD ✱ parcial (viaje 6: C9); C1-C8 pendientes |
 | 494 | Un «Sí» para emitir dispara un descuento no pedido | A | ¿? | Ambos |
 | 462 | Aplica el descuento y no dice la cifra | A | PROD | Parcial ✱: «PRECIO ORIGINAL» en `main` (Juan); pedido que sea fijo. La cifra en el chat no es defecto (decisión de Alberto). Queda la respuesta a la protesta |
 | 456 | Convenio ISSFAM/gubernamental → carril de descuentos | A | Ambos | Parcial |
-| 340 | Re-anuncia como nuevo un descuento ya entregado | A | PROD | Firmado; textos K en el prompt de STG; el grafo (flag de descuento comunicado) pendiente |
+| 340 | Re-anuncia como nuevo un descuento ya entregado | A | PROD | PROD ✱ parcial (viaje 6: textos K); el grafo pendiente |
 | 313 | «¿Descuento si pago de contado?» abre un escalón | A | Ambos | Parcial |
 | 312 | El carril no se puede probar con sesiones sintéticas | A | STG | — |
 | 270 🔴 | «Me cotizaron más barato» se clasifica no_match | A | Ambos | Ambos |
@@ -127,9 +129,9 @@ cierre».
 |---|---|---|---|---|
 | 472 🔴 | Persiste datos del vehículo no confirmados y pasan a la póliza | A | ¿? | PROD ✱ (viaje 1: regla sí/no/ambiguo y `aviso_serie`); falta N≥20 y revisar los 3 rechazos falsos |
 | 469 🔴 | VIN de foto mal leído y nadie lo comprueba | A | PROD | PROD ✱ (viaje 1: lector `claude-sonnet-5` sobre la guarda determinista); falta el caso real |
-| 545 | La regla del RFC calcula RFC inválidos (dos consonantes) | A | Ambos | PROD ✱ (grafo de emisión) + STG ✱ (la base del RFC llega al bot, 5/5); el prompt viaja con el paquete |
+| 545 | La regla del RFC calcula RFC inválidos (dos consonantes) | A | Ambos | PROD ✱ (viaje 4 en la emisión + viaje 6: la base del RFC llega al bot); falta el caso real |
 | 475 | Rechaza VINs válidos inventando errores | A | ¿? | Parcial |
-| 543 | Póliza vencida tratada como renovación | A | PROD | STG ✱ parcial (R0/b1/c1 firmados; a1/a2 esperan el `#566`; b2/c2 esperan la prueba con Quálitas) |
+| 543 | Póliza vencida tratada como renovación | A | PROD | PROD ✱ parcial (viaje 6: R0/b1/c1 y fuera el caso B; a1/a2 esperan el `#566`; b2/c2 la prueba con Quálitas) |
 | 348 | Extract VIN Vision en un modelo de hace una generación | A | Ambos | PROD ✱ (viaje 1). Acreditado en STG con la foto girada de Alberto (ejecuciones 82479/82482); falta la primera foto real de PROD |
 | 534 | TipoRegla 70/31 en el XML de Quálitas | J | Ambos | Parcial |
 | 307 🔴 | La barrera del estado de póliza depende del Intent Router | J | Ambos | — |
@@ -168,12 +170,12 @@ cierre».
 ## 6. Qué dice el bot: contenido, cifras y respuestas (10)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 261 🔴 | Fabrica la URL de un documento que no existe | A | STG | STG ✱ (guarda + textos firmados en el prompt); PROD cuando STG esté al 100 % |
-| 461 | Ofrece Cobertura Limitada sin que la pidan (67/81) | A | PROD | STG ✱ (paquete de prompt firmado, bot `94e85a8c`); PROD cuando STG esté al 100 % |
+| 261 🔴 | Fabrica la URL de un documento que no existe | A | STG | PROD ✱ (viaje 6: guarda + textos firmados); falta el caso real |
+| 461 | Ofrece Cobertura Limitada sin que la pidan (67/81) | A | PROD | PROD ✱ (viaje 6, bot `26dfbb82`: textos firmados en el prompt); el grafo (Limitada solo con permiso) pendiente |
 | 544 | La KB dice que la RC cubre en EUA/Canadá | A | PROD | PROD ✱ (9 oct, KB 113/43/114, validado por Alberto en STG exec 83209); falta la primera pregunta real |
 | 499 | Salida vacía del agente: mensaje sin contestar | A | ¿? | Ambos |
-| 473 | Se niega a decir el correo registrado | A | PROD | STG ✱ (firmado); viaja con el paquete de prompt |
-| 418 | No reconoce la despedida y re-oferta | A | PROD | Firmado; grafo (despedida determinista) pendiente en STG |
+| 473 | Se niega a decir el correo registrado | A | PROD | PROD ✱ (viaje 6); falta el caso real |
+| 418 | No reconoce la despedida y re-oferta | A | PROD | Firmado; encargo en STG (`22261499`), detrás de la comparación de modelos |
 | 245 | «No pude recuperar tu cotización» con la cotización devuelta | A | Ambos | Ambos |
 | 486 | Análisis de coherencia del system prompt (informe) | A | ¿? | — |
 | 333 | La KB excluye conducir sin licencia (solo aplica a Chofer APP) | J | Ambos | — |
@@ -185,7 +187,7 @@ cierre».
 | 285 🔴 | Teléfono sin sesión viva → cliente sin respuesta | A | Ambos | STG ✱ (bot `03b09269`), **en pausa**: Juan propone una solución más sencilla |
 | 542 | Tras declinar o derivar, el seguimiento insiste | A | PROD | — |
 | 464 | Tras derivar por VIN con póliza, los checkpoints siguen | A | PROD | — (espera la decisión de Juan en el `#577`) |
-| 567 | «Te lo mando en la tarde» y los recordatorios insisten a los 30 min | A | PROD | — |
+| 567 | «Te lo mando en la tarde» y los recordatorios insisten a los 30 min | A | PROD | Firmado (textos y regla de horarios); propuesta de «pausa de seguimiento» a Juan, junto con el `#577` |
 | 223 | Iniciativa: hablarle en la fecha que pide | J | ¿? | — |
 | 163 | Invalidar seguimientos de la cotización origen | J | STG | STG |
 | 124 | `quote_followup_15m` para mensuales y anuales | J | PROD | — |
@@ -268,6 +270,7 @@ y que el bot enseña al cliente su cálculo del límite de 30 días.
 **En pausa:** `#285`, completo en STG, a la espera de la propuesta de Juan.
 **Nuevo:** `#577` (Juan), dejar de mandar checkpoints tras una derivación. El `#464` espera su decisión.
 **Pedido a Juan en el `#462`:** que el «PRECIO ORIGINAL» del PDF sea fijo (sale de la primera cotización, no se recalcula).
+**Prioridades de Juan:** `#578`, con el orden que propone Alberto.
 **Firmas:** la página [Firmas del bot](https://claude.ai/artifact/G4D8psUfUYCYFbSMeheHs9) queda como bandeja permanente:
 cada propuesta nueva entra allí, con su caso real.
 
@@ -370,7 +373,7 @@ Se midieron en vivo los 35 issues con algún arreglo declarado. Estos siguen abi
 | 475 | El marcador `[SERIE_FORMATO]` no existe ni en STG ni en PROD |
 | 473, 462 | El cambio principal sigue solo en STG |
 | 344 | Falta el dictamen de diseño: el guard sigue tumbando la respuesta entera |
-| 340 | Firmado; textos K en el prompt de STG; el grafo (flag de descuento comunicado) pendiente |
+| 340 | PROD ✱ parcial (viaje 6: textos K); el grafo pendiente |
 | 337 | Persistir la suma asegurada al emitir: hacerlo o descartarlo por escrito |
 | 304 | Los leads resultado siguen naciendo en `LEAD_CREADO`; no existe `CommercialLead` |
 | 301 | En PROD solo está la regla 4. Siguen activos el 30 %, el VIN obligatorio para el 40 % y el tope 3 |
