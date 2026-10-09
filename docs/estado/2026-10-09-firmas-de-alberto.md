@@ -34,3 +34,9 @@ Agente: Arquitecto-IA-Insurmind
 | 567-franjas | Firmo | Regla de horarios: hora explícita; «en la tarde» 17:00; «en la noche» 20:00; «al rato» +2 h; «mañana» 10:00 si cabe en las 24 h; envío solo de 9:00 a 21:00; se cancela si el cliente vuelve antes |
 | 567-recordatorios-pendiente | Firmo | Los recordatorios nombran solo lo que falta («solo me falta el número de serie», «…las placas», «…el número de serie y las placas») |
 | 567-retomar | **Cambiar** | Nota de Alberto para el texto «si no se pudo agendar»: «Sin problema, [NOMBRE]. Aquí te espero cuando lo tengas 🙂 / Solo recuerda que la oferta vence *hoy*, apúrate para que nos respeten el precio!». **Aclarado por Alberto (9 oct):** «la oferta vence hoy se envía tanto si hubo o no descuento, porque la cotización ya la ofrecemos a un precio especial». Se aplica **siempre**, tal cual. Los otros dos textos de la tarjeta quedan firmados sin cambios |
+
+## Tercera tanda (9 oct, 13:21 CDMX)
+
+| Id | Decisión | Texto |
+|---|---|---|
+| pasarela-caida | Firmo | «Ups, la pasarela de pago está fallando en este momento, no es nada de tu lado. Tu póliza ya está emitida y reservada. Prueba de nuevo con la misma liga en unos minutos; si te vuelve a salir el error, escríbeme y te ayudo.» Solo con un error temporal de la liga y la póliza ya emitida |
