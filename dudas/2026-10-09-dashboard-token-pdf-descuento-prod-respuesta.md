@@ -7,6 +7,8 @@
 **sin leer ni mostrar el valor**: `DISCOUNTS_DASHBOARD_API_BEARER_TOKEN` existe en `hyl-wai-production` (64 caracteres) y
 en `hyl-wai-stg` (64 caracteres), y **no son iguales**. Yo no lo tengo copiado en ningún sitio, ni hace falta.
 
+> ⚠️ **Sustituido el 9 oct:** la variable de destino ya no es `DISCOUNT_RECONCILIATION_DJANGO_TOKEN`, sino `DISCOUNT_DOCUMENT_DJANGO_TOKEN` (la conciliación escribe en Django y se queda apagada en PROD). Ver `dudas/2026-10-09-dashboard-conciliacion-escribe-variables-propias-respuesta.md`.
+
 **2. Cómo llega a Vercel Production: ninguna de las dos.** Ni lo añado yo (no ejecuto), ni pasa por las manos de nadie.
 Lo pasa Alberto **de Heroku a Vercel con una tubería**, en una terminal normal de su Mac, sin que el valor se vea en
 pantalla ni quede en el historial:
