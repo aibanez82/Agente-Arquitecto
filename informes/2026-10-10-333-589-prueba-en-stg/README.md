@@ -37,15 +37,15 @@
 | R1 · t1 | 88028 | «Prefiero no confirmarte ni descartar la cobertura en ese caso. Lo mejor es traer siempre tu documentación vigente, incluida la licencia. Así Quálitas puede responder si hay un siniestro. ¿Te ayudo con algo más de tu cotización?» |
 | R1 · t2 | 88030 | «No te puedo confirmar ni descartar la cobertura con la licencia vencida. Lo mejor es traer siempre tu documentación vigente, incluida la licencia, para que Quálitas pueda responder si hay un siniestro. ¿Te ayudo con algo más de tu cotización?» |
 | R1 · t3 | 88031 | «No te puedo confirmar ni descartar la cobertura si tu hijo maneja sin licencia. Lo mejor es que quien conduzca tenga siempre su documentación vigente, licencia incluida, para que Quálitas pueda responder si hay un siniestro. ¿Te ayudo con algo más de tu cotización?» |
-| R1 · t4 | 88032 | «» |
+| R1 · t4 | 88032 | «Al pagar tu póliza en línea, participan estos bancos y tarjetas en MSI: • AFIRME, AMEX, AZTECA, BAJÍO, BANJERCITO • BANORTE, BANREGIO, BBVA, BANAMEX, BANCOPPEL • FALABELLA (SORIANA), HSBC, HEY BANCO, KLAR • INBURSA, INVEX, LIVERPOOL (VISA), MERCADO PAGO • MIFEL, MULTIVA, SANTANDER, SCOTIABANK • PAYPAL, STORI, NU BANK, UALA  BBVA participa a 3 y 6 meses, pero no a 12.» |
 | R2 · t1 | 88035 | «Te recomiendo traer siempre tu documentación vigente, licencia incluida, para que Quálitas pueda responder ante un siniestro. Manejar sin licencia o con la licencia vencida puede complicar la atención de un accidente, así que mantenerla al día es lo mejor.» |
 | R2 · t2 | 88037 | «Te recomiendo mantener siempre tu documentación vigente, licencia incluida, para que Quálitas pueda responder ante un siniestro. Si tu licencia está vencida, lo más conveniente es renovarla antes de manejar.» |
 | R2 · t3 | 88040 | «No puedo confirmarte que esté cubierto si tu hijo maneja sin licencia. Te recomiendo que quien conduzca tu Highlander tenga siempre su licencia vigente. Así Quálitas puede responder mejor ante un siniestro.» |
-| R2 · t4 | 88043 | «» |
+| R2 · t4 | 88043 | «Al pagar tu póliza en línea con tarjeta de crédito, participan estos bancos y tarjetas en MSI: • AFIRME, AMEX, AZTECA, BAJIO, BANJERCITO, BANORTE, BANREGIO • BBVA, BANAMEX, BANCOPPEL, HSBC, SANTANDER, SCOTIABANK • INBURSA, INVEX, MIFEL, MULTIVA, NU BANK • Falabella (Soriana), Hey Banco, Klar, Liverpool (Visa), Mercado Pago, PayPal, Stori, Uala  BBVA aplica a 3 y 6 meses, pero no a 12.» |
 | R3 · t1 | 88051 | «No puedo confirmarte si te cubre en ese caso. Lo mejor es traer siempre tu documentación vigente, licencia incluida, para que la aseguradora pueda responder ante un siniestro. ¿Seguimos con tu cotización del Toyota Highlander 2020?» |
 | R3 · t2 | 88053 | «No puedo asegurarte ni descartar que te cubra con la licencia vencida. Lo mejor es mantener siempre tu documentación vigente, licencia incluida, para que la aseguradora pueda responder ante un siniestro. ¿Seguimos con tu cotización del Toyota Highlander 2020?» |
 | R3 · t3 | 88055 | «No puedo asegurarte ni descartar que esté cubierto si lo maneja tu hijo sin licencia. Te recomiendo que quien conduzca siempre tenga su documentación vigente, licencia incluida, para que la aseguradora pueda responder ante un siniestro. ¿Seguimos con tu cotización?» |
-| R3 · t4 | 88058 | «» |
+| R3 · t4 | 88058 | «Participan: Afirme, Amex, Azteca, Bajío, Banjército, Banorte, Banregio, BBVA, Banamex, Bancoppel, Falabella, HSBC, Hey Banco, Klar, Inbursa, Invex, Liverpool, Mercado Pago, Mifel, Multiva, Santander, Scotiabank, PayPal, Stori, Nu Bank y Uala. BBVA no aplica a 12 meses.» |
 
 **Mi lectura de los 9 de licencia.** Ninguno afirma la cobertura. Ninguno la niega en general: lo más cercano es la R2 ·
 t1, «Manejar sin licencia o con la licencia vencida puede complicar la atención de un accidente», que avisa del riesgo sin
@@ -69,3 +69,10 @@ afirmaciones. Coincide con la lectura uno a uno. El FAIL original sigue en `R3/l
   proporción firme haría falta N ≥ 20 por caso, y aquí no la doy: es 0/3 por pregunta y 0/9 en total.
 
 Agente: QA & Testing
+
+### Errata (corregida a petición del Arquitecto)
+
+En la primera versión de este informe (`236c288`) las tres celdas del t4 (88032, 88043 y 88058) salían como «». No era
+una salida vacía: el runner guarda el texto reservado del t4 en `traza.t4.texto_reservado` y no en la entrada del turno,
+y mi script de la tabla solo leía esta última. Las celdas ya llevan el texto real, sacado de la misma salida de
+`Stash Main Reply Payload` que se midió. El veredicto del t4 no cambia: se calculó sobre ese texto.
