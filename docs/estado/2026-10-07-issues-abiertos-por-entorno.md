@@ -1,7 +1,9 @@
-# Issues abiertos de HYL-WAI por caso de uso y entorno — foto del 7 oct 2026, actualizada el 10 oct (noche)
+# Issues abiertos de HYL-WAI por caso de uso y entorno — foto del 7 oct 2026, actualizada el 10 oct (cierre del día)
 
 **De:** Arquitecto-IA-Insurmind · **Para:** Alberto · **7 oct 2026 · actualizado 10 oct 2026 (tarde, CDMX)**
 
+> **10 oct, cierre:** **97 abiertos**. **Cerrados por la tarde, con evidencia medida (8):** `#496`, `#349`, `#545`, `#469`, `#245`, `#344`, `#345` y `#588`. **Nuevos:** `#587`, `#589`, `#590` y `#591` (el `#588` se abrió y se cerró el mismo día). **Viajando a PROD** por orden de Alberto: `#333` (licencia, «ni sí ni no») y `#589` (router de pagos). Ver «Movimientos del 10 oct».
+>
 > **10 oct, noche:** **100 abiertos**. Nuevos `#585` y `#586`, los dos nuestros, salidos de la revisión de PROD de Mejoras y medidos por el Arquitecto. **Dashboard en PROD con el PDF del descuento** (`main` `313d375`; falta la prueba con la #4379). `#486`: el inventario del prompt, encargado al Agente n8n. Viaje 7 aún sin tráfico real: el último mensaje de cliente es del 9 oct a las 17:33. Ver «Movimientos del 10 oct».
 >
 > **10 oct:** **98 abiertos**. **Viaje 7 en PROD** (bot `1b869a0f`, Guard `3e196c7b`; Dashboard `d453998`). Juan cerró 8 en su auditoría final (`#259`, `#337`, `#463`, `#473`, `#479`, `#552`, `#564`, `#570`); el Arquitecto cerró el `#348`. Nuevos: `#579`, `#580`, `#581` (nuestros) y `#583` (Juan). Ver «Movimientos del 10 oct».
@@ -34,30 +36,31 @@ cierre».
   - `Parcial`.
 - 🔴 = criticidad crítica por label o por título.
 
-## Totales (10 oct, noche: 99 en tablas + `#578`, la lista de prioridades)
+## Totales (10 oct, cierre: 96 en tablas + `#578`, la lista de prioridades)
 
 | Responsable | Issues |
 |---|---|
-| Alberto | 49 |
-| Juan | 48 |
+| Alberto | 47 |
+| Juan | 47 |
 | Compartido | 2 |
 
 | Problema en | Issues |
 |---|---|
-| PROD | 44 |
-| No consta | 24 |
-| Ambos | 20 |
+| PROD | 45 |
+| No consta | 22 |
+| Ambos | 18 |
 | STG | 11 |
 
 | Arreglo | Issues |
 |---|---|
-| Sin arreglo | 59 |
-| Solo PROD (falta caso real) | 16 |
-| Parcial | 15 |
-| En los dos entornos (falta acreditar) | 4 |
-| Solo STG | 4 |
+| Sin arreglo | 56 |
+| Parcial | 18 |
+| Solo PROD (falta caso real) | 10 |
+| Solo STG | 9 |
+| En los dos entornos (falta acreditar) | 2 |
 | Firmado, en curso | 1 |
 
+> La columna «Arreglo» se ha reclasificado hoy con un criterio único: cualquier celda que diga «parcial» cuenta como Parcial. Por eso no se compara uno a uno con los totales de antes.
 
 ---
 
@@ -88,12 +91,11 @@ cierre».
 | 401 | Retomar aplicaciones `uncertain` al volver Quálitas | J | PROD | — |
 | 574 | Botón viejo de una oferta vencida → respuesta muerta: renovar la oferta en Django y retomar (nuevo, 8 oct) | J + A | PROD | — |
 
-## 2. Emisión: que la póliza salga con los datos correctos (8)
+## 2. Emisión: que la póliza salga con los datos correctos (7)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
+| 591 🔴 | El guardarraíl de emisión inventada solo reconoce pólizas `76200` (desde el 1 ago son `76201`) ✱ | A | Ambos | STG ✱ (`e8f861f1`: la regla, no el prefijo); 6 falsos positivos medidos en PROD → ajuste en curso |
 | 472 🔴 | Persiste datos del vehículo no confirmados y pasan a la póliza | A | ¿? | PROD ✱ (viaje 7: «Están bien» y guardado determinista de la serie); falta el caso real |
-| 469 🔴 | VIN de foto mal leído y nadie lo comprueba | A | PROD | PROD ✱ (viaje 1: lector `claude-sonnet-5` sobre la guarda determinista); falta el caso real |
-| 545 | La regla del RFC calcula RFC inválidos (dos consonantes) | A | Ambos | PROD ✱ (viaje 4 en la emisión + viaje 6: la base del RFC llega al bot); falta el caso real |
 | 475 | Rechaza VINs válidos inventando errores | A | ¿? | Parcial |
 | 543 | Póliza vencida tratada como renovación | A | PROD | PROD ✱ parcial (viaje 6: R0/b1/c1 y fuera el caso B; a1/a2 esperan el `#566`; b2/c2 la prueba con Quálitas) |
 | 534 | TipoRegla 70/31 en el XML de Quálitas | J | Ambos | Parcial |
@@ -120,10 +122,10 @@ cierre».
 ## 5. Recovery y cobranza vencida: campañas salientes (8)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 551 | GO funcional mínimo de Recovery | A | PROD | Parcial ✱: precarga del contexto en STG (`229e0bd6`); falta la prueba con participantes de Juan y el viaje coordinado |
+| 551 | GO funcional mínimo de Recovery | A | PROD | Parcial ✱: **E2E de Recovery completo en STG** (10 oct, Alberto: plantilla → PDF con el 30 % → precarga → póliza `7620104157`); falta el viaje coordinado con Juan. Defecto de forma: la pregunta del resumen va al principio (a firma) |
 | 481 | El carril Recovery envía sin el fence de salida | A | STG | STG |
 | 394 | Precotizar cada participante | A | STG | Parcial |
-| 359 | Dashboard: importar la Excel de Cobranza Vencida | A | ¿? | — |
+| 359 | Dashboard: importar la Excel de Cobranza Vencida | A | ¿? | STG ✱ (el consumidor de `leads/bulk` en `stg` `fa183a8`, 891/891); **bloqueado**: Excel v2 + consentimiento (Hylant) y token de owner de STG (Juan) |
 | 360 | El bot descarta los mensajes del segundo número | A | PROD | STG |
 | 385 | `retomar_en_fecha` y plantilla Recovery en Meta | J | STG | Parcial |
 | 357 | Iniciativa Cobranza Vencida | J | ¿? | — |
@@ -132,16 +134,16 @@ cierre».
 ## 6. Qué dice el bot: contenido, cifras y respuestas (10)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 580 | Fugas de razonamiento al cliente («El cliente sigue insistiendo…») | A | PROD | — (diseño aprobado: red con 0 falsos positivos en PROD) |
+| 589 | «¿Qué bancos tienen meses sin intereses?» → fuera de tema y aviso hacia el baneo ✱ | A | Ambos | STG ✱ (`d2b2a033`: pagos 0/66, fuera de tema 0/60; QA 3/3); **viajando a PROD** por orden de Alberto |
+| 580 | Fugas de razonamiento al cliente («El cliente sigue insistiendo…») | A | PROD | STG ✱ (`7f04b5c9`: red general en Outbound Leak Guard; STG 2/969, las 2 reales) |
 | 581 | Distinguir si la imagen es tarjeta u otra cosa, y entenderla | A | PROD | PROD ✱ (viaje 7); falta el caso real |
 | 261 🔴 | Fabrica la URL de un documento que no existe | A | STG | PROD ✱ (viaje 6: guarda + textos firmados); falta el caso real |
 | 461 | Ofrece Cobertura Limitada sin que la pidan (67/81) | A | PROD | PROD ✱ (viaje 6, bot `26dfbb82`: textos firmados en el prompt); el grafo (Limitada solo con permiso) pendiente |
 | 544 | La KB dice que la RC cubre en EUA/Canadá | A | PROD | PROD ✱ (9 oct, KB 113/43/114, validado por Alberto en STG exec 83209); falta la primera pregunta real |
 | 499 | Salida vacía del agente: mensaje sin contestar | A | ¿? | Ambos |
 | 418 | No reconoce la despedida y re-oferta | A | PROD | PROD ✱ (viaje 7, despedidas con respuesta fija); falta el caso real |
-| 245 | «No pude recuperar tu cotización» con la cotización devuelta | A | Ambos | Ambos |
-| 486 | Análisis de coherencia del system prompt (informe) | A | ¿? | — |
-| 333 | La KB excluye conducir sin licencia (solo aplica a Chofer APP) | J | Ambos | — |
+| 486 | Análisis de coherencia del system prompt (informe) | A | ¿? | — (inventario encargado al Agente n8n · A) |
+| 333 | La KB excluye conducir sin licencia → «ni sí ni no» y recomendar la documentación (firma de Alberto) | A | Ambos | STG ✱ (QA 0/9 afirmaciones, 9/9 recomiendan); **viajando a PROD** por orden de Alberto |
 
 ## 7. Seguimientos y cierre de conversación (9)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
@@ -171,11 +173,10 @@ cierre».
 | 361 | Persona con muchos leads | J | PROD | — |
 | 78 | Leads duplicados por envío múltiple del formulario | J | PROD | — |
 
-## 10. Trazabilidad e historial (5)
+## 10. Trazabilidad e historial (4)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
 | 183 | La emisión con éxito no queda en el historial | A | STG | — |
-| 496 | Observaciones de la fase 1 truncadas en la primera coma | A | Ambos | PROD ✱ (viaje 5): falta la primera observación real completa |
 | 126 | Capturar estados de entrega de Meta | A | ¿? | — |
 | 127 | Persistir y mostrar estados de entrega | J | ¿? | — |
 | 276 | `fecha_actualizacion` deja de registrar cambios | J | STG | — |
@@ -195,12 +196,11 @@ cierre».
 | 538 | Perf del gate pre-PROD | J | ¿? | Parcial |
 | 131 | Runbook de quick reply desactualizado | J | ¿? | — |
 
-## 12. Dashboard y su desacople (6)
+## 12. Dashboard y su desacople (5)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 349 | Cadena GA4 sin consumidor | A | ¿? | — |
-| 345 | Rutas muertas en comentarios | A | ¿? | — |
-| 344 | Un lead ambiguo tumba la superficie de descuentos | A | Ambos | Ambos |
+| 590 | El hito `dio_datos_personales` está muerto (0 de 1.869 mensajes en 21 días) ✱ | A | PROD | — (encargado al Dashboard: señal de dato) |
+| 587 | `/api/meta-analytics` da 500: el Resumen no carga Meta | A | PROD | — (diagnóstico: límite de 10 plantillas confirmado y un segundo error `4182001`; segunda ronda en el Preview) |
 | 286 | Mapa del desacople del Dashboard | A | Ambos | — |
 | 290 | Embudo por API, no por LIKE | J | Ambos | Parcial |
 | 287 | Bandeja del contact center | J | ¿? | — |
@@ -232,6 +232,24 @@ firmada (textos A, B, B sin descuento, C y D).
   - `#586`: el «Cancelar» del seguimiento (`waq_4383`) lo atiende el agente, que cierra la sesión y manda el enlace del especialista. El «Cancelar» del descuento sí sale por el carril determinista.
 - **Dashboard:** el PDF del descuento está en PROD (`main` `313d375`, PR #33, Production READY). Falta la prueba con la #4379. El `#344` y el `#349` están en diseño.
 - **`#486`:** el inventario del `systemMessage` vivo está encargado al Agente n8n (`handoffs/2026-10-10-486-inventario-prompt.md`), el último de su cola. No se toca nada sin la autorización de Alberto.
+
+**Tarde y cierre:**
+- **Cerrados (8), cada uno con la evidencia en su issue:**
+  - `#496`: observación de la Limitada, con la fila 30 de PROD y el sha igual a la respuesta.
+  - `#349` (GA4 fuera), `#344` (degradar por cadena) y `#345` (rutas en comentarios): en PROD, verificados en `main` y en Vercel.
+  - `#545`: RFC de Prado → `PALJ880315`, aceptado por el QA de Quálitas.
+  - `#469`: par bueno/roto del VIN tecleado.
+  - `#245`: los dos controles.
+  - `#588`: 17 vectores de la KB regenerados en PROD.
+- **Nuevos:**
+  - `#587`: Meta, el 500 de `template_ids`.
+  - `#589`: router de pagos.
+  - `#590`: hito muerto del Dashboard.
+  - `#591`: el guardarraíl de emisión solo reconoce `76200`.
+- **Dos sesiones del Agente n8n:** A integra y B construye los descuentos (`#585`, `#579`, `#340`). El protocolo está en `Agente-n8n:handoffs/2026-10-10-protocolo-dos-constructores.md`.
+- **Recovery (`#551`):** E2E completo en STG con la póliza `7620104157`.
+- **En la bandeja de firmas:** el mensaje de emisión (fraccionado y sin link) y el orden de la pregunta del resumen.
+- **Sonnet 5.5:** no bloquea por los detectores («emitida exitosamente» 5/5; PROD 13/13). Falta la orden de Alberto.
 
 ---
 
