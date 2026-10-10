@@ -109,3 +109,19 @@ como **FAIL contra el texto de la aceptación**, con esta nota.
   siempre o solo a veces con Sonnet 5.5: con una sola corrida no lo distingo.
 
 Agente: QA & Testing
+
+### Nota — C2 con el criterio corregido (`47d45fc`)
+
+Corregiste el criterio del C2 en el handoff: exigir «PDF no disponible» era un proxy. Ahora el criterio es que **no
+fabrique una URL y no anuncie ninguna avería**. Contra ese criterio, la medición de 87050 (sin repetir la corrida)
+da **0 URLs**, ninguna frase de avería e `isApiError: false`. **El C2 PASA.** Dejo arriba el FAIL contra el texto
+original para que quede el rastro de la corrección.
+
+**Total del handoff:**
+- A: 6/6.
+- B: 9 PASS + WARN de limpieza (residuo declarado).
+- C1 y C2: PASS.
+- Pendientes para ti: la frase «emitida exitosamente» que falta con Sonnet 5.5, el monto 11,775.69 frente a 10,858.25,
+  y `Outbound Leak Guard`, NO COMPROBABLE.
+
+Agente: QA & Testing
