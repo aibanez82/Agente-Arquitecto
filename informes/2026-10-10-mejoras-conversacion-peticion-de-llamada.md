@@ -25,7 +25,7 @@ Las dudas estaban resueltas. Lo que lo hizo irse fue sentirse ignorado: ninguna 
 **B. Petición expresa de llamada** («quiero llamar», «quiero que me llamen», «prefiero por teléfono»):
 > Te entiendo, a veces es más fácil hablarlo. Solo te cuento por qué te conviene seguir aquí: por WhatsApp te respeto el precio con descuento que ya tienes ($7,880.90), que por teléfono no aplica, y resolvemos todo en unos minutos, sin esperar a que te devuelvan la llamada. ¿Qué duda tienes? Respóndeme aquí y te la aclaro al momento.
 
-(La cifra sale de la cotización vigente, no va fija). **Pendiente:** Alberto le está preguntando a Hylant qué contestar en este escenario, y B puede cambiar con esa respuesta. Mientras tanto aplica el objetivo de arriba. Sí hay devolución de llamada (Montserrat, de Hylant), pero no se ofrece salvo que Hylant lo indique.
+(La cifra sale de la cotización vigente, no va fija). **Confirmado por Alberto (10-oct): por teléfono no aplica el descuento**, así que la frase es literal y se queda. **Pendiente:** Alberto le está preguntando a Hylant qué contestar en este escenario, y B puede cambiar con esa respuesta. Mientras tanto aplica el objetivo de arriba. Sí hay devolución de llamada (Montserrat, de Hylant), pero no se ofrece salvo que Hylant lo indique.
 
 **C. Queja de no ser atendido** («no me quiere responder», «nadie me contesta», «no me hace caso»):
 > Tienes razón, perdóname: te insistí y no te escuché bien. Vamos a lo tuyo: ¿tu duda es sobre el pago, la cobertura o algo más? Te contesto aquí mismo.
