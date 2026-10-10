@@ -1,0 +1,118 @@
+{
+  "system": "e2e-545-469-B",
+  "run_id": "20261010-1401-545B",
+  "timestamp_mx": "2026-10-10 14:08 (GMT-6 MX)",
+  "triggered_by": "detección automática",
+  "results": [
+    {
+      "id": "QA-545-B-T1",
+      "system": "e2e-545-469-B",
+      "description": "Selección guardada y «Continuamos con…»",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 87030",
+      "result": "paquete=1 forma_pago=C",
+      "expected": "no vacíos",
+      "message": ""
+    },
+    {
+      "id": "QA-545-B-T2",
+      "system": "e2e-545-469-B",
+      "description": "Save Group1 Progress",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 87032",
+      "result": "corrió",
+      "expected": "corre",
+      "message": ""
+    },
+    {
+      "id": "QA-545-B-469-B3",
+      "system": "e2e-545-469-B",
+      "description": "#469 B3 (control positivo) · VIN válido → Check Typed VIN corre SIN noteReason y el chatInput no lleva [SERIE_SOSPECHOSA]",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 87034",
+      "result": "Check Typed VIN: corrió · checks {\"typedVin\":\"5TDDZRFH1LS054501\",\"checkDigit\":\"ok\",\"yearCheck\":\"ok\",\"wmiCheck\":\"ok\",\"wouldBlockBy2of3\":false,\"at\":\"2026-10-10T20:02:59.837Z\"} · noteReason null · marcador: no",
+      "expected": "corre, sin nota, sin marcador",
+      "message": ""
+    },
+    {
+      "id": "QA-545-B-B4",
+      "system": "e2e-545-469-B",
+      "description": "Save Group3 Progress con Fresno 150",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 87036",
+      "result": "{\"calle\":\"Fresno\",\"ciudad\":\"Monterrey\",\"estado\":\"Nuevo León\",\"numero\":\"150\",\"colonia\":\"Colinas del Valle\",\"codigo_postal\":\"64650\",\"numero_exterior\":\"150\",\"numero_interior\":\"N/A\"}",
+      "expected": "Fresno / 150",
+      "message": ""
+    },
+    {
+      "id": "QA-545-B-B5",
+      "system": "e2e-545-469-B",
+      "description": "Resumen desde el registro",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 87038 · guard 87040/resumen,87039/resumen",
+      "result": "«¡Excelente! Ya tenemos todo 🎉 Vehículo: TOYOTA HIGHLANDER 2020 Cobertura: Cobertura Amplia Pago: Pago Anual Monto total: $10,858.25 MXN *Datos del contratante:* Juan Prado López Nacimiento: 15/03/198»",
+      "expected": "resumen",
+      "message": ""
+    },
+    {
+      "id": "QA-545-B-545-BASE",
+      "system": "e2e-545-469-B",
+      "description": "#545 · Calcular Base RFC = PALJ880315",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "guard exec 87042 · salida de Calcular Base RFC (_rfc_545)",
+      "result": "{\"calculada\":\"PALJ880315\",\"modelo\":\"PALJ880315\",\"aplicada\":true,\"desacuerdo\":false}",
+      "expected": "calculada PALJ880315",
+      "message": ""
+    },
+    {
+      "id": "QA-545-B-545-CUERPO",
+      "system": "e2e-545-469-B",
+      "description": "#545 · el RFC del cuerpo a Django empieza por PALJ880315",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "guard exec 87042 · entrada de Call Issue Policy Real",
+      "result": "rfc=\"PALJ880315\" homoclave=\"\"",
+      "expected": "PALJ880315…",
+      "message": ""
+    },
+    {
+      "id": "QA-545-B-545-POLIZA",
+      "system": "e2e-545-469-B",
+      "description": "#545 · Quálitas acepta y trae número de póliza; «emitida exitosamente»",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "guard exec 87042 · respuesta de Django y qualitas_polizaemitida",
+      "result": "póliza 7620104155 · «emitida exitosamente»: NO",
+      "expected": "número de póliza; sin reintento si rechaza",
+      "message": ""
+    },
+    {
+      "id": "QA-545-B-VERSIONES",
+      "system": "e2e-545-469-B",
+      "description": "Versión igual al principio y al final",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "",
+      "result": "inicio 7f04b5c9/89019409 · final 7f04b5c9/89019409",
+      "expected": "iguales; si no, corrida NULA",
+      "message": ""
+    },
+    {
+      "id": "QA-545-B-LIMPIEZA",
+      "system": "e2e-545-469-B",
+      "description": "Limpieza por IDs exactos, en orden de FK descubierto del catálogo",
+      "priority": "alta",
+      "status": "WARN",
+      "check": "cotización clonada 3005 · lead 1652 · sesión QA-SUITE-RFCPRADO-B",
+      "result": "n8n_chat_histories:34 · whatsapp_sessions:1 · qualitas_leadactionevent:2 · qualitas_cotizacionrespuestaxml:1 · qualitas_businessoutboxdelivery:1 · qualitas_qualitaspaymentpollstate:1 · qualitas_policyinstallment:1 · qualitas_policypaymentsummary:1",
+      "expected": "cero residuo en STG (lo creado en el QA de Quálitas no es borrable desde aquí y se declara aparte)",
+      "message": "RESIDUO DECLARADO (no se fuerza): qualitas_leadfunnelevent(803,804,805,806) ERROR: ERROR:  LeadFunnelEvent is append-only | qualitas_lead(1652) ERROR: ERROR:  update or delete on table \"qualitas_lead\" violates foreign key constraint \"qualitas_leadfunnelevent_lead_id_80be022d_fk_qualitas_lead_id\" on table \"qual | qualitas_leadfunnelevent(803,804,805,806) ERROR: ERROR:  LeadFunnelEvent is append-only | qualitas_lead(1652) ERROR: ERROR:  update or delete on table \"qualitas_lead\" violates foreign key constraint \"qualitas_leadfunnelevent_lead_id_80be022d_fk_qualitas_lead_id\" on table \"qual | qualitas_leadfunnelevent(803,804,805,806) ERROR: ERROR:  LeadFunnelEvent is append-only | qualitas_lead(1652) ERROR: ERROR:  update or delete on table \"qualitas_lead\" violates foreign key constraint \"qualitas_leadfunnelevent_lead_id_80be022d_fk_qualitas_lead_id\" on table \"qual | qualitas_paymentevidence(397) ERROR: ERROR:  PaymentEvidence is append-only | qualitas_qualitaspaymentpollobservation(9366) ERROR: ERROR:  QualitasPaymentPollObservation is append-only | qualitas_policypaymentmilestone(b856351e-06e3-567b-b45f-8b5ff71192bc) ERROR: ERROR:  receipt ledger row is append-only | qualitas_policypaymentmilestone(b856351e-06e3-567b-b45f-8b5ff71192bc) ERROR: ERROR:  receipt ledger row is append-only | qualitas_qualitasproviderreceiptidentity(430) ERROR: ERROR:  receipt ledger V2 row is append-only | qualitas_qualitasproviderreceiptobservation(16877) ERROR: ERROR:  receipt ledger V2 row is append-only | qualitas_qualitasreceiptsnapshotevaluation(1946) ERROR: ERROR:  receipt ledger V2 row is append-only | qualitas_qualitaspolicyreceiptsnapshot(2051) ERROR: ERROR:  receipt ledger row is append-only | qualitas_qualitasproviderreceiptobservation(16877) ERROR: ERROR:  receipt ledger V2 row is append-only | qualitas_qualitasproviderreceiptidentity(430) ERROR: ERROR:  receipt ledger V2 row is append-only | qualitas_polizaemitida(1884) ERROR: ERROR:  policy deletion is forbidden after receipt ledger cutover | qualitas_asegurado(2017) ERROR: ERROR:  update or delete on table \"qualitas_asegurado\" violates foreign key constraint \"qualitas_polizaemiti_asegurado_id_c0c5ac01_fk_qualitas_\" on table \"quali | qualitas_leadfunnelevent(803,804,805,806) ERROR: ERROR:  LeadFunnelEvent is append-only | qualitas_lead(1652) ERROR: ERROR:  update or delete on table \"qualitas_lead\" violates foreign key constraint \"qualitas_leadfunnelevent_lead_id_80be022d_fk_qualitas_lead_id\" on table \"qual | qualitas_paymentevidence(397) ERROR: ERROR:  PaymentEvidence is append-only | qualitas_qualitaspaymentpollobservation(9366) ERROR: ERROR:  QualitasPaymentPollObservation is append-only | qualitas_policypaymentmilestone(b856351e-06e3-567b-b45f-8b5ff71192bc) ERROR: ERROR:  receipt ledger row is append-only | qualitas_policypaymentmilestone(b856351e-06e3-567b-b45f-8b5ff71192bc) ERROR: ERROR:  receipt ledger row is append-only | qualitas_qualitasproviderreceiptobservation(16877) ERROR: ERROR:  receipt ledger V2 row is append-only | qualitas_qualitasproviderreceiptidentity(430) ERROR: ERROR:  receipt ledger V2 row is append-only | qualitas_qualitasproviderreceiptobservation(16877) ERROR: ERROR:  receipt ledger V2 row is append-only | qualitas_qualitasreceiptsnapshotevaluation(1946) ERROR: ERROR:  receipt ledger V2 row is append-only | qualitas_qualitaspolicyreceiptsnapshot(2051) ERROR: ERROR:  receipt ledger row is append-only | qualitas_qualitasproviderreceiptobservation(16877) ERROR: ERROR:  receipt ledger V2 row is append-only | qualitas_qualitasproviderreceiptidentity(430) ERROR: ERROR:  receipt ledger V2 row is append-only | qualitas_polizaemitida(1884) ERROR: ERROR:  policy deletion is forbidden after receipt ledger cutover | qualitas_leadfunnelevent(803,804,805,806) ERROR: ERROR:  LeadFunnelEvent is append-only | qualitas_cotizacion(3005) ERROR: ERROR:  update or delete on table \"qualitas_cotizacion\" violates foreign key constraint \"qualitas_asegurado_cotizacion_id_3a1f41d5_fk_qualitas_\" on table \"quali"
+    }
+  ]
+}

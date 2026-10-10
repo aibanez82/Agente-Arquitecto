@@ -1,0 +1,52 @@
+{
+  "system": "e2e-545-469-C1",
+  "run_id": "20261010-1408-545C1",
+  "timestamp_mx": "2026-10-10 14:09 (GMT-6 MX)",
+  "triggered_by": "detección automática",
+  "results": [
+    {
+      "id": "QA-545-C1-245-API",
+      "system": "e2e-545-469-C1",
+      "description": "#245 C1 · Get Quotation Data sin error e isApiError=false en Detect API Failure",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 87047 · Get Quotation Data / Detect API Failure",
+      "result": "Get Quotation Data error: null · isApiError: false",
+      "expected": "sin error · false",
+      "message": ""
+    },
+    {
+      "id": "QA-545-C1-245-C1-TEXTO",
+      "system": "e2e-545-469-C1",
+      "description": "#245 C1 (con PDF) · da la cotización o su URL real; ni «no pude recuperar» ni «intenta más tarde»",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 87047 · texto enviado",
+      "result": "avería: no · URLs [] · datos: sí · «Ya tengo tu cotización para tu *TOYOTA HIGHLANDER 2020*: Cobertura Amplia, pago anual de *$10,858.25 MXN*. ¿Te la dejo lista para contratar?»",
+      "expected": "sin avería; URL = la del payload o datos",
+      "message": ""
+    },
+    {
+      "id": "QA-545-C1-VERSIONES",
+      "system": "e2e-545-469-C1",
+      "description": "Versión igual al principio y al final",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "",
+      "result": "inicio 7f04b5c9/89019409 · final 7f04b5c9/89019409",
+      "expected": "iguales; si no, corrida NULA",
+      "message": ""
+    },
+    {
+      "id": "QA-545-C1-LIMPIEZA",
+      "system": "e2e-545-469-C1",
+      "description": "Limpieza por IDs exactos, en orden de FK descubierto del catálogo",
+      "priority": "alta",
+      "status": "PASS",
+      "check": "cotización clonada 3006 · lead 1653 · sesión QA-SUITE-CDF-CON",
+      "result": "n8n_chat_histories:4 · whatsapp_sessions:1 · qualitas_lead:1 · qualitas_cotizacionrespuestaxml:1 · qualitas_cotizacion:1",
+      "expected": "cero residuo en STG (lo creado en el QA de Quálitas no es borrable desde aquí y se declara aparte)",
+      "message": "sin residuo en STG"
+    }
+  ]
+}

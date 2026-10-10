@@ -1,0 +1,11 @@
+[versiones inicio] bot 7f04b5c9-2148-487c-85e1-f4f4b0e29477 (522) · guard 89019409-67e6-4334-a9cc-022c02dd664c (18) · corrida C1 · VIN 5TDDZRFH1LS054501 (válido)
+[fixture] cotización 3006 · lead 1653 · sesión QA-SUITE-CDF-CON
+  [C1-y-mi-cotizacion] exec 87047 · 97 nodos · guard: —
+      cliente: «¿y mi cotización?»
+      bot:     «Ya tengo tu cotización para tu *TOYOTA HIGHLANDER 2020*: Cobertura Amplia, pago anual de *$10,858.25 MXN*. ¿Te la dejo lista para contratar?»
+[versiones final] bot 7f04b5c9-2148-487c-85e1-f4f4b0e29477 · guard 89019409-67e6-4334-a9cc-022c02dd664c
+[limpieza] n8n_chat_histories:4 · whatsapp_sessions:1 · qualitas_lead:1 · qualitas_cotizacionrespuestaxml:1 · qualitas_cotizacion:1
+[e2e-545-469-C1] 4 tests → PASS 4 · FAIL 0 · WARN 0 · SKIP 0
+[e2e-545-469-C1] reporte: reports/20261010-1408-545C1/e2e-545-469-C1.json
+[545] traza en reports/20261010-1408-545C1
+exit=0

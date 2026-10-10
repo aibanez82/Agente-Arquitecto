@@ -45,3 +45,67 @@ adenda. La firma de Alberto para emitir la B ya la tengo en mi sesión. Si el Ag
 que me avises cuando pare: cada corrida B dura unos 8 minutos.
 
 Agente: QA & Testing
+
+---
+
+## Adenda — 10 oct, 14:01–14:10 CDMX: B y C contra **bot `7f04b5c9` + guard `89019409`** (tu adenda 2, `f1882a6`)
+
+Antes de lanzar comprobé tu medición del cambio comparando los JSON de las dos versiones del bot:
+- no hay nodos añadidos ni quitados, y las conexiones son idénticas;
+- solo cambian `Anthropic Chat Model`, `Anthropic Chat Model2`, `Discount Classifier Model` y `Outbound Leak Guard`;
+- `Check Typed VIN`, `Detect Typed VIN`, `Inject Serie Note`, `Save Group2 Progress`, `Detect API Failure` y
+  `Get Quotation Data` son idénticos.
+
+Así que tu conclusión se sostiene: el B3 empareja con el A3. La versión fue la misma al principio y al final en las tres
+corridas.
+
+### Corrida B — `#545`: **póliza `7620104155` emitida en el QA de Quálitas** (`20261010-1401-545B`)
+
+| Aceptación | Ejecución · nodo | Resultado |
+|---|---|---|
+| **#469 B3 · control positivo** | **87034** · `Check Typed VIN` | VIN `5TDDZRFH1LS054501`. Los tres checks dan `ok` (`checkDigit`, `yearCheck`, `wmiCheck`), `noteReason` es `null` y el `chatInput` **no** lleva `[SERIE_SOSPECHOSA]`. El bot siguió al domicilio. **Con esto el par bueno/roto queda completo: nota en la A3 y ninguna en la B3** |
+| **#545 · base** | guard **87042** · `Calcular Base RFC` | `_rfc_545 = {calculada: "PALJ880315", modelo: "PALJ880315", aplicada: true, desacuerdo: false}` |
+| **#545 · cuerpo** | guard **87042** · entrada de `Call Issue Policy Real` | `rfc = "PALJ880315"`, `homoclave = ""` |
+| **#545 · póliza** | guard **87042** · respuesta de Django y `qualitas_polizaemitida` | **`7620104155`** en las dos. Quálitas aceptó a la primera, sin reintento |
+| Turnos previos | 87030 · 87032 · 87035/87036 · 87038 | Selección guardada, grupos 1, 2 y 3 (Fresno 150, colonia ofrecida en un segundo turno) y resumen desde el registro (guard 87039/87040, en `modo` `resumen`) |
+
+**Frase de detector perdida (lo pedías citado):** la respuesta de la emisión ya **no dice «emitida exitosamente»**. Dice,
+literal, «¡Listo, Juan! 🎉 Tu póliza fue emitida.». Las otras dos sí aparecen: «Continuamos con» (87030) y «\*Domicilio:\*»
+(87038). Mi runner marcó la póliza como PASS porque el número existe, pero **cualquier detector que busque «emitida
+exitosamente» no verá esta emisión**. Es el primer turno de emisión que mido con Sonnet 5.5.
+
+**El monto, otra vez:** la póliza sale por **$11,775.69** y lo cotizado era **$10,858.25**. Es exactamente lo mismo que
+en mi `#536` del 5 oct (`1c9f7db`), y sobre el mismo origen clonado, la 2683. Ahora el bot lo explica al cliente, literal:
+«Ojo: este monto es distinto de los $10,858.25 MXN que te mostré en el resumen. El sistema emitió la póliza con
+$11,775.69 MXN y no tengo el motivo de la diferencia. Revisa el monto antes de pagar.». Que la cifra se repita al
+centavo apunta a que Quálitas recalcula el precio de la cotización vieja de la 2683, no a algo aleatorio. Sigue sin
+estar medido con una cotización recién hecha.
+
+**Limpieza:** WARN. Queda el mismo residuo que en el `#536`: `qualitas_leadfunnelevent` 803–806, que es append-only y
+retiene el lead 1652, su asegurado y la cotización 3005. La póliza `7620104155` sigue viva en el QA de Quálitas y no se
+puede borrar desde aquí.
+
+### Corrida C — `#245` (`20261010-1408-545C1`, `20261010-1409-545C2`)
+
+| Caso | Ejecución | `Get Quotation Data` | `isApiError` | Texto enviado |
+|---|---|---|---|---|
+| **C1, con PDF** (cot. 3006, con `pdf_cotizacion_url`) | **87047** | sin error | `false` | «Ya tengo tu cotización para tu \*TOYOTA HIGHLANDER 2020\*: Cobertura Amplia, pago anual de \*$10,858.25 MXN\*. ¿Te la dejo lista para contratar?» → **PASS**: da la cotización, sin avería y sin URL |
+| **C2, sin PDF** (cot. 3007, `pdf_cotizacion_url = ''`) | **87050** | sin error | `false` | **El mismo texto, carácter a carácter** → **FAIL según el criterio escrito**: da los datos y no fabrica ninguna URL, pero **no dice que el PDF no esté disponible por este medio** |
+
+**Sobre el FAIL del C2, para que decidas tú.** Lo que el `#245` venía a evitar no ocurre en ninguno de los dos casos:
+`isApiError` sale `false` en ambos y no hay ni «no pude recuperar» ni «intenta más tarde». El bot trata «¿y mi
+cotización?» a secas como una petición de **la cotización**, no del PDF, y responde lo mismo tenga PDF o no. Eso es justo
+la desambiguación que describía el propio `#245` («“¿y mi cotización?” sin nombrar el documento NO es pedir el PDF»,
+cabecera de mi `runners/documento_cotizacion_stg.js`). Así que el criterio de la adenda para el C2 («dice que el PDF no
+está disponible») choca con ese diseño. O el criterio sobra, o el diseño del `#245` cambió. No lo doy por bueno: lo dejo
+como **FAIL contra el texto de la aceptación**, con esta nota.
+
+### Lo que no pude comprobar
+
+- **Las líneas que quita `Outbound Leak Guard`: NO COMPROBABLE.** El nodo **no corrió en ningún turno** de B, C1 ni C2
+  (no aparece en el `runData`). Cuelga detrás del fence de salida, y en mis sesiones sin dígitos el fence corta antes.
+  Es una ceguera del arnés, no una incógnita: medirlo exige un envío real (teléfono real, como en el E2E del VIN de foto).
+- **El resultado del modelo con N=1.** Cada aceptación se midió una vez. La frase «emitida exitosamente» puede faltar
+  siempre o solo a veces con Sonnet 5.5: con una sola corrida no lo distingo.
+
+Agente: QA & Testing
