@@ -1,0 +1,74 @@
+{
+  "system": "e2e-545-469-A",
+  "run_id": "20261010-1332-545A",
+  "timestamp_mx": "2026-10-10 13:34 (GMT-6 MX)",
+  "triggered_by": "detección automática",
+  "results": [
+    {
+      "id": "QA-545-A-T1",
+      "system": "e2e-545-469-A",
+      "description": "Selección guardada y «Continuamos con…»",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 86899",
+      "result": "paquete=1 forma_pago=C",
+      "expected": "no vacíos",
+      "message": ""
+    },
+    {
+      "id": "QA-545-A-T2",
+      "system": "e2e-545-469-A",
+      "description": "Save Group1 Progress",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 86904",
+      "result": "corrió",
+      "expected": "corre",
+      "message": ""
+    },
+    {
+      "id": "QA-545-A-469-A3",
+      "system": "e2e-545-469-A",
+      "description": "#469 A3 · dígito mal → noteReason, [SERIE_SOSPECHOSA] en el chatInput del AI Agent, pide reconfirmar sin rechazar",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 86906 · Check Typed VIN / Inject Serie Note",
+      "result": "Check Typed VIN: corrió · checks {\"typedVin\":\"5TDDZRFH2LS054501\",\"checkDigit\":\"fail\",\"yearCheck\":\"ok\",\"wmiCheck\":\"ok\",\"wouldBlockBy2of3\":false,\"at\":\"2026-10-10T19:33:28.995Z\"} · noteReason «El número de serie que escribió el cliente (5TDDZRFH2LS054501) podría tener un carácter equivocado; conviene que lo revise.» · marcador en chatInput: sí · bot: «Gracias Ana. Antes de guardarlo, ¿puedes revisar bien tu número de serie? El que escribiste (5TDDZRFH2LS054501) podría tener algún carácter equivocado — verifícalo en tu tarjeta de circulación o tablero y lo confirmamos.»",
+      "expected": "noteReason, marcador, pide confirmar y no dice inválido",
+      "message": ""
+    },
+    {
+      "id": "QA-545-A-469-A4",
+      "system": "e2e-545-469-A",
+      "description": "#469 A4 · lo acepta tal cual: Save Group2 Progress con ese VIN, serie_source=tecleada, y no lo vuelve a pedir",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 86909 · captured_data.grupo2",
+      "result": "Save Group2 Progress: corrió · serie 5TDDZRFH2LS054501 · serie_source tecleada · bot: «¡Excelente, Ana! Último paso y ya: - Calle, número exterior e interior (si tiene) - Colonia»",
+      "expected": "serie 5TDDZRFH2LS054501, tecleada, sin volver a pedirlo",
+      "message": ""
+    },
+    {
+      "id": "QA-545-A-VERSIONES",
+      "system": "e2e-545-469-A",
+      "description": "Versión igual al principio y al final",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "",
+      "result": "inicio 21bb6da5/89019409 · final 21bb6da5/89019409",
+      "expected": "iguales; si no, corrida NULA",
+      "message": ""
+    },
+    {
+      "id": "QA-545-A-LIMPIEZA",
+      "system": "e2e-545-469-A",
+      "description": "Limpieza por IDs exactos, en orden de FK descubierto del catálogo",
+      "priority": "alta",
+      "status": "PASS",
+      "check": "cotización clonada 3004 · lead 1651 · sesión QA-SUITE-RFCPRADO-A",
+      "result": "n8n_chat_histories:18 · whatsapp_sessions:1 · qualitas_lead:1 · qualitas_cotizacionrespuestaxml:1 · qualitas_cotizacion:1",
+      "expected": "cero residuo en STG (lo creado en el QA de Quálitas no es borrable desde aquí y se declara aparte)",
+      "message": "sin residuo en STG"
+    }
+  ]
+}

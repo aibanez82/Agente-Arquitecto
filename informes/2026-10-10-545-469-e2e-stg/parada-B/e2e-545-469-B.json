@@ -1,0 +1,19 @@
+{
+  "system": "e2e-545-469-B",
+  "run_id": "20261010-1400-545B",
+  "timestamp_mx": "2026-10-10 14:00 (GMT-6 MX)",
+  "triggered_by": "detección automática",
+  "results": [
+    {
+      "id": "QA-545-B-VERSIONES",
+      "system": "e2e-545-469-B",
+      "description": "Versiones de STG distintas de las del handoff",
+      "priority": "critica",
+      "status": "FAIL",
+      "check": "",
+      "result": "bot 7f04b5c9-2148-487c-85e1-f4f4b0e29477 · guard 89019409-67e6-4334-a9cc-022c02dd664c",
+      "expected": "bot 21bb6da5 · guard 89019409",
+      "message": "PARO sin sembrar nada"
+    }
+  ]
+}
