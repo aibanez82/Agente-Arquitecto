@@ -1,7 +1,9 @@
-# Issues abiertos de HYL-WAI por caso de uso y entorno — foto del 7 oct 2026, actualizada el 9 oct
+# Issues abiertos de HYL-WAI por caso de uso y entorno — foto del 7 oct 2026, actualizada el 10 oct
 
-**De:** Arquitecto-IA-Insurmind · **Para:** Alberto · **7 oct 2026 · actualizado 9 oct 2026 (mañana, CDMX)**
+**De:** Arquitecto-IA-Insurmind · **Para:** Alberto · **7 oct 2026 · actualizado 10 oct 2026 (tarde, CDMX)**
 
+> **10 oct:** **98 abiertos**. **Viaje 7 en PROD** (bot `1b869a0f`, Guard `3e196c7b`; Dashboard `d453998`). Juan cerró 8 en su auditoría final (`#259`, `#337`, `#463`, `#473`, `#479`, `#552`, `#564`, `#570`); el Arquitecto cerró el `#348`. Nuevos: `#579`, `#580`, `#581` (nuestros) y `#583` (Juan). Ver «Movimientos del 10 oct».
+>
 > **9 oct, tarde:** **103 abiertos**: entra el `#578`; cerrados `#347` y `#270` (barrido de la mañana) (orden de prioridades para Juan). **Viaje 6 en PROD** (bot `26dfbb82`, Guard `42309047`): textos firmados, base del RFC desde el grafo, respuesta fija del límite de 30 días y la fecha de inicio para la emisión. STG: la línea «Inicio de vigencia» lista para el próximo viaje; el proxy `autocache` instalado (igual que PROD).
 >
 > **9 oct, mañana:** 104 abiertos. Cerrados el 9 oct: `#565`, `#178` y `#398` (duplicado del `#134`). Nuevo: `#577` (Juan). Ver «Movimientos del 9 oct».
@@ -30,10 +32,31 @@ cierre».
   - `Parcial`.
 - 🔴 = criticidad crítica por label o por título.
 
-## Totales (9 oct: 104)
+## Totales (10 oct: 97 en tablas + `#578`, la lista de prioridades)
 
 | Responsable | Issues |
 |---|---|
+| Juan | 48 |
+| Alberto | 47 |
+| Compartido | 2 |
+
+| Problema en | Issues |
+|---|---|
+| PROD | 42 |
+| No consta | 24 |
+| Ambos | 20 |
+| STG | 11 |
+
+| Arreglo | Issues |
+|---|---|
+| Sin arreglo | 57 |
+| Solo PROD (falta caso real) | 16 |
+| Parcial | 15 |
+| En los dos entornos (falta acreditar) | 4 |
+| Solo STG | 4 |
+| Firmado, en curso | 1 |
+
+---|---|
 | Alberto | 52 |
 | Juan | 50 |
 | Compartido | 2 |
@@ -97,13 +120,14 @@ cierre».
 
 ---
 
-## 1. Descuentos: ofrecer, aplicar y comunicar bien el descuento (23)
+## 1. Descuentos: ofrecer, aplicar y comunicar bien el descuento (22)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
+| 579 | Un timeout de Django deja la aplicación `uncertain` para siempre | A | PROD | — |
 | 563 | El carril vuelve a pedir el VIN confirmado por foto | A | PROD | PROD ✱ (viaje 1, bot `b7caf68b`); falta la primera foto real |
 | 553 | Oferta de la competencia: pedir precio y cobertura | A | PROD | PROD ✱ parcial (viaje 6: C9); C1-C8 pendientes |
 | 494 | Un «Sí» para emitir dispara un descuento no pedido | A | ¿? | Ambos |
-| 462 | Aplica el descuento y no dice la cifra | A | PROD | Parcial ✱: «PRECIO ORIGINAL» en `main` (Juan); pedido que sea fijo. La cifra en el chat no es defecto (decisión de Alberto). Queda la respuesta a la protesta |
+| 462 | Aplica el descuento y no dice la cifra | A | PROD | Parcial ✱: «PRECIO ORIGINAL» fijo pedido a Juan; la respuesta a la protesta, pendiente en n8n |
 | 456 | Convenio ISSFAM/gubernamental → carril de descuentos | A | Ambos | Parcial |
 | 340 | Re-anuncia como nuevo un descuento ya entregado | A | PROD | PROD ✱ parcial (viaje 6: textos K); el grafo pendiente |
 | 313 | «¿Descuento si pago de contado?» abre un escalón | A | Ambos | Parcial |
@@ -116,22 +140,20 @@ cierre».
 | 303 | Recordar al que ya tiene el 40 % que caduca hoy | J | Ambos | — |
 | 301 | Alinear la regla 20 % → 40 % → nada | J | PROD | Parcial |
 | 266 | «¿Cuánto ahorro?» exige elegir cobertura antes | J | PROD | — |
-| 259 | Tras el PDF con descuento no se dice nada | J | STG | — |
 | 205 | Segunda oferta idéntica con la primera viva | J | Ambos | Parcial |
 | 351 | La cotización con descuento no rearma recordatorios | J | Ambos | — |
 | 400 | Texto terminal «Avanzamos?» del estado `uncertain` | J | PROD | — |
 | 401 | Retomar aplicaciones `uncertain` al volver Quálitas | J | PROD | — |
 | 574 | Botón viejo de una oferta vencida → respuesta muerta: renovar la oferta en Django y retomar (nuevo, 8 oct) | J + A | PROD | — |
 
-## 2. Emisión: que la póliza salga con los datos correctos (9)
+## 2. Emisión: que la póliza salga con los datos correctos (8)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 472 🔴 | Persiste datos del vehículo no confirmados y pasan a la póliza | A | ¿? | PROD ✱ (viaje 1: regla sí/no/ambiguo y `aviso_serie`); falta N≥20 y revisar los 3 rechazos falsos |
+| 472 🔴 | Persiste datos del vehículo no confirmados y pasan a la póliza | A | ¿? | PROD ✱ (viaje 7: «Están bien» y guardado determinista de la serie); falta el caso real |
 | 469 🔴 | VIN de foto mal leído y nadie lo comprueba | A | PROD | PROD ✱ (viaje 1: lector `claude-sonnet-5` sobre la guarda determinista); falta el caso real |
 | 545 | La regla del RFC calcula RFC inválidos (dos consonantes) | A | Ambos | PROD ✱ (viaje 4 en la emisión + viaje 6: la base del RFC llega al bot); falta el caso real |
 | 475 | Rechaza VINs válidos inventando errores | A | ¿? | Parcial |
 | 543 | Póliza vencida tratada como renovación | A | PROD | PROD ✱ parcial (viaje 6: R0/b1/c1 y fuera el caso B; a1/a2 esperan el `#566`; b2/c2 la prueba con Quálitas) |
-| 348 | Extract VIN Vision en un modelo de hace una generación | A | Ambos | PROD ✱ (viaje 1). Acreditado en STG con la foto girada de Alberto (ejecuciones 82479/82482); falta la primera foto real de PROD |
 | 534 | TipoRegla 70/31 en el XML de Quálitas | J | Ambos | Parcial |
 | 307 🔴 | La barrera del estado de póliza depende del Intent Router | J | Ambos | — |
 | 280 | Emisión web en STG no completa | J | STG | — |
@@ -139,7 +161,7 @@ cierre».
 ## 3. Cobro: liga de pago, recibos y recordatorios (8)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 552 | «Mándame la liga» antes de emitir deja sin camino | A | Ambos | PROD ✱ (viaje 2, `fe9c5213`); falta el caso real |
+| 583 | Diagnóstico de la derivación previa al enlace de pago (OPL) | J | ¿? | — |
 | 289 | `payment-link/ensure` no distingue «sin liga» de «pagada» | A | Ambos | PROD ✱ (viaje 2); el caso «ya pagada» se acredita con la primera póliza pagada real |
 | 329 | El cron de ligas no reintenta (costó una venta) | J | PROD | — |
 | 364 | Recuperación cross-day de Payment Links | J | PROD | — |
@@ -153,15 +175,14 @@ cierre».
 |---|---|---|---|---|
 | 566 | Atenderle con su póliza y sus pagos, sin llevarle a cotizar | J + A | PROD | — |
 
-## 5. Recovery y cobranza vencida: campañas salientes (9)
+## 5. Recovery y cobranza vencida: campañas salientes (8)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 551 | GO funcional mínimo de Recovery | A | PROD | Parcial ✱: contrato v2 en Django (PR #573, fusionado a `stg`) y en n8n STG; falta la campaña de Juan a un participante limpio y el viaje coordinado |
+| 551 | GO funcional mínimo de Recovery | A | PROD | Parcial ✱: precarga del contexto en STG (`229e0bd6`); falta la prueba con participantes de Juan y el viaje coordinado |
 | 481 | El carril Recovery envía sin el fence de salida | A | STG | STG |
 | 394 | Precotizar cada participante | A | STG | Parcial |
 | 359 | Dashboard: importar la Excel de Cobranza Vencida | A | ¿? | — |
 | 360 | El bot descarta los mensajes del segundo número | A | PROD | STG |
-| 564 | Prima de la póliza anterior en `previous_policy` | J | PROD | STG ✱ (cubierto por el contrato v2 del `#551`, PR #573) |
 | 385 | `retomar_en_fecha` y plantilla Recovery en Meta | J | STG | Parcial |
 | 357 | Iniciativa Cobranza Vencida | J | ¿? | — |
 | 356 | No existe registro de «no contactar» | J | PROD | — |
@@ -169,16 +190,16 @@ cierre».
 ## 6. Qué dice el bot: contenido, cifras y respuestas (10)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
+| 580 | Fugas de razonamiento al cliente («El cliente sigue insistiendo…») | A | PROD | — (diseño aprobado: red con 0 falsos positivos en PROD) |
+| 581 | Distinguir si la imagen es tarjeta u otra cosa, y entenderla | A | PROD | PROD ✱ (viaje 7); falta el caso real |
 | 261 🔴 | Fabrica la URL de un documento que no existe | A | STG | PROD ✱ (viaje 6: guarda + textos firmados); falta el caso real |
 | 461 | Ofrece Cobertura Limitada sin que la pidan (67/81) | A | PROD | PROD ✱ (viaje 6, bot `26dfbb82`: textos firmados en el prompt); el grafo (Limitada solo con permiso) pendiente |
 | 544 | La KB dice que la RC cubre en EUA/Canadá | A | PROD | PROD ✱ (9 oct, KB 113/43/114, validado por Alberto en STG exec 83209); falta la primera pregunta real |
 | 499 | Salida vacía del agente: mensaje sin contestar | A | ¿? | Ambos |
-| 473 | Se niega a decir el correo registrado | A | PROD | PROD ✱ (viaje 6); falta el caso real |
-| 418 | No reconoce la despedida y re-oferta | A | PROD | Firmado; encargo en STG (`22261499`), detrás de la comparación de modelos |
+| 418 | No reconoce la despedida y re-oferta | A | PROD | PROD ✱ (viaje 7, despedidas con respuesta fija); falta el caso real |
 | 245 | «No pude recuperar tu cotización» con la cotización devuelta | A | Ambos | Ambos |
 | 486 | Análisis de coherencia del system prompt (informe) | A | ¿? | — |
 | 333 | La KB excluye conducir sin licencia (solo aplica a Chofer APP) | J | Ambos | — |
-| 337 | Exponer el valor convenido para contestarlo | J | Ambos | Parcial |
 
 ## 7. Seguimientos y cierre de conversación (8)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
@@ -186,18 +207,15 @@ cierre».
 | 285 🔴 | Teléfono sin sesión viva → cliente sin respuesta | A | Ambos | STG ✱ (bot `03b09269`), **en pausa**: Juan propone una solución más sencilla |
 | 542 | Tras declinar o derivar, el seguimiento insiste | A | PROD | — |
 | 464 | Tras derivar por VIN con póliza, los checkpoints siguen | A | PROD | — (espera la decisión de Juan en el `#577`) |
-| 567 | «Te lo mando en la tarde» y los recordatorios insisten a los 30 min | A | PROD | Firmado (textos y regla de horarios); propuesta de «pausa de seguimiento» a Juan, junto con el `#577` |
+| 567 | «Te lo mando en la tarde» y los recordatorios insisten a los 30 min | A | PROD | Firmado; la pausa de seguimiento, propuesta a Juan (`#578`) |
 | 223 | Iniciativa: hablarle en la fecha que pide | J | ¿? | — |
 | 163 | Invalidar seguimientos de la cotización origen | J | STG | STG |
 | 124 | `quote_followup_15m` para mensuales y anuales | J | PROD | — |
 | 577 | Dejar de mandar checkpoints cuando el bot ya dijo que no se puede emitir y derivó (nuevo, 9 oct) | J | PROD | — |
 
-## 8. Guardarraíl antijailbreak (4)
+## 8. Guardarraíl antijailbreak (1)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 463 | Si el guardarraíl falla, banea al cliente | A | STG | PROD ✱ (viaje 3, `458024c6`); falta el caso real |
-| 479 | Escanea texto del sistema como si fuera del cliente | A | Ambos | PROD ✱ (viaje 3); falta el caso real |
-| 570 | Los turnos del guardarraíl no quedan en la memoria del modelo | A | PROD | PROD ✱ (viaje 3); falta el caso real |
 | 325 | Una pregunta del deducible lo reventó | A | STG | PROD ✱ (viaje 3: `onError` y `Guardrail Error Safe Reply`); falta el caso real |
 
 ## 9. Identidad, sesiones y control humano (6)
@@ -210,7 +228,7 @@ cierre».
 | 361 | Persona con muchos leads | J | PROD | — |
 | 78 | Leads duplicados por envío múltiple del formulario | J | PROD | — |
 
-## 10. Trazabilidad e historial (6)
+## 10. Trazabilidad e historial (5)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
 | 183 | La emisión con éxito no queda en el historial | A | STG | — |
@@ -224,7 +242,7 @@ cierre».
 |---|---|---|---|---|
 | 134 | Aislar n8n del owner | A | PROD | — |
 | 238 | Desacoplar n8n de Postgres | A | Ambos | — |
-| 257 | Número de atención humana escrito a mano en 8 nodos | A | Ambos | — |
+| 257 | Número de atención humana escrito a mano en 8 nodos | A | Ambos | PROD ✱ (viaje 7: número en `WA Config`, interruptor en «sí») |
 | 526 | PDF de cotización públicos y con nombre predecible | J | PROD | — |
 | 406 | Autenticar `/api/emitir-externo/` | J | PROD | — |
 | 130 | `N8N_TOKEN` por defecto: rotar | J | PROD | — |
@@ -250,6 +268,20 @@ cierre».
 | 441 | Logo de Quálitas en blanco en el PDF | J | ¿? | — |
 | 560 | Reorganizar el detalle de Lead en Wagtail | J | ¿? | Parcial (PR #569 a `stg`) |
 | 571 | Wagtail: seguimientos, Recovery y recordatorios en el perfil del Lead (nuevo) | J | ¿? | — |
+
+---
+
+## Movimientos del 10 oct
+
+**Viaje 7 en PROD, verificado por el Arquitecto:** bot `1b869a0f`, Guard `3e196c7b`. Lleva `#472` (confirmación de la foto y
+guardado de la serie), `#581` (imágenes que no son tarjeta, con el Dashboard en `d453998`), `#418` (despedidas), `#257` (número de
+atención humana en `WA Config`), «Inicio de vigencia» y la pasarela caída. Antes del import se frenó y se arregló una regresión:
+las imágenes sumaban al baneo por fuera de alcance.
+**Cerrados:** el `#348` (Arquitecto, con el primer caso real de foto en PROD) y 8 en la auditoría final de Juan (`#259`, `#337`,
+`#463`, `#473`, `#479`, `#552`, `#564`, `#570`).
+**Nuevos:** `#579` (timeout de Django en descuentos), `#580` (fugas de razonamiento), `#581` (imágenes) y `#583` (Juan, OPL).
+**En STG:** Recovery con la precarga del contexto (`#551`), Sonnet 5.5 en pruebas, el `#580` diseñado y la petición de llamada
+firmada (textos A, B, B sin descuento, C y D).
 
 ---
 
@@ -367,12 +399,11 @@ Se midieron en vivo los 35 issues con algún arreglo declarado. Estos siguen abi
 | # | Qué falta |
 |---|---|
 | 494, 469, 456, 313, 270, 245, 499 | El arreglo está vivo en PROD, pero aún no ha habido el caso real que lo acredite |
-| 472 | PROD ✱ (viaje 1: regla sí/no/ambiguo y `aviso_serie`); falta N≥20 y revisar los 3 rechazos falsos |
+| 472 | PROD ✱ (viaje 7: «Están bien» y guardado determinista de la serie); falta el caso real |
 | 475 | El marcador `[SERIE_FORMATO]` no existe ni en STG ni en PROD |
 | 473, 462 | El cambio principal sigue solo en STG |
 | 344 | Falta el dictamen de diseño: el guard sigue tumbando la respuesta entera |
 | 340 | PROD ✱ parcial (viaje 6: textos K); el grafo pendiente |
-| 337 | Persistir la suma asegurada al emitir: hacerlo o descartarlo por escrito |
 | 304 | Los leads resultado siguen naciendo en `LEAD_CREADO`; no existe `CommercialLead` |
 | 301 | En PROD solo está la regla 4. Siguen activos el 30 %, el VIN obligatorio para el 40 % y el tope 3 |
 | 290 | `GET /api/v1/dashboard/funnel` no existe |
