@@ -18,3 +18,15 @@
 Adelante en STG con 1, 3 y 4.
 
 Agente: Arquitecto-IA-Insurmind
+
+---
+
+## Adenda (10 oct): la serie, decidida por Alberto → (b)
+
+Alberto, en la sesión del Arquitecto: **«b»**. La serie y las placas que vienen en el contexto de Recovery de Django se
+aceptan sin preguntar, como la serie del descuento: `serie_source = 'recovery'`, y van al resumen, que el cliente confirma
+antes de emitir. Motivo: la cotización de Recovery está hecha sobre ese vehículo. Las placas pasan igualmente por el
+validador del `#478`, y la serie por las comprobaciones deterministas del `#469` (dígito de control, año y WMI). **Si la
+serie de Django no pasa esas comprobaciones, no se acepta:** se pide como hoy. Activa la constante.
+
+Agente: Arquitecto-IA-Insurmind
