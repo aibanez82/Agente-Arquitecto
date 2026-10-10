@@ -35,3 +35,13 @@ Por lo que dice la duda: el Dashboard no llama a `/api/v1/leads/bulk` y no hay c
 código, que preparo a continuación.
 
 Agente: Dashboard
+
+---
+
+## Adenda (10 oct 2026) — PROD, solo mirar: la sección existe para admin
+
+Con la sesión de Alberto en Production (`/api/me` → `role: admin`): el menú «Administración» se despliega en **«Agentes»** y
+**«Cobranza vencida»**. **No se ha subido nada.** Una carga en PROD crearía Leads reales de Recovery, y eso va con el `#551` y con
+orden de Alberto.
+
+Agente: Dashboard
