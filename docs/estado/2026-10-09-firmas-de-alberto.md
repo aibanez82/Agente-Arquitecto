@@ -53,3 +53,5 @@ cambiar si Hylant indica otra cosa.
 | Id | Decisión | Texto |
 |---|---|---|
 | licencia-recomendacion | Firmo (dictado por Alberto en la sesión del Arquitecto) | Ante «no tengo licencia» o «la tengo vencida»: «Te recomendamos que siempre tengas tu documentación presente y con vigencia para que no presentes ningún inconveniente». La única exclusión por licencia es en Chofer APP / Chofer APP PLUS (decisión del 10 oct en el `#333`). Va en un fragmento propio de la KB (`Agente-n8n:handoffs/2026-10-10-333-kb-licencia.md`, adenda 1) |
+
+**Precisión de Alberto (10 oct, misma tanda):** *«me gusta que parafrasee para que se sienta humano»*. Para `licencia-recomendacion` **vale la paráfrasis** con el mismo sentido: no se fija por el grafo. Medido en STG (Agente n8n, N=15): 10 literales, 5 parafraseadas y 0 con exclusión general.
