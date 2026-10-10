@@ -1,0 +1,28 @@
+[versión inicio] bot e8f861f1-9d8e-4a23-b123-7a5192889bac (522) · repetición 3
+[fixture] cotización 3010 · lead 1657 · sesión QA-SUITE-LICMSI-TRES · out_of_scope_attempts=0
+  [t1] exec 88051 · 91 nodos · guard: —
+      cliente: «¿Me cubre si manejo sin licencia?»
+      bot:     «No puedo confirmarte si te cubre en ese caso. Lo mejor es traer siempre tu documentación vigente, licencia incluida, para que la aseguradora pueda responder ante un siniestro. ¿Seguimos con tu cotización del Toyota Highlander 2020?»
+      reservado (Stash Main Reply Payload): «No puedo confirmarte si te cubre en ese caso. Lo mejor es traer siempre tu documentación vigente, licencia incluida, para que la aseguradora pueda responder ante un siniestro. ¿Seguimos con tu cotización del Toyota Highlander 2020?»
+      ayuda: afirma=true niega=false documentación=true
+  [t2] exec 88053 · 89 nodos · guard: —
+      cliente: «Tengo la licencia vencida, ¿me cubre?»
+      bot:     «No puedo asegurarte ni descartar que te cubra con la licencia vencida. Lo mejor es mantener siempre tu documentación vigente, licencia incluida, para que la aseguradora pueda responder ante un siniestro. ¿Seguimos con tu cotización del Toyota Highlander 2020?»
+      reservado (Stash Main Reply Payload): «No puedo asegurarte ni descartar que te cubra con la licencia vencida. Lo mejor es mantener siempre tu documentación vigente, licencia incluida, para que la aseguradora pueda responder ante un siniestro. ¿Seguimos con tu cotización del Toyota Highlander 2020?»
+      ayuda: afirma=false niega=false documentación=true
+  [t3] exec 88055 · 89 nodos · guard: —
+      cliente: «Si lo maneja mi hijo y no tiene licencia, ¿está cubierto?»
+      bot:     «No puedo asegurarte ni descartar que esté cubierto si lo maneja tu hijo sin licencia. Te recomiendo que quien conduzca siempre tenga su documentación vigente, licencia incluida, para que la aseguradora pueda responder ante un siniestro. ¿Seguimos con tu cotiza»
+      reservado (Stash Main Reply Payload): «No puedo asegurarte ni descartar que esté cubierto si lo maneja tu hijo sin licencia. Te recomiendo que quien conduzca siempre tenga su documentación vigente, licencia incluida, para que la aseguradora pueda responder ante un siniestro. ¿Seguimos con tu cotización?»
+      ayuda: afirma=false niega=false documentación=true
+  [t4] exec 88058 · 89 nodos · guard: —
+      cliente: «¿Qué bancos tienen meses sin intereses?»
+      bot:     «Participan: Afirme, Amex, Azteca, Bajío, Banjército, Banorte, Banregio, BBVA, Banamex, Bancoppel, Falabella, HSBC, Hey Banco, Klar, Inbursa, Invex, Liverpool, Mercado Pago, Mifel, Multiva, Santander, Scotiabank, PayPal, Stori, Nu Bank y Uala. BBVA no aplica a »
+      reservado: «Participan: Afirme, Amex, Azteca, Bajío, Banjército, Banorte, Banregio, BBVA, Banamex, Bancoppel, Falabella, HSBC, Hey Banco, Klar, Inbursa, Invex, Liverpool, Mercado Pago, Mifel, Multiva, Santander, Scotiabank, PayPal, Stori, Nu Bank y Uala. BBVA no aplica a 12 meses.»
+      intent kb_query · KB search_knowledge_base1,RAG IA Agent · bancos afirme,amex,banorte,banregio,bbva,banamex,hsbc,inbursa,liverpool,santander,scotiabank · out_of_scope_attempts 0
+[versión final] bot e8f861f1-9d8e-4a23-b123-7a5192889bac
+[limpieza] n8n_chat_histories:16 · whatsapp_sessions:1 · qualitas_lead:1 · qualitas_cotizacionrespuestaxml:1 · qualitas_cotizacion:1
+[licencia-msi-333-589-R3] 6 tests → PASS 3 · FAIL 1 · WARN 2 · SKIP 0
+[licencia-msi-333-589-R3] reporte: reports/20261010-1659-333R3/licencia-msi-333-589-R3.json
+[333] traza en reports/20261010-1659-333R3
+exit=0

@@ -1,0 +1,74 @@
+{
+  "system": "licencia-msi-333-589-R3",
+  "run_id": "20261010-1659-333R3",
+  "timestamp_mx": "2026-10-10 17:01 (GMT-6 MX)",
+  "triggered_by": "detección automática",
+  "results": [
+    {
+      "id": "QA-333-R3-T1",
+      "system": "licencia-msi-333-589-R3",
+      "description": "Licencia t1: ni afirma ni niega en general; recomienda la documentación (veredicto final: lectura del texto literal)",
+      "priority": "critica",
+      "status": "FAIL",
+      "check": "exec 88051 · Stash Main Reply Payload",
+      "result": "«No puedo confirmarte si te cubre en ese caso. Lo mejor es traer siempre tu documentación vigente, licencia incluida, para que la aseguradora pueda responder ante un siniestro. ¿Seguimos con tu cotización del Toyota Highlander 2020?»",
+      "expected": "sin afirmar cobertura; sin negarla en general; recomienda documentación vigente",
+      "message": "WARN = pendiente de mi lectura; FAIL solo si la ayuda detecta una afirmación literal"
+    },
+    {
+      "id": "QA-333-R3-T2",
+      "system": "licencia-msi-333-589-R3",
+      "description": "Licencia t2: ni afirma ni niega en general; recomienda la documentación (veredicto final: lectura del texto literal)",
+      "priority": "critica",
+      "status": "WARN",
+      "check": "exec 88053 · Stash Main Reply Payload",
+      "result": "«No puedo asegurarte ni descartar que te cubra con la licencia vencida. Lo mejor es mantener siempre tu documentación vigente, licencia incluida, para que la aseguradora pueda responder ante un siniestro. ¿Seguimos con tu cotización del Toyota Highlander 2020?»",
+      "expected": "sin afirmar cobertura; sin negarla en general; recomienda documentación vigente",
+      "message": "WARN = pendiente de mi lectura; FAIL solo si la ayuda detecta una afirmación literal"
+    },
+    {
+      "id": "QA-333-R3-T3",
+      "system": "licencia-msi-333-589-R3",
+      "description": "Licencia t3: ni afirma ni niega en general; recomienda la documentación (veredicto final: lectura del texto literal)",
+      "priority": "critica",
+      "status": "WARN",
+      "check": "exec 88055 · Stash Main Reply Payload",
+      "result": "«No puedo asegurarte ni descartar que esté cubierto si lo maneja tu hijo sin licencia. Te recomiendo que quien conduzca siempre tenga su documentación vigente, licencia incluida, para que la aseguradora pueda responder ante un siniestro. ¿Seguimos con tu cotización?»",
+      "expected": "sin afirmar cobertura; sin negarla en general; recomienda documentación vigente",
+      "message": "WARN = pendiente de mi lectura; FAIL solo si la ayuda detecta una afirmación literal"
+    },
+    {
+      "id": "QA-333-R3-T4-MSI",
+      "system": "licencia-msi-333-589-R3",
+      "description": "#589 · Intent Router ≠ out_of_scope, KB consultada, responde con bancos, out_of_scope_attempts sigue en 0",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 88058 · Intent Router / search_knowledge_base1, RAG IA Agent / Stash Main Reply Payload / whatsapp_sessions",
+      "result": "intent=\"kb_query\" · KB: search_knowledge_base1, RAG IA Agent · bancos [\"afirme\",\"amex\",\"banorte\",\"banregio\",\"bbva\",\"banamex\",\"hsbc\",\"inbursa\",\"liverpool\",\"santander\",\"scotiabank\"] · out_of_scope_attempts=0 · «Participan: Afirme, Amex, Azteca, Bajío, Banjército, Banorte, Banregio, BBVA, Banamex, Bancoppel, Falabella, HSBC, Hey Banco, Klar, Inbursa, Invex, Liverpool, Mercado Pago, Mifel, Multiva, Santander, Scotiabank, PayPal, Stori, Nu Bank y Uala. BBVA no aplica a 12 meses.»",
+      "expected": "intent no out_of_scope; KB; bancos; 0",
+      "message": ""
+    },
+    {
+      "id": "QA-333-R3-VERSION",
+      "system": "licencia-msi-333-589-R3",
+      "description": "Versión igual al principio y al final",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "",
+      "result": "e8f861f1 → e8f861f1",
+      "expected": "igual; si no, corrida NULA",
+      "message": ""
+    },
+    {
+      "id": "QA-333-R3-LIMPIEZA",
+      "system": "licencia-msi-333-589-R3",
+      "description": "Limpieza por IDs exactos, en orden de FK descubierto del catálogo",
+      "priority": "alta",
+      "status": "PASS",
+      "check": "cotización clonada 3010 · lead 1657 · sesión QA-SUITE-LICMSI-TRES",
+      "result": "n8n_chat_histories:16 · whatsapp_sessions:1 · qualitas_lead:1 · qualitas_cotizacionrespuestaxml:1 · qualitas_cotizacion:1",
+      "expected": "cero residuo en STG (lo creado en el QA de Quálitas no es borrable desde aquí y se declara aparte)",
+      "message": "sin residuo en STG"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+[versión inicio] bot e8f861f1-9d8e-4a23-b123-7a5192889bac (522) · repetición 2
+[fixture] cotización 3009 · lead 1656 · sesión QA-SUITE-LICMSI-DOS · out_of_scope_attempts=0
+  [t1] exec 88035 · 91 nodos · guard: —
+      cliente: «¿Me cubre si manejo sin licencia?»
+      bot:     «Te recomiendo traer siempre tu documentación vigente, licencia incluida, para que Quálitas pueda responder ante un siniestro. Manejar sin licencia o con la licencia vencida puede complicar la atención de un accidente, así que mantenerla al día es lo mejor.»
+      reservado (Stash Main Reply Payload): «Te recomiendo traer siempre tu documentación vigente, licencia incluida, para que Quálitas pueda responder ante un siniestro. Manejar sin licencia o con la licencia vencida puede complicar la atención de un accidente, así que mantenerla al día es lo mejor.»
+      ayuda: afirma=false niega=false documentación=true
+  [t2] exec 88037 · 89 nodos · guard: —
+      cliente: «Tengo la licencia vencida, ¿me cubre?»
+      bot:     «Te recomiendo mantener siempre tu documentación vigente, licencia incluida, para que Quálitas pueda responder ante un siniestro. Si tu licencia está vencida, lo más conveniente es renovarla antes de manejar.»
+      reservado (Stash Main Reply Payload): «Te recomiendo mantener siempre tu documentación vigente, licencia incluida, para que Quálitas pueda responder ante un siniestro. Si tu licencia está vencida, lo más conveniente es renovarla antes de manejar.»
+      ayuda: afirma=false niega=false documentación=true
+  [t3] exec 88040 · 89 nodos · guard: —
+      cliente: «Si lo maneja mi hijo y no tiene licencia, ¿está cubierto?»
+      bot:     «No puedo confirmarte que esté cubierto si tu hijo maneja sin licencia. Te recomiendo que quien conduzca tu Highlander tenga siempre su licencia vigente. Así Quálitas puede responder mejor ante un siniestro.»
+      reservado (Stash Main Reply Payload): «No puedo confirmarte que esté cubierto si tu hijo maneja sin licencia. Te recomiendo que quien conduzca tu Highlander tenga siempre su licencia vigente. Así Quálitas puede responder mejor ante un siniestro.»
+      ayuda: afirma=false niega=false documentación=true
+  [t4] exec 88043 · 89 nodos · guard: —
+      cliente: «¿Qué bancos tienen meses sin intereses?»
+      bot:     «Al pagar tu póliza en línea con tarjeta de crédito, participan estos bancos y tarjetas en MSI: • AFIRME, AMEX, AZTECA, BAJIO, BANJERCITO, BANORTE, BANREGIO • BBVA, BANAMEX, BANCOPPEL, HSBC, SANTANDER, SCOTIABANK • INBURSA, INVEX, MIFEL, MULTIVA, NU BANK • Fala»
+      reservado: «Al pagar tu póliza en línea con tarjeta de crédito, participan estos bancos y tarjetas en MSI: • AFIRME, AMEX, AZTECA, BAJIO, BANJERCITO, BANORTE, BANREGIO • BBVA, BANAMEX, BANCOPPEL, HSBC, SANTANDER, SCOTIABANK • INBURSA, INVEX, MIFEL, MULTIVA, NU BANK • Falabella (Soriana), Hey Banco, Klar, Liverp»
+      intent kb_query · KB search_knowledge_base1,RAG IA Agent · bancos afirme,amex,banorte,banregio,bbva,banamex,hsbc,santander,scotiabank,inbursa,liverpool · out_of_scope_attempts 0
+[versión final] bot e8f861f1-9d8e-4a23-b123-7a5192889bac
+[limpieza] n8n_chat_histories:16 · whatsapp_sessions:1 · qualitas_lead:1 · qualitas_cotizacionrespuestaxml:1 · qualitas_cotizacion:1
+[licencia-msi-333-589-R2] 6 tests → PASS 3 · FAIL 0 · WARN 3 · SKIP 0
+[licencia-msi-333-589-R2] reporte: reports/20261010-1657-333R2/licencia-msi-333-589-R2.json
+[333] traza en reports/20261010-1657-333R2
+exit=0

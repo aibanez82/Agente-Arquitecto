@@ -1,0 +1,74 @@
+{
+  "system": "licencia-msi-333-589-R2",
+  "run_id": "20261010-1657-333R2",
+  "timestamp_mx": "2026-10-10 16:59 (GMT-6 MX)",
+  "triggered_by": "detección automática",
+  "results": [
+    {
+      "id": "QA-333-R2-T1",
+      "system": "licencia-msi-333-589-R2",
+      "description": "Licencia t1: ni afirma ni niega en general; recomienda la documentación (veredicto final: lectura del texto literal)",
+      "priority": "critica",
+      "status": "WARN",
+      "check": "exec 88035 · Stash Main Reply Payload",
+      "result": "«Te recomiendo traer siempre tu documentación vigente, licencia incluida, para que Quálitas pueda responder ante un siniestro. Manejar sin licencia o con la licencia vencida puede complicar la atención de un accidente, así que mantenerla al día es lo mejor.»",
+      "expected": "sin afirmar cobertura; sin negarla en general; recomienda documentación vigente",
+      "message": "WARN = pendiente de mi lectura; FAIL solo si la ayuda detecta una afirmación literal"
+    },
+    {
+      "id": "QA-333-R2-T2",
+      "system": "licencia-msi-333-589-R2",
+      "description": "Licencia t2: ni afirma ni niega en general; recomienda la documentación (veredicto final: lectura del texto literal)",
+      "priority": "critica",
+      "status": "WARN",
+      "check": "exec 88037 · Stash Main Reply Payload",
+      "result": "«Te recomiendo mantener siempre tu documentación vigente, licencia incluida, para que Quálitas pueda responder ante un siniestro. Si tu licencia está vencida, lo más conveniente es renovarla antes de manejar.»",
+      "expected": "sin afirmar cobertura; sin negarla en general; recomienda documentación vigente",
+      "message": "WARN = pendiente de mi lectura; FAIL solo si la ayuda detecta una afirmación literal"
+    },
+    {
+      "id": "QA-333-R2-T3",
+      "system": "licencia-msi-333-589-R2",
+      "description": "Licencia t3: ni afirma ni niega en general; recomienda la documentación (veredicto final: lectura del texto literal)",
+      "priority": "critica",
+      "status": "WARN",
+      "check": "exec 88040 · Stash Main Reply Payload",
+      "result": "«No puedo confirmarte que esté cubierto si tu hijo maneja sin licencia. Te recomiendo que quien conduzca tu Highlander tenga siempre su licencia vigente. Así Quálitas puede responder mejor ante un siniestro.»",
+      "expected": "sin afirmar cobertura; sin negarla en general; recomienda documentación vigente",
+      "message": "WARN = pendiente de mi lectura; FAIL solo si la ayuda detecta una afirmación literal"
+    },
+    {
+      "id": "QA-333-R2-T4-MSI",
+      "system": "licencia-msi-333-589-R2",
+      "description": "#589 · Intent Router ≠ out_of_scope, KB consultada, responde con bancos, out_of_scope_attempts sigue en 0",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 88043 · Intent Router / search_knowledge_base1, RAG IA Agent / Stash Main Reply Payload / whatsapp_sessions",
+      "result": "intent=\"kb_query\" · KB: search_knowledge_base1, RAG IA Agent · bancos [\"afirme\",\"amex\",\"banorte\",\"banregio\",\"bbva\",\"banamex\",\"hsbc\",\"santander\",\"scotiabank\",\"inbursa\",\"liverpool\"] · out_of_scope_attempts=0 · «Al pagar tu póliza en línea con tarjeta de crédito, participan estos bancos y tarjetas en MSI: • AFIRME, AMEX, AZTECA, BAJIO, BANJERCITO, BANORTE, BANREGIO • BBVA, BANAMEX, BANCOPPEL, HSBC, SANTANDER, SCOTIABANK • INBURSA, INVEX, MIFEL, MULTIVA, NU BANK • Falabella (Soriana), Hey Banco, Klar, Liverpool (Visa), Mercado Pago, PayPal, Stori, Uala BBVA aplica a 3 y 6 meses, pero no a 12.»",
+      "expected": "intent no out_of_scope; KB; bancos; 0",
+      "message": ""
+    },
+    {
+      "id": "QA-333-R2-VERSION",
+      "system": "licencia-msi-333-589-R2",
+      "description": "Versión igual al principio y al final",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "",
+      "result": "e8f861f1 → e8f861f1",
+      "expected": "igual; si no, corrida NULA",
+      "message": ""
+    },
+    {
+      "id": "QA-333-R2-LIMPIEZA",
+      "system": "licencia-msi-333-589-R2",
+      "description": "Limpieza por IDs exactos, en orden de FK descubierto del catálogo",
+      "priority": "alta",
+      "status": "PASS",
+      "check": "cotización clonada 3009 · lead 1656 · sesión QA-SUITE-LICMSI-DOS",
+      "result": "n8n_chat_histories:16 · whatsapp_sessions:1 · qualitas_lead:1 · qualitas_cotizacionrespuestaxml:1 · qualitas_cotizacion:1",
+      "expected": "cero residuo en STG (lo creado en el QA de Quálitas no es borrable desde aquí y se declara aparte)",
+      "message": "sin residuo en STG"
+    }
+  ]
+}
