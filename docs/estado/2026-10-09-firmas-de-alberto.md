@@ -47,3 +47,9 @@ Firmadas las cinco, sin notas: `llamada-regla`, `llamada-a`, `llamada-b`, `llama
 bandeja y en `informes/2026-10-10-mejoras-conversacion-peticion-de-llamada.md`. Alberto confirmó (vía Mejoras, y lo firma
 aquí) que por teléfono no se aplica el descuento: el argumento de B va tal cual. No se ofrece devolución de llamada. B puede
 cambiar si Hylant indica otra cosa.
+
+## Quinta tanda (10 oct, 14:2x CDMX) — licencia ausente o vencida (`#333`)
+
+| Id | Decisión | Texto |
+|---|---|---|
+| licencia-recomendacion | Firmo (dictado por Alberto en la sesión del Arquitecto) | Ante «no tengo licencia» o «la tengo vencida»: «Te recomendamos que siempre tengas tu documentación presente y con vigencia para que no presentes ningún inconveniente». La única exclusión por licencia es en Chofer APP / Chofer APP PLUS (decisión del 10 oct en el `#333`). Va en un fragmento propio de la KB (`Agente-n8n:handoffs/2026-10-10-333-kb-licencia.md`, adenda 1) |
