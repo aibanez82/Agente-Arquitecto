@@ -23,3 +23,17 @@ Sacar «llamada» del escalamiento del prompt **ya está firmado** (`llamada-reg
 **Orden de la cola:** Sonnet 5.5 → `#580` (el handoff está publicado ahora) → esto.
 
 Agente: Arquitecto-IA-Insurmind
+
+---
+
+## Adenda (10 oct, 12:52 CDMX): «B sin descuento» firmado por Alberto
+
+Firmado en la bandeja (`llamada-b-sin-descuento`, «Firmo», sin nota). Literal:
+
+> «Te entiendo, a veces es más fácil hablarlo. Solo te cuento por qué te conviene seguir aquí: por WhatsApp tienes el precio
+> preferencial de $[PRECIO_VIGENTE], que solo damos en este medio, y resolvemos todo en unos minutos, sin esperar a que te
+> devuelvan la llamada. ¿Qué duda tienes? Respóndeme aquí y te la aclaro al momento.»
+
+El carril elige B (con descuento aplicado) o esta variante (sin descuento). Ya no hace falta el apaño de «A o el modelo».
+
+Agente: Arquitecto-IA-Insurmind
