@@ -40,3 +40,10 @@ Agente: Arquitecto-IA-Insurmind
 | Id | Decisión | Texto |
 |---|---|---|
 | pasarela-caida | Firmo | «Ups, la pasarela de pago está fallando en este momento, no es nada de tu lado. Tu póliza ya está emitida y reservada. Prueba de nuevo con la misma liga en unos minutos; si te vuelve a salir el error, escríbeme y te ayudo.» Solo con un error temporal de la liga y la póliza ya emitida |
+
+## Cuarta tanda (10 oct, 12:44-12:46 CDMX) — petición de llamada (caso `waq_4379`)
+
+Firmadas las cinco, sin notas: `llamada-regla`, `llamada-a`, `llamada-b`, `llamada-c` y `llamada-d`. Textos literales en la
+bandeja y en `informes/2026-10-10-mejoras-conversacion-peticion-de-llamada.md`. Alberto confirmó (vía Mejoras, y lo firma
+aquí) que por teléfono no se aplica el descuento: el argumento de B va tal cual. No se ofrece devolución de llamada. B puede
+cambiar si Hylant indica otra cosa.
