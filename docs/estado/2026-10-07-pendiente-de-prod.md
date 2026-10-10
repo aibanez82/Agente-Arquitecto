@@ -9,6 +9,22 @@ el Arquitecto** y listo para su OK.
 > sesión del Arquitecto para **todos** los viajes. **Hecho:** viaje 2 (`#552` + `#289`) en PROD `fe9c5213`, verificado.
 > **Viajes 1 a 5 en PROD (8 oct, verificados en vivo por el Arquitecto):** viaje 2 → bot `fe9c5213`; viaje 1 (`#563`+`#472`+`#348`) → `b7caf68b`; viaje 3 (`#325`+`#463`+`#479`+`#570`) → `458024c6`; viaje 4 (`#545`) → Issue Policy Guard `9aa96337`; viaje 5 (`#496`+`#565`) → bot **`9c813fc3`**. Acuses en `informes/2026-10-09-n8n-prod-viaje-*-acuse.md`. **Pendiente:** lo que necesita firma de texto (`#261`, `#257` y los de la sesión de firmas).
 
+## Viaje 7 — listo en STG, a la espera de la prueba real de Alberto y su orden (10 oct)
+
+| Pieza | Issue | Estado en STG |
+|---|---|---|
+| «Están bien» y guardado determinista de la serie confirmada | `#472` | Aceptado (bot `5fe59266`, después) |
+| Imágenes que no son tarjeta: clasificar y entender | `#581` | Aceptado (`6be69202`, 21/21) + Dashboard `stg` `bcaf8ba` (viajan juntos) |
+| Despedidas con respuesta fija | `#418` | Aceptado (`9412c9b0`, 74/74) |
+| «Inicio de vigencia» en el resumen | firmado | Aceptado (`c64c8045` / Guard `89019409`) |
+| Texto de la pasarela caída | firmado | Aceptado (`cc4b3b35`) |
+| Número de atención humana en un solo sitio (`WA Config`), con el interruptor en «sí» | `#257` | En STG desde el 7 oct (`f2c599f1`). **Añadido al viaje por Alberto (10 oct)** |
+
+**Fuera del viaje 7:** Recovery (`#551`), que va con Juan; el `#285`, en pausa; y el cambio de modelo (Sonnet 5.5), que
+espera orden aparte.
+**Ojo para la prueba en seco:** `Rebuild Summary From Record` lleva el `#257` en el nodo de STG y no en su core (informe de
+«Inicio de vigencia»). Con el `#257` dentro del viaje, va el nodo de STG tal cual.
+
 ## Paquetes listos para tu OK
 
 | # | Qué cambia para el cliente | Verificado en STG | Toca emisión/dinero/prompt | Notas para el viaje |
