@@ -1,7 +1,9 @@
-# Issues abiertos de HYL-WAI por caso de uso y entorno — foto del 7 oct 2026, actualizada el 10 oct
+# Issues abiertos de HYL-WAI por caso de uso y entorno — foto del 7 oct 2026, actualizada el 10 oct (noche)
 
 **De:** Arquitecto-IA-Insurmind · **Para:** Alberto · **7 oct 2026 · actualizado 10 oct 2026 (tarde, CDMX)**
 
+> **10 oct, noche:** **100 abiertos**. Nuevos `#585` y `#586`, los dos nuestros, salidos de la revisión de PROD de Mejoras y medidos por el Arquitecto. **Dashboard en PROD con el PDF del descuento** (`main` `313d375`; falta la prueba con la #4379). `#486`: el inventario del prompt, encargado al Agente n8n. Viaje 7 aún sin tráfico real: el último mensaje de cliente es del 9 oct a las 17:33. Ver «Movimientos del 10 oct».
+>
 > **10 oct:** **98 abiertos**. **Viaje 7 en PROD** (bot `1b869a0f`, Guard `3e196c7b`; Dashboard `d453998`). Juan cerró 8 en su auditoría final (`#259`, `#337`, `#463`, `#473`, `#479`, `#552`, `#564`, `#570`); el Arquitecto cerró el `#348`. Nuevos: `#579`, `#580`, `#581` (nuestros) y `#583` (Juan). Ver «Movimientos del 10 oct».
 >
 > **9 oct, tarde:** **103 abiertos**: entra el `#578`; cerrados `#347` y `#270` (barrido de la mañana) (orden de prioridades para Juan). **Viaje 6 en PROD** (bot `26dfbb82`, Guard `42309047`): textos firmados, base del RFC desde el grafo, respuesta fija del límite de 30 días y la fecha de inicio para la emisión. STG: la línea «Inicio de vigencia» lista para el próximo viaje; el proxy `autocache` instalado (igual que PROD).
@@ -32,97 +34,37 @@ cierre».
   - `Parcial`.
 - 🔴 = criticidad crítica por label o por título.
 
-## Totales (10 oct: 97 en tablas + `#578`, la lista de prioridades)
+## Totales (10 oct, noche: 99 en tablas + `#578`, la lista de prioridades)
 
 | Responsable | Issues |
 |---|---|
+| Alberto | 49 |
 | Juan | 48 |
-| Alberto | 47 |
 | Compartido | 2 |
 
 | Problema en | Issues |
 |---|---|
-| PROD | 42 |
+| PROD | 44 |
 | No consta | 24 |
 | Ambos | 20 |
 | STG | 11 |
 
 | Arreglo | Issues |
 |---|---|
-| Sin arreglo | 57 |
+| Sin arreglo | 59 |
 | Solo PROD (falta caso real) | 16 |
 | Parcial | 15 |
 | En los dos entornos (falta acreditar) | 4 |
 | Solo STG | 4 |
 | Firmado, en curso | 1 |
 
----|---|
-| Alberto | 52 |
-| Juan | 50 |
-| Compartido | 2 |
-
-| Problema en | Issues |
-|---|---|
-| PROD | 43 |
-| Ambos | 25 |
-| No consta | 23 |
-| STG | 13 |
-
-| Arreglo | Issues |
-|---|---|
-| Sin arreglo | 58 |
-| Parcial | 16 |
-| Solo PROD (falta caso real) | 13 |
-| Solo STG | 9 |
-| En los dos entornos (falta acreditar) | 5 |
-| Firmado, en curso | 3 |
-
----|---|
-| Alberto | 54 |
-| Juan | 49 |
-| Compartido | 2 |
-
-| Problema en | Issues |
-|---|---|
-| PROD | 43 |
-| Ambos | 26 |
-| No consta | 24 |
-| STG | 13 |
-
-| Arreglo | Issues |
-|---|---|
-| Sin arreglo | 65 |
-| Parcial | 20 |
-| Solo PROD (falta caso real) | 12 |
-| En los dos entornos (falta acreditar) | 5 |
-| Solo STG | 4 |
-
----|---|
-| Alberto | 53 |
-| Juan | 49 |
-| Compartido (`#566`) | 1 |
-| Sin asignar (`#567`, `#568`) | 2 |
-
-| Problema en | Issues |
-|---|---|
-| PROD | 41 |
-| Ambos | 26 |
-| STG | 13 |
-| No consta | 25 (incluye el `#568`, sin clasificar) |
-
-| Arreglo | Issues |
-|---|---|
-| Sin arreglo | 73 (incluye el `#568`) |
-| Parcial | 21 |
-| En los dos entornos (falta acreditar) | 6 |
-| Solo PROD | 1 |
-| Solo STG | 4 |
 
 ---
 
-## 1. Descuentos: ofrecer, aplicar y comunicar bien el descuento (22)
+## 1. Descuentos: ofrecer, aplicar y comunicar bien el descuento (23)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
+| 585 | Tras el descuento pasa a pedir datos sin cobertura elegida (`paquete` y `forma_pago` en NULL) ✱ | A | PROD | — |
 | 579 | Un timeout de Django deja la aplicación `uncertain` para siempre | A | PROD | — |
 | 563 | El carril vuelve a pedir el VIN confirmado por foto | A | PROD | PROD ✱ (viaje 1, bot `b7caf68b`); falta la primera foto real |
 | 553 | Oferta de la competencia: pedir precio y cobertura | A | PROD | PROD ✱ parcial (viaje 6: C9); C1-C8 pendientes |
@@ -201,9 +143,10 @@ cierre».
 | 486 | Análisis de coherencia del system prompt (informe) | A | ¿? | — |
 | 333 | La KB excluye conducir sin licencia (solo aplica a Chofer APP) | J | Ambos | — |
 
-## 7. Seguimientos y cierre de conversación (8)
+## 7. Seguimientos y cierre de conversación (9)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
+| 586 | «Cancelar» al seguimiento «¿Avanzamos?»: el agente cierra la sesión y manda el enlace del especialista ✱ | A | PROD | — |
 | 285 🔴 | Teléfono sin sesión viva → cliente sin respuesta | A | Ambos | STG ✱ (bot `03b09269`), **en pausa**: Juan propone una solución más sencilla |
 | 542 | Tras declinar o derivar, el seguimiento insiste | A | PROD | — |
 | 464 | Tras derivar por VIN con póliza, los checkpoints siguen | A | PROD | — (espera la decisión de Juan en el `#577`) |
@@ -282,6 +225,13 @@ las imágenes sumaban al baneo por fuera de alcance.
 **Nuevos:** `#579` (timeout de Django en descuentos), `#580` (fugas de razonamiento), `#581` (imágenes) y `#583` (Juan, OPL).
 **En STG:** Recovery con la precarga del contexto (`#551`), Sonnet 5.5 en pruebas, el `#580` diseñado y la petición de llamada
 firmada (textos A, B, B sin descuento, C y D).
+**Noche:**
+- **Revisión de PROD de Mejoras** (tras los viajes 6 y 7): no hay regresiones, pero solo hay 13 sesiones reales. L1 sale literal y c1 parafraseado. El viaje 7 sigue sin un solo caso real.
+- **Nuevos, medidos por el Arquitecto en PROD:**
+  - `#585`: tras el descuento (`waq_4385`) el bot pasa a pedir datos sin cobertura guardada.
+  - `#586`: el «Cancelar» del seguimiento (`waq_4383`) lo atiende el agente, que cierra la sesión y manda el enlace del especialista. El «Cancelar» del descuento sí sale por el carril determinista.
+- **Dashboard:** el PDF del descuento está en PROD (`main` `313d375`, PR #33, Production READY). Falta la prueba con la #4379. El `#344` y el `#349` están en diseño.
+- **`#486`:** el inventario del `systemMessage` vivo está encargado al Agente n8n (`handoffs/2026-10-10-486-inventario-prompt.md`), el último de su cola. No se toca nada sin la autorización de Alberto.
 
 ---
 
