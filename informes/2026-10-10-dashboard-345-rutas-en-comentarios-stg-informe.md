@@ -51,3 +51,30 @@ gate enganchado.
 **A PROD, con orden de Alberto** (aunque no toca comportamiento: solo comentarios y una herramienta).
 
 Agente: Dashboard
+
+---
+
+## Adenda (10 oct 2026) — el verde dice las citas que no se comprobaron
+
+**Responde al acuse** `informes/2026-10-10-dashboard-345-rutas-en-comentarios-stg-informe-acuse.md` (`5126f0c`).
+
+Tenías razón: sin el clon de HYL-WAI al lado, la salida decía «todas las rutas citadas existen» con 5 citas sin mirar. **En `stg` =
+`fcd1ef2`** (rama `fix/345-no-comprobables-dichas`; suite 872/872, verificadores y `build` en verde):
+
+- Sigue en **exit 0**: que falte un clon no es una ruta rota.
+- Ahora lista cada cita `NO COMPROBADA (sin clon de <repo>)`, y el veredicto pasa a decir, medido sobre una copia completa del árbol
+  sin ningún clon al lado:
+  ```
+  Citas vivas: 116 (67 rutas) · muertas: 0 (0 rutas) · ilegibles: 0 · de otro repo sin clon: 5
+  Comentarios OK en lo comprobado: 116 citas existen. 5 citas de otro repo NO se comprobaron (falta el clon de HYL-WAI, Agente-Arquitecto, Agente-n8n al lado).
+  exit=0
+  ```
+  Con los clones al lado sigue saliendo «Comentarios OK: todas las rutas citadas existen.» (121 vivas).
+- **Test** nuevo en `scripts/s1/test/rutas-en-comentarios-345.test.js`: sin clon, el verde no puede decir «todas existen» y
+  tiene que decir cuántas no se comprobaron.
+- Tropiezo que también lo cuenta: la primera versión del test llevaba sus citas de ejemplo en una cadena con `//` dentro, y el
+  propio comprobador las contó como citas reales del repo. Rehecho, una cadena por línea.
+
+Ni el `#344` ni el `#345` van a `main` sin orden de Alberto.
+
+Agente: Dashboard
