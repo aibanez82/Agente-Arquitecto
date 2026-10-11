@@ -97,7 +97,7 @@ cierre».
 | 591 🔴 | El guardarraíl de emisión inventada solo reconoce pólizas `76200` (desde el 1 ago son `76201`) ✱ | A | Ambos | STG ✱ (v2 en `5adf0e57`: 56/56 emisiones reales pasan y 0 falsos positivos en PROD); **en la bandeja de firmas**, y el E2E con emisión real lo hace el QA esta noche |
 | 472 🔴 | Persiste datos del vehículo no confirmados y pasan a la póliza | A | ¿? | PROD ✱ (viaje 7: «Están bien» y guardado determinista de la serie); falta el caso real |
 | 475 | Rechaza VINs válidos inventando errores | A | ¿? | Parcial |
-| 543 | Póliza vencida tratada como renovación | A | PROD | PROD ✱ parcial (viaje 6: R0/b1/c1 y fuera el caso B; a1/a2 esperan el `#566`; b2/c2 la prueba con Quálitas) |
+| 543 | Póliza vencida tratada como renovación | A | PROD | PROD ✱ parcial (viaje 6: R0/b1/c1 y fuera el caso B); **a0, b2 y c2 en la bandeja de firmas** (H/S por decidir); a1/a2 esperan el `#566` |
 | 534 | TipoRegla 70/31 en el XML de Quálitas | J | Ambos | Parcial |
 | 307 🔴 | La barrera del estado de póliza depende del Intent Router | J | Ambos | — |
 | 280 | Emisión web en STG no completa | J | STG | — |
@@ -147,7 +147,7 @@ cierre».
 ## 7. Seguimientos y cierre de conversación (9)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 586 | «Cancelar» al seguimiento «¿Avanzamos?»: el agente cierra la sesión y manda el enlace del especialista ✱ | A | PROD | — |
+| 586 | «Cancelar» al seguimiento «¿Avanzamos?»: el agente cierra la sesión y manda el enlace del especialista ✱ | A | PROD | — (**texto en la bandeja de firmas**: A = el del «Cancelar» del descuento) |
 | 285 🔴 | Teléfono sin sesión viva → cliente sin respuesta | A | Ambos | STG ✱ (bot `03b09269`), **en pausa**: Juan propone una solución más sencilla |
 | 542 | Tras declinar o derivar, el seguimiento insiste | A | PROD | — |
 | 464 | Tras derivar por VIN con póliza, los checkpoints siguen | A | PROD | — (espera la decisión de Juan en el `#577`) |
@@ -256,6 +256,8 @@ firmada (textos A, B, B sin descuento, C y D).
 - **`#591` v2** en STG y en la bandeja de firmas.
 - **`#587`:** causa medida y arreglo aprobado. **`#590`:** diseño aprobado.
 - **Trabajo nocturno lanzado:** n8n·A (`#486`, `#461`, `#475`), QA (llamada, `#591` con emisión y regresión 5.5), Mejoras (`#586`, `#543`) y Dashboard (`#587`, `#590`).
+
+- **Mejoras (nocturno):** los textos del `#586` (A/B) y del `#543` (a0, b2 y c2) están en la bandeja de firmas. Los seguimientos tras un error 41 van al `#577`.
 
 ---
 
