@@ -55,10 +55,10 @@ cierre».
 
 | Arreglo | Issues |
 |---|---|
-| Sin arreglo | 57 |
+| Sin arreglo | 56 |
 | Parcial | 18 |
 | Solo PROD (falta caso real) | 10 |
-| Solo STG | 7 |
+| Solo STG | 8 |
 | En los dos entornos (falta acreditar) | 2 |
 | Firmado, en curso | 1 |
 
@@ -199,7 +199,7 @@ cierre».
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
 | 590 | El hito `dio_datos_personales` está muerto (0 de 1.869 mensajes en 21 días) ✱ | A | PROD | — (diseño aprobado: `asegurado OR grupo1` heredado; PROD 21 + 23 → 28; a `stg`) |
-| 587 | `/api/meta-analytics` da 500: el Resumen no carga Meta | A | PROD | — (causa medida: más de 10 plantillas por petición y una ventana que termina en el futuro; arreglo aprobado, a `stg`) |
+| 587 | `/api/meta-analytics` da 500: el Resumen no carga Meta | A | PROD | STG ✱ (`ecd7719`: troceo de 10 y ventana UTC cerrada; Preview 200 con las 11 plantillas); a PROD con orden de Alberto |
 | 286 | Mapa del desacople del Dashboard | A | Ambos | — |
 | 290 | Embudo por API, no por LIKE | J | Ambos | Parcial |
 | 287 | Bandeja del contact center | J | ¿? | — |
@@ -258,6 +258,8 @@ firmada (textos A, B, B sin descuento, C y D).
 - **Trabajo nocturno lanzado:** n8n·A (`#486`, `#461`, `#475`), QA (llamada, `#591` con emisión y regresión 5.5), Mejoras (`#586`, `#543`) y Dashboard (`#587`, `#590`).
 
 - **Mejoras (nocturno):** los textos del `#586` (A/B) y del `#543` (a0, b2 y c2) están en la bandeja de firmas. Los seguimientos tras un error 41 van al `#577`.
+
+- **`#587`** en el `stg` del Dashboard (`ecd7719`), verificado por mí: el Preview carga Meta con 200.
 
 ---
 
