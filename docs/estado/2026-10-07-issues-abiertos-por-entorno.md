@@ -2,6 +2,8 @@
 
 **De:** Arquitecto-IA-Insurmind · **Para:** Alberto · **7 oct 2026 · actualizado 10 oct 2026 (tarde, CDMX)**
 
+> **10 oct, noche (prueba de Alberto en PROD):** **89 abiertos**. **Cerrados con su caso real (8):** `#544`, `#325`, `#313`, `#456`, `#261`, `#581`, `#418` y `#257`. **Nuevo:** `#593` (serie de foto descartada en silencio). `#475` confirmado con un caso real (VIN tecleado con O).
+>
 > **10 oct, noche:** **96 abiertos**. **Cerrados:** `#333` (licencia, «ni sí ni no») y `#589` (router de pagos), los dos en PROD y verificados (KB: 120 filas y la fila 122; bot `c31d2687`). **Nuevo:** `#592` (tope del 30 % en 12 MSI). Ver «Movimientos del 10 oct».
 >
 > **10 oct, cierre:** **97 abiertos**. **Cerrados por la tarde, con evidencia medida (8):** `#496`, `#349`, `#545`, `#469`, `#245`, `#344`, `#345` y `#588`. **Nuevos:** `#587`, `#589`, `#590` y `#591` (el `#588` se abrió y se cerró el mismo día). **Viajando a PROD** por orden de Alberto: `#333` (licencia, «ni sí ni no») y `#589` (router de pagos). Ver «Movimientos del 10 oct».
@@ -38,33 +40,33 @@ cierre».
   - `Parcial`.
 - 🔴 = criticidad crítica por label o por título.
 
-## Totales (10 oct, noche: 95 en tablas + `#578`, la lista de prioridades)
+## Totales (10 oct, noche: 88 en tablas + `#578`, la lista de prioridades)
 
 | Responsable | Issues |
 |---|---|
 | Juan | 47 |
-| Alberto | 46 |
+| Alberto | 39 |
 | Compartido | 2 |
 
 | Problema en | Issues |
 |---|---|
-| PROD | 46 |
-| No consta | 22 |
-| Ambos | 16 |
-| STG | 11 |
+| PROD | 45 |
+| No consta | 21 |
+| Ambos | 13 |
+| STG | 9 |
 
 | Arreglo | Issues |
 |---|---|
-| Sin arreglo | 56 |
-| Parcial | 18 |
-| Solo PROD (falta caso real) | 10 |
+| Sin arreglo | 57 |
+| Parcial | 16 |
 | Solo STG | 8 |
+| Solo PROD (falta caso real) | 4 |
 | En los dos entornos (falta acreditar) | 2 |
 | Firmado, en curso | 1 |
 
 ---
 
-## 1. Descuentos: ofrecer, aplicar y comunicar bien el descuento (23)
+## 1. Descuentos: ofrecer, aplicar y comunicar bien el descuento (21)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
 | 585 | Tras el descuento pasa a pedir datos sin cobertura elegida (`paquete` y `forma_pago` en NULL) ✱ | A | PROD | — |
@@ -73,9 +75,7 @@ cierre».
 | 553 | Oferta de la competencia: pedir precio y cobertura | A | PROD | PROD ✱ parcial (viaje 6: C9); C1-C8 pendientes |
 | 494 | Un «Sí» para emitir dispara un descuento no pedido | A | ¿? | Ambos |
 | 462 | Aplica el descuento y no dice la cifra | A | PROD | Parcial ✱: «PRECIO ORIGINAL» fijo pedido a Juan; la respuesta a la protesta, pendiente en n8n |
-| 456 | Convenio ISSFAM/gubernamental → carril de descuentos | A | Ambos | Parcial |
 | 340 | Re-anuncia como nuevo un descuento ya entregado | A | PROD | PROD ✱ parcial (viaje 6: textos K); el grafo pendiente |
-| 313 | «¿Descuento si pago de contado?» abre un escalón | A | Ambos | Parcial |
 | 312 | El carril no se puede probar con sesiones sintéticas | A | STG | — |
 | 233 | Un turno rechazado por control muere sin rastro | A | PROD | — |
 | 497 | Las entregas del PDF con descuento no guardan el wamid (46/46) | A | PROD | — |
@@ -91,12 +91,13 @@ cierre».
 | 401 | Retomar aplicaciones `uncertain` al volver Quálitas | J | PROD | — |
 | 574 | Botón viejo de una oferta vencida → respuesta muerta: renovar la oferta en Django y retomar (nuevo, 8 oct) | J + A | PROD | — |
 
-## 2. Emisión: que la póliza salga con los datos correctos (7)
+## 2. Emisión: que la póliza salga con los datos correctos (8)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
+| 593 | La serie de la foto que no casa con el auto cotizado se descarta en silencio: el bot la vuelve a pedir ✱ | A | PROD | — (propuesta: nota `[SERIE_FOTO_NO_CUADRA]` con texto firmado) |
 | 591 🔴 | El guardarraíl de emisión inventada solo reconoce pólizas `76200` (desde el 1 ago son `76201`) ✱ | A | Ambos | STG ✱ (v2 en `5adf0e57`: 56/56 emisiones reales pasan y 0 falsos positivos en PROD); **en la bandeja de firmas**, y el E2E con emisión real lo hace el QA esta noche |
 | 472 🔴 | Persiste datos del vehículo no confirmados y pasan a la póliza | A | ¿? | PROD ✱ (viaje 7: «Están bien» y guardado determinista de la serie); falta el caso real |
-| 475 | Rechaza VINs válidos inventando errores | A | ¿? | Parcial |
+| 475 | VIN tecleado con formato inválido: motivo engañoso y bucle; el modelo afirma «ya tengo tu número de serie» sin guardarla ✱ | A | PROD | Parcial (caso real en PROD 10 oct, VIN con O; propuesta: normalizar O→0 e I→1 + `[SERIE_FORMATO]` con el motivo real) |
 | 543 | Póliza vencida tratada como renovación | A | PROD | PROD ✱ parcial (viaje 6: R0/b1/c1 y fuera el caso B); **a0, b2 y c2 en la bandeja de firmas** (H/S por decidir); a1/a2 esperan el `#566` |
 | 534 | TipoRegla 70/31 en el XML de Quálitas | J | Ambos | Parcial |
 | 307 🔴 | La barrera del estado de póliza depende del Intent Router | J | Ambos | — |
@@ -131,17 +132,13 @@ cierre».
 | 357 | Iniciativa Cobranza Vencida | J | ¿? | — |
 | 356 | No existe registro de «no contactar» | J | PROD | — |
 
-## 6. Qué dice el bot: contenido, cifras y respuestas (9)
+## 6. Qué dice el bot: contenido, cifras y respuestas (5)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
 | 592 | 12 meses sin intereses: tope del 30 % de descuento en CUALQUIER póliza; la KB lo limita a negocios especiales y el bot ofrece 12 MSI tras descuentos ✱ | A | PROD | — (espera a Hylant: ¿nuestros 20/30/40 % cuentan? El texto D de la llamada, bloqueado para PROD) |
 | 580 | Fugas de razonamiento al cliente («El cliente sigue insistiendo…») | A | PROD | STG ✱ (`7f04b5c9`: red general en Outbound Leak Guard; STG 2/969, las 2 reales) |
-| 581 | Distinguir si la imagen es tarjeta u otra cosa, y entenderla | A | PROD | PROD ✱ (viaje 7); falta el caso real |
-| 261 🔴 | Fabrica la URL de un documento que no existe | A | STG | PROD ✱ (viaje 6: guarda + textos firmados); falta el caso real |
 | 461 | Ofrece Cobertura Limitada sin que la pidan (67/81) | A | PROD | PROD ✱ (viaje 6, bot `26dfbb82`: textos firmados en el prompt); el grafo (Limitada solo con permiso) pendiente |
-| 544 | La KB dice que la RC cubre en EUA/Canadá | A | PROD | PROD ✱ (9 oct, KB 113/43/114, validado por Alberto en STG exec 83209); falta la primera pregunta real |
 | 499 | Salida vacía del agente: mensaje sin contestar | A | ¿? | Ambos |
-| 418 | No reconoce la despedida y re-oferta | A | PROD | PROD ✱ (viaje 7, despedidas con respuesta fija); falta el caso real |
 | 486 | Análisis de coherencia del system prompt (informe) | A | ¿? | — (inventario encargado al Agente n8n · A) |
 
 ## 7. Seguimientos y cierre de conversación (9)
@@ -157,10 +154,9 @@ cierre».
 | 124 | `quote_followup_15m` para mensuales y anuales | J | PROD | — |
 | 577 | Dejar de mandar checkpoints cuando el bot ya dijo que no se puede emitir y derivó (nuevo, 9 oct) | J | PROD | — |
 
-## 8. Guardarraíl antijailbreak (1)
+## 8. Guardarraíl antijailbreak (0)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 325 | Una pregunta del deducible lo reventó | A | STG | PROD ✱ (viaje 3: `onError` y `Guardrail Error Safe Reply`); falta el caso real |
 
 ## 9. Identidad, sesiones y control humano (6)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
@@ -180,12 +176,11 @@ cierre».
 | 127 | Persistir y mostrar estados de entrega | J | ¿? | — |
 | 276 | `fecha_actualizacion` deja de registrar cambios | J | STG | — |
 
-## 11. Infraestructura, seguridad y arquitectura (11)
+## 11. Infraestructura, seguridad y arquitectura (10)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
 | 134 | Aislar n8n del owner | A | PROD | — |
 | 238 | Desacoplar n8n de Postgres | A | Ambos | — |
-| 257 | Número de atención humana escrito a mano en 8 nodos | A | Ambos | PROD ✱ (viaje 7: número en `WA Config`, interruptor en «sí») |
 | 526 | PDF de cotización públicos y con nombre predecible | J | PROD | — |
 | 406 | Autenticar `/api/emitir-externo/` | J | PROD | — |
 | 130 | `N8N_TOKEN` por defecto: rotar | J | PROD | — |
@@ -260,6 +255,8 @@ firmada (textos A, B, B sin descuento, C y D).
 - **Mejoras (nocturno):** los textos del `#586` (A/B) y del `#543` (a0, b2 y c2) están en la bandeja de firmas. Los seguimientos tras un error 41 van al `#577`.
 
 - **`#587`** en el `stg` del Dashboard (`ecd7719`), verificado por mí: el Preview carga Meta con 200.
+
+- **Prueba de Alberto en PROD** (Camry, #4394 → #4395): **8 issues cerrados** con su caso real (Texas, deducible, contado, ISSFAM → descuento del 30 %, PDF sin URL inventada, imagen que no es tarjeta, despedida D2 y número de atención humana en `WA Config`). Salieron dos defectos: `#593` (nuevo) y el `#475` (VIN con O: «ya tengo tu número de serie» falso y bucle). El `#472` y el `#563` quedan sin ejercitar: la tarjeta era de otro auto.
 
 ---
 
