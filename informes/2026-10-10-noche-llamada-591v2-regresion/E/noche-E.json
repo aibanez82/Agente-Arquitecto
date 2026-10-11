@@ -1,0 +1,74 @@
+{
+  "system": "noche-E",
+  "run_id": "20261010-2035-NOCHE-E",
+  "timestamp_mx": "2026-10-10 20:42 (GMT-6 MX)",
+  "triggered_by": "detección automática",
+  "results": [
+    {
+      "id": "QA-NOCHE-E-591-DETECT",
+      "system": "noche-E",
+      "description": "#591 · Detect Emision Narration → needsCheck",
+      "priority": "critica",
+      "status": "FAIL",
+      "check": "exec 88640",
+      "result": "{\"afirmaEmision\":true}",
+      "expected": "needsCheck true",
+      "message": ""
+    },
+    {
+      "id": "QA-NOCHE-E-591-VALIDATE",
+      "system": "noche-E",
+      "description": "#591 · Validate Emision Against DB → exists_real con la póliza real",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 88640",
+      "result": "{\"polizas\":1,\"inexistentes\":[],\"dados_por_el_cliente\":[],\"exists_real\":true} · póliza en BD 7620104158",
+      "expected": "exists_real true",
+      "message": ""
+    },
+    {
+      "id": "QA-NOCHE-E-591-SIN-BLOQUEO",
+      "system": "noche-E",
+      "description": "#591 · el mensaje de emisión sale sin bloquear y lleva «emitida exitosamente»",
+      "priority": "critica",
+      "status": "FAIL",
+      "check": "exec 88640 · Stash Main Reply Payload",
+      "result": "bloqueado: no · «emitida exitosamente»: NO · «¡Listo, Ana! 🎉 Tu póliza fue emitida. *Resumen de tu póliza:* Vehículo: TOYOTA HIGHLANDER 2020 Cobertura: Cobertura Amplia Póliza: 7620104158 Monto total: $12,708.48 MXN Primer pago: $1,877.77 MXN *Ojo con esto:* el monto con el que se emitió es distinto al del resumen que confirmaste ($11,712.40 en total y $1,794.80 de primer pago). No sé a qué se debe la diferencia. Si no estás de acuerdo con la cifra, avísame antes de pagar para que lo revisemos. Para activar tu cobertura, realiza tu pago en las próximas 24 horas: https://hyl-wai-stg-d1085ad74dbf.herokuapp.com/pagar/99ab8c37-20c0-4995-8a92-9064fde3cc11/»",
+      "expected": "sin bloqueo y con la frase",
+      "message": ""
+    },
+    {
+      "id": "QA-NOCHE-E-E-POLIZA-MENSUAL",
+      "system": "noche-E",
+      "description": "Póliza en el QA de Quálitas con pago fraccionado (mensual)",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "",
+      "result": "póliza 7620104158 · forma_pago M",
+      "expected": "póliza; forma de pago mensual",
+      "message": ""
+    },
+    {
+      "id": "QA-NOCHE-E-VERSION",
+      "system": "noche-E",
+      "description": "Versión igual al principio y al final",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "",
+      "result": "5adf0e57 → 5adf0e57",
+      "expected": "igual; si no, NULA",
+      "message": ""
+    },
+    {
+      "id": "QA-NOCHE-E-LIMPIEZA",
+      "system": "noche-E",
+      "description": "Limpieza por IDs exactos, en orden de FK descubierto del catálogo",
+      "priority": "alta",
+      "status": "WARN",
+      "check": "cotización clonada 3020 · lead 1667 · sesión QA-SUITE-NOCHE-EMITE",
+      "result": "n8n_chat_histories:32 · whatsapp_sessions:1 · qualitas_leadactionevent:1 · qualitas_cotizacionrespuestaxml:1 · qualitas_businessoutboxdelivery:1 · qualitas_qualitaspaymentpollstate:1 · qualitas_policyinstallment:12 · qualitas_policypaymentsummary:1",
+      "expected": "cero residuo en STG (lo creado en el QA de Quálitas no es borrable desde aquí y se declara aparte)",
+      "message": "RESIDUO DECLARADO (no se fuerza): qualitas_leadfunnelevent(815,816,818,817) ERROR: ERROR:  LeadFunnelEvent is append-only | qualitas_lead(1667) ERROR: ERROR:  update or delete on table \"qualitas_lead\" violates foreign key constraint \"qualitas_leadfunnelevent_lead_id_80be022d_fk_qualitas_lead_id\" on table \"qual | qualitas_leadfunnelevent(815,816,818,817) ERROR: ERROR:  LeadFunnelEvent is append-only | qualitas_lead(1667) ERROR: ERROR:  update or delete on table \"qualitas_lead\" violates foreign key constraint \"qualitas_leadfunnelevent_lead_id_80be022d_fk_qualitas_lead_id\" on table \"qual | qualitas_leadfunnelevent(815,816,818,817) ERROR: ERROR:  LeadFunnelEvent is append-only | qualitas_lead(1667) ERROR: ERROR:  update or delete on table \"qualitas_lead\" violates foreign key constraint \"qualitas_leadfunnelevent_lead_id_80be022d_fk_qualitas_lead_id\" on table \"qual | qualitas_paymentevidence(400) ERROR: ERROR:  PaymentEvidence is append-only | qualitas_qualitaspaymentpollobservation(9429) ERROR: ERROR:  QualitasPaymentPollObservation is append-only | qualitas_qualitasproviderreceiptidentity(433,434,435,436,437,438,439,440,441,442,443,444) ERROR: ERROR:  receipt ledger V2 row is append-only | qualitas_qualitasproviderreceiptobservation(17013,17014,17015,17016,17017,17018,17019,17020,17021,17022,17023,17024) ERROR: ERROR:  receipt ledger V2 row is append-only | qualitas_qualitasreceiptsnapshotevaluation(1967) ERROR: ERROR:  receipt ledger V2 row is append-only | qualitas_qualitaspolicyreceiptsnapshot(2072) ERROR: ERROR:  receipt ledger row is append-only | qualitas_qualitasproviderreceiptobservation(17013,17014,17015,17016,17017,17018,17019,17020,17021,17022,17023,17024) ERROR: ERROR:  receipt ledger V2 row is append-only | qualitas_qualitasproviderreceiptidentity(433,434,435,436,437,438,439,440,441,442,443,444) ERROR: ERROR:  receipt ledger V2 row is append-only | qualitas_polizaemitida(1887) ERROR: ERROR:  policy deletion is forbidden after receipt ledger cutover | qualitas_asegurado(2020) ERROR: ERROR:  update or delete on table \"qualitas_asegurado\" violates foreign key constraint \"qualitas_polizaemiti_asegurado_id_c0c5ac01_fk_qualitas_\" on table \"quali | qualitas_leadfunnelevent(815,816,818,817) ERROR: ERROR:  LeadFunnelEvent is append-only | qualitas_lead(1667) ERROR: ERROR:  update or delete on table \"qualitas_lead\" violates foreign key constraint \"qualitas_leadfunnelevent_lead_id_80be022d_fk_qualitas_lead_id\" on table \"qual | qualitas_paymentevidence(400) ERROR: ERROR:  PaymentEvidence is append-only | qualitas_qualitaspaymentpollobservation(9429) ERROR: ERROR:  QualitasPaymentPollObservation is append-only | qualitas_qualitasproviderreceiptobservation(17013,17014,17015,17016,17017,17018,17019,17020,17021,17022,17023,17024) ERROR: ERROR:  receipt ledger V2 row is append-only | qualitas_qualitasproviderreceiptidentity(433,434,435,436,437,438,439,440,441,442,443,444) ERROR: ERROR:  receipt ledger V2 row is append-only | qualitas_qualitasproviderreceiptobservation(17013,17014,17015,17016,17017,17018,17019,17020,17021,17022,17023,17024) ERROR: ERROR:  receipt ledger V2 row is append-only | qualitas_qualitasreceiptsnapshotevaluation(1967) ERROR: ERROR:  receipt ledger V2 row is append-only | qualitas_qualitaspolicyreceiptsnapshot(2072) ERROR: ERROR:  receipt ledger row is append-only | qualitas_qualitasproviderreceiptobservation(17013,17014,17015,17016,17017,17018,17019,17020,17021,17022,17023,17024) ERROR: ERROR:  receipt ledger V2 row is append-only | qualitas_qualitasproviderreceiptidentity(433,434,435,436,437,438,439,440,441,442,443,444) ERROR: ERROR:  receipt ledger V2 row is append-only | qualitas_polizaemitida(1887) ERROR: ERROR:  policy deletion is forbidden after receipt ledger cutover | qualitas_leadfunnelevent(815,816,818,817) ERROR: ERROR:  LeadFunnelEvent is append-only | qualitas_cotizacion(3020) ERROR: ERROR:  update or delete on table \"qualitas_cotizacion\" violates foreign key constraint \"qualitas_asegurado_cotizacion_id_3a1f41d5_fk_qualitas_\" on table \"quali"
+    }
+  ]
+}

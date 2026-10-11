@@ -17,7 +17,7 @@
 | **R** (hitos, ×3) | **3/3**. Las tres frases de detector aparecen literales en las tres |
 | **L** (llamada, ×3) | El turno 1 da **B sin descuento** en 3/3, sin enlace y sin ofrecer devolver la llamada. El turno 2 **no es C**: ver abajo, es el código. El escalado y «contratar por aquí» van bien |
 | **LS** (llamada con el contador sembrado, ×3) | Turno 2: responde el **modelo** (no C) en 3/3. Turno 3: **no repite** en 3/3 |
-| **E** (`#591` v2 con emisión) | **Pendiente.** Mi capa pide la confirmación de Alberto en mi sesión para emitir, y se la estoy pidiendo. Si no está, queda escrito aquí y no se emite |
+| **E** (`#591` v2 con emisión) | **Póliza `7620104158` (mensual) emitida y SIN bloquear**: `needsGuardrailCheck` true y `exists_real` true. **Falta «emitida exitosamente»** (FAIL contra el texto del handoff): ver la sección E |
 
 ## Corrida R — regresión de hitos con Sonnet 5.5 (sin emitir)
 
@@ -102,3 +102,37 @@ veredicto no cambia, pero ahora se apoya en el dato correcto.
   `Persist Contador Llamada` lo escriba tras un envío real solo se mide con un teléfono real.
 
 Agente: QA & Testing
+
+---
+
+## Corrida E — `#591` v2 con emisión real (`20261010-2035-NOCHE-E`)
+
+**Firma:** Alberto, **en mi sesión** («Sí, emite»).
+**Versión:** `5adf0e57` al principio, justo antes de emitir y al final.
+**Fixture:** sesión `QA-SUITE-NOCHE-EMITE`, cotización 3020, «Ana Pérez Ríos», VIN `5TDDZRFHXLS059101` (Toyota 2020 con el
+dígito de control bien), placas `QAA591E`, **pago mensual** (`forma_pago = M`).
+
+| Aceptación | Ejecución · nodo | Resultado |
+|---|---|---|
+| `Detect Emision Narration` → marca el mensaje para comprobación | **88640** | **`needsGuardrailCheck: true`**, `afirmaEmision: true`, `narratedPolicyNumbers: ["7620104158"]` → **PASS** |
+| `Validate Emision Against DB` → `exists_real` con la póliza real | **88640** | `{polizas: 1, inexistentes: [], dados_por_el_cliente: [], exists_real: true}`; en `qualitas_polizaemitida`: **`7620104158`** → **PASS** |
+| El mensaje de emisión sale **sin bloquear** | **88640** · `Stash Main Reply Payload` | **No se bloqueó** → **PASS**. **El guardarraíl no bloquea una emisión real.** |
+| …y lleva «emitida exitosamente» | ídem | **NO** → **FAIL**. El texto literal: «¡Listo, Ana! 🎉 **Tu póliza fue emitida.** \*Resumen de tu póliza:\* … Póliza: 7620104158 · Monto total: $12,708.48 MXN · Primer pago: $1,877.77 MXN · \*Ojo con esto:\* el monto con el que se emitió es distinto al del resumen que confirmaste ($11,712.40 en total y $1,794.80 de primer pago). No sé a qué se debe la diferencia…» |
+| Póliza en el QA de Quálitas, fraccionada | guard **88641** · `Call Issue Policy Real` | Django `200`, «Emisión exitosa con link de pago generado.», póliza **`7620104158`**, 12 `qualitas_policyinstallment` → **PASS** |
+
+**«emitida exitosamente», 2 de 2 ausente con Sonnet 5.5.** Es la segunda emisión con Sonnet 5.5 sin la frase: la
+primera fue la B del `#545` (87041), con el mismo «Tu póliza fue emitida.». El guardarraíl la reconoce igual (`fue
+emitida` está en su regex), pero cualquier detector o hito que busque «emitida exitosamente» dejará de ver las emisiones.
+Con N=2 no lo doy como proporción, pero no ha salido ni una vez.
+
+**El monto, fraccionado esta vez.** El resumen decía $11,712.40 (primer pago $1,794.80) y Quálitas emitió por
+**$12,708.48** (primer pago $1,877.77). Va en la misma dirección que el +$917.44 del anual (`#536`, `#545`), y el bot
+avisa al cliente. Sigue midiéndose sobre el clon de la 2683.
+
+**Corrección de mi instrumento (declarada).** El primer veredicto del `Detect` fue FAIL porque mi runner leía la clave
+`needsCheck`, que es el nombre interno de la función. La salida del nodo es `needsGuardrailCheck`. Lo corregí
+(`Agente_QATest_Qualitas` runner) y lo **reevalué sobre la misma ejecución 88640**, leída por API: PASS. El FAIL
+original sigue en `E/noche-E.json`.
+
+**Limpieza:** WARN, con el residuo de siempre en una emisión. Quedan `qualitas_leadfunnelevent` 815–818 (append-only),
+que retienen el lead 1667, su asegurado y la cotización 3020. La póliza `7620104158` sigue viva en el QA de Quálitas.
