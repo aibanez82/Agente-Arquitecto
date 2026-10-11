@@ -57,3 +57,9 @@ cambiar si Hylant indica otra cosa.
 **Precisión de Alberto (10 oct, misma tanda):** *«me gusta que parafrasee para que se sienta humano»*. Para `licencia-recomendacion` **vale la paráfrasis** con el mismo sentido: no se fija por el grafo. Medido en STG (Agente n8n, N=15): 10 literales, 5 parafraseadas y 0 con exclusión general.
 
 **Cambio de Alberto (10 oct, después de probarlo en STG a las 14:40):** *«no me gustan las respuestas, son muy ambiguas… ni sí ni no. Recomienda tener la documentación vigente. Pero en ningún caso podemos asegurar que la aseguradora cubra cuando maneje una persona que no tiene licencia.»* **`licencia-recomendacion` pasa a ser:** ni se afirma ni se niega la cobertura; se recomienda tener siempre la documentación vigente para que la aseguradora pueda responder ante un siniestro, con paráfrasis permitida; **nunca** se afirma que cubra. Se retira el «la única exclusión es Chofer APP» del fragmento de la licencia. La orden de PROD de las 14:4x quedó revocada sin ejecutarse.
+
+## Sexta tanda (10 oct, 20:37 CDMX) — retener antes de pasar a una persona
+
+| Id | Decisión | Texto |
+|---|---|---|
+| retener-antes-de-escalar | Firmo, sin notas | Ante una petición expresa de hablar con una persona: **un** intento de retención por conversación, y si insiste, el enlace al momento. Excepciones que escalan directo: siniestro o accidente, queja o reclamación, problema con una póliza emitida o un pago, y producto que no vendemos (Uber, taxi, flotilla). Textos literales (con descuento, sin descuento y «si insiste») en la bandeja (`propuestas/retener-antes-de-escalar`). Nace de su prueba en PROD (`waq_4395`, filas 14987-14988) |
