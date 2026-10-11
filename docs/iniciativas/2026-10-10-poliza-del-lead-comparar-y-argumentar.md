@@ -31,6 +31,18 @@
 - **Si no conviene:** el argumento de Alberto, Quálitas como **número 1 en autos en México** y **número 1 en atención de siniestros**.
 - **Enganche con la vigencia:** si la actual vence pronto, «te preparo la nueva para que empiece justo el día que vence» (c1).
 
+## Arquitectura: un nodo especialista en pólizas (Alberto, 10 oct: «es conveniente tener un nodo especialista en reconocer pólizas»)
+
+**De acuerdo, y como sub-workflow propio, no como un caso más del lector de tarjetas.**
+- Hoy `Extract VIN Vision` + `Parse VIN Extraction` hacen dos trabajos: reconocer **qué** es la imagen y leer la tarjeta. Meter ahí la lectura de una póliza (decenas de campos, varias páginas, PDF) lo sobrecargaría, y cualquier cambio rozaría la lectura del VIN, que ya funciona.
+- **Propuesta:** el lector actual solo **clasifica** (tarjeta / póliza / otra) y lee la tarjeta. Si es una **póliza** (foto o PDF), la pasa a un **«Lector de Pólizas»** especialista: un sub-workflow con su propio prompt, su **esquema de salida fijo** (JSON con cada campo y su confianza), su modelo y el soporte de PDF. Devuelve datos, no texto para el cliente.
+- **El comparador** (fase 2) es **otro nodo, de código**, sin modelo: recibe los datos del lector y la cotización vigente, y devuelve la tabla de diferencias con las cifras exactas.
+- **El bot** solo recibe un resumen ya comparado en el `[CTX:]` (o un carril con texto firmado) y argumenta.
+- **Ventajas:**
+  - se prueba aislado, con un banco de pólizas reales anonimizadas;
+  - se puede cambiar de modelo sin tocar el bot;
+  - es el primer paso real de **partir el bot en sub-workflows**, así que una sesión del Agente n8n puede construirlo en paralelo sin pisar a la otra (protocolo de dos constructores).
+
 ## Condiciones antes de construir
 
 1. **Los dos «número 1» necesitan una fuente citable y un literal firmado.** No se puede afirmar al cliente algo que no podamos sostener.
