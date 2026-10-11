@@ -1,0 +1,34 @@
+[versión inicio] bot 5adf0e57-eb89-4c8b-a02b-389fa3b3e8db (536) · corrida LS3
+[fixture] cotización 3019 · lead 1666 · sesión QA-SUITE-NOCHE-LSTRES
+  [0-saludo] exec 88610 · 98 nodos · guard: —
+      cliente: «Hola, quiero contratar el seguro de mi Toyota Highlander»
+      bot:     «¡Hola! Ya tengo tu cotización para tu *TOYOTA HIGHLANDER 2020*: Cobertura Amplia, pago anual de *$10,858.25 MXN*. ¿Te la dejo lista para contratar?»
+  [l1] exec 88613 · 70 nodos · guard: —
+      cliente: «¿Me pueden llamar?»
+      bot:     «»
+      → [Llamada Fija Copy · llamada_B_SIN_DESCUENTO] «Te entiendo, a veces es más fácil hablarlo. Solo te cuento por qué te conviene seguir aquí: por WhatsApp tienes el precio preferencial de $10,858.25, que solo damos en este medio, y resolvemos todo en unos minutos, sin esperar a que te devuelvan la llamada. ¿Qué duda tienes? Resp»
+      llamadaFija {"clase":"peticion","texto":"B","variante":"B_SIN_DESCUENTO"}
+      [sembrado tras l1] captured_data.llamada = {"b": true}
+UPDATE 1
+  [l2] exec 88614 · 95 nodos · guard: —
+      cliente: «Prefiero que me marquen, no me gusta escribir»
+      bot:     «Entiendo. Por este medio no puedo hacer llamadas, pero lo hago lo más ligero posible. Te pido los datos de uno en uno y solo me respondes lo justo. Tu *TOYOTA HIGHLANDER 2020* quedaría con Cobertura Amplia, pago anual de *$10,858.25 MXN*. ¿Empezamos?»
+      → [Stash Main Reply Payload] «Entiendo. Por este medio no puedo hacer llamadas, pero lo hago lo más ligero posible. Te pido los datos de uno en uno y solo me respondes lo justo. Tu *TOYOTA HIGHLANDER 2020* quedaría con Cobertura Amplia, pago anual de *$10,858.25 MXN*. ¿Empezamos?»
+  [l3] exec 88615 · 95 nodos · guard: —
+      cliente: «¿Me pueden llamar?»
+      bot:     «Por aquí no tengo manera de programar llamadas, y no quiero prometerte algo que no puedo cumplir. Lo que sí puedo hacer es que escribas lo mínimo. Te pido un dato a la vez, y para las placas y el número de serie basta una foto de tu tarjeta de circulación. ¿Ar»
+      → [Stash Main Reply Payload] «Por aquí no tengo manera de programar llamadas, y no quiero prometerte algo que no puedo cumplir. Lo que sí puedo hacer es que escribas lo mínimo. Te pido un dato a la vez, y para las placas y el número de serie basta una foto de tu tarjeta de circulación. ¿Arrancamos con tu nomb»
+  [l4] exec 88617 · 96 nodos · guard: —
+      cliente: «Quiero contratar por aquí»
+      bot:     «Continuamos con *Cobertura Amplia, pago anual de $10,858.25 MXN*. *Para continuar necesito:* - Tu nombre completo - Fecha de nacimiento (DD/MM/AAAA) - Género (M/F) No hace falta que lo tengas todo listo de golpe: tú dime lo que tengas y yo te voy guiando con l»
+      → [Stash Main Reply Payload] «Continuamos con *Cobertura Amplia, pago anual de $10,858.25 MXN*. *Para continuar necesito:* - Tu nombre completo - Fecha de nacimiento (DD/MM/AAAA) - Género (M/F) No hace falta que lo tengas todo listo de golpe: tú dime lo que tengas y yo te voy guiando con lo que falte.»
+  [l5] exec 88619 · 95 nodos · guard: —
+      cliente: «Quiero hablar con un agente»
+      bot:     «Para tu caso, te recomendamos contactar directamente con un agente especializado que podrá atenderte mejor: https://api.whatsapp.com/send?phone=525537511678&text=Quiero%20continuar%20con%20mi%20cotizacion%203019»
+      → [Stash Main Reply Payload] «Para tu caso, te recomendamos contactar directamente con un agente especializado que podrá atenderte mejor: https://api.whatsapp.com/send?phone=525537511678&text=Quiero%20continuar%20con%20mi%20cotizacion%203019»
+[versión final] bot 5adf0e57-eb89-4c8b-a02b-389fa3b3e8db
+[limpieza] n8n_chat_histories:14 · whatsapp_sessions:1 · qualitas_lead:1 · qualitas_cotizacionrespuestaxml:1 · qualitas_cotizacion:1
+[noche-LS3] 7 tests → PASS 6 · FAIL 1 · WARN 0 · SKIP 0
+[noche-LS3] reporte: reports/20261010-2027-NOCHE-LS3/noche-LS3.json
+[noche] traza en reports/20261010-2027-NOCHE-LS3
+exit=0

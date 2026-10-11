@@ -1,0 +1,34 @@
+[versión inicio] bot 5adf0e57-eb89-4c8b-a02b-389fa3b3e8db (536) · corrida L2
+[fixture] cotización 3012 · lead 1659 · sesión QA-SUITE-NOCHE-LDOS
+  [0-saludo] exec 88522 · 98 nodos · guard: —
+      cliente: «Hola, quiero contratar el seguro de mi Toyota Highlander»
+      bot:     «¡Hola! Ya tengo tu cotización para tu *TOYOTA HIGHLANDER 2020*: Cobertura Amplia, pago anual de *$10,858.25 MXN*. ¿Te la dejo lista para contratar?»
+  [l1] exec 88525 · 70 nodos · guard: —
+      cliente: «¿Me pueden llamar?»
+      bot:     «»
+      → [Llamada Fija Copy · llamada_B_SIN_DESCUENTO] «Te entiendo, a veces es más fácil hablarlo. Solo te cuento por qué te conviene seguir aquí: por WhatsApp tienes el precio preferencial de $10,858.25, que solo damos en este medio, y resolvemos todo en unos minutos, sin esperar a que te devuelvan la llamada. ¿Qué duda tienes? Resp»
+      llamadaFija {"clase":"peticion","texto":"B","variante":"B_SIN_DESCUENTO"}
+  [l2] exec 88526 · 70 nodos · guard: —
+      cliente: «Prefiero que me marquen, no me gusta escribir»
+      bot:     «»
+      → [Llamada Fija Copy · llamada_B_SIN_DESCUENTO] «Te entiendo, a veces es más fácil hablarlo. Solo te cuento por qué te conviene seguir aquí: por WhatsApp tienes el precio preferencial de $10,858.25, que solo damos en este medio, y resolvemos todo en unos minutos, sin esperar a que te devuelvan la llamada. ¿Qué duda tienes? Resp»
+      llamadaFija {"clase":"peticion","texto":"B","variante":"B_SIN_DESCUENTO"}
+  [l3] exec 88527 · 70 nodos · guard: —
+      cliente: «¿Me pueden llamar?»
+      bot:     «»
+      → [Llamada Fija Copy · llamada_B_SIN_DESCUENTO] «Te entiendo, a veces es más fácil hablarlo. Solo te cuento por qué te conviene seguir aquí: por WhatsApp tienes el precio preferencial de $10,858.25, que solo damos en este medio, y resolvemos todo en unos minutos, sin esperar a que te devuelvan la llamada. ¿Qué duda tienes? Resp»
+      llamadaFija {"clase":"peticion","texto":"B","variante":"B_SIN_DESCUENTO"}
+  [l4] exec 88529 · 96 nodos · guard: —
+      cliente: «Quiero contratar por aquí»
+      bot:     «Continuamos con *Cobertura Amplia, pago anual de $10,858.25 MXN*. *Para continuar necesito:* - Tu nombre completo (nombre y apellidos) - Fecha de nacimiento (DD/MM/AAAA) - Género (M/F) No hace falta que lo tengas todo a mano: te los voy pidiendo poco a poco. ¿»
+      → [Stash Main Reply Payload] «Continuamos con *Cobertura Amplia, pago anual de $10,858.25 MXN*. *Para continuar necesito:* - Tu nombre completo (nombre y apellidos) - Fecha de nacimiento (DD/MM/AAAA) - Género (M/F) No hace falta que lo tengas todo a mano: te los voy pidiendo poco a poco. ¿Me das tu nombre com»
+  [l5] exec 88531 · 95 nodos · guard: —
+      cliente: «Quiero hablar con un agente»
+      bot:     «Para tu caso, te recomendamos contactar directamente con un agente especializado que podrá atenderte mejor: https://api.whatsapp.com/send?phone=525537511678&text=Quiero%20continuar%20con%20mi%20cotizacion%203012»
+      → [Stash Main Reply Payload] «Para tu caso, te recomendamos contactar directamente con un agente especializado que podrá atenderte mejor: https://api.whatsapp.com/send?phone=525537511678&text=Quiero%20continuar%20con%20mi%20cotizacion%203012»
+[versión final] bot 5adf0e57-eb89-4c8b-a02b-389fa3b3e8db
+[limpieza] n8n_chat_histories:10 · whatsapp_sessions:1 · qualitas_lead:1 · qualitas_cotizacionrespuestaxml:1 · qualitas_cotizacion:1
+[noche-L2] 7 tests → PASS 5 · FAIL 2 · WARN 0 · SKIP 0
+[noche-L2] reporte: reports/20261010-2004-NOCHE-L2/noche-L2.json
+[noche] traza en reports/20261010-2004-NOCHE-L2
+exit=0

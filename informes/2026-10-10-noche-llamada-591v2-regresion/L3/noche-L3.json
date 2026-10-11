@@ -1,0 +1,85 @@
+{
+  "system": "noche-L3",
+  "run_id": "20261010-2007-NOCHE-L3",
+  "timestamp_mx": "2026-10-10 20:09 (GMT-6 MX)",
+  "triggered_by": "detección automática",
+  "results": [
+    {
+      "id": "QA-NOCHE-L3-L1",
+      "system": "noche-L3",
+      "description": "«¿Me pueden llamar?» → A o B (B sin descuento si no hay), sin enlace, sin ofrecer devolver la llamada",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 88536 · Llamada Fija Copy",
+      "result": "B B_SIN_DESCUENTO · URLs [] · «Te entiendo, a veces es más fácil hablarlo. Solo te cuento por qué te conviene seguir aquí: por WhatsApp tienes el precio preferencial de $10,858.25, que solo damos en este medio, y resolvemos todo en unos minutos, sin esperar a que te devuelvan la llamada. ¿Qué duda tienes? Respóndeme aquí y te la aclaro al momento.»",
+      "expected": "A o B, sin URL",
+      "message": ""
+    },
+    {
+      "id": "QA-NOCHE-L3-L2",
+      "system": "noche-L3",
+      "description": "«Prefiero que me marquen, no me gusta escribir» → C",
+      "priority": "critica",
+      "status": "FAIL",
+      "check": "exec 88537 · Llamada Fija Copy",
+      "result": "B · clase peticion · URLs [] · «Te entiendo, a veces es más fácil hablarlo. Solo te cuento por qué te conviene seguir aquí: por WhatsApp tienes el precio preferencial de $10,858.25, que solo damos en este medio, y resolvemos todo en unos minutos, sin esperar a que te devuelvan la llamada. ¿Qué duda tienes? Respóndeme aquí y te la aclaro al momento.»",
+      "expected": "C",
+      "message": ""
+    },
+    {
+      "id": "QA-NOCHE-L3-L3",
+      "system": "noche-L3",
+      "description": "La misma petición otra vez → no repite el mismo texto",
+      "priority": "critica",
+      "status": "FAIL",
+      "check": "exec 88538 · Llamada Fija Copy",
+      "result": "B · repite un texto anterior: SÍ · «Te entiendo, a veces es más fácil hablarlo. Solo te cuento por qué te conviene seguir aquí: por WhatsApp tienes el precio preferencial de $10,858.25, que solo damos en este medio, y resolvemos todo en unos minutos, sin esperar a que te devuelvan la llamada. ¿Qué duda tienes? Respóndeme aquí y te la aclaro al momento.»",
+      "expected": "texto distinto",
+      "message": ""
+    },
+    {
+      "id": "QA-NOCHE-L3-L4",
+      "system": "noche-L3",
+      "description": "«Quiero contratar por aquí» → la conversación sigue con normalidad",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 88539",
+      "result": "vía Stash Main Reply Payload · fase data_capture · «Continuamos con *Cobertura Amplia, pago anual de $10,858.25 MXN*. *Para continuar necesito:* - Tu nombre completo (nombre y apellidos) - Fecha de nacimiento (DD/MM/AAAA) - Género (M/F) No hace falta que lo tengas todo a mano, te voy pidiendo cada dato poco a poco. ¿Empezamos con tu nombre completo?»",
+      "expected": "respuesta del flujo normal",
+      "message": ""
+    },
+    {
+      "id": "QA-NOCHE-L3-L5",
+      "system": "noche-L3",
+      "description": "«Quiero hablar con un agente» → sigue escalando a atención humana",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 88542 · whatsapp_sessions.human_takeover / nodos",
+      "result": "human_takeover=false · nodos [\"Human Takeover Guard\"] · llamadaFija null · «Para tu caso, te recomendamos contactar directamente con un agente especializado que podrá atenderte mejor: https://api.whatsapp.com/send?phone=525537511678&text=Quiero%20continuar%20con%20mi%20cotizacion%203013»",
+      "expected": "escala; sin texto de llamada",
+      "message": ""
+    },
+    {
+      "id": "QA-NOCHE-L3-VERSION",
+      "system": "noche-L3",
+      "description": "Versión igual al principio y al final",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "",
+      "result": "5adf0e57 → 5adf0e57",
+      "expected": "igual; si no, NULA",
+      "message": ""
+    },
+    {
+      "id": "QA-NOCHE-L3-LIMPIEZA",
+      "system": "noche-L3",
+      "description": "Limpieza por IDs exactos, en orden de FK descubierto del catálogo",
+      "priority": "alta",
+      "status": "PASS",
+      "check": "cotización clonada 3013 · lead 1660 · sesión QA-SUITE-NOCHE-LTRES",
+      "result": "n8n_chat_histories:10 · whatsapp_sessions:1 · qualitas_lead:1 · qualitas_cotizacionrespuestaxml:1 · qualitas_cotizacion:1",
+      "expected": "cero residuo en STG (lo creado en el QA de Quálitas no es borrable desde aquí y se declara aparte)",
+      "message": "sin residuo en STG"
+    }
+  ]
+}

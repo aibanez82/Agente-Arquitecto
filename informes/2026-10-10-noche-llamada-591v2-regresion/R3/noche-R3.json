@@ -1,0 +1,63 @@
+{
+  "system": "noche-R3",
+  "run_id": "20261010-2016-NOCHE-R3",
+  "timestamp_mx": "2026-10-10 20:20 (GMT-6 MX)",
+  "triggered_by": "detección automática",
+  "results": [
+    {
+      "id": "QA-NOCHE-R3-FRASE-Continuamos-con-cobertura",
+      "system": "noche-R3",
+      "description": "Frase de detector «Continuamos con + cobertura» presente (literal)",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "",
+      "result": "sí",
+      "expected": "sí",
+      "message": ""
+    },
+    {
+      "id": "QA-NOCHE-R3-FRASE-N-mero-de-serie-o-Placas",
+      "system": "noche-R3",
+      "description": "Frase de detector «Número de serie: o Placas» presente (literal)",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "",
+      "result": "sí",
+      "expected": "sí",
+      "message": ""
+    },
+    {
+      "id": "QA-NOCHE-R3-FRASE--Domicilio-",
+      "system": "noche-R3",
+      "description": "Frase de detector «*Domicilio:*» presente (literal)",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "",
+      "result": "sí",
+      "expected": "sí",
+      "message": ""
+    },
+    {
+      "id": "QA-NOCHE-R3-VERSION",
+      "system": "noche-R3",
+      "description": "Versión igual al principio y al final",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "",
+      "result": "5adf0e57 → 5adf0e57",
+      "expected": "igual; si no, NULA",
+      "message": ""
+    },
+    {
+      "id": "QA-NOCHE-R3-LIMPIEZA",
+      "system": "noche-R3",
+      "description": "Limpieza por IDs exactos, en orden de FK descubierto del catálogo",
+      "priority": "alta",
+      "status": "PASS",
+      "check": "cotización clonada 3016 · lead 1663 · sesión QA-SUITE-NOCHE-RTRES",
+      "result": "n8n_chat_histories:26 · whatsapp_sessions:1 · qualitas_lead:1 · qualitas_cotizacionrespuestaxml:1 · qualitas_cotizacion:1",
+      "expected": "cero residuo en STG (lo creado en el QA de Quálitas no es borrable desde aquí y se declara aparte)",
+      "message": "sin residuo en STG"
+    }
+  ]
+}
