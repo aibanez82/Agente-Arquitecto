@@ -40,24 +40,24 @@ cierre».
   - `Parcial`.
 - 🔴 = criticidad crítica por label o por título.
 
-## Totales (10 oct, noche: 88 en tablas + `#578`, la lista de prioridades)
+## Totales (10 oct, noche: 89 en tablas + `#578`, la lista de prioridades)
 
 | Responsable | Issues |
 |---|---|
 | Juan | 47 |
-| Alberto | 39 |
+| Alberto | 40 |
 | Compartido | 2 |
 
 | Problema en | Issues |
 |---|---|
-| PROD | 45 |
+| PROD | 46 |
 | No consta | 21 |
 | Ambos | 13 |
 | STG | 9 |
 
 | Arreglo | Issues |
 |---|---|
-| Sin arreglo | 57 |
+| Sin arreglo | 58 |
 | Parcial | 16 |
 | Solo STG | 8 |
 | Solo PROD (falta caso real) | 4 |
@@ -132,9 +132,10 @@ cierre».
 | 357 | Iniciativa Cobranza Vencida | J | ¿? | — |
 | 356 | No existe registro de «no contactar» | J | PROD | — |
 
-## 6. Qué dice el bot: contenido, cifras y respuestas (5)
+## 6. Qué dice el bot: contenido, cifras y respuestas (6)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
+| 594 | Iniciativa: la póliza actual del lead (foto o PDF) → nodo especialista que la lee, comparador y argumento ✱ | A | PROD | — (diseño en `docs/iniciativas/2026-10-10-poliza-del-lead-…`; esperan las fuentes de los dos «número 1») |
 | 592 | 12 meses sin intereses: tope del 30 % de descuento en CUALQUIER póliza; la KB lo limita a negocios especiales y el bot ofrece 12 MSI tras descuentos ✱ | A | PROD | — (espera a Hylant: ¿nuestros 20/30/40 % cuentan? El texto D de la llamada, bloqueado para PROD) |
 | 580 | Fugas de razonamiento al cliente («El cliente sigue insistiendo…») | A | PROD | STG ✱ (`7f04b5c9`: red general en Outbound Leak Guard; STG 2/969, las 2 reales) |
 | 461 | Ofrece Cobertura Limitada sin que la pidan (67/81) | A | PROD | PROD ✱ (viaje 6, bot `26dfbb82`: textos firmados en el prompt); el grafo (Limitada solo con permiso) pendiente |
@@ -257,6 +258,8 @@ firmada (textos A, B, B sin descuento, C y D).
 - **`#587`** en el `stg` del Dashboard (`ecd7719`), verificado por mí: el Preview carga Meta con 200.
 
 - **Prueba de Alberto en PROD** (Camry, #4394 → #4395): **8 issues cerrados** con su caso real (Texas, deducible, contado, ISSFAM → descuento del 30 %, PDF sin URL inventada, imagen que no es tarjeta, despedida D2 y número de atención humana en `WA Config`). Salieron dos defectos: `#593` (nuevo) y el `#475` (VIN con O: «ya tengo tu número de serie» falso y bucle). El `#472` y el `#563` quedan sin ejercitar: la tarjeta era de otro auto.
+
+- **Iniciativa nueva `#594`** (Alberto): leer la póliza actual del lead (foto o PDF) con un **nodo especialista**, compararla con nuestra cotización (comparador determinista) y argumentar. Espera las fuentes citables de «Quálitas número 1 en autos» y de la atención de siniestros.
 
 ---
 
