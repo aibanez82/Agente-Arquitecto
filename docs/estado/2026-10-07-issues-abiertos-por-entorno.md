@@ -2,6 +2,8 @@
 
 **De:** Arquitecto-IA-Insurmind · **Para:** Alberto · **7 oct 2026 · actualizado 10 oct 2026 (tarde, CDMX)**
 
+> **10 oct, noche:** **96 abiertos**. **Cerrados:** `#333` (licencia, «ni sí ni no») y `#589` (router de pagos), los dos en PROD y verificados (KB: 120 filas y la fila 122; bot `c31d2687`). **Nuevo:** `#592` (tope del 30 % en 12 MSI). Ver «Movimientos del 10 oct».
+>
 > **10 oct, cierre:** **97 abiertos**. **Cerrados por la tarde, con evidencia medida (8):** `#496`, `#349`, `#545`, `#469`, `#245`, `#344`, `#345` y `#588`. **Nuevos:** `#587`, `#589`, `#590` y `#591` (el `#588` se abrió y se cerró el mismo día). **Viajando a PROD** por orden de Alberto: `#333` (licencia, «ni sí ni no») y `#589` (router de pagos). Ver «Movimientos del 10 oct».
 >
 > **10 oct, noche:** **100 abiertos**. Nuevos `#585` y `#586`, los dos nuestros, salidos de la revisión de PROD de Mejoras y medidos por el Arquitecto. **Dashboard en PROD con el PDF del descuento** (`main` `313d375`; falta la prueba con la #4379). `#486`: el inventario del prompt, encargado al Agente n8n. Viaje 7 aún sin tráfico real: el último mensaje de cliente es del 9 oct a las 17:33. Ver «Movimientos del 10 oct».
@@ -36,31 +38,29 @@ cierre».
   - `Parcial`.
 - 🔴 = criticidad crítica por label o por título.
 
-## Totales (10 oct, cierre: 96 en tablas + `#578`, la lista de prioridades)
+## Totales (10 oct, noche: 95 en tablas + `#578`, la lista de prioridades)
 
 | Responsable | Issues |
 |---|---|
-| Alberto | 47 |
 | Juan | 47 |
+| Alberto | 46 |
 | Compartido | 2 |
 
 | Problema en | Issues |
 |---|---|
-| PROD | 45 |
+| PROD | 46 |
 | No consta | 22 |
-| Ambos | 18 |
+| Ambos | 16 |
 | STG | 11 |
 
 | Arreglo | Issues |
 |---|---|
-| Sin arreglo | 56 |
+| Sin arreglo | 57 |
 | Parcial | 18 |
 | Solo PROD (falta caso real) | 10 |
-| Solo STG | 9 |
+| Solo STG | 7 |
 | En los dos entornos (falta acreditar) | 2 |
 | Firmado, en curso | 1 |
-
-> La columna «Arreglo» se ha reclasificado hoy con un criterio único: cualquier celda que diga «parcial» cuenta como Parcial. Por eso no se compara uno a uno con los totales de antes.
 
 ---
 
@@ -94,7 +94,7 @@ cierre».
 ## 2. Emisión: que la póliza salga con los datos correctos (7)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 591 🔴 | El guardarraíl de emisión inventada solo reconoce pólizas `76200` (desde el 1 ago son `76201`) ✱ | A | Ambos | STG ✱ (`e8f861f1`: la regla, no el prefijo); 6 falsos positivos medidos en PROD → ajuste en curso |
+| 591 🔴 | El guardarraíl de emisión inventada solo reconoce pólizas `76200` (desde el 1 ago son `76201`) ✱ | A | Ambos | STG ✱ (v2 en `5adf0e57`: 56/56 emisiones reales pasan y 0 falsos positivos en PROD); **en la bandeja de firmas**, y el E2E con emisión real lo hace el QA esta noche |
 | 472 🔴 | Persiste datos del vehículo no confirmados y pasan a la póliza | A | ¿? | PROD ✱ (viaje 7: «Están bien» y guardado determinista de la serie); falta el caso real |
 | 475 | Rechaza VINs válidos inventando errores | A | ¿? | Parcial |
 | 543 | Póliza vencida tratada como renovación | A | PROD | PROD ✱ parcial (viaje 6: R0/b1/c1 y fuera el caso B; a1/a2 esperan el `#566`; b2/c2 la prueba con Quálitas) |
@@ -131,10 +131,10 @@ cierre».
 | 357 | Iniciativa Cobranza Vencida | J | ¿? | — |
 | 356 | No existe registro de «no contactar» | J | PROD | — |
 
-## 6. Qué dice el bot: contenido, cifras y respuestas (10)
+## 6. Qué dice el bot: contenido, cifras y respuestas (9)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 589 | «¿Qué bancos tienen meses sin intereses?» → fuera de tema y aviso hacia el baneo ✱ | A | Ambos | STG ✱ (`d2b2a033`: pagos 0/66, fuera de tema 0/60; QA 3/3); **viajando a PROD** por orden de Alberto |
+| 592 | 12 meses sin intereses: tope del 30 % de descuento en CUALQUIER póliza; la KB lo limita a negocios especiales y el bot ofrece 12 MSI tras descuentos ✱ | A | PROD | — (espera a Hylant: ¿nuestros 20/30/40 % cuentan? El texto D de la llamada, bloqueado para PROD) |
 | 580 | Fugas de razonamiento al cliente («El cliente sigue insistiendo…») | A | PROD | STG ✱ (`7f04b5c9`: red general en Outbound Leak Guard; STG 2/969, las 2 reales) |
 | 581 | Distinguir si la imagen es tarjeta u otra cosa, y entenderla | A | PROD | PROD ✱ (viaje 7); falta el caso real |
 | 261 🔴 | Fabrica la URL de un documento que no existe | A | STG | PROD ✱ (viaje 6: guarda + textos firmados); falta el caso real |
@@ -143,7 +143,6 @@ cierre».
 | 499 | Salida vacía del agente: mensaje sin contestar | A | ¿? | Ambos |
 | 418 | No reconoce la despedida y re-oferta | A | PROD | PROD ✱ (viaje 7, despedidas con respuesta fija); falta el caso real |
 | 486 | Análisis de coherencia del system prompt (informe) | A | ¿? | — (inventario encargado al Agente n8n · A) |
-| 333 | La KB excluye conducir sin licencia → «ni sí ni no» y recomendar la documentación (firma de Alberto) | A | Ambos | STG ✱ (QA 0/9 afirmaciones, 9/9 recomiendan); **viajando a PROD** por orden de Alberto |
 
 ## 7. Seguimientos y cierre de conversación (9)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
@@ -199,8 +198,8 @@ cierre».
 ## 12. Dashboard y su desacople (5)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 590 | El hito `dio_datos_personales` está muerto (0 de 1.869 mensajes en 21 días) ✱ | A | PROD | — (encargado al Dashboard: señal de dato) |
-| 587 | `/api/meta-analytics` da 500: el Resumen no carga Meta | A | PROD | — (diagnóstico: límite de 10 plantillas confirmado y un segundo error `4182001`; segunda ronda en el Preview) |
+| 590 | El hito `dio_datos_personales` está muerto (0 de 1.869 mensajes en 21 días) ✱ | A | PROD | — (diseño aprobado: `asegurado OR grupo1` heredado; PROD 21 + 23 → 28; a `stg`) |
+| 587 | `/api/meta-analytics` da 500: el Resumen no carga Meta | A | PROD | — (causa medida: más de 10 plantillas por petición y una ventana que termina en el futuro; arreglo aprobado, a `stg`) |
 | 286 | Mapa del desacople del Dashboard | A | Ambos | — |
 | 290 | Embudo por API, no por LIKE | J | Ambos | Parcial |
 | 287 | Bandeja del contact center | J | ¿? | — |
@@ -250,6 +249,13 @@ firmada (textos A, B, B sin descuento, C y D).
 - **Recovery (`#551`):** E2E completo en STG con la póliza `7620104157`.
 - **En la bandeja de firmas:** el mensaje de emisión (fraccionado y sin link) y el orden de la pregunta del resumen.
 - **Sonnet 5.5:** no bloquea por los detectores («emitida exitosamente» 5/5; PROD 13/13). Falta la orden de Alberto.
+
+**Noche (cont.):**
+- **En PROD:** `#333` (KB, viaje 1) y `#589` (bot `1b869a0f` → `c31d2687`, solo `Intent Router`). Cerrados.
+- **Nuevo `#592`:** los términos de Quálitas ponen un tope del 30 % a los 12 MSI en cualquier póliza. Se pregunta a Hylant. La llamada está en STG (`5adf0e57`) con D bloqueado para PROD.
+- **`#591` v2** en STG y en la bandeja de firmas.
+- **`#587`:** causa medida y arreglo aprobado. **`#590`:** diseño aprobado.
+- **Trabajo nocturno lanzado:** n8n·A (`#486`, `#461`, `#475`), QA (llamada, `#591` con emisión y regresión 5.5), Mejoras (`#586`, `#543`) y Dashboard (`#587`, `#590`).
 
 ---
 
