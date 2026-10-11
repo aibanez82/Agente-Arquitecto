@@ -95,7 +95,7 @@ cierre».
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
 | 593 | La serie de la foto que no casa con el auto cotizado se descarta en silencio: el bot la vuelve a pedir ✱ | A | PROD | — (propuesta: nota `[SERIE_FOTO_NO_CUADRA]` con texto firmado) |
-| 591 🔴 | El guardarraíl de emisión inventada solo reconoce pólizas `76200` (desde el 1 ago son `76201`) ✱ | A | Ambos | STG ✱ (v2 en `5adf0e57`: 56/56 emisiones reales pasan y 0 falsos positivos en PROD); **en la bandeja de firmas**, y el E2E con emisión real lo hace el QA esta noche |
+| 591 🔴 | El guardarraíl de emisión inventada solo reconoce pólizas `76200` (desde el 1 ago son `76201`) ✱ | A | Ambos | STG ✱ (v2 en `5adf0e57`: 56/56 en PROD, 0 falsos positivos, y **una emisión real en STG que pasa**, exec 88640); **listo para PROD, en la bandeja de firmas** |
 | 472 🔴 | Persiste datos del vehículo no confirmados y pasan a la póliza | A | ¿? | PROD ✱ (viaje 7: «Están bien» y guardado determinista de la serie); falta el caso real |
 | 475 | VIN tecleado con formato inválido: motivo engañoso y bucle; el modelo afirma «ya tengo tu número de serie» sin guardarla ✱ | A | PROD | Parcial (caso real en PROD 10 oct, VIN con O; propuesta: normalizar O→0 e I→1 + `[SERIE_FORMATO]` con el motivo real) |
 | 543 | Póliza vencida tratada como renovación | A | PROD | PROD ✱ parcial (viaje 6: R0/b1/c1 y fuera el caso B); **a0, b2 y c2 en la bandeja de firmas** (H/S por decidir); a1/a2 esperan el `#566` |
@@ -260,6 +260,8 @@ firmada (textos A, B, B sin descuento, C y D).
 - **Prueba de Alberto en PROD** (Camry, #4394 → #4395): **8 issues cerrados** con su caso real (Texas, deducible, contado, ISSFAM → descuento del 30 %, PDF sin URL inventada, imagen que no es tarjeta, despedida D2 y número de atención humana en `WA Config`). Salieron dos defectos: `#593` (nuevo) y el `#475` (VIN con O: «ya tengo tu número de serie» falso y bucle). El `#472` y el `#563` quedan sin ejercitar: la tarjeta era de otro auto.
 
 - **Iniciativa nueva `#594`** (Alberto): leer la póliza actual del lead (foto o PDF) con un **nodo especialista**, compararla con nuestra cotización (comparador determinista) y argumentar. Espera las fuentes citables de «Quálitas número 1 en autos» y de la atención de siniestros.
+
+- **`#591` v2:** el control positivo con una emisión real en STG pasa. Listo para PROD con la firma de Alberto. **Sonnet 5.5** omite «exitosamente» en 2 de 2 emisiones reales en STG, así que no va a PROD sin el mensaje de emisión determinista.
 
 ---
 
