@@ -40,24 +40,24 @@ cierre».
   - `Parcial`.
 - 🔴 = criticidad crítica por label o por título.
 
-## Totales (14 oct: 91 en tablas + `#578`, la lista de prioridades)
+## Totales (14 oct: 93 en tablas + `#578`, la lista de prioridades)
 
 | Responsable | Issues |
 |---|---|
 | Juan | 46 |
-| Alberto | 43 |
+| Alberto | 45 |
 | Compartido | 2 |
 
 | Problema en | Issues |
 |---|---|
-| PROD | 49 |
+| PROD | 51 |
 | No consta | 21 |
 | Ambos | 12 |
 | STG | 9 |
 
 | Arreglo | Issues |
 |---|---|
-| Sin arreglo | 57 |
+| Sin arreglo | 59 |
 | Parcial | 16 |
 | Solo STG | 11 |
 | Solo PROD (falta caso real) | 4 |
@@ -66,9 +66,10 @@ cierre».
 
 ---
 
-## 1. Descuentos: ofrecer, aplicar y comunicar bien el descuento (21)
+## 1. Descuentos: ofrecer, aplicar y comunicar bien el descuento (22)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
+| 608 🔴 | Cotizó con un CP que no es el suyo: no se puede corregir conservando el descuento y la póliza sale con un domicilio falso ✱ | A | PROD | — (Django: recotizar con otro CP; n8n: provisional, no seguir con colonias del CP equivocado) |
 | 585 | Tras el descuento pasa a pedir datos sin cobertura elegida (`paquete` y `forma_pago` en NULL) ✱ | A | PROD | — |
 | 579 | Un timeout de Django deja la aplicación `uncertain` para siempre | A | PROD | — |
 | 563 | El carril vuelve a pedir el VIN confirmado por foto | A | PROD | PROD ✱ (viaje 1, bot `b7caf68b`); falta la primera foto real |
@@ -133,9 +134,10 @@ cierre».
 | 357 | Iniciativa Cobranza Vencida | J | ¿? | — |
 | 356 | No existe registro de «no contactar» | J | PROD | — |
 
-## 6. Qué dice el bot: contenido, cifras y respuestas (6)
+## 6. Qué dice el bot: contenido, cifras y respuestas (7)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
+| 609 | Un recibo de luz como comprobante de domicilio se clasifica como comprobante de pago ✱ | A | PROD | — (tipo `comprobante_de_domicilio` + texto a la firma) |
 | 594 | Iniciativa: la póliza actual del lead (foto o PDF) → nodo especialista que la lee, comparador y argumento ✱ | A | PROD | — (diseño en `docs/iniciativas/2026-10-10-poliza-del-lead-…`; esperan las fuentes de los dos «número 1») |
 | 592 | 12 meses sin intereses: tope del 30 % de descuento en CUALQUIER póliza; la KB lo limita a negocios especiales y el bot ofrece 12 MSI tras descuentos ✱ | A | PROD | — (espera a Hylant: ¿nuestros 20/30/40 % cuentan? El texto D de la llamada, bloqueado para PROD) |
 | 580 | Fugas de razonamiento al cliente («El cliente sigue insistiendo…») | A | PROD | STG ✱ (`7f04b5c9`: red general en Outbound Leak Guard; STG 2/969, las 2 reales) |
@@ -282,6 +284,8 @@ firmada (textos A, B, B sin descuento, C y D).
 - **`#591` cerrado en PROD** (`af2cbaee`, dos nodos, 84/84 emisiones reales pasan). Nuevo **`#607`** (un falso positivo con una explicación del proceso). **`#606` en STG.**
 
 - **Paso 1 del plan de cierre (Alberto):** aprobados los textos del `#593` y el `#475`, el paquete de prompt del `#486` y la higiene (`#147` cerrado como no planificado; `#238` aparcada; `#126` y `#353` encargados; `#134` a hablar con Juan). Retención: el siniestro y la queja conservan la respuesta de hoy. `#607` v1.1 en verde en STG.
+
+- **Caso de hoy en PROD (`waq_4442`, Camry):** el cliente iba a emitir con una colonia de un CP que no es el suyo, y Alberto avisó a Montserrat. Nuevos **`#608`** (no se puede recotizar con otro CP conservando el descuento) y **`#609`** (el recibo de la luz tomado por un comprobante de pago); el VIN de 16 caracteres, al `#475`.
 
 ---
 
