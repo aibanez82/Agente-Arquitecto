@@ -147,7 +147,7 @@ cierre».
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
 | 596 | Textos de urgencia para clientes dormidos y tras el descuento o la pausa (Montserrat, Hylant) | A | PROD | — (firmado: urgencia honesta H + los tres textos; n8n en la cola de STG, y los textos de Django pedidos a Juan) |
-| 586 | «Cancelar» al seguimiento «¿Avanzamos?»: el agente cierra la sesión y manda el enlace del especialista ✱ | A | PROD | STG ✱ (`29c034e1`: B → A → silencio, 3/3; el 2.º «Cancelar» ya arreglado); falta repetir la C del QA; la pausa espera el `reason` de Juan |
+| 586 | «Cancelar» al seguimiento «¿Avanzamos?»: el agente cierra la sesión y manda el enlace del especialista ✱ | A | PROD | STG ✱ (`ae699fe9`: B → A → silencio, el QA 3/3, 21/21); **listo para PROD con orden de Alberto**; la pausa de seguimientos espera el `reason` de Juan |
 | 285 🔴 | Teléfono sin sesión viva → cliente sin respuesta | A | Ambos | STG ✱ (bot `03b09269`), **en pausa**: Juan propone una solución más sencilla |
 | 542 | Tras declinar o derivar, el seguimiento insiste | A | PROD | — |
 | 464 | Tras derivar por VIN con póliza, los checkpoints siguen | A | PROD | STG ✱ (cubierto por el cableado del `#577`) |
@@ -300,6 +300,8 @@ firmada (textos A, B, B sin descuento, C y D).
 - **Viaje 4: no prometer contacto, en PROD** (`5abccce9` → `80fe1b49`: 2 hunks del AI Agent, el `vuelve_desde` en el `[CTX:]`, la regla 14 del RAG y el límite de 30 en `Merge Session Data`), verificado. El bot deja de prometer «te contacto» (caso `waq_4420`). Sigue el viaje 5 (`#580`).
 
 - **Viaje 5: `#580` cerrado** (PROD `80fe1b49` → `4b9eaf42`, solo `Outbound Leak Guard`, sin la frase D). **El día de viajes termina:** `#607`, `#606`, resumen, no prometer contacto y `#580` en PROD, los cinco verificados por el Arquitecto. PROD queda en `4b9eaf42`.
+
+- **`#586` verde en STG** (QA C 3/3 sobre `ae699fe9`/`1e11ea53`), listo para PROD con orden de Alberto. STG descongelado (adenda 9).
 
 ---
 
