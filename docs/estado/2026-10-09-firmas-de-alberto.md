@@ -96,3 +96,11 @@ Encargo: `Agente-n8n:handoffs/2026-10-14-A-firmas-orden-prod-591-y-cola.md`. Los
 | prompt-486-paquete | OK | Los puntos 3, 4, 6, 8, 9, 10, 11 y 14 del juicio del `#486` (solo redacción) |
 | higiene-iniciativas | De acuerdo | `#147`, cerrado como no planificado; `#238`, aparcada; `#286`, abierta; `#126` y `#353`, encargados a la sesión A; `#134`, a hablar con Juan |
 | retención: siniestro y queja | Aprobado («sí, así está bien») | Ver la sexta tanda (corregida) |
+
+## Décima tanda (14 oct) — caso `waq_4442`
+
+| Id | Decisión | Qué |
+|---|---|---|
+| cp-equivocado-608 | OK | Provisional: con un CP distinto al cotizado, no se siguen colonias del CP equivocado ni se manda a la web; se pasa a una persona y la sesión queda marcada |
+| serie-16-475 | OK | El texto de longitud del `#475` cubre también el caso de los 16 caracteres |
+| domicilio-recibo-609 | Cambio de Alberto | «Intentemos extraer la dirección del comprobante, se la ofrecemos al cliente y que nos la confirme. Como con el VIN y las placas.» La dirección se extrae, se ofrece y solo se guarda con confirmación; si el CP no casa, se aplica el `#608` |
