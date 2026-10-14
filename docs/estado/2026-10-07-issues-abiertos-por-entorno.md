@@ -57,8 +57,8 @@ cierre».
 
 | Arreglo | Issues |
 |---|---|
-| Sin arreglo | 59 |
-| Parcial | 16 |
+| Sin arreglo | 58 |
+| Parcial | 17 |
 | Solo STG | 11 |
 | Solo PROD (falta caso real) | 3 |
 | En los dos entornos (falta acreditar) | 2 |
@@ -148,7 +148,7 @@ cierre».
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
 | 596 | Textos de urgencia para clientes dormidos y tras el descuento o la pausa (Montserrat, Hylant) | A | PROD | — (firmado: urgencia honesta H + los tres textos; n8n en la cola de STG, y los textos de Django pedidos a Juan) |
-| 586 | «Cancelar» al seguimiento «¿Avanzamos?»: el agente cierra la sesión y manda el enlace del especialista ✱ | A | PROD | — (firmado: **B**, la pregunta de objeción, una vez; en la cola de STG de la sesión A) |
+| 586 | «Cancelar» al seguimiento «¿Avanzamos?»: el agente cierra la sesión y manda el enlace del especialista ✱ | A | PROD | STG parcial (`327de5ea`: el 1.º da B; **el 2.º falla**, cae al modelo y acaba en `Terminal Sink`, según el QA; arreglo en curso; la pausa espera el `reason` de Juan) |
 | 285 🔴 | Teléfono sin sesión viva → cliente sin respuesta | A | Ambos | STG ✱ (bot `03b09269`), **en pausa**: Juan propone una solución más sencilla |
 | 542 | Tras declinar o derivar, el seguimiento insiste | A | PROD | — |
 | 464 | Tras derivar por VIN con póliza, los checkpoints siguen | A | PROD | STG ✱ (cubierto por el cableado del `#577`) |
@@ -287,6 +287,8 @@ firmada (textos A, B, B sin descuento, C y D).
 - **Caso de hoy en PROD (`waq_4442`, Camry):** el cliente iba a emitir con una colonia de un CP que no es el suyo, y Alberto avisó a Montserrat. Nuevos **`#608`** (no se puede recotizar con otro CP conservando el descuento) y **`#609`** (el recibo de la luz tomado por un comprobante de pago); el VIN de 16 caracteres, al `#475`.
 
 - **`#472` cerrado** con el caso real `waq_4398` (12 oct): la guarda impidió guardar una serie de foto sin confirmar. Sin casos reales todavía: `#563` (carril de descuento con foto), `#494` (0 vetos), `#289` (1 pagada desde el 9 oct, sin pasar por la liga) y `#499`.
+
+- **E2E del QA en STG** (`327de5ea`): **`#606`, no prometer contacto y el resumen pasan 3/3**, listos para el viaje. El **2.º «Cancelar» del `#586` falla** (Terminal Sink sin envío): arreglo encargado y no viaja.
 
 ---
 
