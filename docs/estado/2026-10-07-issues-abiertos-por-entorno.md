@@ -40,24 +40,24 @@ cierre».
   - `Parcial`.
 - 🔴 = criticidad crítica por label o por título.
 
-## Totales (14 oct: 89 en tablas + `#578`, la lista de prioridades)
+## Totales (14 oct: 92 en tablas + `#578`, la lista de prioridades)
 
 | Responsable | Issues |
 |---|---|
-| Juan | 46 |
-| Alberto | 41 |
+| Juan | 47 |
+| Alberto | 43 |
 | Compartido | 2 |
 
 | Problema en | Issues |
 |---|---|
-| PROD | 46 |
+| PROD | 48 |
 | No consta | 21 |
 | Ambos | 13 |
-| STG | 9 |
+| STG | 10 |
 
 | Arreglo | Issues |
 |---|---|
-| Sin arreglo | 56 |
+| Sin arreglo | 59 |
 | Parcial | 18 |
 | Solo STG | 8 |
 | Solo PROD (falta caso real) | 4 |
@@ -103,9 +103,10 @@ cierre».
 | 307 🔴 | La barrera del estado de póliza depende del Intent Router | J | Ambos | — |
 | 280 | Emisión web en STG no completa | J | STG | — |
 
-## 3. Cobro: liga de pago, recibos y recordatorios (8)
+## 3. Cobro: liga de pago, recibos y recordatorios (9)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
+| 597 | Del pago a los documentos pasan ~3 h: los clientes desconfían (Montserrat, Hylant) ✱ | J | PROD | — (medido: la orden se crea a la hora en punto y el envío sale cada 2 h a las :15; mediana de 135 min) |
 | 583 | Diagnóstico de la derivación previa al enlace de pago (OPL) | J | ¿? | — |
 | 289 | `payment-link/ensure` no distingue «sin liga» de «pagada» | A | Ambos | PROD ✱ (viaje 2); el caso «ya pagada» se acredita con la primera póliza pagada real |
 | 329 | El cron de ligas no reintenta (costó una venta) | J | PROD | — |
@@ -132,9 +133,10 @@ cierre».
 | 357 | Iniciativa Cobranza Vencida | J | ¿? | — |
 | 356 | No existe registro de «no contactar» | J | PROD | — |
 
-## 6. Qué dice el bot: contenido, cifras y respuestas (6)
+## 6. Qué dice el bot: contenido, cifras y respuestas (7)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
+| 605 | STG: el URL Fidelity Guard (`#261`) retira el enlace del agente (`new URL` no existe en el sandbox) ✱ | A | STG | — (orden: arreglarlo en STG antes del `#577`; el nodo no viaja a PROD hasta verlo en verde) |
 | 594 | Iniciativa: la póliza actual del lead (foto o PDF) → nodo especialista que la lee, comparador y argumento ✱ | A | PROD | — (diseño en `docs/iniciativas/2026-10-10-poliza-del-lead-…`; esperan las fuentes de los dos «número 1») |
 | 592 | 12 meses sin intereses: tope del 30 % de descuento en CUALQUIER póliza; la KB lo limita a negocios especiales y el bot ofrece 12 MSI tras descuentos ✱ | A | PROD | — (espera a Hylant: ¿nuestros 20/30/40 % cuentan? El texto D de la llamada, bloqueado para PROD) |
 | 580 | Fugas de razonamiento al cliente («El cliente sigue insistiendo…») | A | PROD | STG ✱ (`7f04b5c9`: red general en Outbound Leak Guard; STG 2/969, las 2 reales) |
@@ -142,9 +144,10 @@ cierre».
 | 499 | Salida vacía del agente: mensaje sin contestar | A | ¿? | Ambos |
 | 486 | Análisis de coherencia del system prompt (informe) | A | ¿? | — (inventario encargado al Agente n8n · A) |
 
-## 7. Seguimientos y cierre de conversación (9)
+## 7. Seguimientos y cierre de conversación (10)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
+| 596 | Textos de urgencia para clientes dormidos y tras el descuento o la pausa (Montserrat, Hylant) | A | PROD | — (Mejoras los contrasta con lo firmado; luego a la bandeja) |
 | 586 | «Cancelar» al seguimiento «¿Avanzamos?»: el agente cierra la sesión y manda el enlace del especialista ✱ | A | PROD | — (**texto en la bandeja de firmas**: A = el del «Cancelar» del descuento) |
 | 285 🔴 | Teléfono sin sesión viva → cliente sin respuesta | A | Ambos | STG ✱ (bot `03b09269`), **en pausa**: Juan propone una solución más sencilla |
 | 542 | Tras declinar o derivar, el seguimiento insiste | A | PROD | — |
@@ -264,6 +267,8 @@ firmada (textos A, B, B sin descuento, C y D).
 - **`#591` v2:** el control positivo con una emisión real en STG pasa. Listo para PROD con la firma de Alberto. **Sonnet 5.5** omite «exitosamente» en 2 de 2 emisiones reales en STG, así que no va a PROD sin el mensaje de emisión determinista.
 
 - **14 oct:** Juan terminó la parte de Django del `#577` (PR #600, verificado en STG). El cableado de n8n (PUT de pausa antes de la derivación, que cubre también el `#464`) está encargado a la sesión A. La responsabilidad del `#577` pasa a Alberto.
+
+- **14 oct:** entran el `#596` y el `#597` (Montserrat, Hylant): el `#596` asignado a Alberto (pasa por Mejoras) y el `#597` a Juan, con la causa medida (un proceso cada 2 h). Entra el `#605` (URL Fidelity Guard roto en STG, encontrado por la sesión A), que va antes del `#577`.
 
 ---
 
