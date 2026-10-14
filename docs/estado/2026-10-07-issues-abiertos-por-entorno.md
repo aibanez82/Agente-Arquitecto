@@ -298,6 +298,8 @@ firmada (textos A, B, B sin descuento, C y D).
 
 - **Nuevo `#610`** (Mejoras): un «Ok gracias» guarda la cobertura sin aceptación (`waq_4419`, `waq_4447`). Pendiente de Alberto: si una **pausa** («voy a checarlo») debe abrir el carril de descuento, como pasa hoy en `waq_4451`, o recibir el gancho D2.
 
+- **Viaje 4: no prometer contacto, en PROD** (`5abccce9` → `80fe1b49`: 2 hunks del AI Agent, el `vuelve_desde` en el `[CTX:]`, la regla 14 del RAG y el límite de 30 en `Merge Session Data`), verificado. El bot deja de prometer «te contacto» (caso `waq_4420`). Sigue el viaje 5 (`#580`).
+
 ---
 
 ## Movimientos del 9 oct
