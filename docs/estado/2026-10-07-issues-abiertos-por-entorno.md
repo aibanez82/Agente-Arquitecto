@@ -40,24 +40,24 @@ cierre».
   - `Parcial`.
 - 🔴 = criticidad crítica por label o por título.
 
-## Totales (14 oct: 89 en tablas + `#578`, la lista de prioridades)
+## Totales (14 oct: 90 en tablas + `#578`, la lista de prioridades)
 
 | Responsable | Issues |
 |---|---|
 | Juan | 46 |
-| Alberto | 41 |
+| Alberto | 42 |
 | Compartido | 2 |
 
 | Problema en | Issues |
 |---|---|
-| PROD | 48 |
+| PROD | 49 |
 | No consta | 20 |
 | Ambos | 12 |
 | STG | 9 |
 
 | Arreglo | Issues |
 |---|---|
-| Sin arreglo | 58 |
+| Sin arreglo | 59 |
 | Parcial | 16 |
 | Solo STG | 9 |
 | Solo PROD (falta caso real) | 3 |
@@ -132,9 +132,10 @@ cierre».
 | 357 | Iniciativa Cobranza Vencida | J | ¿? | — |
 | 356 | No existe registro de «no contactar» | J | PROD | — |
 
-## 6. Qué dice el bot: contenido, cifras y respuestas (7)
+## 6. Qué dice el bot: contenido, cifras y respuestas (8)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
+| 610 | Un «Ok gracias» o una frase ambigua guarda la cobertura y pasa a pedir datos (`Save_Quotation_Selection` sin aceptación) ✱ | A | PROD | — (propuesta: una guarda del grafo que exija aceptación explícita, como con el VIN) |
 | 609 | Un recibo de luz como comprobante de domicilio se clasifica como comprobante de pago ✱ | A | PROD | — (aprobado: la dirección se extrae, se ofrece y se confirma, como con el VIN; en la cola de la sesión A) |
 | 594 | Iniciativa: la póliza actual del lead (foto o PDF) → nodo especialista que la lee, comparador y argumento ✱ | A | PROD | — (diseño en `docs/iniciativas/2026-10-10-poliza-del-lead-…`; esperan las fuentes de los dos «número 1») |
 | 592 | 12 meses sin intereses: tope del 30 % de descuento en CUALQUIER póliza; la KB lo limita a negocios especiales y el bot ofrece 12 MSI tras descuentos ✱ | A | PROD | — (espera a Hylant: ¿nuestros 20/30/40 % cuentan? El texto D de la llamada, bloqueado para PROD) |
@@ -294,6 +295,8 @@ firmada (textos A, B, B sin descuento, C y D).
 - **Viaje 2: `#606` cerrado** (PROD `d3a660c2` → `97822428`). El inventario de cambios de los viajes 3 y 4 está revisado. En STG, el 2.º «Cancelar» del `#586` ya está arreglado (`29c034e1`).
 
 - **Viaje 3: el resumen con la pregunta al principio, en PROD** (`97822428` → `5abccce9`, 3 hunks del prompt y `Rebuild Summary From Record`), verificado. Es el punto 1 del `#486` y la firma `resumen-orden-pregunta`.
+
+- **Nuevo `#610`** (Mejoras): un «Ok gracias» guarda la cobertura sin aceptación (`waq_4419`, `waq_4447`). Pendiente de Alberto: si una **pausa** («voy a checarlo») debe abrir el carril de descuento, como pasa hoy en `waq_4451`, o recibir el gancho D2.
 
 ---
 
