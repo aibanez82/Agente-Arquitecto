@@ -57,9 +57,9 @@ cierre».
 
 | Arreglo | Issues |
 |---|---|
-| Sin arreglo | 59 |
+| Sin arreglo | 57 |
 | Parcial | 16 |
-| Solo STG | 8 |
+| Solo STG | 10 |
 | Solo PROD (falta caso real) | 3 |
 | En los dos entornos (falta acreditar) | 2 |
 | Firmado, en curso | 1 |
@@ -69,7 +69,7 @@ cierre».
 ## 1. Descuentos: ofrecer, aplicar y comunicar bien el descuento (22)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 608 🔴 | Cotizó con un CP que no es el suyo: no se puede corregir conservando el descuento y la póliza sale con un domicilio falso ✱ | A | PROD | — (provisional aprobado y primero en la cola de la sesión A; la recotización con otro CP, pedida a Juan) |
+| 608 🔴 | Cotizó con un CP que no es el suyo: no se puede corregir conservando el descuento y la póliza sale con un domicilio falso ✱ | A | PROD | STG ✱ provisional (`ae699fe9`/`02ed57c1`: la marca bloquea la emisión, pasa a una persona con el texto firmado y pausa los seguimientos); a PROD con orden; la recotización con otro CP, pedida a Juan |
 | 585 | Tras el descuento pasa a pedir datos sin cobertura elegida (`paquete` y `forma_pago` en NULL) ✱ | A | PROD | — |
 | 579 | Un timeout de Django deja la aplicación `uncertain` para siempre | A | PROD | — |
 | 563 | El carril vuelve a pedir el VIN confirmado por foto | A | PROD | PROD ✱ (viaje 1, bot `b7caf68b`); falta la primera foto real |
@@ -136,7 +136,7 @@ cierre».
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
 | 610 | Un «Ok gracias» o una frase ambigua guarda la cobertura y pasa a pedir datos (`Save_Quotation_Selection` sin aceptación) ✱ | A | PROD | — (propuesta: una guarda del grafo que exija aceptación explícita, como con el VIN) |
-| 609 | Un recibo de luz como comprobante de domicilio se clasifica como comprobante de pago ✱ | A | PROD | — (aprobado: la dirección se extrae, se ofrece y se confirma, como con el VIN; en la cola de la sesión A) |
+| 609 | Un recibo de luz como comprobante de domicilio se clasifica como comprobante de pago ✱ | A | PROD | STG ✱ (`02ed57c1`: tipo `comprobante_de_domicilio`, el domicilio se ofrece y se guarda solo con confirmación; si el CP es otro, se aplica el `#608`); a PROD con orden |
 | 594 | Iniciativa: la póliza actual del lead (foto o PDF) → nodo especialista que la lee, comparador y argumento ✱ | A | PROD | — (diseño en `docs/iniciativas/2026-10-10-poliza-del-lead-…`; esperan las fuentes de los dos «número 1») |
 | 592 | 12 meses sin intereses: tope del 30 % de descuento en CUALQUIER póliza; la KB lo limita a negocios especiales y el bot ofrece 12 MSI tras descuentos ✱ | A | PROD | — (espera a Hylant: ¿nuestros 20/30/40 % cuentan? El texto D de la llamada, bloqueado para PROD) |
 | 461 | Ofrece Cobertura Limitada sin que la pidan (67/81) | A | PROD | PROD ✱ (viaje 6, bot `26dfbb82`: textos firmados en el prompt); el grafo (Limitada solo con permiso) pendiente |
@@ -302,6 +302,8 @@ firmada (textos A, B, B sin descuento, C y D).
 - **Viaje 5: `#580` cerrado** (PROD `80fe1b49` → `4b9eaf42`, solo `Outbound Leak Guard`, sin la frase D). **El día de viajes termina:** `#607`, `#606`, resumen, no prometer contacto y `#580` en PROD, los cinco verificados por el Arquitecto. PROD queda en `4b9eaf42`.
 
 - **`#586` verde en STG** (QA C 3/3 sobre `ae699fe9`/`1e11ea53`), listo para PROD con orden de Alberto. STG descongelado (adenda 9).
+
+- **`#608` y `#609` en STG** (bot `02ed57c1`), verificados por el diff; el siguiente en la cola es la retención con su adenda 1.
 
 ---
 
