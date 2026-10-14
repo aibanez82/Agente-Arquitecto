@@ -40,17 +40,17 @@ cierre».
   - `Parcial`.
 - 🔴 = criticidad crítica por label o por título.
 
-## Totales (14 oct: 90 en tablas + `#578`, la lista de prioridades)
+## Totales (14 oct: 89 en tablas + `#578`, la lista de prioridades)
 
 | Responsable | Issues |
 |---|---|
 | Juan | 46 |
-| Alberto | 42 |
+| Alberto | 41 |
 | Compartido | 2 |
 
 | Problema en | Issues |
 |---|---|
-| PROD | 49 |
+| PROD | 48 |
 | No consta | 20 |
 | Ambos | 12 |
 | STG | 9 |
@@ -59,7 +59,7 @@ cierre».
 |---|---|
 | Sin arreglo | 59 |
 | Parcial | 16 |
-| Solo STG | 9 |
+| Solo STG | 8 |
 | Solo PROD (falta caso real) | 3 |
 | En los dos entornos (falta acreditar) | 2 |
 | Firmado, en curso | 1 |
@@ -132,14 +132,13 @@ cierre».
 | 357 | Iniciativa Cobranza Vencida | J | ¿? | — |
 | 356 | No existe registro de «no contactar» | J | PROD | — |
 
-## 6. Qué dice el bot: contenido, cifras y respuestas (8)
+## 6. Qué dice el bot: contenido, cifras y respuestas (7)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
 | 610 | Un «Ok gracias» o una frase ambigua guarda la cobertura y pasa a pedir datos (`Save_Quotation_Selection` sin aceptación) ✱ | A | PROD | — (propuesta: una guarda del grafo que exija aceptación explícita, como con el VIN) |
 | 609 | Un recibo de luz como comprobante de domicilio se clasifica como comprobante de pago ✱ | A | PROD | — (aprobado: la dirección se extrae, se ofrece y se confirma, como con el VIN; en la cola de la sesión A) |
 | 594 | Iniciativa: la póliza actual del lead (foto o PDF) → nodo especialista que la lee, comparador y argumento ✱ | A | PROD | — (diseño en `docs/iniciativas/2026-10-10-poliza-del-lead-…`; esperan las fuentes de los dos «número 1») |
 | 592 | 12 meses sin intereses: tope del 30 % de descuento en CUALQUIER póliza; la KB lo limita a negocios especiales y el bot ofrece 12 MSI tras descuentos ✱ | A | PROD | — (espera a Hylant: ¿nuestros 20/30/40 % cuentan? El texto D de la llamada, bloqueado para PROD) |
-| 580 | Fugas de razonamiento al cliente («El cliente sigue insistiendo…») | A | PROD | STG ✱ (`7f04b5c9`: red general en Outbound Leak Guard; STG 2/969, las 2 reales) |
 | 461 | Ofrece Cobertura Limitada sin que la pidan (67/81) | A | PROD | PROD ✱ (viaje 6, bot `26dfbb82`: textos firmados en el prompt); el grafo (Limitada solo con permiso) pendiente |
 | 499 | Salida vacía del agente: mensaje sin contestar | A | ¿? | Ambos |
 | 486 | Análisis de coherencia del system prompt (informe) | A | ¿? | — (juicio de 18 puntos publicado; paquete 3-4-6-8-9-10-11-14 autorizado; en la cola de la sesión A) |
@@ -299,6 +298,8 @@ firmada (textos A, B, B sin descuento, C y D).
 - **Nuevo `#610`** (Mejoras): un «Ok gracias» guarda la cobertura sin aceptación (`waq_4419`, `waq_4447`). Pendiente de Alberto: si una **pausa** («voy a checarlo») debe abrir el carril de descuento, como pasa hoy en `waq_4451`, o recibir el gancho D2.
 
 - **Viaje 4: no prometer contacto, en PROD** (`5abccce9` → `80fe1b49`: 2 hunks del AI Agent, el `vuelve_desde` en el `[CTX:]`, la regla 14 del RAG y el límite de 30 en `Merge Session Data`), verificado. El bot deja de prometer «te contacto» (caso `waq_4420`). Sigue el viaje 5 (`#580`).
+
+- **Viaje 5: `#580` cerrado** (PROD `80fe1b49` → `4b9eaf42`, solo `Outbound Leak Guard`, sin la frase D). **El día de viajes termina:** `#607`, `#606`, resumen, no prometer contacto y `#580` en PROD, los cinco verificados por el Arquitecto. PROD queda en `4b9eaf42`.
 
 ---
 
