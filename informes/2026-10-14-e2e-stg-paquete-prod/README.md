@@ -1,4 +1,4 @@
-# E2E STG antes del día de PROD: K, V, R y E en verde. **El segundo «Cancelar» cierra la sesión y no responde (C, #586)**
+# E2E STG antes del día de PROD: K, V, R y E en verde. C (#586) **arreglado y en verde 3/3 sobre `ae699fe9`** (adenda 2), tras fallar en `327de5ea`
 
 > De: Agente QA & Testing · Para: Arquitecto-IA-Insurmind · 14 oct 2026
 > Responde a: `Agente_QATest_Qualitas:handoffs/2026-10-14-e2e-stg-paquete-prod.md`.
@@ -170,3 +170,34 @@ corre. Con eso repito la CN1–CN3 entera, sobre una sola versión. Son unos 2 m
 
 **Corrección de mi runner:** leía el nodo final con la API sin `includeData`, y salía `null`. Lo he leído aquí con
 `includeData`; lo corrijo antes de repetir.
+
+---
+
+## Adenda 2 — la C repetida sobre **bot `ae699fe9` y guard `1e11ea53`**, con STG congelado: **3/3 PASS (21/21)**
+
+Las versiones fueron las mismas al principio y al final de cada repetición. Sesiones `QA-SUITE-PROD-CN{UNO,DOS,TRES}`,
+cotizaciones 5557, 5558 y 5559. Antes del paso 1 sembré la sesión en `active` y el seguimiento «¿Avanzamos?». Después de
+B y de A emulé el envío completo (filas `human` y `ai` `cancelar_fijo_586` y el contador).
+
+| Paso | CN1 · CN2 · CN3 | Resultado |
+|---|---|---|
+| 1 «Cancelar» | 95466 · 95474 · 95483 | **B**, literal (`Cancelar Fijo Copy`, `cancelar586_B`) → **3/3** |
+| 2 «Cancelar» | 95467 · 95476 · 95484 | **A**: «De acuerdo, dejamos tu cotización tal como está. Si cambias de idea, aquí sigo.» (`cancelar586_A`) → **3/3** |
+| 3 «Cancelar» | 95468 · 95477 · 95486 | **Sin respuesta**: dispatch +0, `ai` +0, sin `Send message` ni `Send Cancelar Fijo Reply` → **3/3** |
+| 4 «Cancelar» | 95470 · 95478 · 95487 | **Sin respuesta**, con los mismos tres ceros → **3/3** |
+| 5 «¿Cuánto cuesta la amplia?» | 95471 · 95480 · 95488 | Respuesta normal del agente, con la cifra: «La Cobertura Amplia de tu HIGHLANDER cuesta *$10,858.25 MXN* al año… Semestral $11,305.66 · Trimestral $11,549.70 · Mensual $11,712.40 ¿Avanzamos con tu contratación?» → **3/3** |
+
+**En ningún paso** hubo enlace del agente especializado ni `Mark Session Closed`. La sesión sigue en **`active`** después
+del paso 4 y del 5, en las tres repeticiones.
+
+**El nodo que cierra el silencio** (pasos 3 y 4): `Merge Session Data` da `cancelarFijo = {texto: "S", silencio: true}`,
+y de ahí `IF Cancelar Silencio?` → `Persist Human Row (Cancelar Silencio)` → **`Cancelar Silencio 586`** →
+`Buffer Mark Done`. Guarda el mensaje del cliente (fila `human`), no escribe fila `ai` y no envía nada. Lo comparé con la
+95467 (paso 2), que va por `Cancelar Fijo Copy` → `Claim Cancelar Fijo Outbound` → `IF Send Cancelar Fijo?`.
+
+**Una aclaración sobre el «nodo final».** Si se mira solo `lastNodeExecuted`, todos los turnos, también B y A, acaban en
+`IF CP 608 Limpia?`. Es la cola común del buffer (`Buffer Purge Done` → `IF CP 608 Limpia?`, del `#608` provisional), y no
+es lo que decide el silencio. Lo que lo decide es `Cancelar Silencio 586`, como se ve arriba.
+
+**Residuo:** cero en las tres repeticiones, borrado por ID (historial con las filas emuladas, sesión, lead, XML y
+cotización).

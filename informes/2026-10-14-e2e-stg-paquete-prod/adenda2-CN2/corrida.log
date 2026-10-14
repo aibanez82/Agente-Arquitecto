@@ -1,0 +1,36 @@
+[versiones inicio] bot ae699fe9-2849-454b-81bf-bc5067456fb5 · guard 1e11ea53-41ac-49cc-9cca-7854b1b3b796 · corrida CN2
+[fixture] cotización 5558 · lead 4205 · sesión QA-SUITE-PROD-CNDOS
+      [sembrado] status=active · seguimiento «¿Avanzamos?» (django_checkpoint_followup_v06, attempt 1)
+  [cn1] exec 95474 · 74 nodos · guard: —
+      cliente: «Cancelar»
+      bot:     «»
+      → [Cancelar Fijo Copy · cancelar586_B] «Entendido. ¿Es por el precio o te quedó alguna duda de la cobertura? Si prefieres dejarlo aquí, no pasa nada: tu cotización queda guardada.»
+      dispatch+0 · ai nuevas 0 · Send [] · Mark Session Closed false · último nodo IF CP 608 Limpia? · status active
+      [emulado tras cn1] filas 20699,20700 (cancelar_fijo_586) · cancelar586={"b": true}
+  [cn2] exec 95476 · 74 nodos · guard: —
+      cliente: «Cancelar»
+      bot:     «»
+      → [Cancelar Fijo Copy · cancelar586_A] «De acuerdo, dejamos tu cotización tal como está. Si cambias de idea, aquí sigo.»
+      dispatch+0 · ai nuevas 0 · Send [] · Mark Session Closed false · último nodo IF CP 608 Limpia? · status active
+      [emulado tras cn2] filas 20701,20702 (cancelar_fijo_586) · cancelar586={"a": true, "b": true}
+  [cn3] exec 95477 · 74 nodos · guard: —
+      cliente: «Cancelar»
+      bot:     «»
+      → [(sin texto: no corrió ni carril ni Stash)] «»
+      dispatch+0 · ai nuevas 0 · Send [] · Mark Session Closed false · último nodo IF CP 608 Limpia? · status active
+  [cn4] exec 95478 · 74 nodos · guard: —
+      cliente: «Cancelar»
+      bot:     «»
+      → [(sin texto: no corrió ni carril ni Stash)] «»
+      dispatch+0 · ai nuevas 0 · Send [] · Mark Session Closed false · último nodo IF CP 608 Limpia? · status active
+  [cn5] exec 95480 · 97 nodos · guard: —
+      cliente: «¿Cuánto cuesta la amplia?»
+      bot:     «La Cobertura Amplia de tu HIGHLANDER cuesta *$10,858.25 MXN* al año, pagando en una sola exhibición. Si prefieres pagar en parcialidades, el total sube: • Semestral: $11,305.66 • Trimestral: $11,549.70 • Mensual: $11,712.40 ¿Avanzamos con tu contratación?»
+      → [Stash Main Reply Payload] «La Cobertura Amplia de tu HIGHLANDER cuesta *$10,858.25 MXN* al año, pagando en una sola exhibición. Si prefieres pagar en parcialidades, el total sube: • Semestral: $11,305.66 • Trimestral: $11,549.70 • Mensual: $11,712.40 ¿Avanzamos con tu contratación?»
+      dispatch+0 · ai nuevas 3 · Send [] · Mark Session Closed false · último nodo IF CP 608 Limpia? · status active
+[versiones final] bot ae699fe9-2849-454b-81bf-bc5067456fb5 · guard 1e11ea53-41ac-49cc-9cca-7854b1b3b796
+[limpieza] n8n_chat_histories:13 · whatsapp_sessions:1 · qualitas_lead:1 · qualitas_cotizacionrespuestaxml:1 · qualitas_cotizacion:1
+[p14-CN2] 7 tests → PASS 7 · FAIL 0 · WARN 0 · SKIP 0
+[p14-CN2] reporte: reports/20261014-1619-P14-CN2/p14-CN2.json
+[p14] traza en reports/20261014-1619-P14-CN2
+exit=0
