@@ -1,4 +1,4 @@
-# E2E STG antes del día de PROD: K, V y R en verde. **El segundo «Cancelar» cierra la sesión y no responde (C, #586)**. E pendiente de firma
+# E2E STG antes del día de PROD: K, V, R y E en verde. **El segundo «Cancelar» cierra la sesión y no responde (C, #586)**
 
 > De: Agente QA & Testing · Para: Arquitecto-IA-Insurmind · 14 oct 2026
 > Responde a: `Agente_QATest_Qualitas:handoffs/2026-10-14-e2e-stg-paquete-prod.md`.
@@ -59,7 +59,7 @@ para que decidas tú:
   bloque del registro (de `Rebuild Summary From Record`) y no dice «antes de que cambie».
 - **C ×3.** B: **3/3 PASS**. 2.º «Cancelar»: **3/3 FAIL**, porque cierra la sesión y no envía nada (ver arriba).
 - **CX (variante declarada) — PASS.** Con un segundo seguimiento por medio sale **A**, sin enlace y sin cerrar la sesión.
-- **E — pendiente de la firma de Alberto en mi sesión.** Si no la da, no emito y lo dejo escrito aquí.
+- **E — PASS.** Firma de Alberto en mi sesión («Sí, emite»). Póliza **`7620104237`** en el QA de Quálitas. El guardarraíl la deja pasar: en la ejecución **95213**, `Detect Emision Narration` da `needsGuardrailCheck: true` y `narratedPolicyNumbers: ["7620104237"]`, y `Validate Emision Against DB` da `exists_real: true` (`polizas: 1`, `inexistentes: []`). El mensaje sale con la póliza. Detalle abajo.
 
 ## Emulación del envío (declarada)
 
@@ -114,3 +114,25 @@ En K sembré además `phaseCounters.greeting = 10` y una fila `ai` previa del bo
   sembrado. Sin él, el resultado medido es el cierre.
 
 Agente: QA & Testing
+
+---
+
+## Corrida E — emisión real (`20261014-1333-P14-E`)
+
+**Firma:** Alberto, en mi sesión. **Versiones:** `327de5ea` y `c31a3c54` al principio, justo antes de emitir y al final.
+**Fixture:** cotización 5555, «Ana Pérez Ríos», VIN `5TDDZRFHXLS061401`, placas `QAA614E`, pago anual de contado.
+
+| Aceptación | Ejecución · nodo | Resultado |
+|---|---|---|
+| El guardarraíl deja pasar la emisión real | **95213** · `Detect Emision Narration` → `Validate Emision Against DB` | `needsGuardrailCheck: true`, `afirmaEmision: true`, `narratedPolicyNumbers: ["7620104237"]` → `{polizas: 1, inexistentes: [], dados_por_el_cliente: [], exists_real: true}` → **PASS** |
+| El mensaje de emisión sale | 95213 · `Stash Main Reply Payload` | «¡Listo, Ana! 🎉 Tu póliza fue emitida. … Póliza: 7620104237 · Monto total: $11,775.69 MXN · Ojo: este monto es distinto de los $10,858.25 MXN que te mostré en el resumen…» → **PASS** |
+| Póliza en el QA | guard **95215** · `Call Issue Policy Real` y `qualitas_polizaemitida` | **`7620104237`** |
+
+**Dos cosas que ya conoces, y vuelven a salir:**
+- **«emitida exitosamente» no aparece.** Es la **3.ª de 3** emisiones con Sonnet 5.5 que dicen «Tu póliza fue emitida.».
+  Esta vez no estaba en la aceptación, pero cualquier detector que busque la frase antigua sigue sin ver las emisiones.
+- **El monto:** **$11,775.69** frente a $10,858.25. Es la misma cifra que en el `#536` y en el `#545`, sobre el mismo
+  origen (2683). El bot avisa al cliente de la diferencia.
+
+**Residuo:** el de siempre en una emisión. Quedan `qualitas_leadfunnelevent` 9996–9999 (append-only), que retienen el
+lead 4202, su asegurado y la cotización 5555. La póliza sigue viva en el QA de Quálitas.
