@@ -63,3 +63,10 @@ cambiar si Hylant indica otra cosa.
 | Id | Decisión | Texto |
 |---|---|---|
 | retener-antes-de-escalar | Firmo, sin notas | Ante una petición expresa de hablar con una persona: **un** intento de retención por conversación, y si insiste, el enlace al momento. Excepciones que escalan directo: siniestro o accidente, queja o reclamación, problema con una póliza emitida o un pago, y producto que no vendemos (Uber, taxi, flotilla). Textos literales (con descuento, sin descuento y «si insiste») en la bandeja (`propuestas/retener-antes-de-escalar`). Nace de su prueba en PROD (`waq_4395`, filas 14987-14988) |
+
+## Séptima tanda (14 oct) — decisiones sobre el caso `waq_4420` (`#606`)
+
+| Id | Decisión | Qué |
+|---|---|---|
+| limite-cortesia | Decidido por Alberto: «sí, adelante con las tres» | La cortesía y la despedida no cuentan para el límite de mensajes por fase (`Message Budget Guard`); las reacciones, tampoco. El texto del corte no cambia |
+| no-prometer-contacto | **Pendiente de firma** (bandeja: `propuestas/no-prometer-contacto`) | Mientras no exista el recordatorio por fecha (`#223`), el bot no promete «te contacto»: el cliente vuelve a escribir a partir de una fecha que calcula el sistema. Cambia el texto firmado del límite de 30 |
