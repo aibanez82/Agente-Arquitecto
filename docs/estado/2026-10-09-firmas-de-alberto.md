@@ -62,7 +62,7 @@ cambiar si Hylant indica otra cosa.
 
 | Id | Decisión | Texto |
 |---|---|---|
-| retener-antes-de-escalar | Firmo, sin notas | Ante una petición expresa de hablar con una persona: **un** intento de retención por conversación, y si insiste, el enlace al momento. Excepciones que escalan directo: siniestro o accidente, queja o reclamación, problema con una póliza emitida o un pago, y producto que no vendemos (Uber, taxi, flotilla). Textos literales (con descuento, sin descuento y «si insiste») en la bandeja (`propuestas/retener-antes-de-escalar`). Nace de su prueba en PROD (`waq_4395`, filas 14987-14988) |
+| retener-antes-de-escalar | Firmo, sin notas | Ante una petición expresa de hablar con una persona: **un** intento de retención por conversación, y si insiste, el enlace al momento. ~~Excepciones que escalan directo: siniestro o accidente, queja o reclamación, problema con una póliza emitida o un pago, y producto que no vendemos (Uber, taxi, flotilla).~~ **Corregido el 14 oct** (Alberto: «sí, así está bien»): **siniestro y queja conservan la respuesta de hoy** (la información útil de la KB, más el contacto si hace falta) **y solo dejan de intentar retener**; póliza o pago y Uber, taxi o flotilla siguen escalando directo. La redacción tachada era del Arquitecto y quitaba la ayuda inmediata que hoy da el bot. Textos literales (con descuento, sin descuento y «si insiste») en la bandeja (`propuestas/retener-antes-de-escalar`). Nace de su prueba en PROD (`waq_4395`, filas 14987-14988) |
 
 ## Séptima tanda (14 oct) — decisiones sobre el caso `waq_4420` (`#606`)
 
