@@ -69,7 +69,7 @@ cierre».
 ## 1. Descuentos: ofrecer, aplicar y comunicar bien el descuento (22)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 608 🔴 | Cotizó con un CP que no es el suyo: no se puede corregir conservando el descuento y la póliza sale con un domicilio falso ✱ | A | PROD | — (Django: recotizar con otro CP; n8n: provisional, no seguir con colonias del CP equivocado) |
+| 608 🔴 | Cotizó con un CP que no es el suyo: no se puede corregir conservando el descuento y la póliza sale con un domicilio falso ✱ | A | PROD | — (provisional aprobado y primero en la cola de la sesión A; la recotización con otro CP, pedida a Juan) |
 | 585 | Tras el descuento pasa a pedir datos sin cobertura elegida (`paquete` y `forma_pago` en NULL) ✱ | A | PROD | — |
 | 579 | Un timeout de Django deja la aplicación `uncertain` para siempre | A | PROD | — |
 | 563 | El carril vuelve a pedir el VIN confirmado por foto | A | PROD | PROD ✱ (viaje 1, bot `b7caf68b`); falta la primera foto real |
@@ -137,7 +137,7 @@ cierre».
 ## 6. Qué dice el bot: contenido, cifras y respuestas (7)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 609 | Un recibo de luz como comprobante de domicilio se clasifica como comprobante de pago ✱ | A | PROD | — (tipo `comprobante_de_domicilio` + texto a la firma) |
+| 609 | Un recibo de luz como comprobante de domicilio se clasifica como comprobante de pago ✱ | A | PROD | — (aprobado: la dirección se extrae, se ofrece y se confirma, como con el VIN; en la cola de la sesión A) |
 | 594 | Iniciativa: la póliza actual del lead (foto o PDF) → nodo especialista que la lee, comparador y argumento ✱ | A | PROD | — (diseño en `docs/iniciativas/2026-10-10-poliza-del-lead-…`; esperan las fuentes de los dos «número 1») |
 | 592 | 12 meses sin intereses: tope del 30 % de descuento en CUALQUIER póliza; la KB lo limita a negocios especiales y el bot ofrece 12 MSI tras descuentos ✱ | A | PROD | — (espera a Hylant: ¿nuestros 20/30/40 % cuentan? El texto D de la llamada, bloqueado para PROD) |
 | 580 | Fugas de razonamiento al cliente («El cliente sigue insistiendo…») | A | PROD | STG ✱ (`7f04b5c9`: red general en Outbound Leak Guard; STG 2/969, las 2 reales) |
