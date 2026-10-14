@@ -40,17 +40,17 @@ cierre».
   - `Parcial`.
 - 🔴 = criticidad crítica por label o por título.
 
-## Totales (14 oct: 90 en tablas + `#578`, la lista de prioridades)
+## Totales (14 oct: 89 en tablas + `#578`, la lista de prioridades)
 
 | Responsable | Issues |
 |---|---|
 | Juan | 46 |
-| Alberto | 42 |
+| Alberto | 41 |
 | Compartido | 2 |
 
 | Problema en | Issues |
 |---|---|
-| PROD | 49 |
+| PROD | 48 |
 | No consta | 20 |
 | Ambos | 12 |
 | STG | 9 |
@@ -58,7 +58,7 @@ cierre».
 | Arreglo | Issues |
 |---|---|
 | Sin arreglo | 58 |
-| Parcial | 17 |
+| Parcial | 16 |
 | Solo STG | 9 |
 | Solo PROD (falta caso real) | 3 |
 | En los dos entornos (falta acreditar) | 2 |
@@ -147,7 +147,7 @@ cierre».
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
 | 596 | Textos de urgencia para clientes dormidos y tras el descuento o la pausa (Montserrat, Hylant) | A | PROD | — (firmado: urgencia honesta H + los tres textos; n8n en la cola de STG, y los textos de Django pedidos a Juan) |
-| 586 | «Cancelar» al seguimiento «¿Avanzamos?»: el agente cierra la sesión y manda el enlace del especialista ✱ | A | PROD | STG parcial (`327de5ea`: el 1.º da B; **el 2.º falla**, cae al modelo y acaba en `Terminal Sink`, según el QA; arreglo en curso; la pausa espera el `reason` de Juan) |
+| 586 | «Cancelar» al seguimiento «¿Avanzamos?»: el agente cierra la sesión y manda el enlace del especialista ✱ | A | PROD | STG ✱ (`29c034e1`: B → A → silencio, 3/3; el 2.º «Cancelar» ya arreglado); falta repetir la C del QA; la pausa espera el `reason` de Juan |
 | 285 🔴 | Teléfono sin sesión viva → cliente sin respuesta | A | Ambos | STG ✱ (bot `03b09269`), **en pausa**: Juan propone una solución más sencilla |
 | 542 | Tras declinar o derivar, el seguimiento insiste | A | PROD | — |
 | 464 | Tras derivar por VIN con póliza, los checkpoints siguen | A | PROD | STG ✱ (cubierto por el cableado del `#577`) |
@@ -170,10 +170,9 @@ cierre».
 | 361 | Persona con muchos leads | J | PROD | — |
 | 78 | Leads duplicados por envío múltiple del formulario | J | PROD | — |
 
-## 10. Trazabilidad e historial (5)
+## 10. Trazabilidad e historial (4)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 606 | Dos envíos sin fila en el historial (PROD, `waq_4420`): el corte por presupuesto no escribe memoria, y una reacción cuenta como mensaje ✱ | A | PROD | STG ✱ (`1500c022`: el corte con historial, reacciones ignoradas, la cortesía no cuenta; `waq_4420` reproducida con 0 cortes); a PROD con orden de Alberto |
 | 183 | La emisión con éxito no queda en el historial | A | STG | — |
 | 126 | Capturar estados de entrega de Meta | A | ¿? | — (veredicto del 25 ago: failed y delivered; duda de diseño en la cola de la sesión A) |
 | 127 | Persistir y mostrar estados de entrega | J | ¿? | — |
@@ -291,6 +290,8 @@ firmada (textos A, B, B sin descuento, C y D).
 - **`#587` cerrado en PROD** (Dashboard `1eda3e6`): el Resumen vuelve a cargar Meta. El despliegue en Vercel es de segunda mano: al Arquitecto se le caducó el token.
 
 - **Día de viajes a PROD:** viaje 1, el **`#607`, cerrado** (PROD `af2cbaee` → `d3a660c2`, un nodo). Sigue el viaje 2 (`#606`).
+
+- **Viaje 2: `#606` cerrado** (PROD `d3a660c2` → `97822428`). El inventario de cambios de los viajes 3 y 4 está revisado. En STG, el 2.º «Cancelar» del `#586` ya está arreglado (`29c034e1`).
 
 ---
 
