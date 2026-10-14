@@ -53,7 +53,7 @@ Es el tercer mensaje de la cadena de seguimiento:
 - `waq_4387` 14897 (9-oct): el cliente contesta al minuto, «Si por favor quiero seguir los contacto ya que salga de trabajar».
 - `waq_4378` 14757: «Aceptar» 18 min después, y abre el descuento (14776).
 
-**Quién lo manda:** Django no lo registra en `qualitas_whatsappmessage` (en la sesión `waq_4387` solo consta `saludos_inicial_sin_pdf_con_boton`). Los tres mensajes viven en `n8n_chat_histories`, así que salen por n8n. Según `Agente-n8n:scripts/load-checkpoint-followup-copy-stg.py`, el texto se configura en `qualitas_leadfollowuppolicy`, en el checkpoint `quote_sent`, intento 3. No tengo permiso de lectura de esa tabla en PROD. **Confírmalo en el grafo.**
+**Quién lo manda:** Django no lo registra en `qualitas_whatsappmessage` (en la sesión `waq_4387` solo consta `saludos_inicial_sin_pdf_con_boton`). Los tres mensajes viven en `n8n_chat_histories`. **Corrección del Arquitecto (14-oct): son los checkpoints de Django (`django_checkpoint_followup_v06`), no n8n**; la escritura en `n8n_chat_histories` no indica que los mande n8n. Según `Agente-n8n:scripts/load-checkpoint-followup-copy-stg.py`, el texto se configura en `qualitas_leadfollowuppolicy`, en el checkpoint `quote_sent`, intento 3. No tengo permiso de lectura de esa tabla en PROD. **Confírmalo en el grafo.**
 
 **Cómo responden** (desde el 21-sep, un teléfono por mensaje, sin copias):
 
