@@ -40,17 +40,17 @@ cierre».
   - `Parcial`.
 - 🔴 = criticidad crítica por label o por título.
 
-## Totales (14 oct: 92 en tablas + `#578`, la lista de prioridades)
+## Totales (14 oct: 91 en tablas + `#578`, la lista de prioridades)
 
 | Responsable | Issues |
 |---|---|
 | Juan | 46 |
-| Alberto | 44 |
+| Alberto | 43 |
 | Compartido | 2 |
 
 | Problema en | Issues |
 |---|---|
-| PROD | 51 |
+| PROD | 50 |
 | No consta | 20 |
 | Ambos | 12 |
 | STG | 9 |
@@ -59,7 +59,7 @@ cierre».
 |---|---|
 | Sin arreglo | 58 |
 | Parcial | 17 |
-| Solo STG | 11 |
+| Solo STG | 10 |
 | Solo PROD (falta caso real) | 3 |
 | En los dos entornos (falta acreditar) | 2 |
 | Firmado, en curso | 1 |
@@ -194,11 +194,10 @@ cierre».
 | 538 | Perf del gate pre-PROD | J | ¿? | Parcial |
 | 131 | Runbook de quick reply desactualizado | J | ¿? | — |
 
-## 12. Dashboard y su desacople (5)
+## 12. Dashboard y su desacople (4)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
 | 590 | El hito `dio_datos_personales` está muerto (0 de 1.869 mensajes en 21 días) ✱ | A | PROD | — (diseño aprobado: `asegurado OR grupo1` heredado; PROD 21 + 23 → 28; a `stg`) |
-| 587 | `/api/meta-analytics` da 500: el Resumen no carga Meta | A | PROD | STG ✱ (`ecd7719`: troceo de 10 y ventana UTC cerrada; Preview 200 con las 11 plantillas); a PROD con orden de Alberto |
 | 286 | Mapa del desacople del Dashboard | A | Ambos | — |
 | 290 | Embudo por API, no por LIKE | J | Ambos | Parcial |
 | 287 | Bandeja del contact center | J | ¿? | — |
@@ -289,6 +288,8 @@ firmada (textos A, B, B sin descuento, C y D).
 - **`#472` cerrado** con el caso real `waq_4398` (12 oct): la guarda impidió guardar una serie de foto sin confirmar. Sin casos reales todavía: `#563` (carril de descuento con foto), `#494` (0 vetos), `#289` (1 pagada desde el 9 oct, sin pasar por la liga) y `#499`.
 
 - **E2E del QA en STG** (`327de5ea`): **`#606`, no prometer contacto y el resumen pasan 3/3**, listos para el viaje. El **2.º «Cancelar» del `#586` falla** (Terminal Sink sin envío): arreglo encargado y no viaja.
+
+- **`#587` cerrado en PROD** (Dashboard `1eda3e6`): el Resumen vuelve a cargar Meta. El despliegue en Vercel es de segunda mano: al Arquitecto se le caducó el token.
 
 ---
 
