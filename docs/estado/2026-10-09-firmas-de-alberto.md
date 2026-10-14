@@ -86,3 +86,13 @@ cambiar si Hylant indica otra cosa.
 | no-prometer-contacto | 14 oct | sí | Sin recordatorio por fecha, nunca «te contacto»: «escríbeme por aquí a partir del…» |
 
 Encargo: `Agente-n8n:handoffs/2026-10-14-A-firmas-orden-prod-591-y-cola.md`. Los textos de Django del `#596` van a Juan.
+
+## Novena tanda (14 oct) — paso 1 del plan de cierre
+
+| Id | Decisión | Qué |
+|---|---|---|
+| serie-foto-no-cuadra-593 | Aprobado | «Leí tu tarjeta de circulación, pero el número de serie que trae es de un [MARCA AÑO], y estamos cotizando un [VEHÍCULO]. ¿Es el mismo auto? Si es otro, dime cuál y te lo cotizo; si es este, escríbeme el número de serie tal como aparece en la tarjeta.» |
+| serie-formato-475 | Aprobado | O→0 e I→1 con confirmación: «Tu número de serie tenía una letra O, y los números de serie nunca llevan O, I ni Q, así que la he cambiado por un cero: [SERIE]. ¿Es correcto?»; si la longitud no es 17: «El número de serie tiene que tener 17 caracteres y el que me escribiste tiene [N]. ¿Me lo revisas en tu tarjeta de circulación?» |
+| prompt-486-paquete | OK | Los puntos 3, 4, 6, 8, 9, 10, 11 y 14 del juicio del `#486` (solo redacción) |
+| higiene-iniciativas | De acuerdo | `#147`, cerrado como no planificado; `#238`, aparcada; `#286`, abierta; `#126` y `#353`, encargados a la sesión A; `#134`, a hablar con Juan |
+| retención: siniestro y queja | Aprobado («sí, así está bien») | Ver la sexta tanda (corregida) |

@@ -40,26 +40,26 @@ cierre».
   - `Parcial`.
 - 🔴 = criticidad crítica por label o por título.
 
-## Totales (14 oct: 92 en tablas + `#578`, la lista de prioridades)
+## Totales (14 oct: 91 en tablas + `#578`, la lista de prioridades)
 
 | Responsable | Issues |
 |---|---|
-| Juan | 47 |
+| Juan | 46 |
 | Alberto | 43 |
 | Compartido | 2 |
 
 | Problema en | Issues |
 |---|---|
-| PROD | 50 |
+| PROD | 49 |
 | No consta | 21 |
 | Ambos | 12 |
 | STG | 9 |
 
 | Arreglo | Issues |
 |---|---|
-| Sin arreglo | 59 |
+| Sin arreglo | 57 |
 | Parcial | 16 |
-| Solo STG | 10 |
+| Solo STG | 11 |
 | Solo PROD (falta caso real) | 4 |
 | En los dos entornos (falta acreditar) | 2 |
 | Firmado, en curso | 1 |
@@ -94,10 +94,10 @@ cierre».
 ## 2. Emisión: que la póliza salga con los datos correctos (8)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 607 | El guardarraíl del `#591` lee «Primero emitimos su póliza…» (una explicación) como una emisión afirmada ✱ | A | PROD | — (1 de 4.227; afinar la regla, en la cola de la sesión A) |
-| 593 | La serie de la foto que no casa con el auto cotizado se descarta en silencio: el bot la vuelve a pedir ✱ | A | PROD | — (propuesta: nota `[SERIE_FOTO_NO_CUADRA]` con texto firmado) |
+| 607 | El guardarraíl del `#591` lee «Primero emitimos su póliza…» (una explicación) como una emisión afirmada ✱ | A | PROD | STG ✱ (v1.1 `0d2921dd`, 11/11 medido por mí); a PROD con orden de Alberto |
+| 593 | La serie de la foto que no casa con el auto cotizado se descarta en silencio: el bot la vuelve a pedir ✱ | A | PROD | — (texto aprobado por Alberto; en la cola de la sesión A) |
 | 472 🔴 | Persiste datos del vehículo no confirmados y pasan a la póliza | A | ¿? | PROD ✱ (viaje 7: «Están bien» y guardado determinista de la serie); falta el caso real |
-| 475 | VIN tecleado con formato inválido: motivo engañoso y bucle; el modelo afirma «ya tengo tu número de serie» sin guardarla ✱ | A | PROD | Parcial (caso real en PROD 10 oct, VIN con O; propuesta: normalizar O→0 e I→1 + `[SERIE_FORMATO]` con el motivo real) |
+| 475 | VIN tecleado con formato inválido: motivo engañoso y bucle; el modelo afirma «ya tengo tu número de serie» sin guardarla ✱ | A | PROD | Parcial (texto aprobado: O→0 e I→1 con confirmación; en la cola de la sesión A) |
 | 543 | Póliza vencida tratada como renovación | A | PROD | PROD ✱ parcial (viaje 6); **a0 + b2/c2 en variante S firmados**, en la cola de STG; a1/a2 esperan el `#566` |
 | 534 | TipoRegla 70/31 en el XML de Quálitas | J | Ambos | Parcial |
 | 307 🔴 | La barrera del estado de póliza depende del Intent Router | J | Ambos | — |
@@ -113,7 +113,7 @@ cierre».
 | 364 | Recuperación cross-day de Payment Links | J | PROD | — |
 | 362 | Deduplicar snapshots del ledger | J | ¿? | — |
 | 231 | Ledger como fuente de verdad: grants | J | PROD | — |
-| 353 | Versionar `n8n_payment_events` y grants | J | PROD | — |
+| 353 | Versionar `n8n_payment_events` y grants | A | ¿? | — (el paquete `088981f6` de Juan, en la cola de la sesión A) |
 | 144 | Recordatorios de pago D-7/48h/24h/día D | J | ¿? | — |
 
 ## 4. Postventa: el cliente que ya compró (1)
@@ -141,7 +141,7 @@ cierre».
 | 580 | Fugas de razonamiento al cliente («El cliente sigue insistiendo…») | A | PROD | STG ✱ (`7f04b5c9`: red general en Outbound Leak Guard; STG 2/969, las 2 reales) |
 | 461 | Ofrece Cobertura Limitada sin que la pidan (67/81) | A | PROD | PROD ✱ (viaje 6, bot `26dfbb82`: textos firmados en el prompt); el grafo (Limitada solo con permiso) pendiente |
 | 499 | Salida vacía del agente: mensaje sin contestar | A | ¿? | Ambos |
-| 486 | Análisis de coherencia del system prompt (informe) | A | ¿? | — (inventario encargado al Agente n8n · A) |
+| 486 | Análisis de coherencia del system prompt (informe) | A | ¿? | — (juicio de 18 puntos publicado; paquete 3-4-6-8-9-10-11-14 autorizado; en la cola de la sesión A) |
 
 ## 7. Seguimientos y cierre de conversación (10)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
@@ -161,10 +161,9 @@ cierre».
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
 
-## 9. Identidad, sesiones y control humano (6)
+## 9. Identidad, sesiones y control humano (5)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 147 | Separar identidad, lifecycle, autoridad y reservas | A | ¿? | — |
 | 556 | 458 sesiones legacy sin `lead_id` → `identity_contradiction` | J | PROD | — |
 | 346 | `whatsapp_sessions` no guarda quién creó la fila | J | Ambos | — |
 | 128 | Control humano ↔ IA: redefinición de estados | J | Ambos | Parcial |
@@ -176,7 +175,7 @@ cierre».
 |---|---|---|---|---|
 | 606 | Dos envíos sin fila en el historial (PROD, `waq_4420`): el corte por presupuesto no escribe memoria, y una reacción cuenta como mensaje ✱ | A | PROD | STG ✱ (`1500c022`: el corte con historial, reacciones ignoradas, la cortesía no cuenta; `waq_4420` reproducida con 0 cortes); a PROD con orden de Alberto |
 | 183 | La emisión con éxito no queda en el historial | A | STG | — |
-| 126 | Capturar estados de entrega de Meta | A | ¿? | — |
+| 126 | Capturar estados de entrega de Meta | A | ¿? | — (veredicto del 25 ago: failed y delivered; duda de diseño en la cola de la sesión A) |
 | 127 | Persistir y mostrar estados de entrega | J | ¿? | — |
 | 276 | `fecha_actualizacion` deja de registrar cambios | J | STG | — |
 
@@ -281,6 +280,8 @@ firmada (textos A, B, B sin descuento, C y D).
 - **Firmas:** 5 del 11 oct se quedaron sin atender hasta hoy (el Arquitecto no miró la bandeja) y 4 son de hoy. **El `#591` va a PROD.** Cola de STG para la sesión A: no prometer contacto, la pregunta del resumen al principio, `#586` B, `#543` S, emisión determinista (fraccionado + b1) y `#596` H.
 
 - **`#591` cerrado en PROD** (`af2cbaee`, dos nodos, 84/84 emisiones reales pasan). Nuevo **`#607`** (un falso positivo con una explicación del proceso). **`#606` en STG.**
+
+- **Paso 1 del plan de cierre (Alberto):** aprobados los textos del `#593` y el `#475`, el paquete de prompt del `#486` y la higiene (`#147` cerrado como no planificado; `#238` aparcada; `#126` y `#353` encargados; `#134` a hablar con Juan). Retención: el siniestro y la queja conservan la respuesta de hoy. `#607` v1.1 en verde en STG.
 
 ---
 
