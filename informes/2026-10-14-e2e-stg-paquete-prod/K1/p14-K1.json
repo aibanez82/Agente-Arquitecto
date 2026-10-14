@@ -1,0 +1,74 @@
+{
+  "system": "p14-K1",
+  "run_id": "20261014-1303-P14-K1",
+  "timestamp_mx": "2026-10-14 13:05 (GMT-6 MX)",
+  "triggered_by": "detección automática",
+  "results": [
+    {
+      "id": "QA-P14-K1-K1-REACCION",
+      "system": "p14-K1",
+      "description": "#606 · reacción → nada, y el contador no sube",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 95023",
+      "result": "Reacción Ignorada 606: sí · Stash: no · contador 10 · historial nuevo []",
+      "expected": "ignorada, sin texto, contador 10",
+      "message": ""
+    },
+    {
+      "id": "QA-P14-K1-K2-CORTESIA",
+      "system": "p14-K1",
+      "description": "#606 · «Gracias, buen día» → sin corte",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 95024 · Despedida Fija Copy",
+      "result": "corte: no · contador 10 · «¡Con gusto! Tu cotización queda guardada; cuando quieras retomarla, escríbeme por aquí 🙂»",
+      "expected": "sin corte; contador 10",
+      "message": ""
+    },
+    {
+      "id": "QA-P14-K1-K3-CORTE",
+      "system": "p14-K1",
+      "description": "#606 · «¿y si me roban el auto?» → corte",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 95026 · Stash Main Reply Payload",
+      "result": "corte: sí · contador 10 · «Hemos alcanzado el límite de mensajes para esta etapa de tu proceso. Para continuar con tu contratación, te invitamos a hablar con uno de nuestros agentes especializados: https://api.whatsapp.com/send?phone=525537511678&text=Quiero%20continuar%20con%20mi%20cotizacion%205542 Nuestro horario de atención es de 8am - 5pm, Lunes a Viernes.»",
+      "expected": "texto de corte por límite",
+      "message": ""
+    },
+    {
+      "id": "QA-P14-K1-K3-PAR-HISTORIAL",
+      "system": "p14-K1",
+      "description": "#606 · el corte deja su par human + ai en n8n_chat_histories",
+      "priority": "critica",
+      "status": "NO COMPROBABLE",
+      "check": "exec 95026 · Persist Human Row (Corte Presupuesto): no corrió · Build Corte AI Row: no corrió",
+      "result": "filas nuevas [] · del par: 0",
+      "expected": "human + ai",
+      "message": "Las dos filas cuelgan del fence autorizado (IF Turno Corte Presupuesto? / IF Turno Corte Enviado?): con la sesión sin dígitos no se escriben. Exige un envío real."
+    },
+    {
+      "id": "QA-P14-K1-VERSION",
+      "system": "p14-K1",
+      "description": "Versiones iguales al principio y al final",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "",
+      "result": "327de5ea/c31a3c54 → 327de5ea/c31a3c54",
+      "expected": "iguales; si no, NULA",
+      "message": ""
+    },
+    {
+      "id": "QA-P14-K1-LIMPIEZA",
+      "system": "p14-K1",
+      "description": "Limpieza por IDs exactos, en orden de FK descubierto del catálogo",
+      "priority": "alta",
+      "status": "PASS",
+      "check": "cotización clonada 5542 · lead 4189 · sesión QA-SUITE-PROD-KUNO",
+      "result": "n8n_chat_histories:3 · whatsapp_sessions:1 · qualitas_lead:1 · qualitas_cotizacionrespuestaxml:1 · qualitas_cotizacion:1",
+      "expected": "cero residuo en STG (lo creado en el QA de Quálitas no es borrable desde aquí y se declara aparte)",
+      "message": "sin residuo en STG"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+[versiones inicio] bot 327de5ea-f1f0-4f84-bcfb-60569f07b3fc · guard c31a3c54-7e66-4e97-b75d-997d6c870e6b · corrida C2
+[fixture] cotización 5549 · lead 4196 · sesión QA-SUITE-PROD-CDOS
+      [sembrado] seguimiento «¿Avanzamos?» (django_checkpoint_followup_v06, attempt 1)
+  [c1] exec 95071 · 75 nodos · guard: —
+      cliente: «Cancelar»
+      bot:     «»
+      → [Cancelar Fijo Copy · cancelar586_B] «Entendido. ¿Es por el precio o te quedó alguna duda de la cobertura? Si prefieres dejarlo aquí, no pasa nada: tu cotización queda guardada.»
+      [emulado tras c1] filas 20057,20058 (cancelar_fijo_586) · cancelar586={"b": true}
+  [c2] exec 95073 · 91 nodos · guard: —
+      cliente: «Cancelar»
+      bot:     «Para tu caso, te recomendamos contactar directamente con un agente especializado que podrá atenderte mejor: https://api.whatsapp.com/send?phone=525537511678&text=Quiero%20continuar%20con%20mi%20cotizacion%205549»
+      → [(sin texto: no corrió ni carril ni Stash)] «»
+[versiones final] bot 327de5ea-f1f0-4f84-bcfb-60569f07b3fc · guard c31a3c54-7e66-4e97-b75d-997d6c870e6b
+[limpieza] n8n_chat_histories:7 · whatsapp_sessions:1 · qualitas_lead:1 · qualitas_cotizacionrespuestaxml:1 · qualitas_cotizacion:1
+[p14-C2] 5 tests → PASS 3 · FAIL 2 · WARN 0 · SKIP 0
+[p14-C2] reporte: reports/20261014-1315-P14-C2/p14-C2.json
+[p14] traza en reports/20261014-1315-P14-C2
+exit=0

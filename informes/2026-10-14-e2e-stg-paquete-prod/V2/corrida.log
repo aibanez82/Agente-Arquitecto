@@ -1,0 +1,22 @@
+[versiones inicio] bot 327de5ea-f1f0-4f84-bcfb-60569f07b3fc · guard c31a3c54-7e66-4e97-b75d-997d6c870e6b · corrida V2
+[fixture] cotización 5546 · lead 4193 · sesión QA-SUITE-PROD-VDOS
+  [v1] exec 95058 · 71 nodos · guard: —
+      cliente: «Tengo póliza con otra aseguradora»
+      bot:     «»
+      → [Limite 30 Fijo Copy · limite30_pide_dia] «¿Qué día exacto vence tu seguro actual?»
+      [emulado tras v1] filas 20041,20042 (limite30_fijo)
+  [v2] exec 95060 · 70 nodos · guard: —
+      cliente: «Vence el 15 de enero de 2027»
+      bot:     «»
+      → [Limite 30 Fijo Copy · limite30_fuera] «Por ahora solo puedo diferir el inicio de tu póliza hasta 30 días. La fecha más lejana que puedo ofrecerte es el 13/11/2026. ¿Quieres que la iniciemos en esa fecha? Si prefieres esperar a que se acerque el vencimiento, escríbeme por aquí a partir del 16/12/2026 y te la preparo en el momento, con tu »
+      [emulado tras v2] filas 20043,20044 (limite30_fijo)
+  [v3] exec 95061 · 69 nodos · guard: —
+      cliente: «Prefiero esperar»
+      bot:     «»
+      → [Limite 30 Fijo Copy · limite30_espera] «Perfecto. Te guardo tu cotización: escríbeme por aquí a partir del 16/12/2026 y la dejamos lista para que empiece justo el 15/01/2027. ¡Que tengas muy buen día!»
+[versiones final] bot 327de5ea-f1f0-4f84-bcfb-60569f07b3fc · guard c31a3c54-7e66-4e97-b75d-997d6c870e6b
+[limpieza] n8n_chat_histories:4 · whatsapp_sessions:1 · qualitas_lead:1 · qualitas_cotizacionrespuestaxml:1 · qualitas_cotizacion:1
+[p14-V2] 5 tests → PASS 5 · FAIL 0 · WARN 0 · SKIP 0
+[p14-V2] reporte: reports/20261014-1310-P14-V2/p14-V2.json
+[p14] traza en reports/20261014-1310-P14-V2
+exit=0

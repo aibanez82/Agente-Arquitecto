@@ -1,0 +1,63 @@
+{
+  "system": "p14-C3",
+  "run_id": "20261014-1316-P14-C3",
+  "timestamp_mx": "2026-10-14 13:18 (GMT-6 MX)",
+  "triggered_by": "detección automática",
+  "results": [
+    {
+      "id": "QA-P14-C3-C1-B",
+      "system": "p14-C3",
+      "description": "#586 · 1.er «Cancelar» → B, sin enlace",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 95075 · Cancelar Fijo Copy",
+      "result": "b · URLs [] · «Entendido. ¿Es por el precio o te quedó alguna duda de la cobertura? Si prefieres dejarlo aquí, no pasa nada: tu cotización queda guardada.»",
+      "expected": "B",
+      "message": ""
+    },
+    {
+      "id": "QA-P14-C3-C2-A",
+      "system": "p14-C3",
+      "description": "#586 · 2.º «Cancelar» → A, sin enlace",
+      "priority": "critica",
+      "status": "FAIL",
+      "check": "exec 95076 · (sin texto: no corrió ni carril ni Stash)",
+      "result": "(sin texto: no corrió ni carril ni Stash) · URLs [] · «»",
+      "expected": "A",
+      "message": ""
+    },
+    {
+      "id": "QA-P14-C3-C-SESION",
+      "system": "p14-C3",
+      "description": "#586 · ni cierre de sesión",
+      "priority": "critica",
+      "status": "FAIL",
+      "check": "",
+      "result": "status closed",
+      "expected": "abierta",
+      "message": ""
+    },
+    {
+      "id": "QA-P14-C3-VERSION",
+      "system": "p14-C3",
+      "description": "Versiones iguales al principio y al final",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "",
+      "result": "327de5ea/c31a3c54 → 327de5ea/c31a3c54",
+      "expected": "iguales; si no, NULA",
+      "message": ""
+    },
+    {
+      "id": "QA-P14-C3-LIMPIEZA",
+      "system": "p14-C3",
+      "description": "Limpieza por IDs exactos, en orden de FK descubierto del catálogo",
+      "priority": "alta",
+      "status": "PASS",
+      "check": "cotización clonada 5550 · lead 4197 · sesión QA-SUITE-PROD-CTRES",
+      "result": "n8n_chat_histories:7 · whatsapp_sessions:1 · qualitas_lead:1 · qualitas_cotizacionrespuestaxml:1 · qualitas_cotizacion:1",
+      "expected": "cero residuo en STG (lo creado en el QA de Quálitas no es borrable desde aquí y se declara aparte)",
+      "message": "sin residuo en STG"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+[versiones inicio] bot 327de5ea-f1f0-4f84-bcfb-60569f07b3fc · guard c31a3c54-7e66-4e97-b75d-997d6c870e6b · corrida CX
+[fixture] cotización 5551 · lead 4198 · sesión QA-SUITE-PROD-CEQUIS
+      [sembrado] seguimiento «¿Avanzamos?» (django_checkpoint_followup_v06, attempt 1)
+  [c1] exec 95079 · 75 nodos · guard: —
+      cliente: «Cancelar»
+      bot:     «»
+      → [Cancelar Fijo Copy · cancelar586_B] «Entendido. ¿Es por el precio o te quedó alguna duda de la cobertura? Si prefieres dejarlo aquí, no pasa nada: tu cotización queda guardada.»
+      [emulado tras c1] filas 20071,20072 (cancelar_fijo_586) · cancelar586={"b": true}
+      [CX] sembrado un SEGUNDO seguimiento (attempt 2)
+  [c2] exec 95080 · 73 nodos · guard: —
+      cliente: «Cancelar»
+      bot:     «»
+      → [Cancelar Fijo Copy · cancelar586_A] «De acuerdo, dejamos tu cotización tal como está. Si cambias de idea, aquí sigo.»
+[versiones final] bot 327de5ea-f1f0-4f84-bcfb-60569f07b3fc · guard c31a3c54-7e66-4e97-b75d-997d6c870e6b
+[limpieza] n8n_chat_histories:4 · whatsapp_sessions:1 · qualitas_lead:1 · qualitas_cotizacionrespuestaxml:1 · qualitas_cotizacion:1
+[p14-CX] 5 tests → PASS 5 · FAIL 0 · WARN 0 · SKIP 0
+[p14-CX] reporte: reports/20261014-1318-P14-CX/p14-CX.json
+[p14] traza en reports/20261014-1318-P14-CX
+exit=0

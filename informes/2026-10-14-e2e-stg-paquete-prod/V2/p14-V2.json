@@ -1,0 +1,63 @@
+{
+  "system": "p14-V2",
+  "run_id": "20261014-1310-P14-V2",
+  "timestamp_mx": "2026-10-14 13:12 (GMT-6 MX)",
+  "triggered_by": "detección automática",
+  "results": [
+    {
+      "id": "QA-P14-V2-V-AVISO",
+      "system": "p14-V2",
+      "description": "Aviso firmado con «escríbeme por aquí a partir del [vence − 30]» y sin prometer contacto",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 95060 · Limite 30 Fijo Copy",
+      "result": "«Por ahora solo puedo diferir el inicio de tu póliza hasta 30 días. La fecha más lejana que puedo ofrecerte es el 13/11/2026. ¿Quieres que la iniciemos en esa fecha? Si prefieres esperar a que se acerque el vencimiento, escríbeme por aquí a partir del 16/12/2026 y te la preparo en el momento, con tu cotización guardada.» · promete contacto: no",
+      "expected": "…a partir del 16/12/2026",
+      "message": ""
+    },
+    {
+      "id": "QA-P14-V2-V-ESPERA",
+      "system": "p14-V2",
+      "description": "«Prefiero esperar» → «Te guardo tu cotización: escríbeme por aquí a partir del…», sin prometer contacto",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 95061 · Limite 30 Fijo Copy",
+      "result": "«Perfecto. Te guardo tu cotización: escríbeme por aquí a partir del 16/12/2026 y la dejamos lista para que empiece justo el 15/01/2027. ¡Que tengas muy buen día!» · promete contacto: no",
+      "expected": "Te guardo tu cotización: escríbeme por aquí a partir del…",
+      "message": ""
+    },
+    {
+      "id": "QA-P14-V2-V-NINGUNO-PROMETE",
+      "system": "p14-V2",
+      "description": "Nunca «te contacto» ni «te escribo» en los 3 turnos",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "",
+      "result": "v1: no · v2: no · v3: no",
+      "expected": "ninguno",
+      "message": ""
+    },
+    {
+      "id": "QA-P14-V2-VERSION",
+      "system": "p14-V2",
+      "description": "Versiones iguales al principio y al final",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "",
+      "result": "327de5ea/c31a3c54 → 327de5ea/c31a3c54",
+      "expected": "iguales; si no, NULA",
+      "message": ""
+    },
+    {
+      "id": "QA-P14-V2-LIMPIEZA",
+      "system": "p14-V2",
+      "description": "Limpieza por IDs exactos, en orden de FK descubierto del catálogo",
+      "priority": "alta",
+      "status": "PASS",
+      "check": "cotización clonada 5546 · lead 4193 · sesión QA-SUITE-PROD-VDOS",
+      "result": "n8n_chat_histories:4 · whatsapp_sessions:1 · qualitas_lead:1 · qualitas_cotizacionrespuestaxml:1 · qualitas_cotizacion:1",
+      "expected": "cero residuo en STG (lo creado en el QA de Quálitas no es borrable desde aquí y se declara aparte)",
+      "message": "sin residuo en STG"
+    }
+  ]
+}
