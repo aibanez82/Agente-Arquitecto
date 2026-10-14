@@ -40,12 +40,12 @@ cierre».
   - `Parcial`.
 - 🔴 = criticidad crítica por label o por título.
 
-## Totales (14 oct: 92 en tablas + `#578`, la lista de prioridades)
+## Totales (14 oct: 91 en tablas + `#578`, la lista de prioridades)
 
 | Responsable | Issues |
 |---|---|
 | Juan | 47 |
-| Alberto | 43 |
+| Alberto | 42 |
 | Compartido | 2 |
 
 | Problema en | Issues |
@@ -53,13 +53,13 @@ cierre».
 | PROD | 48 |
 | No consta | 21 |
 | Ambos | 13 |
-| STG | 10 |
+| STG | 9 |
 
 | Arreglo | Issues |
 |---|---|
-| Sin arreglo | 59 |
-| Parcial | 18 |
-| Solo STG | 8 |
+| Sin arreglo | 58 |
+| Parcial | 16 |
+| Solo STG | 10 |
 | Solo PROD (falta caso real) | 4 |
 | En los dos entornos (falta acreditar) | 2 |
 | Firmado, en curso | 1 |
@@ -133,10 +133,9 @@ cierre».
 | 357 | Iniciativa Cobranza Vencida | J | ¿? | — |
 | 356 | No existe registro de «no contactar» | J | PROD | — |
 
-## 6. Qué dice el bot: contenido, cifras y respuestas (7)
+## 6. Qué dice el bot: contenido, cifras y respuestas (6)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 605 | STG: el URL Fidelity Guard (`#261`) retira el enlace del agente (`new URL` no existe en el sandbox) ✱ | A | STG | — (orden: arreglarlo en STG antes del `#577`; el nodo no viaja a PROD hasta verlo en verde) |
 | 594 | Iniciativa: la póliza actual del lead (foto o PDF) → nodo especialista que la lee, comparador y argumento ✱ | A | PROD | — (diseño en `docs/iniciativas/2026-10-10-poliza-del-lead-…`; esperan las fuentes de los dos «número 1») |
 | 592 | 12 meses sin intereses: tope del 30 % de descuento en CUALQUIER póliza; la KB lo limita a negocios especiales y el bot ofrece 12 MSI tras descuentos ✱ | A | PROD | — (espera a Hylant: ¿nuestros 20/30/40 % cuentan? El texto D de la llamada, bloqueado para PROD) |
 | 580 | Fugas de razonamiento al cliente («El cliente sigue insistiendo…») | A | PROD | STG ✱ (`7f04b5c9`: red general en Outbound Leak Guard; STG 2/969, las 2 reales) |
@@ -151,12 +150,12 @@ cierre».
 | 586 | «Cancelar» al seguimiento «¿Avanzamos?»: el agente cierra la sesión y manda el enlace del especialista ✱ | A | PROD | — (**texto en la bandeja de firmas**: A = el del «Cancelar» del descuento) |
 | 285 🔴 | Teléfono sin sesión viva → cliente sin respuesta | A | Ambos | STG ✱ (bot `03b09269`), **en pausa**: Juan propone una solución más sencilla |
 | 542 | Tras declinar o derivar, el seguimiento insiste | A | PROD | — |
-| 464 | Tras derivar por VIN con póliza, los checkpoints siguen | A | PROD | Parcial (lo cubre el cableado del `#577`: la pausa en la derivación por VIN con póliza) |
+| 464 | Tras derivar por VIN con póliza, los checkpoints siguen | A | PROD | STG ✱ (cubierto por el cableado del `#577`) |
 | 567 | «Te lo mando en la tarde» y los recordatorios insisten a los 30 min | A | PROD | Firmado; la pausa de seguimiento, propuesta a Juan (`#578`) |
 | 223 | Iniciativa: hablarle en la fecha que pide | J | ¿? | — |
 | 163 | Invalidar seguimientos de la cotización origen | J | STG | STG |
 | 124 | `quote_followup_15m` para mensuales y anuales | J | PROD | — |
-| 577 | Dejar de mandar checkpoints cuando el bot ya dijo que no se puede emitir y derivó | A | PROD | Parcial ✱ (Django en STG: PR #600, release 436, `PUT …/followup-pause`; **el cableado de n8n, encargado a la sesión A** el 14 oct) |
+| 577 | Dejar de mandar checkpoints cuando el bot ya dijo que no se puede emitir y derivó | A | PROD | STG ✱ (Django `#600` + n8n: bot `cd512e34` / Guard `c31a3c54`; el PUT de pausa solo al derivar con la marca); falta que Juan confirme en Django |
 
 ## 8. Guardarraíl antijailbreak (0)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
@@ -271,6 +270,8 @@ firmada (textos A, B, B sin descuento, C y D).
 - **14 oct:** entran el `#596` y el `#597` (Montserrat, Hylant): el `#596` asignado a Alberto (pasa por Mejoras) y el `#597` a Juan, con la causa medida (un proceso cada 2 h). Entra el `#605` (URL Fidelity Guard roto en STG, encontrado por la sesión A), que va antes del `#577`.
 
 - **`#596`:** Mejoras midió que **«válido solo hoy» no es verdad** (cotizaciones emitidas al mismo precio hasta 35 días después; lo he confirmado). La decisión V/H y los tres textos están en la bandeja. Afecta también a la firma del `#567` («vence hoy») y a «DESCUENTO ADICIONAL para HOY». Nuevo caso del `#340` en `waq_4427`.
+
+- **`#605` cerrado** (URL Fidelity Guard sin `URL`, en STG). **`#577`** cableado en STG (la marca en el Guard y el PUT al derivar), con el cambio exacto y la evidencia en el issue; falta la validación de Juan en Django.
 
 ---
 
