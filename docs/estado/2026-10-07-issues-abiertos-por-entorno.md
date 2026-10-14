@@ -40,18 +40,18 @@ cierre».
   - `Parcial`.
 - 🔴 = criticidad crítica por label o por título.
 
-## Totales (14 oct: 93 en tablas + `#578`, la lista de prioridades)
+## Totales (14 oct: 92 en tablas + `#578`, la lista de prioridades)
 
 | Responsable | Issues |
 |---|---|
 | Juan | 46 |
-| Alberto | 45 |
+| Alberto | 44 |
 | Compartido | 2 |
 
 | Problema en | Issues |
 |---|---|
 | PROD | 51 |
-| No consta | 21 |
+| No consta | 20 |
 | Ambos | 12 |
 | STG | 9 |
 
@@ -60,7 +60,7 @@ cierre».
 | Sin arreglo | 59 |
 | Parcial | 16 |
 | Solo STG | 11 |
-| Solo PROD (falta caso real) | 4 |
+| Solo PROD (falta caso real) | 3 |
 | En los dos entornos (falta acreditar) | 2 |
 | Firmado, en curso | 1 |
 
@@ -92,12 +92,11 @@ cierre».
 | 401 | Retomar aplicaciones `uncertain` al volver Quálitas | J | PROD | — |
 | 574 | Botón viejo de una oferta vencida → respuesta muerta: renovar la oferta en Django y retomar (nuevo, 8 oct) | J + A | PROD | — |
 
-## 2. Emisión: que la póliza salga con los datos correctos (8)
+## 2. Emisión: que la póliza salga con los datos correctos (7)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
 | 607 | El guardarraíl del `#591` lee «Primero emitimos su póliza…» (una explicación) como una emisión afirmada ✱ | A | PROD | STG ✱ (v1.1 `0d2921dd`, 11/11 medido por mí); a PROD con orden de Alberto |
 | 593 | La serie de la foto que no casa con el auto cotizado se descarta en silencio: el bot la vuelve a pedir ✱ | A | PROD | — (texto aprobado por Alberto; en la cola de la sesión A) |
-| 472 🔴 | Persiste datos del vehículo no confirmados y pasan a la póliza | A | ¿? | PROD ✱ (viaje 7: «Están bien» y guardado determinista de la serie); falta el caso real |
 | 475 | VIN tecleado con formato inválido: motivo engañoso y bucle; el modelo afirma «ya tengo tu número de serie» sin guardarla ✱ | A | PROD | Parcial (texto aprobado: O→0 e I→1 con confirmación; en la cola de la sesión A) |
 | 543 | Póliza vencida tratada como renovación | A | PROD | PROD ✱ parcial (viaje 6); **a0 + b2/c2 en variante S firmados**, en la cola de STG; a1/a2 esperan el `#566` |
 | 534 | TipoRegla 70/31 en el XML de Quálitas | J | Ambos | Parcial |
@@ -286,6 +285,8 @@ firmada (textos A, B, B sin descuento, C y D).
 - **Paso 1 del plan de cierre (Alberto):** aprobados los textos del `#593` y el `#475`, el paquete de prompt del `#486` y la higiene (`#147` cerrado como no planificado; `#238` aparcada; `#126` y `#353` encargados; `#134` a hablar con Juan). Retención: el siniestro y la queja conservan la respuesta de hoy. `#607` v1.1 en verde en STG.
 
 - **Caso de hoy en PROD (`waq_4442`, Camry):** el cliente iba a emitir con una colonia de un CP que no es el suyo, y Alberto avisó a Montserrat. Nuevos **`#608`** (no se puede recotizar con otro CP conservando el descuento) y **`#609`** (el recibo de la luz tomado por un comprobante de pago); el VIN de 16 caracteres, al `#475`.
+
+- **`#472` cerrado** con el caso real `waq_4398` (12 oct): la guarda impidió guardar una serie de foto sin confirmar. Sin casos reales todavía: `#563` (carril de descuento con foto), `#494` (0 vetos), `#289` (1 pagada desde el 9 oct, sin pasar por la liga) y `#499`.
 
 ---
 
