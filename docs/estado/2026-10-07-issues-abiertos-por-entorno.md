@@ -147,7 +147,7 @@ cierre».
 ## 7. Seguimientos y cierre de conversación (10)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 596 | Textos de urgencia para clientes dormidos y tras el descuento o la pausa (Montserrat, Hylant) | A | PROD | — (Mejoras los contrasta con lo firmado; luego a la bandeja) |
+| 596 | Textos de urgencia para clientes dormidos y tras el descuento o la pausa (Montserrat, Hylant) | A | PROD | — (**en la bandeja**: antes, decidir V/H porque «solo hoy» no es verdad en los datos; los textos, en versión H) |
 | 586 | «Cancelar» al seguimiento «¿Avanzamos?»: el agente cierra la sesión y manda el enlace del especialista ✱ | A | PROD | — (**texto en la bandeja de firmas**: A = el del «Cancelar» del descuento) |
 | 285 🔴 | Teléfono sin sesión viva → cliente sin respuesta | A | Ambos | STG ✱ (bot `03b09269`), **en pausa**: Juan propone una solución más sencilla |
 | 542 | Tras declinar o derivar, el seguimiento insiste | A | PROD | — |
@@ -269,6 +269,8 @@ firmada (textos A, B, B sin descuento, C y D).
 - **14 oct:** Juan terminó la parte de Django del `#577` (PR #600, verificado en STG). El cableado de n8n (PUT de pausa antes de la derivación, que cubre también el `#464`) está encargado a la sesión A. La responsabilidad del `#577` pasa a Alberto.
 
 - **14 oct:** entran el `#596` y el `#597` (Montserrat, Hylant): el `#596` asignado a Alberto (pasa por Mejoras) y el `#597` a Juan, con la causa medida (un proceso cada 2 h). Entra el `#605` (URL Fidelity Guard roto en STG, encontrado por la sesión A), que va antes del `#577`.
+
+- **`#596`:** Mejoras midió que **«válido solo hoy» no es verdad** (cotizaciones emitidas al mismo precio hasta 35 días después; lo he confirmado). La decisión V/H y los tres textos están en la bandeja. Afecta también a la firma del `#567` («vence hoy») y a «DESCUENTO ADICIONAL para HOY». Nuevo caso del `#340` en `waq_4427`.
 
 ---
 
