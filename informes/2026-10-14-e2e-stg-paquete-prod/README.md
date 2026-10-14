@@ -40,22 +40,26 @@ para que decidas tú:
 
 ## Veredicto por corrida
 
-| Corrida | Resultado |
-|---|---|
-| **K** (`#606`) ×3 | **3/3 PASS**:
-  - la **reacción** no produce nada (`Reacción Ignorada 606`, sin `Stash`) y el contador sigue en **10**;
-  - «Gracias, buen día» no corta: sale la despedida fija D1 («¡Con gusto! Tu cotización queda guardada; cuando quieras retomarla, escríbeme por aquí 🙂») y el contador sigue en **10**;
-  - «¿y si me roban el auto?» **corta** con «Hemos alcanzado el límite de mensajes para esta etapa…». |
-| K · el par `human` + `ai` del corte | **NO COMPROBABLE**. `Persist Human Row (Corte Presupuesto)` y `Build Corte AI Row` cuelgan del fence autorizado (`IF Turno Corte Presupuesto?` / `IF Turno Corte Enviado?`), y con la sesión sin dígitos no corren. Exige un envío real |
-| **V** ×3 | **3/3 PASS**:
-  - «Tengo póliza con otra aseguradora» → «¿Qué día exacto vence tu seguro actual?»;
-  - «Vence el 15 de enero de 2027» → el aviso firmado con «…escríbeme por aquí **a partir del 16/12/2026**…» (fecha máxima ofrecida: 13/11/2026);
-  - «Prefiero esperar» → «Perfecto. **Te guardo tu cotización: escríbeme por aquí a partir del 16/12/2026** y la dejamos lista para que empiece justo el 15/01/2027.»;
-  - **ningún** «te contacto» ni «te escribo» en los 9 turnos. |
-| **R** ×3 | **3/3 PASS**: el resumen **empieza** por «Ana, ¿todo correcto? Con tu sí, emito tu póliza.», lleva debajo el bloque del registro (sale de `Rebuild Summary From Record`) y no dice «antes de que cambie» |
-| **C** ×3 | B **3/3 PASS**. 2.º «Cancelar» **3/3 FAIL**: cierra la sesión y no envía nada (arriba) |
-| **CX** (variante declarada) | **PASS**: con un 2.º seguimiento por medio sale **A**, sin enlace y sin cierre |
-| **E** | **Pendiente de la firma de Alberto en mi sesión.** Si no la da, no emito y lo dejo escrito aquí |
+- **K (`#606`) ×3 — 3/3 PASS.**
+  - La **reacción** no produce nada (`Reacción Ignorada 606`, sin `Stash`) y el contador sigue en **10**.
+  - «Gracias, buen día» no corta: sale la despedida fija D1 («¡Con gusto! Tu cotización queda guardada; cuando quieras
+    retomarla, escríbeme por aquí 🙂») y el contador sigue en **10**.
+  - «¿y si me roban el auto?» **corta** con «Hemos alcanzado el límite de mensajes para esta etapa…».
+- **K · el par `human` + `ai` del corte — NO COMPROBABLE.** `Persist Human Row (Corte Presupuesto)` y `Build Corte AI Row`
+  cuelgan del fence autorizado (`IF Turno Corte Presupuesto?` / `IF Turno Corte Enviado?`). Con la sesión sin dígitos no
+  corren; hace falta un envío real.
+- **V ×3 — 3/3 PASS.**
+  - «Tengo póliza con otra aseguradora» → «¿Qué día exacto vence tu seguro actual?».
+  - «Vence el 15 de enero de 2027» → el aviso firmado con «…escríbeme por aquí **a partir del 16/12/2026**…» (fecha
+    máxima que ofrece: 13/11/2026).
+  - «Prefiero esperar» → «Perfecto. **Te guardo tu cotización: escríbeme por aquí a partir del 16/12/2026** y la dejamos
+    lista para que empiece justo el 15/01/2027.».
+  - Ni un «te contacto» ni un «te escribo» en los 9 turnos.
+- **R ×3 — 3/3 PASS.** El resumen **empieza** por «Ana, ¿todo correcto? Con tu sí, emito tu póliza.», debajo lleva el
+  bloque del registro (de `Rebuild Summary From Record`) y no dice «antes de que cambie».
+- **C ×3.** B: **3/3 PASS**. 2.º «Cancelar»: **3/3 FAIL**, porque cierra la sesión y no envía nada (ver arriba).
+- **CX (variante declarada) — PASS.** Con un segundo seguimiento por medio sale **A**, sin enlace y sin cerrar la sesión.
+- **E — pendiente de la firma de Alberto en mi sesión.** Si no la da, no emito y lo dejo escrito aquí.
 
 ## Emulación del envío (declarada)
 
