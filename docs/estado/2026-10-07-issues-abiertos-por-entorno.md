@@ -174,7 +174,7 @@ cierre».
 ## 10. Trazabilidad e historial (5)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 606 | Dos envíos sin fila en el historial (PROD, `waq_4420`): el corte por presupuesto no escribe memoria, y una reacción cuenta como mensaje ✱ | A | PROD | — (diagnóstico hecho; arreglos 1 y 2 encargados a la sesión A en STG; el límite y el texto esperan a Alberto) |
+| 606 | Dos envíos sin fila en el historial (PROD, `waq_4420`): el corte por presupuesto no escribe memoria, y una reacción cuenta como mensaje ✱ | A | PROD | — (encargado a la sesión A en STG: historial, ignorar reacciones y **la cortesía no cuenta**, por decisión de Alberto) |
 | 183 | La emisión con éxito no queda en el historial | A | STG | — |
 | 126 | Capturar estados de entrega de Meta | A | ¿? | — |
 | 127 | Persistir y mostrar estados de entrega | J | ¿? | — |
@@ -275,6 +275,8 @@ firmada (textos A, B, B sin descuento, C y D).
 - **`#605` cerrado** (URL Fidelity Guard sin `URL`, en STG). **`#577`** cableado en STG (la marca en el Guard y el PUT al derivar), con el cambio exacto y la evidencia en el issue; falta la validación de Juan en Django.
 
 - **`#606`** (lo detectó el Dashboard): los envíos huérfanos eran el corte de `Message Budget Guard` (límite de 10 en saludo), disparado por una **reacción** y por un «gracias» tras la despedida. Ese camino no escribe el historial. Historial y reacciones, encargados; el límite y el texto, a decisión de Alberto.
+
+- **`waq_4420` (caso completo):** el bot prometió tres veces «te contacto» sin que nada lo cumpla. Texto a la firma («escríbeme a partir del…»); el caso se ha llevado al `#223` (recordatorio por fecha, bloqueado por la plantilla de Meta de Juan) y al `#567` (seguimientos tras pedir contacto).
 
 ---
 
