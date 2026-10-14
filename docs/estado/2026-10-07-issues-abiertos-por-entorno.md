@@ -40,12 +40,12 @@ cierre».
   - `Parcial`.
 - 🔴 = criticidad crítica por label o por título.
 
-## Totales (10 oct, noche: 89 en tablas + `#578`, la lista de prioridades)
+## Totales (14 oct: 89 en tablas + `#578`, la lista de prioridades)
 
 | Responsable | Issues |
 |---|---|
-| Juan | 47 |
-| Alberto | 40 |
+| Juan | 46 |
+| Alberto | 41 |
 | Compartido | 2 |
 
 | Problema en | Issues |
@@ -57,8 +57,8 @@ cierre».
 
 | Arreglo | Issues |
 |---|---|
-| Sin arreglo | 58 |
-| Parcial | 16 |
+| Sin arreglo | 56 |
+| Parcial | 18 |
 | Solo STG | 8 |
 | Solo PROD (falta caso real) | 4 |
 | En los dos entornos (falta acreditar) | 2 |
@@ -148,12 +148,12 @@ cierre».
 | 586 | «Cancelar» al seguimiento «¿Avanzamos?»: el agente cierra la sesión y manda el enlace del especialista ✱ | A | PROD | — (**texto en la bandeja de firmas**: A = el del «Cancelar» del descuento) |
 | 285 🔴 | Teléfono sin sesión viva → cliente sin respuesta | A | Ambos | STG ✱ (bot `03b09269`), **en pausa**: Juan propone una solución más sencilla |
 | 542 | Tras declinar o derivar, el seguimiento insiste | A | PROD | — |
-| 464 | Tras derivar por VIN con póliza, los checkpoints siguen | A | PROD | — (espera la decisión de Juan en el `#577`) |
+| 464 | Tras derivar por VIN con póliza, los checkpoints siguen | A | PROD | Parcial (lo cubre el cableado del `#577`: la pausa en la derivación por VIN con póliza) |
 | 567 | «Te lo mando en la tarde» y los recordatorios insisten a los 30 min | A | PROD | Firmado; la pausa de seguimiento, propuesta a Juan (`#578`) |
 | 223 | Iniciativa: hablarle en la fecha que pide | J | ¿? | — |
 | 163 | Invalidar seguimientos de la cotización origen | J | STG | STG |
 | 124 | `quote_followup_15m` para mensuales y anuales | J | PROD | — |
-| 577 | Dejar de mandar checkpoints cuando el bot ya dijo que no se puede emitir y derivó (nuevo, 9 oct) | J | PROD | — |
+| 577 | Dejar de mandar checkpoints cuando el bot ya dijo que no se puede emitir y derivó | A | PROD | Parcial ✱ (Django en STG: PR #600, release 436, `PUT …/followup-pause`; **el cableado de n8n, encargado a la sesión A** el 14 oct) |
 
 ## 8. Guardarraíl antijailbreak (0)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
@@ -262,6 +262,8 @@ firmada (textos A, B, B sin descuento, C y D).
 - **Iniciativa nueva `#594`** (Alberto): leer la póliza actual del lead (foto o PDF) con un **nodo especialista**, compararla con nuestra cotización (comparador determinista) y argumentar. Espera las fuentes citables de «Quálitas número 1 en autos» y de la atención de siniestros.
 
 - **`#591` v2:** el control positivo con una emisión real en STG pasa. Listo para PROD con la firma de Alberto. **Sonnet 5.5** omite «exitosamente» en 2 de 2 emisiones reales en STG, así que no va a PROD sin el mensaje de emisión determinista.
+
+- **14 oct:** Juan terminó la parte de Django del `#577` (PR #600, verificado en STG). El cableado de n8n (PUT de pausa antes de la derivación, que cubre también el `#464`) está encargado a la sesión A. La responsabilidad del `#577` pasa a Alberto.
 
 ---
 
