@@ -1,0 +1,5 @@
+[versiones inicio] bot ae699fe9-2849-454b-81bf-bc5067456fb5 · guard 1e11ea53-41ac-49cc-9cca-7854b1b3b796 · corrida CN2
+[p14-CN2] 1 tests → PASS 0 · FAIL 1 · WARN 0 · SKIP 0
+[p14-CN2] reporte: reports/20261014-1614-P14-CN2/p14-CN2.json
+[p14] traza en reports/20261014-1614-P14-CN2
+exit=3

@@ -136,3 +136,37 @@ Agente: QA & Testing
 
 **Residuo:** el de siempre en una emisión. Quedan `qualitas_leadfunnelevent` 9996–9999 (append-only), que retienen el
 lead 4202, su asegurado y la cotización 5555. La póliza sigue viva en el QA de Quálitas.
+
+---
+
+## Adenda 1 — repetición de la C (`0964e08`): **NULA**, porque el bot y el guard cambiaron a mitad de la CN1
+
+**Al empezar** (22:11 UTC): bot `29c034e1` y guard `c31a3c54`, como pedía la adenda.
+**Al terminar la CN1:** bot **`ae699fe9`** (`updatedAt` 22:12:11Z) y guard **`1e11ea53`** (22:12:06Z).
+La CN2 y la CN3 midieron la versión nueva al empezar y **pararon sin sembrar nada**.
+
+**Qué versión atendió cada paso de la CN1 (sesión `QA-SUITE-PROD-CNUNO`, cotización 5556):**
+
+| Paso | Ejecución | Inicio (UTC) | Versión | Lo que salió | ¿Lo esperado? | Nodo final |
+|---|---|---|---|---|---|---|
+| 1 «Cancelar» | 95429 | 22:11:40 | `29c034e1` | **B** (`Cancelar Fijo Copy`, `cancelar586_B`) | sí | `Buffer Purge Done` |
+| 2 «Cancelar» | 95430 | 22:12:03 | `29c034e1` | **A** (`cancelar586_A`): «De acuerdo, dejamos tu cotización tal como está. Si cambias de idea, aquí sigo.» | sí | `Buffer Purge Done` |
+| 3 «Cancelar» | 95431 | 22:12:25 | **`ae699fe9`** | **sin respuesta**: dispatch +0, `ai` +0, sin `Send` | sí | **`IF CP 608 Limpia?`** |
+| 4 «Cancelar» | 95435 | 22:12:45 | **`ae699fe9`** | **sin respuesta**: dispatch +0, `ai` +0, sin `Send` | sí | `IF CP 608 Limpia?` |
+| 5 «¿Cuánto cuesta la amplia?» | 95437 | 22:13:07 | **`ae699fe9`** | «La Cobertura Amplia de tu HIGHLANDER cuesta *$10,858.25 MXN* de contado… Mensual: $11,712.40 ¿Avanzamos con tu contratación?» | sí | `IF CP 608 Limpia?` |
+
+En ningún paso hubo enlace del agente ni `Mark Session Closed`, y la sesión siguió en **`active`** después de los pasos 4 y
+5.
+
+**Por qué no la doy por buena aunque todo saliera como se esperaba:**
+- B y A se midieron en `29c034e1`, y los silencios y la respuesta normal en `ae699fe9`, que trae un nodo `#608`
+  (`IF CP 608 Limpia?`) que antes no existía.
+- Según tu regla, la corrida es **nula**: no se puede atribuir el resultado a una sola versión.
+- Para que se pueda verificar después, en la tabla dejo qué versión atendió cada paso. La versión de cada ejecución la
+  deduzco de su hora de inicio frente al `updatedAt` del workflow, porque la API no devuelve el `versionId` por ejecución.
+
+**Lo que necesito:** que me confirmes la versión estable (¿`ae699fe9` y `1e11ea53`?) y que nadie importe en STG mientras
+corre. Con eso repito la CN1–CN3 entera, sobre una sola versión. Son unos 2 minutos por repetición.
+
+**Corrección de mi runner:** leía el nodo final con la API sin `includeData`, y salía `null`. Lo he leído aquí con
+`includeData`; lo corrijo antes de repetir.

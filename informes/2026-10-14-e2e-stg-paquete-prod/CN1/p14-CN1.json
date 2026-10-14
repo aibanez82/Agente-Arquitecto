@@ -1,0 +1,85 @@
+{
+  "system": "p14-CN1",
+  "run_id": "20261014-1611-P14-CN1",
+  "timestamp_mx": "2026-10-14 16:14 (GMT-6 MX)",
+  "triggered_by": "detección automática",
+  "results": [
+    {
+      "id": "QA-P14-CN1-CN1-B",
+      "system": "p14-CN1",
+      "description": "Paso 1 · «Cancelar» → B, sin enlace ni cierre",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 95429 · Cancelar Fijo Copy",
+      "result": "b · «Entendido. ¿Es por el precio o te quedó alguna duda de la cobertura? Si prefieres dejarlo aquí, no pasa nada: tu cotización queda guardada.» · status active",
+      "expected": "B",
+      "message": ""
+    },
+    {
+      "id": "QA-P14-CN1-CN2-A",
+      "system": "p14-CN1",
+      "description": "Paso 2 · «Cancelar» → A, sin enlace ni cierre",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 95430 · Cancelar Fijo Copy",
+      "result": "a · «De acuerdo, dejamos tu cotización tal como está. Si cambias de idea, aquí sigo.» · status active",
+      "expected": "A",
+      "message": ""
+    },
+    {
+      "id": "QA-P14-CN1-CN3-SILENCIO",
+      "system": "p14-CN1",
+      "description": "Paso 3 · «Cancelar» → sin respuesta (dispatch 0 · ai 0 · sin Send), sin enlace ni cierre",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 95431 · último nodo null",
+      "result": "dispatch nuevos 0 · ai nuevas [] · Send [] · Mark Session Closed false · texto reservado «» · status active",
+      "expected": "los tres a cero; status active",
+      "message": ""
+    },
+    {
+      "id": "QA-P14-CN1-CN4-SILENCIO",
+      "system": "p14-CN1",
+      "description": "Paso 4 · «Cancelar» → sin respuesta (dispatch 0 · ai 0 · sin Send), sin enlace ni cierre",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 95435 · último nodo null",
+      "result": "dispatch nuevos 0 · ai nuevas [] · Send [] · Mark Session Closed false · texto reservado «» · status active",
+      "expected": "los tres a cero; status active",
+      "message": ""
+    },
+    {
+      "id": "QA-P14-CN1-CN5-NORMAL",
+      "system": "p14-CN1",
+      "description": "Paso 5 · «¿Cuánto cuesta la amplia?» → respuesta normal del agente con la cifra de la cotización",
+      "priority": "critica",
+      "status": "PASS",
+      "check": "exec 95437 · Stash Main Reply Payload",
+      "result": "cifra: sí · «La Cobertura Amplia de tu HIGHLANDER cuesta *$10,858.25 MXN* de contado, en pago anual. Si prefieres pagar en parcialidades, el total sube: • Semestral: $11,305.66 • Trimestral: $11,549.70 • Mensual: $11,712.40 ¿Avanzamos con tu contratación?» · status active",
+      "expected": "respuesta normal con cifra; status active",
+      "message": ""
+    },
+    {
+      "id": "QA-P14-CN1-VERSION",
+      "system": "p14-CN1",
+      "description": "Versiones iguales al principio y al final",
+      "priority": "critica",
+      "status": "FAIL",
+      "check": "",
+      "result": "29c034e1/c31a3c54 → ae699fe9/1e11ea53",
+      "expected": "iguales; si no, NULA",
+      "message": ""
+    },
+    {
+      "id": "QA-P14-CN1-LIMPIEZA",
+      "system": "p14-CN1",
+      "description": "Limpieza por IDs exactos, en orden de FK descubierto del catálogo",
+      "priority": "alta",
+      "status": "PASS",
+      "check": "cotización clonada 5556 · lead 4203 · sesión QA-SUITE-PROD-CNUNO",
+      "result": "n8n_chat_histories:13 · whatsapp_sessions:1 · qualitas_lead:1 · qualitas_cotizacionrespuestaxml:1 · qualitas_cotizacion:1",
+      "expected": "cero residuo en STG (lo creado en el QA de Quálitas no es borrable desde aquí y se declara aparte)",
+      "message": "sin residuo en STG"
+    }
+  ]
+}
