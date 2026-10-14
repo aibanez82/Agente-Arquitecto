@@ -70,3 +70,19 @@ cambiar si Hylant indica otra cosa.
 |---|---|---|
 | limite-cortesia | Decidido por Alberto: «sí, adelante con las tres» | La cortesía y la despedida no cuentan para el límite de mensajes por fase (`Message Budget Guard`); las reacciones, tampoco. El texto del corte no cambia |
 | no-prometer-contacto | **Pendiente de firma** (bandeja: `propuestas/no-prometer-contacto`) | Mientras no exista el recordatorio por fecha (`#223`), el bot no promete «te contacto»: el cliente vuelve a escribir a partir de una fecha que calcula el sistema. Cambia el texto firmado del límite de 30 |
+
+## Octava tanda — firmas del 11 oct (en la bandeja, **sin atender hasta el 14 oct: el Arquitecto no volvió a mirar la bandeja**) y del 14 oct
+
+| Id | Fecha | Decisión | Qué queda firmado |
+|---|---|---|---|
+| guardarrail-emision-591 | 11 oct | sí | El `#591` v2 a PROD (todo número de póliza afirmado tiene que existir para esa cotización) |
+| emision-fraccionado | 11 oct | sí | El mensaje de emisión con pago fraccionado (`Pago:`, `Primer pago:`, `Después: N pagos de`) |
+| resumen-orden-pregunta | 11 oct | sí → **A** | La pregunta «[Nombre], ¿todo correcto? Con tu sí, emito tu póliza.» **al principio** del resumen |
+| cancelar-seguimiento-586 | 11 oct | **cambio → B** | El «Cancelar» del seguimiento: la pregunta de objeción («¿Es por el precio o te quedó alguna duda de la cobertura?…»), una vez por conversación |
+| error41-ramas-543 | 11 oct | sí | `a0`, más `b2`/`c2` en la **variante S** (sin persona), que era la recomendada como permanente |
+| emision-sin-link | 14 oct | sí → **b1** | La emisión sin link: la frase de la pasarela adaptada |
+| urgencia-hoy-596 | 14 oct | sí → **H** | Urgencia honesta: nunca «válido solo hoy»; sí «es el precio de hoy y no te puedo asegurar que se mantenga» |
+| textos-montserrat-596 | 14 oct | sí | Los tres textos de Montserrat en versión H (el 3 sin descuento, sin los 12 MSI hasta el `#592`) |
+| no-prometer-contacto | 14 oct | sí | Sin recordatorio por fecha, nunca «te contacto»: «escríbeme por aquí a partir del…» |
+
+Encargo: `Agente-n8n:handoffs/2026-10-14-A-firmas-orden-prod-591-y-cola.md`. Los textos de Django del `#596` van a Juan.
