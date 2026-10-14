@@ -293,6 +293,8 @@ firmada (textos A, B, B sin descuento, C y D).
 
 - **Viaje 2: `#606` cerrado** (PROD `d3a660c2` → `97822428`). El inventario de cambios de los viajes 3 y 4 está revisado. En STG, el 2.º «Cancelar» del `#586` ya está arreglado (`29c034e1`).
 
+- **Viaje 3: el resumen con la pregunta al principio, en PROD** (`97822428` → `5abccce9`, 3 hunks del prompt y `Rebuild Summary From Record`), verificado. Es el punto 1 del `#486` y la firma `resumen-orden-pregunta`.
+
 ---
 
 ## Movimientos del 9 oct
