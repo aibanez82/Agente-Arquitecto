@@ -104,3 +104,5 @@ Encargo: `Agente-n8n:handoffs/2026-10-14-A-firmas-orden-prod-591-y-cola.md`. Los
 | cp-equivocado-608 | OK | Provisional: con un CP distinto al cotizado, no se siguen colonias del CP equivocado ni se manda a la web; se pasa a una persona y la sesión queda marcada |
 | serie-16-475 | OK | El texto de longitud del `#475` cubre también el caso de los 16 caracteres |
 | domicilio-recibo-609 | Cambio de Alberto | «Intentemos extraer la dirección del comprobante, se la ofrecemos al cliente y que nos la confirme. Como con el VIN y las placas.» La dirección se extrae, se ofrece y solo se guarda con confirmación; si el CP no casa, se aplica el `#608` |
+
+| cp-equivocado-608-texto | Firmado (14 oct, 19:14 UTC) | «Entiendo, tu código postal es otro. Para corregirlo te paso con una persona de nuestro equipo que te atiende por WhatsApp: [enlace]» |
