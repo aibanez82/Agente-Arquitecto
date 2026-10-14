@@ -40,24 +40,24 @@ cierre».
   - `Parcial`.
 - 🔴 = criticidad crítica por label o por título.
 
-## Totales (14 oct: 91 en tablas + `#578`, la lista de prioridades)
+## Totales (14 oct: 92 en tablas + `#578`, la lista de prioridades)
 
 | Responsable | Issues |
 |---|---|
 | Juan | 47 |
-| Alberto | 42 |
+| Alberto | 43 |
 | Compartido | 2 |
 
 | Problema en | Issues |
 |---|---|
-| PROD | 48 |
+| PROD | 49 |
 | No consta | 21 |
 | Ambos | 13 |
 | STG | 9 |
 
 | Arreglo | Issues |
 |---|---|
-| Sin arreglo | 58 |
+| Sin arreglo | 59 |
 | Parcial | 16 |
 | Solo STG | 10 |
 | Solo PROD (falta caso real) | 4 |
@@ -171,9 +171,10 @@ cierre».
 | 361 | Persona con muchos leads | J | PROD | — |
 | 78 | Leads duplicados por envío múltiple del formulario | J | PROD | — |
 
-## 10. Trazabilidad e historial (4)
+## 10. Trazabilidad e historial (5)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
+| 606 | Dos envíos sin fila en el historial (PROD, `waq_4420`): el corte por presupuesto no escribe memoria, y una reacción cuenta como mensaje ✱ | A | PROD | — (diagnóstico hecho; arreglos 1 y 2 encargados a la sesión A en STG; el límite y el texto esperan a Alberto) |
 | 183 | La emisión con éxito no queda en el historial | A | STG | — |
 | 126 | Capturar estados de entrega de Meta | A | ¿? | — |
 | 127 | Persistir y mostrar estados de entrega | J | ¿? | — |
@@ -272,6 +273,8 @@ firmada (textos A, B, B sin descuento, C y D).
 - **`#596`:** Mejoras midió que **«válido solo hoy» no es verdad** (cotizaciones emitidas al mismo precio hasta 35 días después; lo he confirmado). La decisión V/H y los tres textos están en la bandeja. Afecta también a la firma del `#567` («vence hoy») y a «DESCUENTO ADICIONAL para HOY». Nuevo caso del `#340` en `waq_4427`.
 
 - **`#605` cerrado** (URL Fidelity Guard sin `URL`, en STG). **`#577`** cableado en STG (la marca en el Guard y el PUT al derivar), con el cambio exacto y la evidencia en el issue; falta la validación de Juan en Django.
+
+- **`#606`** (lo detectó el Dashboard): los envíos huérfanos eran el corte de `Message Budget Guard` (límite de 10 en saludo), disparado por una **reacción** y por un «gracias» tras la despedida. Ese camino no escribe el historial. Historial y reacciones, encargados; el límite y el texto, a decisión de Alberto.
 
 ---
 
