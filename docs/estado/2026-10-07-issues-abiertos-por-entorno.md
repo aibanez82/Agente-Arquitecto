@@ -95,10 +95,10 @@ cierre».
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
 | 593 | La serie de la foto que no casa con el auto cotizado se descarta en silencio: el bot la vuelve a pedir ✱ | A | PROD | — (propuesta: nota `[SERIE_FOTO_NO_CUADRA]` con texto firmado) |
-| 591 🔴 | El guardarraíl de emisión inventada solo reconoce pólizas `76200` (desde el 1 ago son `76201`) ✱ | A | Ambos | STG ✱ (v2 en `5adf0e57`: 56/56 en PROD, 0 falsos positivos, y **una emisión real en STG que pasa**, exec 88640); **listo para PROD, en la bandeja de firmas** |
+| 591 🔴 | El guardarraíl de emisión inventada solo reconoce pólizas `76200` (desde el 1 ago son `76201`) ✱ | A | Ambos | STG ✱; **firmado el 11 oct → orden de PROD a la sesión A** (solo `Detect Emision Narration` y `Validate Emision Against DB`) |
 | 472 🔴 | Persiste datos del vehículo no confirmados y pasan a la póliza | A | ¿? | PROD ✱ (viaje 7: «Están bien» y guardado determinista de la serie); falta el caso real |
 | 475 | VIN tecleado con formato inválido: motivo engañoso y bucle; el modelo afirma «ya tengo tu número de serie» sin guardarla ✱ | A | PROD | Parcial (caso real en PROD 10 oct, VIN con O; propuesta: normalizar O→0 e I→1 + `[SERIE_FORMATO]` con el motivo real) |
-| 543 | Póliza vencida tratada como renovación | A | PROD | PROD ✱ parcial (viaje 6: R0/b1/c1 y fuera el caso B); **a0, b2 y c2 en la bandeja de firmas** (H/S por decidir); a1/a2 esperan el `#566` |
+| 543 | Póliza vencida tratada como renovación | A | PROD | PROD ✱ parcial (viaje 6); **a0 + b2/c2 en variante S firmados**, en la cola de STG; a1/a2 esperan el `#566` |
 | 534 | TipoRegla 70/31 en el XML de Quálitas | J | Ambos | Parcial |
 | 307 🔴 | La barrera del estado de póliza depende del Intent Router | J | Ambos | — |
 | 280 | Emisión web en STG no completa | J | STG | — |
@@ -146,8 +146,8 @@ cierre».
 ## 7. Seguimientos y cierre de conversación (10)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 596 | Textos de urgencia para clientes dormidos y tras el descuento o la pausa (Montserrat, Hylant) | A | PROD | — (**en la bandeja**: antes, decidir V/H porque «solo hoy» no es verdad en los datos; los textos, en versión H) |
-| 586 | «Cancelar» al seguimiento «¿Avanzamos?»: el agente cierra la sesión y manda el enlace del especialista ✱ | A | PROD | — (**texto en la bandeja de firmas**: A = el del «Cancelar» del descuento) |
+| 596 | Textos de urgencia para clientes dormidos y tras el descuento o la pausa (Montserrat, Hylant) | A | PROD | — (firmado: urgencia honesta H + los tres textos; n8n en la cola de STG, y los textos de Django pedidos a Juan) |
+| 586 | «Cancelar» al seguimiento «¿Avanzamos?»: el agente cierra la sesión y manda el enlace del especialista ✱ | A | PROD | — (firmado: **B**, la pregunta de objeción, una vez; en la cola de STG de la sesión A) |
 | 285 🔴 | Teléfono sin sesión viva → cliente sin respuesta | A | Ambos | STG ✱ (bot `03b09269`), **en pausa**: Juan propone una solución más sencilla |
 | 542 | Tras declinar o derivar, el seguimiento insiste | A | PROD | — |
 | 464 | Tras derivar por VIN con póliza, los checkpoints siguen | A | PROD | STG ✱ (cubierto por el cableado del `#577`) |
@@ -277,6 +277,8 @@ firmada (textos A, B, B sin descuento, C y D).
 - **`#606`** (lo detectó el Dashboard): los envíos huérfanos eran el corte de `Message Budget Guard` (límite de 10 en saludo), disparado por una **reacción** y por un «gracias» tras la despedida. Ese camino no escribe el historial. Historial y reacciones, encargados; el límite y el texto, a decisión de Alberto.
 
 - **`waq_4420` (caso completo):** el bot prometió tres veces «te contacto» sin que nada lo cumpla. Texto a la firma («escríbeme a partir del…»); el caso se ha llevado al `#223` (recordatorio por fecha, bloqueado por la plantilla de Meta de Juan) y al `#567` (seguimientos tras pedir contacto).
+
+- **Firmas:** 5 del 11 oct se quedaron sin atender hasta hoy (el Arquitecto no miró la bandeja) y 4 son de hoy. **El `#591` va a PROD.** Cola de STG para la sesión A: no prometer contacto, la pregunta del resumen al principio, `#586` B, `#543` S, emisión determinista (fraccionado + b1) y `#596` H.
 
 ---
 
