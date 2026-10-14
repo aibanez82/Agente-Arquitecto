@@ -50,9 +50,9 @@ cierre».
 
 | Problema en | Issues |
 |---|---|
-| PROD | 49 |
+| PROD | 50 |
 | No consta | 21 |
-| Ambos | 13 |
+| Ambos | 12 |
 | STG | 9 |
 
 | Arreglo | Issues |
@@ -94,8 +94,8 @@ cierre».
 ## 2. Emisión: que la póliza salga con los datos correctos (8)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
+| 607 | El guardarraíl del `#591` lee «Primero emitimos su póliza…» (una explicación) como una emisión afirmada ✱ | A | PROD | — (1 de 4.227; afinar la regla, en la cola de la sesión A) |
 | 593 | La serie de la foto que no casa con el auto cotizado se descarta en silencio: el bot la vuelve a pedir ✱ | A | PROD | — (propuesta: nota `[SERIE_FOTO_NO_CUADRA]` con texto firmado) |
-| 591 🔴 | El guardarraíl de emisión inventada solo reconoce pólizas `76200` (desde el 1 ago son `76201`) ✱ | A | Ambos | STG ✱; **firmado el 11 oct → orden de PROD a la sesión A** (solo `Detect Emision Narration` y `Validate Emision Against DB`) |
 | 472 🔴 | Persiste datos del vehículo no confirmados y pasan a la póliza | A | ¿? | PROD ✱ (viaje 7: «Están bien» y guardado determinista de la serie); falta el caso real |
 | 475 | VIN tecleado con formato inválido: motivo engañoso y bucle; el modelo afirma «ya tengo tu número de serie» sin guardarla ✱ | A | PROD | Parcial (caso real en PROD 10 oct, VIN con O; propuesta: normalizar O→0 e I→1 + `[SERIE_FORMATO]` con el motivo real) |
 | 543 | Póliza vencida tratada como renovación | A | PROD | PROD ✱ parcial (viaje 6); **a0 + b2/c2 en variante S firmados**, en la cola de STG; a1/a2 esperan el `#566` |
@@ -174,7 +174,7 @@ cierre».
 ## 10. Trazabilidad e historial (5)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 606 | Dos envíos sin fila en el historial (PROD, `waq_4420`): el corte por presupuesto no escribe memoria, y una reacción cuenta como mensaje ✱ | A | PROD | — (encargado a la sesión A en STG: historial, ignorar reacciones y **la cortesía no cuenta**, por decisión de Alberto) |
+| 606 | Dos envíos sin fila en el historial (PROD, `waq_4420`): el corte por presupuesto no escribe memoria, y una reacción cuenta como mensaje ✱ | A | PROD | STG ✱ (`1500c022`: el corte con historial, reacciones ignoradas, la cortesía no cuenta; `waq_4420` reproducida con 0 cortes); a PROD con orden de Alberto |
 | 183 | La emisión con éxito no queda en el historial | A | STG | — |
 | 126 | Capturar estados de entrega de Meta | A | ¿? | — |
 | 127 | Persistir y mostrar estados de entrega | J | ¿? | — |
@@ -279,6 +279,8 @@ firmada (textos A, B, B sin descuento, C y D).
 - **`waq_4420` (caso completo):** el bot prometió tres veces «te contacto» sin que nada lo cumpla. Texto a la firma («escríbeme a partir del…»); el caso se ha llevado al `#223` (recordatorio por fecha, bloqueado por la plantilla de Meta de Juan) y al `#567` (seguimientos tras pedir contacto).
 
 - **Firmas:** 5 del 11 oct se quedaron sin atender hasta hoy (el Arquitecto no miró la bandeja) y 4 son de hoy. **El `#591` va a PROD.** Cola de STG para la sesión A: no prometer contacto, la pregunta del resumen al principio, `#586` B, `#543` S, emisión determinista (fraccionado + b1) y `#596` H.
+
+- **`#591` cerrado en PROD** (`af2cbaee`, dos nodos, 84/84 emisiones reales pasan). Nuevo **`#607`** (un falso positivo con una explicación del proceso). **`#606` en STG.**
 
 ---
 
