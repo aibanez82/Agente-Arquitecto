@@ -40,17 +40,17 @@ cierre».
   - `Parcial`.
 - 🔴 = criticidad crítica por label o por título.
 
-## Totales (14 oct: 91 en tablas + `#578`, la lista de prioridades)
+## Totales (14 oct: 90 en tablas + `#578`, la lista de prioridades)
 
 | Responsable | Issues |
 |---|---|
 | Juan | 46 |
-| Alberto | 43 |
+| Alberto | 42 |
 | Compartido | 2 |
 
 | Problema en | Issues |
 |---|---|
-| PROD | 50 |
+| PROD | 49 |
 | No consta | 20 |
 | Ambos | 12 |
 | STG | 9 |
@@ -59,7 +59,7 @@ cierre».
 |---|---|
 | Sin arreglo | 58 |
 | Parcial | 17 |
-| Solo STG | 10 |
+| Solo STG | 9 |
 | Solo PROD (falta caso real) | 3 |
 | En los dos entornos (falta acreditar) | 2 |
 | Firmado, en curso | 1 |
@@ -92,10 +92,9 @@ cierre».
 | 401 | Retomar aplicaciones `uncertain` al volver Quálitas | J | PROD | — |
 | 574 | Botón viejo de una oferta vencida → respuesta muerta: renovar la oferta en Django y retomar (nuevo, 8 oct) | J + A | PROD | — |
 
-## 2. Emisión: que la póliza salga con los datos correctos (7)
+## 2. Emisión: que la póliza salga con los datos correctos (6)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 607 | El guardarraíl del `#591` lee «Primero emitimos su póliza…» (una explicación) como una emisión afirmada ✱ | A | PROD | STG ✱ (v1.1 `0d2921dd`, 11/11 medido por mí); a PROD con orden de Alberto |
 | 593 | La serie de la foto que no casa con el auto cotizado se descarta en silencio: el bot la vuelve a pedir ✱ | A | PROD | — (texto aprobado por Alberto; en la cola de la sesión A) |
 | 475 | VIN tecleado con formato inválido: motivo engañoso y bucle; el modelo afirma «ya tengo tu número de serie» sin guardarla ✱ | A | PROD | Parcial (texto aprobado: O→0 e I→1 con confirmación; en la cola de la sesión A) |
 | 543 | Póliza vencida tratada como renovación | A | PROD | PROD ✱ parcial (viaje 6); **a0 + b2/c2 en variante S firmados**, en la cola de STG; a1/a2 esperan el `#566` |
@@ -290,6 +289,8 @@ firmada (textos A, B, B sin descuento, C y D).
 - **E2E del QA en STG** (`327de5ea`): **`#606`, no prometer contacto y el resumen pasan 3/3**, listos para el viaje. El **2.º «Cancelar» del `#586` falla** (Terminal Sink sin envío): arreglo encargado y no viaja.
 
 - **`#587` cerrado en PROD** (Dashboard `1eda3e6`): el Resumen vuelve a cargar Meta. El despliegue en Vercel es de segunda mano: al Arquitecto se le caducó el token.
+
+- **Día de viajes a PROD:** viaje 1, el **`#607`, cerrado** (PROD `af2cbaee` → `d3a660c2`, un nodo). Sigue el viaje 2 (`#606`).
 
 ---
 
