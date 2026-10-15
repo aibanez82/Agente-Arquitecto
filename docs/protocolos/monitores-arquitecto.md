@@ -279,6 +279,46 @@ rollback lo cambia **sin que nadie lo anuncie**.
 morir con los redundantes: no por serlo, sino porque no había forma de acreditar para qué servía sin
 leerle el `ps`. Corolario: un monitor sin sección en esta spec es indistinguible de un residuo.
 
+
+## 7. Lo que espera una decisión mía — `docs/lo-que-espera-mi-decision.md`
+
+Poll del fichero. **No consulta ninguna API: el fichero ES la fuente**, y eso es deliberado — un monitor
+que dedujera «esto espera al Arquitecto» de los issues tendría que adivinar un estado que el tracker no
+guarda, que es exactamente por lo que nació.
+
+Emite el recuento y una línea por fila de la sección `## Abierto`. **Si el fichero no existe, lo DICE**
+(`NO COMPROBABLE`) en vez de callar: «no hay nada pendiente» y «no estoy mirando» tienen que verse
+distintos, que es la regla del `m6`.
+
+**Por qué existe, en una línea:** el `#460` estuvo cuatro días parado esperando una palabra mía, y
+«esperando una decisión del Arquitecto» no tenía casa — ni campo en el tracker, ni etiqueta, ni lista. Un
+encargo en ese estado es indistinguible de uno terminado: para el ejecutor, porque hizo su parte; para mí,
+porque no me llega nada.
+
+**No es un sexto canal, y por eso no rompe la regla de «uno por canal».** Los otros cinco vigilan lo que
+entra de fuera. Éste vigila **mi propia cola**, que es la única superficie del ecosistema que nadie más
+puede ver: los ejecutores no saben si les contesté tarde, y Alberto tampoco.
+
+**El filtro que lo mantiene útil:** aquí solo entra lo parado porque falta que **yo** hable. Lo que está en
+manos de un ejecutor lo vigila el `m3`; lo que espera a Alberto entra, pero con su nombre en la columna
+«lo desbloquea». Sin ese filtro, en una semana es un segundo tablero de tareas y deja de leerse.
+
+**v2 (29 sep, mismo día): cuenta por QUIÉN desbloquea, no en un solo número.** La v1 decía «N cosas
+esperando una decisión mía» y metía en esa N las que esperan a Alberto — **justo la confusión que el
+fichero existe para deshacer**. Esa misma tarde la lista quedó en `0 mías · 6 de Alberto`, y la v1 lo
+habría anunciado como seis decisiones mías pendientes: un vigilante que me acusa de algo que no es mío
+se lee una vez y se ignora la siguiente.
+
+Ejercitado con fixture, no mirando si la salida cuadra: una fila de cada clase debe salir **1 y 1** con su
+marca, una fila de la sección `## Cerrado` **no debe contarse**, y sin fichero debe decir `NO COMPROBABLE`.
+Los tres, comprobados. El caso «mía» no se podía acreditar contra el documento real precisamente porque
+estaba a cero — *una salida vacía no acredita que el filtro funcione*.
+
+**Gotcha de nacimiento (29 sep):** bash no acepta identificadores con tilde. Un `que=` dentro del bucle
+daba `command not found` en cada fila; el recuento salía bien, así que el fallo **no se veía en el
+resultado** — solo en siete líneas de ruido antes. Un vigilante que imprime errores es el primero que se
+deja de leer.
+
 ## Notas
 
 - Emitir solo líneas accionables (los monitores ruidosos se auto-detienen).
@@ -317,3 +357,18 @@ y parecía correcto. La prueba válida desactiva la siembra y retrasa `SINCE`. R
 `oilycoyote` **emitido**; `#220`, `#218`, `#217` y `#204` nuestros, **silenciados y anotados**.
 Corolario para cualquier monitor: *una salida vacía no acredita que el filtro funcione* — hay que
 forzar el caso que debe pasar y el que debe callarse, y ver los dos.
+
+### m4 · el punto ciego que quedaba, medido el 29 sep
+
+La v2 arregló la dirección (se lee la firma del documento, no el sufijo del nombre). Queda un tercer modo,
+y el 29 sep tenía **tres** falsos positivos vivos: `#297` (11 días) y las dos de `#409` (27 días).
+
+**Una duda cuya decisión se escribió en el issue y no en este canal se queda «pendiente» para siempre.**
+El `m4` no mira issues: mira ficheros. Las tres estaban decididas —`#297` cerrado por Juan el 13 sep,
+`#409` cerrado el 18 sep con `versionId eccf76e4`— y el canal seguía diciendo que esperaban respuesta.
+
+**No se arregla en el monitor**, y conviene no intentarlo: enseñarle a mirar el tracker sería pedirle que
+adivine si un cierre de issue contesta *esta* pregunta concreta, y acertaría a veces. Se arregla en la
+conducta: **decidir una duda incluye cerrar su fichero el mismo día**, aunque la decisión se haya escrito
+en otro sitio. Es la misma regla de la retractación — una respuesta solo existe en el canal donde se hizo
+la pregunta.
