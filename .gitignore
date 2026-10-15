@@ -8,3 +8,6 @@ scripts/monitores/.m*-seen
 scripts/monitores/.m*-state
 scripts/monitores/.m6-*
 scripts/monitores/.m6-fallos-*
+
+# Salida de graphify (grafo local, se regenera con /graphify .)
+graphify-out/
