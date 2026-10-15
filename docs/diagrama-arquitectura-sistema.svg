@@ -1,6 +1,6 @@
 <svg width="1780" height="900" viewBox="0 0 1780 900" xmlns="http://www.w3.org/2000/svg" role="img">
 <title>Arquitectura del sistema — Ecosistema Quálitas/Insurmind</title>
-<desc>Diagrama del funnel completo: Google Ads, Landing/Django, n8n/WhatsApp, Postgres compartida, Dashboard y Kommo. Actualizado 2 julio 2026.</desc>
+<desc>Diagrama del funnel completo: Google Ads, Landing/Django, n8n/WhatsApp, Postgres compartida, Dashboard y Kommo. Creado 2 julio 2026; corregido 2 octubre 2026 contra CLAUDE.md (webhooks Django→n8n, primer WhatsApp, llamadas a Claude, conversation_phase).</desc>
 <style>
   text { font-family: system-ui, sans-serif; }
   .th { font-size: 14px; font-weight: 500; }
@@ -10,7 +10,7 @@
 </style>
 <rect width="1780" height="900" fill="#ffffff"/>
 <text x="890" y="30" text-anchor="middle" font-size="15" font-weight="500" fill="#2C2C2A">Arquitectura del sistema — Quálitas / Insurmind</text>
-<text x="890" y="50" text-anchor="middle" font-size="12" fill="#888780">2 julio 2026 · Google Ads → Landing → WhatsApp → póliza emitida → pago confirmado</text>
+<text x="890" y="50" text-anchor="middle" font-size="12" fill="#888780">2 jul 2026 · corregido 2 oct 2026 · Google Ads → Landing → WhatsApp → póliza emitida → pago confirmado</text>
 
 <defs>
   <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
@@ -22,14 +22,16 @@
 <line x1="135" y1="140" x2="250" y2="170" stroke="#888780" stroke-width="1" marker-end="url(#arr)"/>
 
 <line x1="460" y1="210" x2="1140" y2="210" stroke="#888780" stroke-width="1" stroke-dasharray="5 3" marker-end="url(#arr)"/>
-<text class="li" x="800" y="200" text-anchor="middle" fill="#5F5E5A">Webhook 1: lead creado</text>
-<text class="li" x="800" y="188" text-anchor="middle" fill="#5F5E5A">Webhook 2: pago confirmado</text>
+<text class="li" x="800" y="200" text-anchor="middle" fill="#5F5E5A">único webhook: pago confirmado (Payment Confirmation)</text>
 
 <line x1="1140" y1="320" x2="460" y2="320" stroke="#888780" stroke-width="1" marker-end="url(#arr)"/>
 <text class="li" x="800" y="336" text-anchor="middle" fill="#5F5E5A">Issue_Policy → POST /api/emitir-externo/</text>
 
 <line x1="160" y1="360" x2="160" y2="400" stroke="#888780" stroke-width="1" marker-end="url(#arr)"/>
 <text class="li" x="172" y="384" fill="#5F5E5A">XML SOAP</text>
+
+<path d="M460 345 C780 345 1060 340 1140 410" fill="none" stroke="#888780" stroke-width="1" marker-end="url(#arr)"/>
+<text class="li" x="700" y="358" text-anchor="middle" fill="#5F5E5A">1er WhatsApp directo (Meta Graph API)</text>
 
 <path d="M380 360 Q550 385 700 400" fill="none" stroke="#888780" stroke-width="1" marker-end="url(#arr)"/>
 <text class="li" x="520" y="394" text-anchor="middle" fill="#5F5E5A">INSERT / UPDATE</text>
@@ -70,9 +72,10 @@
 <text x="62" y="192" font-size="10.5" fill="#0C447C">Heroku · Wagtail + Django</text>
 <text x="62" y="214" font-size="15" font-weight="600" fill="#042C53">Landing + Backend</text>
 <text class="li" x="62" y="242" fill="#0C447C">• crea qualitas_lead + qualitas_cotizacion</text>
-<text class="li" x="62" y="262" fill="#0C447C">• dispara Webhook 1 (lead) y Webhook 2 (pago)</text>
+<text class="li" x="62" y="262" fill="#0C447C">• manda el 1er WhatsApp directo a Meta + INSERT whatsapp_sessions</text>
 <text class="li" x="62" y="282" fill="#0C447C">• POST /api/emitir-externo/ → XML SOAP</text>
-<text class="li" x="62" y="302" fill="#0C447C">• un solo repo: aguayo-co/HYL-WAI</text>
+<text class="li" x="62" y="302" fill="#0C447C">• webhook a n8n SOLO al confirmar el pago</text>
+<text class="li" x="62" y="322" fill="#0C447C">• un solo repo: aguayo-co/HYL-WAI</text>
 
 <!-- Quálitas SOAP externo -->
 <rect x="40" y="400" width="260" height="70" rx="8" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="0.5" stroke-dasharray="2 3"/>
@@ -87,20 +90,22 @@
 <text class="li" x="662" y="470" fill="#26215C">qualitas_lead — Django · estado, canal</text>
 <text class="li" x="662" y="488" fill="#26215C">qualitas_cotizacion — Django · auto, CP</text>
 <text class="li" x="662" y="506" fill="#26215C">qualitas_polizaemitida — Django · pago</text>
-<text class="li" x="662" y="524" fill="#A32D2D">whatsapp_sessions — n8n · phase bug activo</text>
+<text class="li" x="662" y="524" fill="#26215C">whatsapp_sessions — n8n · INSERT inicial Django</text>
 <text class="li" x="662" y="542" fill="#0F6E56">n8n_chat_histories — n8n · fuente fiable de hitos</text>
 
 <!-- n8n -->
 <rect x="1140" y="170" width="420" height="190" rx="10" fill="#FAECE7" stroke="#993C1D" stroke-width="0.7"/>
 <text x="1162" y="192" font-size="10.5" fill="#712B13">Hostinger · n8n</text>
 <text x="1162" y="214" font-size="15" font-weight="600" fill="#4A1B0C">Bot WhatsApp</text>
-<text class="li" x="1162" y="240" fill="#712B13">~2,087 líneas · 3 nodos Claude por mensaje</text>
-<rect x="1162" y="252" width="376" height="24" rx="5" fill="#ffffff" stroke="#E7D4C9" stroke-width="0.5"/>
-<text class="li" x="1174" y="267" fill="#4A1B0C">Haiku — jailbreak detection</text>
-<rect x="1162" y="280" width="376" height="24" rx="5" fill="#ffffff" stroke="#E7D4C9" stroke-width="0.5"/>
-<text class="li" x="1174" y="295" fill="#4A1B0C">Haiku — intent router classifier</text>
-<rect x="1162" y="308" width="376" height="24" rx="5" fill="#ffffff" stroke="#E7D4C9" stroke-width="0.5"/>
-<text class="li" x="1174" y="323" fill="#4A1B0C">Sonnet — agente conversacional principal</text>
+<text class="li" x="1162" y="236" fill="#712B13">Claude se llama desde 6 sitios (revalidado 6 sep)</text>
+<rect x="1162" y="244" width="376" height="22" rx="5" fill="#ffffff" stroke="#E7D4C9" stroke-width="0.5"/>
+<text class="li" x="1174" y="258" fill="#4A1B0C">Haiku 4.5 — Detect Jailbreak</text>
+<rect x="1162" y="268" width="376" height="22" rx="5" fill="#ffffff" stroke="#E7D4C9" stroke-width="0.5"/>
+<text class="li" x="1174" y="282" fill="#4A1B0C">Haiku 4.5 — Intent Router</text>
+<rect x="1162" y="292" width="376" height="22" rx="5" fill="#ffffff" stroke="#E7D4C9" stroke-width="0.5"/>
+<text class="li" x="1174" y="306" fill="#4A1B0C">Sonnet 5 — AI Agent · RAG IA Agent · Discount Intent Classifier</text>
+<rect x="1162" y="316" width="376" height="22" rx="5" fill="#ffffff" stroke="#E7D4C9" stroke-width="0.5"/>
+<text class="li" x="1174" y="330" fill="#4A1B0C">Sonnet 4.5 — Extract VIN Vision (httpRequest, no nodo de modelo)</text>
 
 <!-- Meta Cloud API -->
 <rect x="1140" y="400" width="190" height="60" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
@@ -144,5 +149,5 @@
 <text x="248" y="860" font-size="11" fill="#888780">webhook / evento async</text>
 <line x1="440" y1="856" x2="480" y2="856" stroke="#B4B2A9" stroke-width="1" stroke-dasharray="2 3"/>
 <text x="488" y="860" font-size="11" fill="#8A8878">planeado / en diseño</text>
-<text x="700" y="860" font-size="11" fill="#A32D2D">whatsapp_sessions.conversation_phase: bug activo, stuck en "greeting" (Bug #5)</text>
+<text x="700" y="860" font-size="11" fill="#888780">conversation_phase ya no está stuck en "greeting" (medido 24 ago); los hitos se leen de n8n_chat_histories</text>
 </svg>
