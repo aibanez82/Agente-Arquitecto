@@ -310,6 +310,8 @@ firmada (textos A, B, B sin descuento, C y D).
 
 - **`#543` S en STG** (bot `387fee41`, Guard `b46c8d48`). a0 lleva el enlace; su texto está a la firma.
 
+- **Mensaje de emisión determinista en STG** (bot `387fee41` → `820c08d4`): el grafo compone «emitida exitosamente» con la fila de `qualitas_polizaemitida` del turno y la liga de la API (contado, fraccionado y b1 sin liga); `URL Fidelity Guard` admite esa liga. Arnés 30/30, a mitad de turno 12/12, vivo 6/6. Nodos y cableado comprobados por el Arquitecto en el vivo de STG. **A PROD necesita orden de Alberto (toca emisión)**. Sin ejercitar: emisión real contra Quálitas QA y la respuesta de la API de liga en PROD justo tras emitir.
+
 ---
 
 ## Movimientos del 9 oct
