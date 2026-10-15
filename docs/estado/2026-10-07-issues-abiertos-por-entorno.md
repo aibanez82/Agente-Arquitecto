@@ -40,7 +40,7 @@ cierre».
   - `Parcial`.
 - 🔴 = criticidad crítica por label o por título.
 
-## Totales (14 oct: 89 en tablas + `#578`, la lista de prioridades)
+## Totales (15 oct: 89 en tablas + `#578`, la lista de prioridades)
 
 | Responsable | Issues |
 |---|---|
@@ -59,9 +59,10 @@ cierre».
 |---|---|
 | Sin arreglo | 57 |
 | Parcial | 16 |
-| Solo STG | 10 |
+| Solo STG | 9 |
 | Solo PROD (falta caso real) | 3 |
 | En los dos entornos (falta acreditar) | 2 |
+| Otro | 1 |
 | Firmado, en curso | 1 |
 
 ---
@@ -147,7 +148,7 @@ cierre».
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
 | 596 | Textos de urgencia para clientes dormidos y tras el descuento o la pausa (Montserrat, Hylant) | A | PROD | — (firmado: urgencia honesta H + los tres textos; n8n en la cola de STG, y los textos de Django pedidos a Juan) |
-| 586 | «Cancelar» al seguimiento «¿Avanzamos?»: el agente cierra la sesión y manda el enlace del especialista ✱ | A | PROD | STG ✱ (`ae699fe9`: B → A → silencio, el QA 3/3, 21/21); **listo para PROD con orden de Alberto**; la pausa de seguimientos espera el `reason` de Juan |
+| 586 | «Cancelar» al seguimiento «¿Avanzamos?»: el agente cierra la sesión y manda el enlace del especialista ✱ | A | PROD | **PROD ✱** (`dcfb7a13`: B → A → silencio, sin enlace ni cierre); **solo falta la pausa de los seguimientos**, que espera el `reason` de Juan |
 | 285 🔴 | Teléfono sin sesión viva → cliente sin respuesta | A | Ambos | STG ✱ (bot `03b09269`), **en pausa**: Juan propone una solución más sencilla |
 | 542 | Tras declinar o derivar, el seguimiento insiste | A | PROD | — |
 | 464 | Tras derivar por VIN con póliza, los checkpoints siguen | A | PROD | STG ✱ (cubierto por el cableado del `#577`) |
@@ -304,6 +305,8 @@ firmada (textos A, B, B sin descuento, C y D).
 - **`#586` verde en STG** (QA C 3/3 sobre `ae699fe9`/`1e11ea53`), listo para PROD con orden de Alberto. STG descongelado (adenda 9).
 
 - **`#608` y `#609` en STG** (bot `02ed57c1`), verificados por el diff; el siguiente en la cola es la retención con su adenda 1.
+
+- **15 oct: el `#586` en PROD** (`4b9eaf42` → `dcfb7a13`), verificado, con la cadena del «no» hasta `IF Identity Intent?`. Solo queda la pausa (Juan).
 
 ---
 
