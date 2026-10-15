@@ -58,8 +58,8 @@ cierre».
 | Arreglo | Issues |
 |---|---|
 | Sin arreglo | 57 |
-| Parcial | 16 |
-| Solo STG | 9 |
+| Parcial | 15 |
+| Solo STG | 10 |
 | Solo PROD (falta caso real) | 3 |
 | En los dos entornos (falta acreditar) | 2 |
 | Otro | 1 |
@@ -98,7 +98,7 @@ cierre».
 |---|---|---|---|---|
 | 593 | La serie de la foto que no casa con el auto cotizado se descarta en silencio: el bot la vuelve a pedir ✱ | A | PROD | — (texto aprobado por Alberto; en la cola de la sesión A) |
 | 475 | VIN tecleado con formato inválido: motivo engañoso y bucle; el modelo afirma «ya tengo tu número de serie» sin guardarla ✱ | A | PROD | Parcial (texto aprobado: O→0 e I→1 con confirmación; en la cola de la sesión A) |
-| 543 | Póliza vencida tratada como renovación | A | PROD | PROD ✱ parcial (viaje 6); **a0 + b2/c2 en variante S firmados**, en la cola de STG; a1/a2 esperan el `#566` |
+| 543 | Póliza vencida tratada como renovación | A | PROD | STG ✱ (bot `387fee41` / Guard `b46c8d48`: R0, a0 con enlace (texto a firma), b2 S y c2 S con «no es nuestra» comprobado por serie, y la pausa al bloquear; 21/21); a1/a2 esperan el `#566` |
 | 534 | TipoRegla 70/31 en el XML de Quálitas | J | Ambos | Parcial |
 | 307 🔴 | La barrera del estado de póliza depende del Intent Router | J | Ambos | — |
 | 280 | Emisión web en STG no completa | J | STG | — |
@@ -307,6 +307,8 @@ firmada (textos A, B, B sin descuento, C y D).
 - **`#608` y `#609` en STG** (bot `02ed57c1`), verificados por el diff; el siguiente en la cola es la retención con su adenda 1.
 
 - **15 oct: el `#586` en PROD** (`4b9eaf42` → `dcfb7a13`), verificado, con la cadena del «no» hasta `IF Identity Intent?`. Solo queda la pausa (Juan).
+
+- **`#543` S en STG** (bot `387fee41`, Guard `b46c8d48`). a0 lleva el enlace; su texto está a la firma.
 
 ---
 
