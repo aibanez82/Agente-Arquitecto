@@ -85,6 +85,7 @@ cambiar si Hylant indica otra cosa.
 | textos-montserrat-596 | 14 oct | sí | Los tres textos de Montserrat en versión H (el 3 sin descuento, sin los 12 MSI hasta el `#592`) |
 | no-prometer-contacto | 14 oct | sí | Sin recordatorio por fecha, nunca «te contacto»: «escríbeme por aquí a partir del…» |
 | placas-opcionales-614 | 16 oct | sí (en la sesión del Arquitecto) | `#614`: **P1** «No te preocupes, las placas no son necesarias para emitir tu póliza: el dato importante es el número de serie (VIN) de tu auto. Si después las tienes a la mano, me las puedes pasar.» · **P2** «Placas del vehículo (si las tienes a la mano)» |
+| resumen-pregunta-contundente | 16 oct | sí (texto de Alberto) | Sustituye a la pregunta de `resumen-orden-pregunta`: «[Nombre], ¿está todo correcto? Dime *Sí* y emito la póliza.» (sin nombre: «¿Está todo correcto? Dime *Sí* y emito la póliza.») |
 
 Encargo: `Agente-n8n:handoffs/2026-10-14-A-firmas-orden-prod-591-y-cola.md`. Los textos de Django del `#596` van a Juan.
 
