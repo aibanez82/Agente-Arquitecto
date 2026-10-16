@@ -144,7 +144,7 @@ Detectores **verificados el 16 ago contra el workflow VIVO de PROD** (`BtOaZm7Wl
 | `has_responded` | `human_msg_count > 0` (ojo `#41`: exige marcador `USER INPUT STARTS BELOW` o texto sin wrapper `[CTX:`) |
 | `confirmo_cobertura` | AI dijo `"continuamos con"` + `"cobertura"` (ILIKE) |
 | `dio_datos_personales` | AI dijo "tengo… Nombre:" |
-| `dio_vin` | AI dijo "Número de serie:" / "Placas" |
+| `dio_vin` | AI dijo "Serie:" (sin «Placas»: `#614`) |
 | `dio_domicilio` | AI dijo `"*Domicilio:*"` |
 | `poliza_emitida_wa` | AI dijo "emitida exitosamente" |
 
