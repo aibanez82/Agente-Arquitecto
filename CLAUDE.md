@@ -81,7 +81,7 @@ Diagrama completo, observabilidad, JOIN de producción, hitos y detalle de nodos
 | Agente QA | `aibanez82/Agente_QATest_Qualitas` | Claude Code | Tests E2E en STG sin pasar por la landing; valida cambios de `systemMessage` |
 | Agente Mejoras Conv. | `aibanez82/Agente-MejorasConversacion` | Claude Code | Analiza abandono (Postgres) y tono/trato (capturas WA), propone copy — nunca modifica nada. Protocolo: `docs/protocolos/agente-mejoras-conversacion.md` |
 | Agente n8n | `aibanez82/Agente-n8n` | Claude Code | Modifica los JSON de workflows, sube a git **y hace el import en la instancia por API**. Protocolo: `docs/protocolos/agente-n8n.md` |
-| Agente Conciliación | `aibanez82/Agente-Conciliacion` | Postgres, lectura | 🔴 **El scraper del portal Q 360 está MUERTO**: última escritura en `conciliacion_pagos` el **18 ago 06:59**, cron fallando a diario del 22 al 26 ago y sin ejecuciones desde entonces (medido 6 sep). El agente está reescribiendo su oficio a **reportes sobre el ledger, 100 % lectura** — pendiente de mi validación. Protocolo: `docs/protocolos/agente-conciliacion.md` |
+| Agente Conciliación | `aibanez82/Agente-Conciliacion` | Postgres, lectura | 🔴 Scraper del portal Q 360 **parado desde el 18 ago**; el estatus de pago lo da hoy el ledger de Django (`provider_poll`). Repo sin actividad desde el 10 sep. Protocolo **desactualizado**: `docs/protocolos/agente-conciliacion.md` |
 | Agente Conversión | — | ⏳ Futuro | Reintentos + seguimiento |
 | Arquitecto | `aibanez82/Agente-Arquitecto` | Este repo | Documentación transversal, workflows n8n, spec SOAP Quálitas |
 
@@ -185,8 +185,8 @@ Roles y protocolos completos: tabla "Mapa de sistemas". Reglas operativas:
 **Gobernanza Contract-First S1–S5** (`#132` → `#135` → `#128` → `#143` → `#146`): contrato congelado con fingerprint ANTES de implementar, stand-down por etapa hasta freeze + handoff, el monitor de Juan emite GO. **`#132` cerrado el 26 ago.** Estado: `docs/iniciativas/s2-prep-offline.md`. Metodología: `HYL-WAI:docs/metodologia-contract-first-integracion.md`.
 
 **Iniciativas (estado en su doc, no aquí):**
-- **Seguimiento leads estancados:** ✅ **encendido en los DOS entornos** — `WHATSAPP_FOLLOWUPS_ENABLED` y `WHATSAPP_CHECKPOINT_FOLLOWUPS_ENABLED` a `true` y `DRY_RUN_DEFAULT=false` en STG y en PROD (medido 6 sep). **En STG manda WhatsApp de verdad**: no sirve para probar sin efectos. Cadencia ~4 min entre avisos, la misma en los dos — decisión de Alberto, no defecto. `docs/iniciativas/seguimiento-leads-estancados.md`.
-- **Conversation ID:** ✅ los dos entornos en `dual` (revalidado 6 sep). Sesión `waq_<qid>_<hex>` por lead; Django mantiene **una sola `active` por teléfono** (`activate_whatsapp_session_affinity()`). **Consecuencia operativa: un teléfono puede tener varias sesiones vivas.** `docs/iniciativas/conversation-id-whatsapp-n8n.md`.
+- **Seguimiento leads estancados:** encendido en STG y PROD (`WHATSAPP_CHECKPOINT_FOLLOWUPS_DRY_RUN_DEFAULT=false`). **En STG manda WhatsApp de verdad**: no sirve para probar sin efectos. Cadencia ~4 min entre avisos, la misma en los dos — decisión de Alberto, no defecto. `docs/iniciativas/seguimiento-leads-estancados.md`.
+- **Conversation ID:** los dos entornos en `dual`. Sesión `waq_<qid>_<hex>` por lead; Django mantiene **una sola `active` por teléfono** (`activate_whatsapp_session_affinity()`). **Consecuencia operativa: un teléfono puede tener varias sesiones vivas.** `docs/iniciativas/conversation-id-whatsapp-n8n.md`.
 - **Recordatorios por fecha mencionada:** diseño entregado a Juan; bloqueado por plantilla Meta re-enganche 24h. `docs/iniciativas/2026-07-10-recordatorios-seguimiento-por-fecha-mencionada-design.md`.
 - **HYL-WAI#156 Descuentos + Conversation Control:** Django terminado por Juan; n8n y Dashboard son nuestros. `docs/iniciativas/2026-08-11-hyl-wai-156-descuentos-lado-nuestro.md`.
 
