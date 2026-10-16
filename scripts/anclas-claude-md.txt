@@ -59,3 +59,16 @@ Manual de migración a STG
 ## --- MOVIBLES: pueden salir, pero exigen puntero desde CLAUDE.md ---
 whatsapp_event | docs/architecture/whatsapp-event-canonico-propuesta.md
 VENCIDO | docs/architecture/estatus-pago-qualitas.md
+
+## --- AÑADIDAS el 16 oct 2026 (higiene, PR 1): convenciones y reglas que entraron después del 23 ago ---
+#   Ninguna sale: se anclan para que la higiene no pueda llevárselas por la puerta de atrás.
+se verifican por `versionId` contra la API
+visionModel
+Una lectura que puede fallar en silencio no acredita ausencia
+Una medición del presente no acredita el pasado
+Hablar en git, y no confundir rama con entorno
+Toda afirmación de ausencia lleva el ámbito donde se buscó
+Autorización permanente de promoción a PROD
+Un descuadre para ANTES del paso irreversible
+regla-merge-por-estado.md
+Esa tabla guarda el texto del agente, no todas sus llamadas a tools

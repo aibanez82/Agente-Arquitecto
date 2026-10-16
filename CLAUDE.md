@@ -121,11 +121,13 @@ Diagrama completo, observabilidad, JOIN de producción, hitos y detalle de nodos
 | Payment Confirmation | `disvKr7iVhnNnefuiqJbJ` |
 | Issue Policy Guard (sub-workflow) | `SEKpp6E4gggaHj11` |
 | Quotation Data Guard (sub-workflow) | `wYLcBiEuS3Jq4rZT` |
+| Quotation Selection Guard (sub-workflow) | `KGuUTaEzqu40yHpG` |
+| Servir Imagen al Dashboard (webhook) | `WQNttkjPhHSapPDM` |
 | Error Handler | `oTZ86TYMitK2bSur` |
 
-> Los mantiene el Agente n8n en su repo y **se verifican por `versionId` contra la API, nunca por número de nodos**: dos grafos distintos pueden tener el mismo recuento. Hay un décimo **inactivo que no se toca**: `#135 CANDIDATO PROD — NO ACTIVAR` (`fqdSLZ5vv2RBtnWE`). `docs/n8n-workflows/` de ESTE repo está **RETIRADO**; el backup automático, descontinuado (`docs/architecture/backup-policy-n8n.md`).
+> Los mantiene el Agente n8n en su repo y **se verifican por `versionId` contra la API, nunca por número de nodos**: dos grafos distintos pueden tener el mismo recuento. Hay uno más, **inactivo, que no se toca**: `#135 CANDIDATO PROD — NO ACTIVAR` (`fqdSLZ5vv2RBtnWE`). `docs/n8n-workflows/` de ESTE repo está **RETIRADO**; el backup automático, descontinuado (`docs/architecture/backup-policy-n8n.md`).
 
-El bot llama a Claude desde **6 sitios** (revalidado 6 sep): **AI Agent**, **RAG IA Agent** y **Discount Intent Classifier** (**Sonnet 5**) · **Intent Router** y **Detect Jailbreak** (**Haiku 4.5**) · y **`Extract VIN Vision`**, que **no es nodo de modelo sino un `httpRequest` a `api.anthropic.com`** con el modelo escrito a mano — sigue en `claude-sonnet-4-5-20250929`, una generación atrás. Ningún otro workflow de PROD llama a un LLM, y ninguno lleva `temperature` (fuera desde el `#270`). n8n escribe a Postgres con la credencial `"Postgres account"`.
+El bot llama a Claude desde **6 sitios**: **AI Agent**, **RAG IA Agent** y **Discount Intent Classifier** (**Sonnet 5**) · **Intent Router** y **Detect Jailbreak** (**Haiku 4.5**) · y **`Extract VIN Vision`**, que **no es nodo de modelo sino un `httpRequest` a `api.anthropic.com`** cuyo modelo sale de `visionModel` en `WA Config` (`#348`): un cambio de modelo se mira ahí, no en el nodo. Ningún otro workflow de PROD llama a un LLM, y ninguno lleva `temperature` (fuera desde el `#270`). n8n escribe a Postgres con la credencial `"Postgres account"`.
 
 Nodos concretos, workflow proactivo y detalle: `docs/architecture/data-flow.md` · `docs/protocolos/workflow-proactivo-dashboard.md`.
 
@@ -273,4 +275,4 @@ Alberto trabaja desde **Claude Code** sobre repos clonados en `~/claude-projects
 > REGLA OPERATIVA, nunca estado, cronología ni narrativa**: si lo que aprieta es eso, la respuesta es
 > higiene, no más techo. Y el techo no decide por mí — comprimir una convención existente para meter
 > otra, eligiendo por cuál se recorta más rápido, es peor que pasarse de largo un día.
-> Procedimiento, test de imprescindibilidad y registro: `docs/protocolos/higiene-claude-md.md`. Aquí solo hechos estables y reglas operativas: sin cronologías ni ítems resueltos. Estado de bugs → `qualitas-issues`; estado de iniciativas → su doc + tablero artifact (aquí solo puntero); convención nueva entra SIN narrativa (la historia va a `docs/architecture/convenciones-origen.md`); lo resuelto → `docs/architecture/pendientes-resueltos-historial.md`. Verificar `wc -c CLAUDE.md` tras cada edición.
+> Procedimiento, test de imprescindibilidad y registro: `docs/protocolos/higiene-claude-md.md`. Aquí solo hechos estables y reglas operativas: sin cronologías ni ítems resueltos. Estado de bugs → su issue en HYL-WAI; estado de iniciativas → su doc + tablero artifact (aquí solo puntero); convención nueva entra SIN narrativa (la historia va a `docs/architecture/convenciones-origen.md`); lo resuelto → `docs/architecture/pendientes-resueltos-historial.md`. Verificar `wc -c CLAUDE.md` tras cada edición.
