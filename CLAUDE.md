@@ -194,16 +194,12 @@ Roles y protocolos completos: tabla "Mapa de sistemas". Reglas operativas:
 
 ## Pendientes de infraestructura
 
-> Solo lo VIVO y bloqueante; el estado detallado vive en su tracker. Verificado el 16 ago contra la
-> fuente: `HYL-WAI#70` llevaba cerrado desde el 2 jul y `#114` desde el 24 jul, ambos aquí listados
-> como pendientes.
+> Solo lo VIVO y bloqueante; el estado detallado vive en su tracker.
 
 | Item | Estado |
 |---|---|
-| Bug #7 / `HYL-WAI#69` — `[phase:completed]` sin pago verificado | 🟢 Barreras 2 y Phase Guard **vivas en PROD**, revalidadas el 6 sep tras dos imports. Cero sesiones `completed` desde el **1 ago**. **Cerrar el issue exige confirmar la barrera 1 y la 3**, que no aparecen nombradas. Detalle: `docs/architecture/pendientes-resueltos-historial.md` |
-| `N8N_TOKEN` hardcodeado como default | 🟡 **El default ya no existe** (revalidado 6 sep en `origin/main`). Queda viva solo la **rotación** del `HYL-WAI#130`, que no se acredita desde aquí |
-| `/api/emitir-externo/` — 400 sin causa + acepta POST sin credencial | ⏳ `HYL-WAI#119` — Juan (hallazgo auth: `c.5183416152`) |
-| Promoción a PROD de `fecha_inicio` en n8n | ⏳ Desbloquea M47/M48. **Sin issue vivo**: nació en `qualitas-issues#66`, que está congelado. Reabrir en HYL-WAI antes de trabajarlo, o dejará de rastrearse |
+| `N8N_TOKEN` hardcodeado como default | 🟡 El default ya no existe. Queda la **rotación** del `HYL-WAI#130`, que no se acredita desde aquí |
+| `/api/emitir-externo/` acepta POST sin credencial | ⏳ `HYL-WAI#406` — Juan |
 
 **Reglas, no pendientes:** la rotación de la service account key de Google Cloud está
 **desprioritizada — no proponerla** salvo señal de exposición; el token de Meta **lo ejecuta Juan**,
