@@ -95,3 +95,9 @@ Lo que sigue abierto y por eso el ítem no se cierra: **confirmar la barrera 1 y
 ## `N8N_TOKEN` — detalle retirado de `CLAUDE.md` el 6 sep 2026
 
 `_n8n_document_access_authorized` (`qualitas/views.py`) usa `os.getenv("N8N_TOKEN", "")` y exige **en positivo** token esperado + recibido + `secrets.compare_digest`: sin variable de entorno, **deniega**. Verificado en `origin/main` el 24 ago y revalidado el 6 sep.
+
+## Salidos de `CLAUDE.md` en la higiene del 16 oct 2026 (medidos ese día)
+
+- **Bug #7 / `HYL-WAI#69` — `[phase:completed]` sin pago verificado.** ✅ Issue **cerrado el 26 ago 2026**. `CLAUDE.md` lo seguía listando como pendiente con «cerrar exige confirmar la barrera 1 y la 3». El workaround del Dashboard (`estatus_pago === 'PAGADO' || (completed && numero_poliza)`) sigue en `CLAUDE.md`: es regla, no estado.
+- **`/api/emitir-externo/` — 400 sin causa (`HYL-WAI#119`).** ✅ **Cerrado el 18 sep 2026** por Juan: clasificación estructurada de fallos de emisión (PR #389 `b999acd2`, promovido por PR #393, deploy Heroku `4c022942`). **La otra mitad de esa fila —el endpoint acepta POST sin credencial— NO está resuelta**: medido el 16 oct en `origin/main` (`qualitas/views.py`, `api_emitir_externo`), la vista no comprueba ninguna credencial y no hay middleware que lo haga. Sigue en `CLAUDE.md` apuntando a su issue vivo, `HYL-WAI#406`.
+- **Promoción a PROD de `fecha_inicio` en n8n (desbloquea M47/M48).** ✅ En PROD desde el **viaje 6 (9 oct 2026)**. Medido el 16 oct: `Issue Policy Guard` de PROD (`SEKpp6E4gggaHj11`) maneja `fecha_inicio` y hay emisiones reales con `fecha_inicio` fechado en `n8n_chat_histories`.
