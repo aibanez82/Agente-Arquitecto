@@ -96,8 +96,8 @@ cierre».
 ## 2. Emisión: que la póliza salga con los datos correctos (6)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 593 | La serie de la foto que no casa con el auto cotizado se descarta en silencio: el bot la vuelve a pedir ✱ | A | PROD | — (texto aprobado por Alberto; en la cola de la sesión A) |
-| 475 | VIN tecleado con formato inválido: motivo engañoso y bucle; el modelo afirma «ya tengo tu número de serie» sin guardarla ✱ | A | PROD | Parcial (texto aprobado: O→0 e I→1 con confirmación; en la cola de la sesión A) |
+| 593 | La serie de la foto que no casa con el auto cotizado se descarta en silencio: el bot la vuelve a pedir ✱ | A | PROD | STG ✱ (bot `676069a3`: nota `[SERIE_FOTO_NO_CUADRA]` con el texto aprobado; 3/3 + vivo 1/1, control 0/1) |
+| 475 | VIN tecleado con formato inválido: motivo engañoso y bucle; el modelo afirma «ya tengo tu número de serie» sin guardarla ✱ | A | PROD | STG ✱ (bot `f0b69aee`: O→0 e I→1 pendientes de confirmar, nota de longitud, `aviso_serie` con el motivo real; textos de una I y de varias letras derivados, a revisar por Alberto) |
 | 543 | Póliza vencida tratada como renovación | A | PROD | STG ✱ (bot `387fee41` / Guard `b46c8d48`: R0, a0 con enlace (texto a firma), b2 S y c2 S con «no es nuestra» comprobado por serie, y la pausa al bloquear; 21/21); a1/a2 esperan el `#566` |
 | 534 | TipoRegla 70/31 en el XML de Quálitas | J | Ambos | Parcial |
 | 307 🔴 | La barrera del estado de póliza depende del Intent Router | J | Ambos | — |
@@ -147,7 +147,7 @@ cierre».
 ## 7. Seguimientos y cierre de conversación (10)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
 |---|---|---|---|---|
-| 596 | Textos de urgencia para clientes dormidos y tras el descuento o la pausa (Montserrat, Hylant) | A | PROD | — (firmado: urgencia honesta H + los tres textos; n8n en la cola de STG, y los textos de Django pedidos a Juan) |
+| 596 | Textos de urgencia para clientes dormidos y tras el descuento o la pausa (Montserrat, Hylant) | A | PROD | Parcial: STG (bot `c39407d1`) el texto 3 de la pausa, con y sin descuento (sin 12 MSI hasta el `#592`), y fuera la única promesa de «hoy» del prompt; texto 2 aparcado para la sesión B; los de Django, pedidos a Juan |
 | 586 | «Cancelar» al seguimiento «¿Avanzamos?»: el agente cierra la sesión y manda el enlace del especialista ✱ | A | PROD | **PROD ✱** (`dcfb7a13`: B → A → silencio, sin enlace ni cierre); **solo falta la pausa de los seguimientos**, que espera el `reason` de Juan |
 | 285 🔴 | Teléfono sin sesión viva → cliente sin respuesta | A | Ambos | STG ✱ (bot `03b09269`), **en pausa**: Juan propone una solución más sencilla |
 | 542 | Tras declinar o derivar, el seguimiento insiste | A | PROD | — |
@@ -311,6 +311,12 @@ firmada (textos A, B, B sin descuento, C y D).
 - **`#543` S en STG** (bot `387fee41`, Guard `b46c8d48`). a0 lleva el enlace; su texto está a la firma.
 
 - **Mensaje de emisión determinista en STG** (bot `387fee41` → `820c08d4`): el grafo compone «emitida exitosamente» con la fila de `qualitas_polizaemitida` del turno y la liga de la API (contado, fraccionado y b1 sin liga); `URL Fidelity Guard` admite esa liga. Arnés 30/30, a mitad de turno 12/12, vivo 6/6. Nodos y cableado comprobados por el Arquitecto en el vivo de STG. **A PROD necesita orden de Alberto (toca emisión)**. Sin ejercitar: emisión real contra Quálitas QA y la respuesta de la API de liga en PROD justo tras emitir.
+
+## Movimientos del 16 oct
+
+- **`#612` nuevo (alto, A, PROD):** un «gracias» en `data_capture` muere en `Update Phase in DB` (`there is no parameter $4`) y el cliente no recibe respuesta. Lo trajo el viaje 2 del 14 oct (adenda 1 del `#606`) y **sigue en PROD `dcfb7a13`**. Arreglo en STG (`queryReplacement` como array; vivo `676069a3`, comprobado por el Arquitecto); el viaje lleva un solo nodo. Sin caso real medible: PROD no guarda las ejecuciones con error.
+
+- **En STG, con informe:** `#596` (texto 3 de la pausa), `#475` (serie tecleada) y `#593` (serie de la foto que no cuadra). Bot STG `676069a3`.
 
 ---
 
