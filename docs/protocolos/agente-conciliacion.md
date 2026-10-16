@@ -1,5 +1,7 @@
 ## Agente Conciliación — protocolo de uso
 
+> ⚠️ **DESACTUALIZADO (medido el 16 oct 2026).** Describe el scraper del portal Q 360, que **no escribe en `conciliacion_pagos` desde el 18 ago 2026** (último `verificado_en`: 18 ago 06:59 CDMX). El estatus de pago lo da hoy el ledger de Django (`qualitas_qualitaspaymentpollobservation`, `provider_poll`; última observación el 16 oct). El repo del agente no tiene commits desde el 10 sep. Antes de usar este protocolo, rehacerlo sobre el ledger.
+
 **Repo:** `aibanez82/Agente-Conciliacion` (clonado en `~/claude-projects/Agente-Conciliacion`, push directo habilitado desde el Arquitecto, 14 jul 2026).
 
 **Rol:** Ejecutor Nivel 3, especializado en verificar el estatus de pago real de las pólizas
