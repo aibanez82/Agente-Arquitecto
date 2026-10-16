@@ -135,7 +135,7 @@ Nodos concretos, workflow proactivo y detalle: `docs/architecture/data-flow.md` 
 
 ## Regla de estado real de un lead
 
-`whatsapp_sessions.conversation_phase` **ya no está stuck en `greeting`** (medido en PROD, 24 ago; revalidado 6 sep). Los detectores de abajo siguen siendo la fuente buena de hitos porque **leen texto, que siempre se persiste** — no porque la fase no avance:
+`whatsapp_sessions.conversation_phase` **ya no está stuck en `greeting`**. Los detectores de abajo siguen siendo la fuente buena de hitos porque **leen texto, que siempre se persiste** — no porque la fase no avance:
 
 Detectores **verificados el 16 ago contra el workflow VIVO de PROD** (`BtOaZm7WlZT-24V7hqCnF`, API n8n), no contra el export local:
 
@@ -160,11 +160,11 @@ Detectores **verificados el 16 ago contra el workflow VIVO de PROD** (`BtOaZm7Wl
 
 **Cola única de prioridad y estado: el GitHub Project de HYL-WAI** — `github.com/orgs/aguayo-co/projects/2`. Los issues **viven** en el repo; el Project es donde se ve qué hay, en qué estado y de quién es. **Todo issue nuevo se asigna a alguien** — sin responsable no es un issue, es una nota.
 
-**`aibanez82/qualitas-issues` está CONGELADO y VACÍO** (revalidado 6 sep): no se abre nada ahí y no se barre. Las referencias `qualitas-issues#NN` de los documentos **siguen siendo válidas** — GitHub no transfiere issues entre owners distintos, así que nada se movió.
+**`aibanez82/qualitas-issues` está CONGELADO y sin issues abiertos**: no se abre nada ahí y no se barre. Las referencias `qualitas-issues#NN` de los documentos **siguen siendo válidas** — GitHub no transfiere issues entre owners distintos, así que nada se movió.
 
 Los `docs/bugs/bug-NN-*.md` son el cuaderno de investigación largo, enlazado desde cada issue.
 
-**Inbox de captura rápida** (prefijo `QUALITAS:`) — el destino es HYL-WAI. Al iniciar sesión (o "revisa QUALITAS"): `gh issue list --repo aguayo-co/HYL-WAI --state open`, más `--assignee aibanez82` y menciones para lo que nos abre Juan; triangular, cerrar con comentario de destino — nunca ejecutar trabajo de otro repo. **`qualitas-issues` no se barre**: comprobado vacío otra vez el 6 sep. Detalle: `docs/protocolos/qualitas-issues-inbox.md`.
+**Inbox de captura rápida** (prefijo `QUALITAS:`) — el destino es HYL-WAI. Al iniciar sesión (o "revisa QUALITAS"): `gh issue list --repo aguayo-co/HYL-WAI --state open`, más `--assignee aibanez82` y menciones para lo que nos abre Juan; triangular, cerrar con comentario de destino — nunca ejecutar trabajo de otro repo. **`qualitas-issues` no se barre.** Detalle: `docs/protocolos/qualitas-issues-inbox.md`.
 
 **Workaround Bug #7 (Dashboard) — póliza pagada:** `d.estatus_pago === 'PAGADO' || (d.conversation_phase === 'completed' && d.numero_poliza != null)`. `completed` lo setea n8n con confirmación verificada de la pasarela; el guard evita falsos positivos. Detalle: `docs/bugs/bug-07-estatus-pago.md`.
 

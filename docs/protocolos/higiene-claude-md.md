@@ -135,3 +135,5 @@ Con el techo en 30 KB ya no hay urgencia, así que se hace bien: 🟢 verde (est
 → 🟡 ámbar (prosa a `docs/architecture/`, ~1,5 KB) → convenciones (justificación duplicada, ~400 B).
 Una PR por fase, en ese orden, cada una con su gate. Objetivo: ~19 KB sobre techo de 30, es decir
 **una docena de convenciones de margen** sin volver a tocar ninguna existente.
+
+| 16 oct 2026 · cuatro PR (#200-#203) | 30.558 → 29.515 (las cuatro fusionadas, medido con el gate) | 46 anclas (+10), 0 huérfanas | **Cinco afirmaciones falsas corregidas** (PR 1): 9 workflows activos eran 11; `Extract VIN Vision` ya no lleva el modelo a mano (`#348`); estado de bugs apuntaba a `qualitas-issues`. **Pendientes** (PR 2): `#69` y `#119` llevaban cerrados desde el 26 ago y el 18 sep, y `fecha_inicio` estaba en PROD desde el 9 oct; la credencial de `/api/emitir-externo/` sigue viva y pasa a apuntar a `#406`. **Estado** (PR 3): Conciliación re-medida; su protocolo, marcado desactualizado en vez de recibir el estado. **Fechas de revalidación** (PR 4): fuera. Disparador: la petición de Alberto al 99,5 % del techo, no un disparador del §4 — llegó tarde |
