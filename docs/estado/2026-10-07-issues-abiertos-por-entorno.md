@@ -142,7 +142,7 @@ cierre».
 | 592 | 12 meses sin intereses: tope del 30 % de descuento en CUALQUIER póliza; la KB lo limita a negocios especiales y el bot ofrece 12 MSI tras descuentos ✱ | A | PROD | — (espera a Hylant: ¿nuestros 20/30/40 % cuentan? El texto D de la llamada, bloqueado para PROD) |
 | 461 | Ofrece Cobertura Limitada sin que la pidan (67/81) | A | PROD | PROD ✱ (viaje 6, bot `26dfbb82`: textos firmados en el prompt); el grafo (Limitada solo con permiso) pendiente |
 | 499 | Salida vacía del agente: mensaje sin contestar | A | ¿? | Ambos |
-| 486 | Análisis de coherencia del system prompt (informe) | A | ¿? | — (juicio de 18 puntos publicado; paquete 3-4-6-8-9-10-11-14 autorizado; en la cola de la sesión A) |
+| 486 | Análisis de coherencia del system prompt (informe) | A | ¿? | STG ✱ (bot `2cf93cb6`: paquete 3-4-6-8-9-10-11-14, solo el systemMessage del AI Agent; arnés N=20 80/80 con el cambio y 80/80 el control: quita incoherencias latentes, no cambia lo medido; 3, 4 y 14 sin ejercitar) |
 
 ## 7. Seguimientos y cierre de conversación (10)
 | # | Qué resuelve | Resp. | Problema en | Arreglo |
@@ -317,6 +317,8 @@ firmada (textos A, B, B sin descuento, C y D).
 - **`#612` nuevo (alto, A, PROD):** un «gracias» en `data_capture` muere en `Update Phase in DB` (`there is no parameter $4`) y el cliente no recibe respuesta. Lo trajo el viaje 2 del 14 oct (adenda 1 del `#606`) y **sigue en PROD `dcfb7a13`**. Arreglo en STG (`queryReplacement` como array; vivo `676069a3`, comprobado por el Arquitecto); el viaje lleva un solo nodo. Sin caso real medible: PROD no guarda las ejecuciones con error.
 
 - **En STG, con informe:** `#596` (texto 3 de la pausa), `#475` (serie tecleada) y `#593` (serie de la foto que no cuadra). Bot STG `676069a3`.
+
+- **`#486` (paquete de prompt) en STG** (bot `676069a3` → `2cf93cb6`). Comprobado por el Arquitecto contra el export anterior: solo cambia el systemMessage del `AI Agent` (12 bloques contiguos de diff para los 14 hunks del informe), conexiones idénticas. La cola de la sesión A queda vacía; el `#126`, aparcado hasta el contrato de Juan.
 
 ---
 
