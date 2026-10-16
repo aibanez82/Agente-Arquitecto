@@ -318,6 +318,8 @@ firmada (textos A, B, B sin descuento, C y D).
 
 - **En STG, con informe:** `#596` (texto 3 de la pausa), `#475` (serie tecleada) y `#593` (serie de la foto que no cuadra). Bot STG `676069a3`.
 
+- **`#612` cerrado en PROD** (bot `dcfb7a13` → `a1f22200`, solo `Update Phase in DB`), verificado por el Arquitecto y validado por Alberto en STG (`waq_5578`). En la misma prueba: `#593` y `#475` verdes (a PROD por orden de Alberto, inventario en curso); **la emisión determinista borró la liga buena** (exec 99341) → adenda 12, no viaja.
+
 - **`#486` (paquete de prompt) en STG** (bot `676069a3` → `2cf93cb6`). Comprobado por el Arquitecto contra el export anterior: solo cambia el systemMessage del `AI Agent` (12 bloques contiguos de diff para los 14 hunks del informe), conexiones idénticas. La cola de la sesión A queda vacía; el `#126`, aparcado hasta el contrato de Juan.
 
 ---
