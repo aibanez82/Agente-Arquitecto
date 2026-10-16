@@ -322,6 +322,14 @@ firmada (textos A, B, B sin descuento, C y D).
 
 - **`#593` y `#475` cerrados en PROD** (por orden de Alberto): bot `a1f22200` → `30421662` (`#593`) → **`31cdd989`** (`#475`, con los textos derivados aprobados). Cada vivo verificado por el Arquitecto como idéntico al candidato revisado antes del PUT.
 
+- **`#614` cerrado en PROD — placas opcionales** (Alberto + Hylant): Guard `6bd5562b`, bot `f398537a`, Dashboard `aba9ff1` (`dio_vin` solo «Serie:», 84 sesiones frente a 81). Validado en STG en una conversación real (póliza `7620104360` sin placas).
+- **`#406`, nuestro lado en PROD:** `Call Issue Policy Real` manda la credencial «Django N8N_TOKEN PROD» (Guard `40246c9e`). La exigencia queda para Juan.
+- **Emisión determinista en PROD** (bot `cc0f03f5`), con la liga del turno (adenda 12): en STG, Quálitas QA marca la póliza como pagada al instante y `ensure` devolvía `temporarily_unavailable`.
+- **`#551` Recovery en PROD (prioridad 1 de Alberto):** viaje A (hunks compartidos, `4cb07a3c`) y viaje B (63 nodos, `a75c713e`), más el arreglo del RFC con precarga (`98790b46`). Un primer candidato A arrastraba el `#596`: rechazado y rehecho. **La campaña no está lanzada**: «Recuperacion Oct 16 2026 (1 lead)», arrancada a las 13:02 y pausada a las 13:18, sin envíos.
+- **`#613` (a) + captura en PROD** (sesión B, bot `60e87884`; STG `739ac62d`): la tarjeta digital o virtual, con el texto puesto por el grafo. Lo demás espera a Hylant.
+- **La pregunta del resumen contundente en STG** (`575da028`), firmada; a PROD, con orden.
+- **Nuevo `#615`** (Juan): devolver a n8n la póliza vigente, el agente y las fechas que manda Quálitas en el código 41.
+
 - **`#486` (paquete de prompt) en STG** (bot `676069a3` → `2cf93cb6`). Comprobado por el Arquitecto contra el export anterior: solo cambia el systemMessage del `AI Agent` (12 bloques contiguos de diff para los 14 hunks del informe), conexiones idénticas. La cola de la sesión A queda vacía; el `#126`, aparcado hasta el contrato de Juan.
 
 ---
