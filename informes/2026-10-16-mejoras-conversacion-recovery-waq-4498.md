@@ -61,3 +61,18 @@ Agente: Mejoras Conversación
 - La persona moral está confirmada en la precarga. La pregunta de si la campaña admite empresas la decide Alberto.
 
 **Decisión de Alberto (16-oct, en mi sesión):** la versión suave le parece bien: «Tu póliza anterior del [VEHÍCULO] se canceló el [FECHA] porque quedó un pago pendiente, así que hoy tu auto no tiene seguro vigente.» Pendiente de firma en la bandeja.
+
+## Adenda 2 (16-oct): ¿tenemos el dato para comparar? ¿Por qué no se puede emitir a empresas?
+**Prima anterior.** Alberto quiere el «antes y ahora».
+- Medido en las 22 sesiones de la campaña 6 con `captured_data.previous_policy`: **las 22 traen `total_premium`**, todas de **contado** y con la cobertura indicada (18 AMPLIA, 4 LIMITADA).
+- El bot tiene los dos datos en el mismo turno: la prima anterior en la sesión y el precio de hoy en `Get_Quotation_Data`. **La comparación es posible**, siempre misma cobertura y anual de contado contra anual de contado.
+- Solo pude verificarla en `waq_4498`: $15,932.89 → $12,311.85, un 23% menos. Las otras 21 no llegaron a leer la cotización.
+- **Regla propuesta:** la frase solo sale **si hoy es más barato**. Si es más caro, no se compara. `commercial_comparison` podría alimentarse de `previous_policy` en vez de quedar en `previous_quote_missing`.
+
+**Personas morales.** El carril de WhatsApp está hecho para personas físicas:
+- Grupo 1 pide nombre, apellidos, fecha de nacimiento y género.
+- El RFC se calcula con la plantilla de persona física (`#545`: 4 letras + AAMMDD). El de una empresa son 3 letras, la fecha de constitución y la homoclave.
+- `Issue_Policy` solo manda campos de persona física: no hay razón social, fecha de constitución ni representante.
+- La landing pide marcar «no soy persona moral» (`HYL-WAI:tests/test_homepage_redesign.py`). El producto las excluye a propósito.
+- **En el lote:** 2 de 22 son empresas por el nombre: «GESTION Y TECNOLOGIA AMBIENTAL» (`waq_4498`) y «GUTIERREZ GUEVARA CONSTRUCCIONES» (`waq_4504`).
+- No sé si la API de Quálitas admitiría persona moral. Lo que no la admite es nuestra integración.
