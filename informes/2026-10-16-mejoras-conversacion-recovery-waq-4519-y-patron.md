@@ -69,3 +69,10 @@ Agente: Mejoras Conversación
 - Le da el único dato que quizá no tiene, que circula sin seguro, con la frase del motivo aprobada hoy.
 - Si vuelve a decir que no o no contesta: D1 y se le saca de los seguimientos de la campaña.
 - La fecha del 31-ago sale del endoso de cancelación, como la del 22-ago en `waq_4498`.
+
+**Cambio de Alberto al cierre (16-oct):** «…así que hoy tu auto no tiene seguro vigente. Si te interesa quedar cubierto hoy mismo y a un mejor precio que antes, pulsa el botón para ver la cotización.» Señalé dos riesgos:
+1. **«Hoy mismo»:** la cotización empieza al día siguiente (`vigencia.fecha_inicio`). Propuesta: «desde el [FECHA_INICIO]».
+2. **«Pulsa el botón»:** el botón está en la plantilla anterior y algunos clientes no lo encuentran (`waq_4507`). Propuesta: que esta respuesta lleve su propio botón «Ver promo», o «toca *Ver promo* en el mensaje anterior».
+
+Versión con los dos ajustes:
+> Entendido, no te insisto. Solo para que lo sepas: tu póliza anterior del [VEHÍCULO] se canceló el [FECHA] porque quedó un pago pendiente, así que hoy tu auto no tiene seguro vigente. Si te interesa quedar cubierto desde el [FECHA_INICIO] y a un mejor precio que antes, toca *Ver promo* para ver tu cotización.
