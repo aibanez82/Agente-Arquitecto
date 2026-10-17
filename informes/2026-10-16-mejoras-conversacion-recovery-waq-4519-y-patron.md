@@ -76,3 +76,20 @@ Agente: Mejoras Conversación
 
 Versión con los dos ajustes:
 > Entendido, no te insisto. Solo para que lo sepas: tu póliza anterior del [VEHÍCULO] se canceló el [FECHA] porque quedó un pago pendiente, así que hoy tu auto no tiene seguro vigente. Si te interesa quedar cubierto desde el [FECHA_INICIO] y a un mejor precio que antes, toca *Ver promo* para ver tu cotización.
+
+## Adenda: `waq_4518` (Nissan Kicks 2019, tel …5940), lo pidió Alberto
+- **Póliza anterior:** 7620093062, AMPLIA, **$8,619.83**, `payment_term: C`, `CANCELA-AUT` (endoso del 15-ago), agente 88199.
+- **Plantilla:** enviada a las 15:24, con un precio de $6,958.27 (19% menos). No pulsó «Ver promo» (`recovery_solo_contexto: true`).
+- **17:04, fila 16371:** «Estoy pagando una poliza mensual con ustedes mismos».
+- **Fila 16372:** error de cuota. Es avería, no copy.
+- **En nuestra BD no hay ninguna otra póliza**, ni por teléfono ni por número de serie, y la 7620093062 no tiene filas en `conciliacion_pagos`.
+
+**Un dato que cambia la lectura:** **las 22 sesiones de Recovery tienen `payment_term: C`** (contado), sin excepción.
+- Que 498 pólizas canceladas por impago sean todas de contado es poco creíble. Lo normal es que se cancelen por recibos mensuales sin pagar.
+- **Es probable que `payment_term` no refleje la forma de pago real**, y que la clienta tenga razón en que pagaba mensual.
+- Si es así, la comparación «antes y ahora» de la propuesta 37 compara un total fraccionado (más caro, con financiamiento) contra un anual de contado, y **infla el ahorro**. **Hay que comprobar `payment_term` antes de firmar esa frase.**
+
+**Qué responderle** (a mano ahora, o como regla cuando el cliente dice que sigue pagando). Sigue la decisión de Alberto del 7-oct en el `#566`: el bot no afirma nada sobre cargos o domiciliación, da los hechos y deriva:
+> Gracias por avisarme, María del Rosario. En nuestros registros tu póliza 7620093062 del Nissan Kicks aparece cancelada desde el 15 de agosto por un pago pendiente. Si sigues viendo cargos, hay que aclararlo: le paso tu caso a una persona de nuestro equipo para que lo revise contigo por aquí mismo.
+
+**No se le ofrece la promoción** hasta que una persona lo haya aclarado: podría tener otra póliza vigente, o un cargo indebido.
