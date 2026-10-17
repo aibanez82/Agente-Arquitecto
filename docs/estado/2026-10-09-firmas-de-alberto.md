@@ -119,3 +119,13 @@ Encargo: `Agente-n8n:handoffs/2026-10-14-A-firmas-orden-prod-591-y-cola.md`. Los
 | recovery-motivo-cancelacion-551 | sí | Recovery (`waq_4498`). Primera respuesta: «Es para tu [VEHÍCULO], el que tenías asegurado con nosotros. Tu póliza anterior ya no está activa, y por eso te mandamos un precio especial para volver a asegurarlo. ¿Te cuento cuánto queda?». Motivo: «Tu póliza anterior del [VEHÍCULO] se canceló el [FECHA] porque quedó un pago pendiente, así que hoy tu auto no tiene seguro vigente. Por eso te mandamos esta promoción: una póliza nueva con [COBERTURA] que empieza el [FECHA_INICIO].» Después, la forma de pago pedida y «¿Te la dejo lista para contratar?». La comparación con la prima anterior (`#394`), marcada como opcional, **queda pendiente de confirmación expresa** |
 
 Encargo: `Agente-n8n:handoffs/2026-10-14-A-firmas-orden-prod-591-y-cola.md`, adenda 13.
+
+## Duodécima tanda (17 oct, 01:43–01:44 UTC): bandeja
+
+| Id | Decisión | Qué |
+|---|---|---|
+| recovery-ver-promo-derivacion-551 | sí | La segunda vez que haría falta el botón, o si no se puede contar: «Perdona, parece que el botón no te aparece. Para darte tu precio con la promoción te paso con una persona de nuestro equipo por WhatsApp: [enlace]» |
+| cp-otra-residencia-doble-deducible | sí (con enlace) | Cliente que vive o circula en otro estado, o que cambió las placas: «Buena pregunta. Tu seguro te cubre en todo el país, pero el precio se calcula con el código postal de donde vives. Si ahora vives en otro estado, hay que ajustar tu cotización a tu nuevo código postal: si no, en un siniestro Quálitas podría aplicarte doble deducible. Para hacerlo te atiende una persona de nuestro equipo por WhatsApp: [enlace]». Nunca «el precio no cambia» |
+| recovery-no-a-la-plantilla-551 | sí, **versión por confirmar (A o B)** | Respuesta única a un «No» a la plantilla de Recovery: el motivo de la cancelación y la invitación a ver la cotización |
+
+Encargo: `Agente-n8n:handoffs/2026-10-14-A-firmas-orden-prod-591-y-cola.md`, adenda 15.
