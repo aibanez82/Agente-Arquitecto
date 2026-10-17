@@ -53,3 +53,19 @@ La regla «solo si hoy es más barato» ya se cumple en todo el lote por constru
 **`waq_4518` es delicado:** el cliente cree que sigue pagando una póliza con nosotros, y en la campaña figura como cancelada por impago. O tiene otra póliza, o no sabe que esta se canceló. Lo tiene que mirar una persona antes de que el bot le ofrezca nada (es terreno del `#566`, postventa).
 
 Agente: Mejoras Conversación
+
+## Adenda: `waq_4521` (Chevrolet Groove 2023, tel …9692), lo pidió Alberto
+- **Póliza anterior:** 7620080151, AMPLIA, contado, **$13,825.56**, `CANCELA-AUT` (endoso del 31-ago).
+- **Plantilla:** enviada a las 15:21, con un precio de **$11,258.93** (19% menos).
+- **17:12, fila 16375:** el cliente escribe **«No»**.
+- **Fila 16376:** recibe el error de cuota («¿puedes repetirlo?»). Es avería, no copy. Pedirle que repita un «No» se lee mal, pero lo provocó la caída.
+- La sesión lleva `recovery_solo_contexto: true` y la cotización 4521 se creó 9 s después del «No». **No pulsó «Ver promo».**
+
+**Cómo debería tratarse un «No» a la plantilla de Recovery**, y cómo responder a mano si alguien lo retoma:
+> Entendido, no te insisto. Solo para que lo sepas: tu póliza anterior del Chevrolet Groove se canceló el 31 de agosto porque quedó un pago pendiente, así que hoy tu auto no tiene seguro vigente. Si más adelante quieres volver a asegurarlo, escríbeme por aquí y te paso tu precio especial.
+
+**Por qué:**
+- Respeta el no: un solo mensaje, sin pregunta de objeción y sin precio.
+- Le da el único dato que quizá no tiene, que circula sin seguro, con la frase del motivo aprobada hoy.
+- Si vuelve a decir que no o no contesta: D1 y se le saca de los seguimientos de la campaña.
+- La fecha del 31-ago sale del endoso de cancelación, como la del 22-ago en `waq_4498`.
