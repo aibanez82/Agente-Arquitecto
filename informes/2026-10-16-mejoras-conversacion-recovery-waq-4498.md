@@ -59,3 +59,5 @@ Agente: Mejoras Conversación
   > Tu póliza anterior del MINI Cooper (7620094767) se canceló el [FECHA] porque quedó un pago pendiente, así que hoy tu auto no tiene seguro vigente.
 - **16336 sí llegó al cliente** (15:40:59, con wamid). Lo que perdió el `#617` fue el turno siguiente (ejecución 96652, 15:41, Ver Promo Copy). La lectura de la conversación no cambia.
 - La persona moral está confirmada en la precarga. La pregunta de si la campaña admite empresas la decide Alberto.
+
+**Decisión de Alberto (16-oct, en mi sesión):** la versión suave le parece bien: «Tu póliza anterior del [VEHÍCULO] se canceló el [FECHA] porque quedó un pago pendiente, así que hoy tu auto no tiene seguro vigente.» Pendiente de firma en la bandeja.
