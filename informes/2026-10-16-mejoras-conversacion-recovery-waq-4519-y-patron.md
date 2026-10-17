@@ -150,3 +150,30 @@ Versión con los dos ajustes:
 > Hola, Luis Alfredo, seguimos con tu Volvo XC40 2022: Cobertura Amplia a $18,329.65 al año. Para emitir tu póliza solo me falta tu fecha de nacimiento (DD/MM/AAAA) y tu género (M/F).
 
 **Pregunta para el grafo:** en 3 horas no salió ningún seguimiento automático. ¿Las sesiones de Recovery están fuera de los checkpoints de Django, o aquí no había checkpoint porque todavía no se había guardado el grupo 1?
+
+## Adenda: `waq_4500` (Nissan Versa 2020, tel …8652), lo pidió Alberto
+- **Póliza anterior:** 7620094585, AMPLIA, $11,782.71, `CANCELA-AUT`.
+- **Cotización:** con el CP **67277** (Nuevo León). `quoted_total` $9,323.86. Pulsó «Ver promo».
+
+| Hora | Fila | Quién | Texto |
+|---|---|---|---|
+| 15:47 | 16337–38 | Cliente / Bot | «Que carro es» → «Tu cotización es para un Nissan Versa 2020.» (patrón del vehículo) |
+| 15:50 | 16339 | Cliente | «Puedes respetar elmprecio andando en otra ciudad» |
+| 15:50 | 16341 | KB | Devuelve: «Si se comprueba que proporcionaste un domicilio o código postal diferente al de tu residencia… se aplicará un **doble deducible**» |
+| 15:50 | 16342 | Bot | «Tu cobertura aplica en toda la República… y **el precio de tu póliza no cambia por manejar en otra ciudad**.» |
+| 15:51 | 16343–44 | Cliente / Bot | «Con placas de estado de México» → «No hay problema… ¿cuáles son tus apellidos paterno y materno?» |
+| 15:52 | 16345–46 | Cliente / Bot | «Cambie de placas / Del estado de México» → «tomamos nota… ¿me compartes tus apellidos…?» |
+
+**Diagnóstico:**
+1. **El cliente se mudó al Estado de México** y pregunta si le respetan el precio cotizado con el CP de Nuevo León. El bot contesta a otra pregunta (si la cobertura vale en otra ciudad) e **ignora el aviso de la KB que tenía delante**. En la práctica le anima a contratar con un CP que no es el de su residencia, y eso puede traerle un **doble deducible en un siniestro**. **Es el riesgo más serio de lo revisado hoy en Recovery.**
+2. **Pide los apellidos dos veces sin que el cliente haya aceptado nada**, y mientras el cliente explica su situación. Es el patrón del `#610`: empuja a datos sin aceptación.
+3. Tampoco le da el precio en ningún momento.
+
+**Propuesta para 16342** (cliente que dice vivir o circular en otro estado, o que cambió las placas):
+> Buena pregunta. Tu seguro te cubre en todo el país, pero el precio se calcula con el código postal de donde vives. Si ahora vives en el Estado de México, tengo que ajustar tu cotización a tu nuevo código postal: si no, en un siniestro Quálitas podría aplicarte doble deducible. ¿Me compartes el código postal de donde vives ahora?
+
+Recotizar con el CP nuevo sin perder la promoción es justo el `#608` (abierto el 14-oct por el caso del Camry). Hasta que exista, el caso pasa a una persona.
+
+**Regla:** si la KB devuelve el fragmento del doble deducible por CP, el bot no puede afirmar que «el precio no cambia».
+
+**Para recuperarlo a mano:** el texto de arriba, y que una persona recotice con el CP nuevo.
