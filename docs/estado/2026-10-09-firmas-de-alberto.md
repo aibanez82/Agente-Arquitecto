@@ -110,3 +110,12 @@ Encargo: `Agente-n8n:handoffs/2026-10-14-A-firmas-orden-prod-591-y-cola.md`. Los
 | domicilio-recibo-609 | Cambio de Alberto | «Intentemos extraer la dirección del comprobante, se la ofrecemos al cliente y que nos la confirme. Como con el VIN y las placas.» La dirección se extrae, se ofrece y solo se guarda con confirmación; si el CP no casa, se aplica el `#608` |
 
 | cp-equivocado-608-texto | Firmado (14 oct, 19:14 UTC) | «Entiendo, tu código postal es otro. Para corregirlo te paso con una persona de nuestro equipo que te atiende por WhatsApp: [enlace]» |
+
+## Undécima tanda (16 oct, noche): bandeja, 00:56 UTC del 17
+
+| Id | Decisión | Qué |
+|---|---|---|
+| a0-con-enlace-543 | sí | Sustituye al a0 del 11 oct: «¡Entonces ya eres cliente! No hace falta contratar otra. Para revisar tu póliza o tu pago te atiende una persona de nuestro equipo por WhatsApp: [enlace]» |
+| recovery-motivo-cancelacion-551 | sí | Recovery (`waq_4498`). Primera respuesta: «Es para tu [VEHÍCULO], el que tenías asegurado con nosotros. Tu póliza anterior ya no está activa, y por eso te mandamos un precio especial para volver a asegurarlo. ¿Te cuento cuánto queda?». Motivo: «Tu póliza anterior del [VEHÍCULO] se canceló el [FECHA] porque quedó un pago pendiente, así que hoy tu auto no tiene seguro vigente. Por eso te mandamos esta promoción: una póliza nueva con [COBERTURA] que empieza el [FECHA_INICIO].» Después, la forma de pago pedida y «¿Te la dejo lista para contratar?». La comparación con la prima anterior (`#394`), marcada como opcional, **queda pendiente de confirmación expresa** |
+
+Encargo: `Agente-n8n:handoffs/2026-10-14-A-firmas-orden-prod-591-y-cola.md`, adenda 13.
