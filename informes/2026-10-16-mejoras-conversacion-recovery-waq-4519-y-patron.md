@@ -125,3 +125,28 @@ Versión con los dos ajustes:
 - **Nunca dar la cifra de `quoted_total` a ojo:** la cotización que se genera puede variar un poco (`waq_4498`: $12,255.98 frente a $12,311.85). La cifra sale de la cotización vigente.
 
 **Para recuperarlo a mano ahora:** mandarle la cotización 4507 y el precio, sin volver a hablar del botón.
+
+## Adenda: `waq_4506` (Volvo XC40 2022, tel …3816), lo pidió Alberto
+- **Póliza anterior:** 7620093433, AMPLIA, $24,668.86, `CANCELA-AUT`.
+- **Plantilla:** enviada a las 15:24 (`quoted_total` $18,257.07). **Pulsó «Ver promo»** (`recovery_solo_contexto: false`); la cotización 4506 se creó a las 16:06.
+- **16:28, fila 16362:** «Si» → `Save_Quotation_Selection`, Amplia anual a $18,329.65 → **fila 16365:**
+  > Continuamos con *Cobertura Amplia, pago anual de $18,329.65 MXN*. Ya tengo tu nombre (Luis Alfredo Marin Lopez), solo confírmame tus apellidos paterno y materno para separarlos bien. Y para seguir, no te preocupes, no hace falta que me des todo junto: vamos paso a paso. Dime también tu fecha de nacimiento (DD/MM/AAAA) y género (M/F).
+- **Desde las 16:28 no ha vuelto a escribir.** Es antes de la avería de cuota, así que no le afecta. **Es el que más lejos llegó de la campaña:** aceptó y entró en `data_capture`.
+
+**Fricción de copy:**
+- Un párrafo denso que pide **tres cosas a la vez** (confirmar la separación de apellidos, la fecha de nacimiento y el género) con un «no hace falta que me des todo junto» metido en medio.
+- Además, la confirmación de apellidos sobra: «Luis Alfredo Marin Lopez» son dos nombres y dos apellidos, y no hay ambigüedad.
+
+**Propuesta:**
+- **Con nombre precargado de 4 palabras** (o 3 o más sin partículas compuestas), separar sin preguntar y pedir solo lo que falta, en lista:
+  > Continuamos con *Cobertura Amplia, pago anual de $18,329.65 MXN*.
+  > Ya tengo tu nombre: *Luis Alfredo Marín López*. Para terminar tus datos solo me falta:
+  > - Fecha de nacimiento (DD/MM/AAAA)
+  > - Género (M/F)
+- **Preguntar la separación solo si es ambigua:** 3 palabras («Juan Pérez García» puede ser un nombre y dos apellidos, o dos nombres y un apellido), o con «de», «del», «de la»:
+  > ¿Tus apellidos son *[AP1] [AP2]*?
+
+**Para recuperarlo a mano:**
+> Hola, Luis Alfredo, seguimos con tu Volvo XC40 2022: Cobertura Amplia a $18,329.65 al año. Para emitir tu póliza solo me falta tu fecha de nacimiento (DD/MM/AAAA) y tu género (M/F).
+
+**Pregunta para el grafo:** en 3 horas no salió ningún seguimiento automático. ¿Las sesiones de Recovery están fuera de los checkpoints de Django, o aquí no había checkpoint porque todavía no se había guardado el grupo 1?
