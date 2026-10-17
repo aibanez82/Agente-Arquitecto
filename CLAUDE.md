@@ -127,7 +127,7 @@ Diagrama completo, observabilidad, JOIN de producción, hitos y detalle de nodos
 
 > Los mantiene el Agente n8n en su repo y **se verifican por `versionId` contra la API, nunca por número de nodos**: dos grafos distintos pueden tener el mismo recuento. Hay uno más, **inactivo, que no se toca**: `#135 CANDIDATO PROD — NO ACTIVAR` (`fqdSLZ5vv2RBtnWE`). `docs/n8n-workflows/` de ESTE repo está **RETIRADO**; el backup automático, descontinuado (`docs/architecture/backup-policy-n8n.md`).
 
-El bot llama a Claude desde **6 sitios**: **AI Agent**, **RAG IA Agent** y **Discount Intent Classifier** (**Sonnet 5**) · **Intent Router** y **Detect Jailbreak** (**Haiku 4.5**) · y **`Extract VIN Vision`**, que **no es nodo de modelo sino un `httpRequest` a `api.anthropic.com`** cuyo modelo sale de `visionModel` en `WA Config` (`#348`): un cambio de modelo se mira ahí, no en el nodo. Ningún otro workflow de PROD llama a un LLM, y ninguno lleva `temperature` (fuera desde el `#270`). n8n escribe a Postgres con la credencial `"Postgres account"`.
+El bot llama a Claude desde **6 sitios**: **AI Agent**, **RAG IA Agent** y **Discount Intent Classifier** (**Sonnet 5.5**, desde el 17 oct) · **Intent Router** y **Detect Jailbreak** (**Haiku 4.5**) · y **`Extract VIN Vision`**, que **no es nodo de modelo sino un `httpRequest` a `api.anthropic.com`** cuyo modelo sale de `visionModel` en `WA Config` (`#348`): un cambio de modelo se mira ahí, no en el nodo. Ningún otro workflow de PROD llama a un LLM, y ninguno lleva `temperature` (fuera desde el `#270`). n8n escribe a Postgres con la credencial `"Postgres account"`.
 
 Nodos concretos, workflow proactivo y detalle: `docs/architecture/data-flow.md` · `docs/protocolos/workflow-proactivo-dashboard.md`.
 
