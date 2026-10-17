@@ -126,6 +126,6 @@ Encargo: `Agente-n8n:handoffs/2026-10-14-A-firmas-orden-prod-591-y-cola.md`, ade
 |---|---|---|
 | recovery-ver-promo-derivacion-551 | sí | La segunda vez que haría falta el botón, o si no se puede contar: «Perdona, parece que el botón no te aparece. Para darte tu precio con la promoción te paso con una persona de nuestro equipo por WhatsApp: [enlace]» |
 | cp-otra-residencia-doble-deducible | sí (con enlace) | Cliente que vive o circula en otro estado, o que cambió las placas: «Buena pregunta. Tu seguro te cubre en todo el país, pero el precio se calcula con el código postal de donde vives. Si ahora vives en otro estado, hay que ajustar tu cotización a tu nuevo código postal: si no, en un siniestro Quálitas podría aplicarte doble deducible. Para hacerlo te atiende una persona de nuestro equipo por WhatsApp: [enlace]». Nunca «el precio no cambia» |
-| recovery-no-a-la-plantilla-551 | sí, **versión por confirmar (A o B)** | Respuesta única a un «No» a la plantilla de Recovery: el motivo de la cancelación y la invitación a ver la cotización |
+| recovery-no-a-la-plantilla-551 | sí → **versión B sin «mejor precio»** (Alberto, 17 oct) | «Entendido, no te insisto. Solo para que lo sepas: tu póliza anterior del [VEHÍCULO] se canceló el [FECHA] porque quedó un pago pendiente, así que hoy tu auto no tiene seguro vigente. Si te interesa quedar cubierto desde el [FECHA_INICIO], dime *Sí* y te mando tu cotización.» Encargo: adenda 16 |
 
 Encargo: `Agente-n8n:handoffs/2026-10-14-A-firmas-orden-prod-591-y-cola.md`, adenda 15.
