@@ -312,6 +312,16 @@ firmada (textos A, B, B sin descuento, C y D).
 
 - **Mensaje de emisión determinista en STG** (bot `387fee41` → `820c08d4`): el grafo compone «emitida exitosamente» con la fila de `qualitas_polizaemitida` del turno y la liga de la API (contado, fraccionado y b1 sin liga); `URL Fidelity Guard` admite esa liga. Arnés 30/30, a mitad de turno 12/12, vivo 6/6. Nodos y cableado comprobados por el Arquitecto en el vivo de STG. **A PROD necesita orden de Alberto (toca emisión)**. Sin ejercitar: emisión real contra Quálitas QA y la respuesta de la API de liga en PROD justo tras emitir.
 
+## Movimientos del 17 oct
+
+- **`#616` cerrado en PROD:** bot `1265f994` → `a090996d` (sesión B, con el «sí» de Alberto). Solo cambia el `queryReplacement` de 11 nodos, que pasa a array. El Arquitecto comprobó que el vivo es igual al candidato y que se conservan los settings. Acreditado con tráfico real: la ejecución 97081 pasó por `Settle Main Reply Sent` con `sent`.
+- **`#617` cerrado en PROD** (`1265f994`, 16 oct): dos nodos Recovery llamaban a una firma de `n8n_outbound_reserve` que solo existe en STG.
+- **`#551` en STG, pendiente:**
+  - Ver promo por texto (adendas 20-22, rama `17aebb03`, 71/71 sin modelo). Firmada (propuesta 39). Le falta el E2E N=1, que espera un participante limpio de Juan.
+  - Textos firmados de Recovery (37, 38 en versión B y 40), la regla del nombre (adendas 23-24) y la baja solo explícita: diseñados, sin construir.
+- **`#551`, hueco hallado:** n8n no escribe `captured_data.recovery_followup`, ni en STG ni en PROD, y no hay políticas `recovery%` en PROD. Los recordatorios Recovery de Django (`#396`) no salen a nadie. Pendiente de decisión de Alberto.
+- **STG frente a PROD (bot):** 76 nodos solo en STG y 55 con diferencia real. Causas: `#608`/`#609`, `#543`, `#577`/llamada, `#285`, guarda de URL y **Sonnet 5.5 en STG frente a Sonnet 5 en PROD**. Plan por causa, mañana.
+
 ## Movimientos del 16 oct
 
 - **`#612` nuevo (alto, A, PROD):** un «gracias» en `data_capture` muere en `Update Phase in DB` (`there is no parameter $4`) y el cliente no recibe respuesta. Lo trajo el viaje 2 del 14 oct (adenda 1 del `#606`) y **sigue en PROD `dcfb7a13`**. Arreglo en STG (`queryReplacement` como array; vivo `676069a3`, comprobado por el Arquitecto); el viaje lleva un solo nodo. Sin caso real medible: PROD no guarda las ejecuciones con error.
