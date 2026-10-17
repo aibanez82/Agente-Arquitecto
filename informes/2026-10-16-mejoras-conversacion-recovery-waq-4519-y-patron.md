@@ -93,3 +93,35 @@ Versión con los dos ajustes:
 > Gracias por avisarme, María del Rosario. En nuestros registros tu póliza 7620093062 del Nissan Kicks aparece cancelada desde el 15 de agosto por un pago pendiente. Si sigues viendo cargos, hay que aclararlo: le paso tu caso a una persona de nuestro equipo para que lo revise contigo por aquí mismo.
 
 **No se le ofrece la promoción** hasta que una persona lo haya aclarado: podría tener otra póliza vigente, o un cargo indebido.
+
+## Adenda: `waq_4507` (Dodge Neon 2000, tel …3207), el bucle de «Ver promo», lo pidió Alberto
+- **Póliza anterior:** 7620085787, AMPLIA, $8,443.14, `CANCELA-AUT` (endoso del 31-ago).
+- **Plantilla:** enviada a las 15:22 con `quoted_total` de $6,976.52. Nunca pulsó «Ver promo».
+
+| Hora | Fila | Quién | Texto |
+|---|---|---|---|
+| 16:14 | 16354 | Cliente | «Sería al año» |
+| 16:14 | 16355 | Bot | «Para darte tu precio con la promoción, toca el botón *Ver promo* del mensaje que te envié y te mando tu cotización al momento.» |
+| 16:18 | 16356–57 | Cliente / Bot | «No me aparece» → **el mismo texto** |
+| 16:25 | 16358–59 | Cliente / Bot | «El precio» → **el mismo texto** |
+| 16:25 | 16360–61 | Cliente / Bot | «No me aparece» → **el mismo texto** (4.ª vez) |
+| 16:39 | 16366 | **Operadora (a mano)** | «Debajo del primer mensaje que te mande, aparece un botón, me apoyas presionando…» |
+| 16:41 | 16367 | Cliente | «**Ese es el msj nada más**» |
+| 16:41–42 | 16368–70 | Bot | Error de cuota, dos veces (avería) |
+
+**Diagnóstico de copy:**
+1. **El cliente no ve el botón**, y lo dice tres veces. Puede ser WhatsApp Web, una versión vieja o que la cabecera de imagen no cargue. Repetirle la instrucción no sirve.
+2. **Pidió el precio dos veces («Sería al año», «El precio») y no lo recibió nunca**, aunque Django ya lo tenía calculado ($6,976.52 en `quoted_total`).
+3. **El mismo texto cuatro veces seguidas.** Choca con la regla de no repetir un mensaje palabra por palabra (firmada el 10-oct en la petición de llamada).
+
+**Propuesta** (encaja con la adenda 20, que ya pide el PDF por texto):
+- **Primer mensaje escrito en vez de pulsar el botón:** se genera la cotización y se manda, sin mencionar el botón:
+  > Claro. Te mando ahora mismo tu cotización con la promoción para tu *[VEHÍCULO]*.
+
+  Al llegar el PDF, el texto con la cifra (estilo L5):
+  > Tu *[VEHÍCULO]* queda en *$[PRECIO_VIGENTE] MXN* al año con Cobertura [COBERTURA]. ¿Te la dejo lista para contratar?
+- **Si técnicamente aún hace falta el botón:** mencionarlo **una sola vez** y dar la salida por texto desde la primera respuesta:
+  > Para darte tu precio, toca *Ver promo* en el mensaje anterior. Si no te aparece, no te preocupes: escríbeme *Sí* y te mando tu cotización por aquí.
+- **Nunca dar la cifra de `quoted_total` a ojo:** la cotización que se genera puede variar un poco (`waq_4498`: $12,255.98 frente a $12,311.85). La cifra sale de la cotización vigente.
+
+**Para recuperarlo a mano ahora:** mandarle la cotización 4507 y el precio, sin volver a hablar del botón.
