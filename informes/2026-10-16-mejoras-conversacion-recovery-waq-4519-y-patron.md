@@ -177,3 +177,42 @@ Recotizar con el CP nuevo sin perder la promoción es justo el `#608` (abierto e
 **Regla:** si la KB devuelve el fragmento del doble deducible por CP, el bot no puede afirmar que «el precio no cambia».
 
 **Para recuperarlo a mano:** el texto de arriba, y que una persona recotice con el CP nuevo.
+
+## Adenda: `waq_4519` continúa (Isidro, Mazda CX-30 2024, tel …2345), lo pidió Alberto
+Revisado a las 21:22 CDMX. La sesión está en `data_capture` y el último mensaje es de las 20:10. Sin póliza.
+
+| Hora | Fila | Quién | Texto |
+|---|---|---|---|
+| 19:12 | 16393 | Operadora (manual, «usted») | «Una disculpa Isidro, ya estamos de vuelta… El vehículo cuya póliza se venció por impago de un recibo es el Mazda CX-30 2024.» |
+| 19:13 | 16394 | Operadora | «Su póliza anterior le costaba $15,816.73. Hoy se la ofrecemos en $13,332.05 (16% menos)…» |
+| 19:36 | 16397–98 | Cliente / Bot | «Hace cuanto se vencio?» → **Ver Promo Copy** («toca el botón *Ver promo*…») |
+| 19:36 | 16399–400 | Cliente / Bot | «Me lo puedes mandar el pago Tri menestral porfa?» → **el mismo Ver Promo Copy** |
+| 19:39 | 16401–04 | Cliente / Bot | «Si pero en pagos trimestrales» → guarda Amplia trimestral ($4,237.18 + 3 × $3,343.97) y pide apellidos ✅ |
+| 20:01 | 16411–14 | Cliente / Bot | «Isidro Cornejo Peralta» → guarda nombre y pide fecha de nacimiento y género ✅ |
+| 20:09 | 16419–20 | Cliente / Bot | «Tú ya cuentas con esos datos» → «No tengo registrada tu fecha de nacimiento ni tu género todavía…» |
+| 20:09 | 16421–22 | Cliente / Bot | «Pero ya contraté seguro contigo antes» → **«Gracias por avisarme, Isidro. ¡Que te vaya muy bien con tu seguro! 🙂»** |
+| 20:10 | 16423–24 | Cliente / Bot | «Como eso es posible que no tengas esos datos» → «…esta es una póliza nueva y necesito confirmar tus datos directamente contigo…» |
+
+**Diagnóstico:**
+1. **16422 despide a un cliente que estaba comprando.** «Ya contraté contigo antes» se leyó como «ya tengo seguro con otro» y salió el cierre de rechazo, justo cuando el cliente ya había elegido el trimestral. En Recovery, «ya contraté con ustedes» es lo esperable: el cliente fue nuestro. El mensaje 16421 no lleva `CTX`, así que no lo contestó el AI Agent. **Arquitecto: ¿qué nodo lo cerró?** Puede ser el Intent Router.
+2. **El Ver Promo Copy salió dos veces 2 h y media después de abrirse la sesión**, después de que la operadora ya había dado el precio. Es el mismo bucle de `waq_4507`, y aquí además tapa dos preguntas reales. 16397 y 16399 tampoco llevan `CTX`, y 16401, tres minutos después, sí. No hay pulsación de botón registrada en `qualitas_whatsappmessage`. **Arquitecto: ¿qué decide el enrutado entre Ver Promo Copy y AI Agent?**
+3. **«¿Hace cuánto se venció?» no se contestó nunca.** Es la misma pregunta que en `waq_4498` («¿desde cuándo?»).
+4. **16420 y 16424 no explican por qué faltan datos.** El cliente cree que ya los tenemos. La precarga solo trae nombre, serie y CP (`grupo1` vacío). Decir qué nos llegó y qué no quita la sospecha.
+5. **La comparación de primas de la operadora (16394)** usa el `payment_term=C`, que no es fiable. Aquí el riesgo es bajo: incluso el trimestral ($14,269.09) queda por debajo de $15,816.73.
+
+**Propuesta para 16422** (Recovery, el cliente dice que ya fue cliente):
+> Sí, Isidro, tu Mazda CX-30 estuvo asegurado con nosotros (póliza 7620094572). De esa póliza me llegaron tu nombre, la serie y tu código postal, pero no tu fecha de nacimiento ni tu género, por eso te los pido. ¿Me los compartes? Fecha (DD/MM/AAAA) y género (M/F).
+
+**Propuesta para 16420 y 16424** (el cliente dice «ya tienes mis datos»):
+> De tu póliza anterior me llegaron tu nombre, la serie de tu Mazda y tu código postal, pero no tu fecha de nacimiento ni tu género. Con esos dos datos sigo: fecha (DD/MM/AAAA) y género (M/F).
+
+**Propuesta para 16398** («¿hace cuánto se venció?», con la frase aprobada por Alberto):
+> Tu póliza anterior del Mazda CX-30 se canceló el 15 de agosto porque quedó un pago pendiente, así que desde entonces tu auto no tiene seguro vigente. Hoy te la dejo en $13,332.05 de contado, o en trimestral con un primer pago de $4,237.18. ¿Cuál prefieres?
+
+La fecha sale del `issued_at` del endoso de cancelación (15-ago), igual que en `waq_4518`. Hay que confirmar que esa es la fecha de cancelación.
+
+**Reglas:**
+- En una sesión con `poliza_anterior_recovery`, «ya contraté contigo / con ustedes / antes» **nunca** dispara el cierre de «ya tengo seguro».
+- Una vez abierta la sesión de Recovery, o si el cliente ya eligió paquete, no vuelve a salir el Ver Promo Copy.
+
+**Para recuperarlo a mano (ahora):** la propuesta para 16422. El cliente quedó molesto, pero a dos datos de la emisión.
